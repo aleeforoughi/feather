@@ -18,6 +18,13 @@ setProjectAnnotations([
   {
     initialGlobals: { theme },
     parameters: { a11y: { test: "error" } },
+    // Let entry animations finish before axe looks: axe cannot judge the contrast of half-faded text, and reports
+    // it as "needs review", not as a violation, so measuring too early hides real problems.
+    async play() {
+      const finite = document.getAnimations().filter((a) => Number.isFinite(a.effect?.getComputedTiming().endTime ?? Infinity))
+      await Promise.all(finite.map((a) => a.finished.catch(() => undefined)))
+      await new Promise((resolve) => setTimeout(resolve, 250))
+    },
     beforeEach(context: Context) {
       const rules = debt[context.id]
       if (!rules) return
