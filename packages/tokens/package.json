@@ -1,0 +1,44 @@
+{
+  "name": "@aleeforoughi/feather-tokens",
+  "version": "1.7.0",
+  "description": "Feather tokens: the feather-tokens/2 schema, the theme engine, the foundation CSS and the reference themes.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/aleeforoughi/feather.git", "directory": "packages/tokens" },
+  "exports": {
+    ".": { "types": "./src/index.d.mts", "default": "./src/index.mjs" },
+    "./foundation.css": "./css/foundation.css",
+    "./fonts/*": "./fonts/*",
+    "./themes/*": "./themes/*",
+    "./schema/*": "./schema/*",
+    "./package.json": "./package.json"
+  },
+  "bin": { "feather-brand": "./bin/feather-brand.mjs" },
+  "files": ["src", "bin", "css", "fonts", "themes", "schema"],
+  "sideEffects": ["*.css"],
+  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource-variable/nunito": "^5.3.0",
+    "@fontsource-variable/outfit": "^5.3.0",
+    "@fontsource-variable/playfair-display": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource-variable/sora": "^5.3.0",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/poppins": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "vitest": "5.0.3"
+  }
+}

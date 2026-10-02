@@ -2,7 +2,7 @@ import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Button } from "./button"
 import { Lightbox, type LightboxImage } from "./lightbox"
-import { SAMPLE_IMAGES } from "@/foundation/sample-images"
+import { SAMPLE_IMAGES } from "../../stories/sample-images"
 
 const meta = {
   title: "Molecules/Lightbox",

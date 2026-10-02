@@ -1,0 +1,22 @@
+packages:
+  - packages/*
+  - apps/*
+
+# A dependency must be public for a day before it can be installed: new releases get time to be
+# pulled or patched first (the rule Feather kept under QOOE).
+minimumReleaseAge: 1440
+
+# Fall back to the newest version old enough instead of failing when the newest is too fresh.
+minimumReleaseAgeStrict: false
+
+onlyBuiltDependencies:
+  - esbuild
+
+# Held at the exact versions Feather 1.7.0 shipped with (qooe-core's package-lock.json), so the L0 move is proven
+# visually identical. Remove after 1.7.0 is published, and take upgrades as their own releases.
+overrides:
+  motion: 13.4.6
+  framer-motion: 13.4.6
+  motion-dom: 13.4.5
+  motion-utils: 13.3.0
+  shadcn: 4.21.0

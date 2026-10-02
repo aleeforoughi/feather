@@ -2,6 +2,7 @@
   "name": "paper-sharp",
   "dark": false,
   "tokens": {
+    "schema": "feather-tokens/2",
     "colors": {
       "background": "#FAF7F2",
       "surface": "#FFFFFF",

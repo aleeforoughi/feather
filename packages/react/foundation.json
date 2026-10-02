@@ -1,7 +1,7 @@
 {
-  "name": "feather-design-system",
+  "name": "@aleeforoughi/feather-react",
   "version": "1.7.0",
-  "tokenSchema": "qooe-tokens/1",
+  "tokenSchema": "feather-tokens/2",
   "themeAxes": {
     "shape": [
       "sharp",

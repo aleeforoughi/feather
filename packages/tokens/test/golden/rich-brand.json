@@ -1,0 +1,24 @@
+{
+  "name": "Acme",
+  "colors": {
+    "primary": "#C2410C",
+    "background": "#FAF7F2",
+    "surface": "#FFFFFF",
+    "text": "#1B1A17",
+    "accent": "#0EA5E9",
+    "border": "#E7E1D8",
+    "destructive": "#B91C1C",
+    "success": "#15803D",
+    "mutedForeground": "#57534E"
+  },
+  "typography": { "fontFamily": { "display": "Poppins", "body": "Figtree" }, "headingWeight": 800 },
+  "shape": "rounded",
+  "density": "spacious",
+  "elevation": "soft",
+  "motion": "snappy",
+  "components": {
+    "button": { "radius": "pill", "fontWeight": 600 },
+    "button.outline": { "borderWidth": "2px", "borderColor": "primary" },
+    "card": { "shadow": "md", "paddingX": 6 }
+  }
+}

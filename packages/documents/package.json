@@ -1,0 +1,8 @@
+{
+  "name": "@aleeforoughi/feather-documents",
+  "private": true,
+  "version": "1.7.0",
+  "description": "Feather for documents: token-themed HTML/CSS templates rendered to PDF or PNG, and the render and verify kit.",
+  "license": "UNLICENSED",
+  "type": "module"
+}

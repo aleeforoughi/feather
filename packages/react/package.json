@@ -1,90 +1,70 @@
 {
-  "name": "feather-design-system",
-  "private": true,
+  "name": "@aleeforoughi/feather-react",
   "version": "1.7.0",
+  "description": "Feather for React: themeable atoms and molecules on Base UI and Tailwind CSS v4, styled only through Feather tokens.",
+  "license": "UNLICENSED",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleeforoughi/feather.git",
+    "directory": "packages/react"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./styles.css",
+    "./foundation.json": "./foundation.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.stories.tsx",
+    "!src/**/*.test.ts",
+    "!src/stories",
+    "styles.css",
+    "foundation.json"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "preview": "vite preview",
-    "brand": "node scripts/apply-brand.mjs",
-    "test": "vitest run --passWithNoTests",
-    "check": "node scripts/check.mjs",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build --quiet",
-    "manifest": "storybook build --quiet && node scripts/foundation-manifest.mjs",
-    "branch": "node scripts/feather-branch.mjs",
-    "hygiene": "node scripts/feather-hygiene.mjs"
+    "build": "rm -rf dist && vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@aleeforoughi/feather-tokens": "workspace:^",
     "@base-ui/react": "^1.8.0",
-    "@fontsource-variable/dm-sans": "^5.3.0",
-    "@fontsource-variable/figtree": "5.3.0",
-    "@fontsource-variable/fraunces": "^5.3.0",
-    "@fontsource-variable/geist": "^5.3.0",
-    "@fontsource-variable/inter": "^5.3.0",
-    "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@fontsource-variable/manrope": "^5.3.0",
-    "@fontsource-variable/nunito": "^5.3.0",
-    "@fontsource-variable/outfit": "^5.3.0",
-    "@fontsource-variable/playfair-display": "^5.3.0",
-    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
-    "@fontsource-variable/sora": "^5.3.0",
-    "@fontsource-variable/space-grotesk": "^5.3.0",
-    "@fontsource/poppins": "5.3.0",
-    "@hookform/resolvers": "^5.9.1",
-    "@tailwindcss/vite": "^4",
-    "@tanstack/react-query": "^5.104.0",
-    "@tanstack/react-router": "1.170.40",
-    "better-auth": "1.7.6",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "lucide-react": "^1.49.0",
     "motion": "^13.4.6",
     "next-themes": "^0.4.6",
-    "openapi-fetch": "0.17.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "react-hook-form": "^7.89.0",
     "shadcn": "^4.21.0",
     "sonner": "^2.0.8",
-    "tailwindcss": "^4",
-    "tw-animate-css": "^1.4.0",
-    "zod": "^4.6.5"
+    "tw-animate-css": "^1.4.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^5.3.1",
-    "@eslint/js": "^10",
-    "@storybook/addon-a11y": "^10.6.1",
-    "@storybook/addon-docs": "^10.6.1",
-    "@storybook/addon-mcp": "^10.6.1",
-    "@storybook/addon-vitest": "^10.6.1",
-    "@storybook/react-vite": "^10.6.1",
-    "@testing-library/jest-dom": "^7.0.1",
-    "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.7",
-    "@types/node": "^24",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^6",
-    "@vitest/browser-playwright": "5.0.3",
-    "@vitest/coverage-v8": "5.0.3",
-    "eslint": "^10",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.7",
-    "globals": "^17",
-    "jsdom": "^30.1.1",
-    "playwright": "1.63.0",
-    "prettier": "^3.9.9",
-    "prettier-plugin-tailwindcss": "^0.8.1",
-    "storybook": "^10.6.1",
-    "typescript": "~6.0.2",
-    "typescript-eslint": "^8",
-    "vite": "^8",
-    "vitest": "^5.0.3"
-  },
-  "description": "Feather \u2014 QOOE's themeable master design system"
+    "@storybook/react-vite": "10.6.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "storybook": "10.6.1",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.1",
+    "vitest": "5.0.3"
+  }
 }

@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion } from "motion/react"
 import { cn } from "cn"
 
-import { useThemeMotion } from "@/lib/motion"
+import { useThemeMotion } from "../../lib/motion"
 
 /** Where a step stands. */
 export type StepStatus = "pending" | "active" | "done" | "blocked"

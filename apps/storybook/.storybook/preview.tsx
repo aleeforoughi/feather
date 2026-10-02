@@ -1,34 +1,26 @@
-import "./process-shim"
 import { useLayoutEffect } from "react"
 import type { Decorator, Preview } from "@storybook/react-vite"
-import "../src/index.css"
-import "@fontsource-variable/sora"
-import "@fontsource-variable/inter"
-import "@fontsource-variable/fraunces"
-import "@fontsource-variable/dm-sans"
-import { buildTheme } from "../scripts/apply-brand.mjs"
-import voidPill from "../themes/void-pill.json"
-import paperSharp from "../themes/paper-sharp.json"
-import { FoundationProviders } from "../src/foundation/providers"
+import "./preview.css"
+import "@aleeforoughi/feather-tokens/fonts/sora.css"
+import "@aleeforoughi/feather-tokens/fonts/inter.css"
+import "@aleeforoughi/feather-tokens/fonts/fraunces.css"
+import "@aleeforoughi/feather-tokens/fonts/dm-sans.css"
+import { buildTheme, type BrandTokens } from "@aleeforoughi/feather-tokens"
+import voidPill from "@aleeforoughi/feather-tokens/themes/void-pill.json"
+import paperSharp from "@aleeforoughi/feather-tokens/themes/paper-sharp.json"
+// From source, not the package build: the stories import their components from source, and providers must be
+// the same module instances as the components that read them.
+import { FeatherProvider } from "../../../packages/react/src/provider"
 
-type Tokens = {
-  colors: Record<string, string>
-  typography: { fontFamily: { display: string; body: string } }
-  shape: string
-  density: string
-  elevation: string
-  motion: string
-}
-
-/** Reference themes (themes/*.json): built by the same engine that produces src/styles/brand.css in
- * production, and checked by scripts/feather-hygiene.mjs on every Feather release. */
-const THEMES: Record<string, { dark: boolean; tokens: Tokens } | null> = {
+/** Reference themes (@aleeforoughi/feather-tokens/themes): built by the same engine that writes a product's
+ * brand.css, and checked by scripts/feather-hygiene.mjs on every Feather release. */
+const THEMES: Record<string, { dark: boolean; tokens: BrandTokens } | null> = {
   neutral: null,
-  "void-pill": voidPill,
-  "paper-sharp": paperSharp,
+  "void-pill": voidPill as { dark: boolean; tokens: BrandTokens },
+  "paper-sharp": paperSharp as { dark: boolean; tokens: BrandTokens },
 }
 
-const STYLE_ID = "qooe-storybook-theme"
+const STYLE_ID = "feather-storybook-theme"
 
 function ThemeApplier({ name }: { name: string }) {
   useLayoutEffect(() => {
@@ -51,12 +43,12 @@ function ThemeApplier({ name }: { name: string }) {
 }
 
 const withFoundation: Decorator = (Story, context) => (
-  <FoundationProviders>
+  <FeatherProvider>
     <ThemeApplier name={String(context.globals.theme ?? "neutral")} />
     <div className="bg-background p-6 text-foreground">
       <Story />
     </div>
-  </FoundationProviders>
+  </FeatherProvider>
 )
 
 const preview: Preview = {

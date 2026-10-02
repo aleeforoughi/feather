@@ -3,7 +3,7 @@ import { motion } from "motion/react"
 import { ImagesIcon } from "lucide-react"
 import { cn } from "cn"
 
-import { useThemeMotion } from "@/lib/motion"
+import { useThemeMotion } from "../../lib/motion"
 import { Lightbox, lightboxChecker, type LightboxImage } from "./lightbox"
 
 export type MediaGallerySection = { key: string; title: string; items: LightboxImage[] }

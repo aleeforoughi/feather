@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "motion/react"
 import { ArrowDownIcon } from "lucide-react"
 import { cn } from "cn"
 
-import { useThemeMotion } from "@/lib/motion"
+import { useThemeMotion } from "../../lib/motion"
 
 /** How an activity line reads: routine, good news, a warning, a failure, or a question for the user. */
 export type ActivityTone = "info" | "good" | "warn" | "bad" | "ask"

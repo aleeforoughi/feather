@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { SAMPLE_IMAGES } from "@/foundation/sample-images"
+import { SAMPLE_IMAGES } from "../../stories/sample-images"
 import { MediaGallery } from "./media-gallery"
 
 const meta = {

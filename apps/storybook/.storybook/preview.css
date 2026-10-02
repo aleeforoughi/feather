@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "@aleeforoughi/feather-react/styles.css";
+
+/* The stories' own layout classes. */
+@source "../../../packages/react/src/**/*.stories.tsx";

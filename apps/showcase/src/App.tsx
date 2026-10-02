@@ -1,6 +1,6 @@
-import { Showcase } from "@/foundation/Showcase"
+import { Showcase } from "./Showcase"
 
-/** The foundation's own app is the design-system sheet. Products replace this with their pages. */
+/** The showcase: every Feather component in its main variants, themed from brand/tokens.json. */
 export default function App() {
   return <Showcase />
 }

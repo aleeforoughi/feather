@@ -1,0 +1,15 @@
+/* Feather for React: everything a product's Tailwind CSS v4 stylesheet needs, after `@import "tailwindcss"`.
+ *
+ *   @import "tailwindcss";
+ *   @import "@aleeforoughi/feather-react/styles.css";
+ *   @import "./styles/brand-fonts.css";   (written by feather-brand)
+ *   @import "./styles/brand.css";         (written by feather-brand)
+ */
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@aleeforoughi/feather-tokens/foundation.css";
+
+/* Generate the utilities Feather's components use. */
+@source "./src";
+@source not "./src/**/*.stories.tsx";
+@source not "./src/**/*.test.ts";

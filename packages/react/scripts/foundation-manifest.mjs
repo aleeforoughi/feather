@@ -1,14 +1,14 @@
 // Writes foundation.json: a machine-readable catalogue of the foundation (components, exports, slots, stories, theme axes).
-// Run after `storybook build` (needs storybook-static/index.json).
+// Run after the Storybook build (needs apps/storybook/storybook-static/index.json): `pnpm manifest` from the repo root.
 import fs from "node:fs"
 import path from "node:path"
-import { DENSITY, ELEVATION, FONTS, MOTION, SHAPES } from "./apply-brand.mjs"
+import { DENSITY, ELEVATION, FONTS, MOTION, SHAPES, TOKEN_SCHEMA } from "@aleeforoughi/feather-tokens"
 
 const root = path.resolve(import.meta.dirname, "..")
 const uiDir = path.join(root, "src/components/ui")
-const indexPath = path.join(root, "storybook-static/index.json")
+const indexPath = path.resolve(root, "../../apps/storybook/storybook-static/index.json")
 if (!fs.existsSync(indexPath)) {
-  console.error("storybook-static/index.json not found. Run `storybook build` first.")
+  console.error("apps/storybook/storybook-static/index.json not found. Run `pnpm build-storybook` first.")
   process.exit(1)
 }
 
@@ -60,7 +60,7 @@ const components = fs
 const manifest = {
   name: pkg.name,
   version: pkg.version,
-  tokenSchema: "qooe-tokens/1",
+  tokenSchema: TOKEN_SCHEMA,
   themeAxes: {
     shape: Object.keys(SHAPES),
     density: Object.keys(DENSITY),

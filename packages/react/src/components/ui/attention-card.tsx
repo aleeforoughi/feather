@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion } from "motion/react"
 import { cn } from "cn"
 
-import { useThemeMotion } from "@/lib/motion"
+import { useThemeMotion } from "../../lib/motion"
 
 /**
  * A rare, important question for the user — it pulses until answered, with the choice on the card.

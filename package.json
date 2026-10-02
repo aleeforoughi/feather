@@ -1,0 +1,33 @@
+{
+  "name": "feather",
+  "private": true,
+  "version": "1.7.0",
+  "description": "Feather, the first liquid design system: semantics in, the right experience out.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "build": "pnpm -r --filter \"./packages/**\" build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "test": "pnpm -r test",
+    "hygiene": "node scripts/feather-hygiene.mjs",
+    "storybook": "pnpm --filter @feather-apps/storybook dev",
+    "build-storybook": "pnpm --filter @feather-apps/storybook build",
+    "manifest": "pnpm build-storybook && node packages/react/scripts/foundation-manifest.mjs",
+    "test:a11y": "pnpm --filter @feather-apps/storybook test:a11y",
+    "test:visual": "pnpm --filter @feather-apps/storybook test:visual",
+    "format": "prettier --write \"**/*.{ts,tsx}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.11.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.13.0",
+    "prettier": "3.9.9",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0"
+  }
+}

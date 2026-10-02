@@ -2,6 +2,7 @@
   "name": "void-pill",
   "dark": true,
   "tokens": {
+    "schema": "feather-tokens/2",
     "colors": {
       "background": "#050505",
       "surface": "#141614",

@@ -1,8 +1,7 @@
-// Feather hygiene — the gate every Feather release passes before Bootstrap may ship it.
+// Feather hygiene — the gate every Feather release passes before it ships.
 //
-// Bootstrap owns Feather's upgrades, and owns keeping it clean: an upgrade must not duplicate what
-// exists, conflict with it, or leave a token, mapping or component unconnected. This checks the whole
-// system, not only the change, so drift from earlier releases is caught too:
+// An upgrade must not duplicate what exists, conflict with it, or leave a token, mapping or component
+// unconnected. This checks the whole system, not only the change, so drift from earlier releases is caught too:
 //
 //   tokens     every semantic token is defined once per scope, has a dark value, is mapped into Tailwind,
 //              and is written by the theme engine (or a brand theme would leak neutral values)
@@ -11,14 +10,22 @@
 //   components every atom has stories, one data-slot owner, no raw colors, no near-duplicate name,
 //              no duplicate export; the manifest lists exactly the atoms that exist
 //   themes     every reference theme compiles and reads (WCAG AA text, contrasting primary text)
-//   release    fonts are installed, version / manifest / changelog agree
+//   release    fonts are installed, every package / manifest / changelog agrees on the version
+//   packaging  published source has no "@/" alias imports, the package entry exports every component,
+//              every stylesheet import is a dependency of its package
 //
 // Deterministic: no network, no dependencies. Exit 1 with every problem listed.
 import fs from "node:fs"
 import path from "node:path"
-import { buildTheme, FONTS, contrastRatio } from "./apply-brand.mjs"
+import { buildTheme, FONTS, TOKEN_SCHEMA, contrastRatio, fontImports as buildFontImports } from "../packages/tokens/src/index.mjs"
 
-const UI = "src/components/ui"
+const TOKENS = "packages/tokens"
+const REACT = "packages/react"
+const UI = `${REACT}/src/components/ui`
+const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
+const STYLES_CSS = `${REACT}/styles.css`
+/** Packages released together, at one version. */
+const RELEASED = [TOKENS, REACT, "packages/documents"]
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 
@@ -31,7 +38,7 @@ export function hygiene(root = ".") {
   const at = (p) => path.join(root, p)
   const problems = []
   const notes = []
-  const css = read(at("src/index.css"))
+  const css = read(at(FOUNDATION_CSS))
 
   // ── tokens ────────────────────────────────────────────────────────────────────────────────────
   const block = (selector) => {
@@ -41,7 +48,7 @@ export function hygiene(root = ".") {
   const decls = (body) => [...body.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()])
   const scopes = { ":root": decls(block(":root")), ".dark": decls(block(".dark")), "@theme inline": decls(block("@theme inline")) }
   for (const [scope, list] of Object.entries(scopes)) {
-    if (list.length === 0) problems.push(`src/index.css has no ${scope} block`)
+    if (list.length === 0) problems.push(`${FOUNDATION_CSS} has no ${scope} block`)
     const seen = new Map()
     for (const [name, value] of list) {
       if (seen.has(name)) problems.push(`${scope} defines ${name} twice (${seen.get(name)} / ${value}) — conflicting values`)
@@ -78,7 +85,7 @@ export function hygiene(root = ".") {
   for (const n of semantic) if (!written.has(n)) problems.push(`the theme engine never writes ${n} — every brand would keep the neutral value`)
 
   // Every token the engine writes must be read by something.
-  const sources = walk(at("src")).filter((f) => /\.(tsx?|css)$/.test(f) && !f.endsWith(path.join("styles", "brand.css")))
+  const sources = [...walk(at(`${REACT}/src`)), at(FOUNDATION_CSS), at(STYLES_CSS)].filter((f) => /\.(tsx?|css)$/.test(f))
   const corpus = sources.map(read).join("\n")
   for (const n of written) {
     if (semantic.has(n) || TAILWIND_NATIVE.test(n)) continue
@@ -127,29 +134,57 @@ export function hygiene(root = ".") {
     if (!atoms.includes(story.slice(0, -12))) problems.push(`${story} documents a component that does not exist`)
   }
 
-  // ── release ───────────────────────────────────────────────────────────────────────────────────
-  const pkg = JSON.parse(read(at("package.json")))
-  const deps = { ...pkg.dependencies, ...pkg.devDependencies }
-  for (const [family, dep] of Object.entries(FONTS)) if (!deps[dep]) problems.push(`font ${family} is offered by the theme engine but ${dep} is not installed`)
-  for (const m of css.matchAll(/@import\s+"([^".][^"]*)"/g)) {
-    const dep = m[1].startsWith("@") ? m[1].split("/").slice(0, 2).join("/") : m[1].split("/")[0]
-    if (!deps[dep]) problems.push(`src/index.css imports ${m[1]} but ${dep} is not a dependency`)
+  // ── packaging ─────────────────────────────────────────────────────────────────────────────────
+  const json = (p) => JSON.parse(read(at(p)))
+  const tokensPkg = json(`${TOKENS}/package.json`)
+  const reactPkg = json(`${REACT}/package.json`)
+  const runtimeDeps = (p) => ({ ...p.dependencies, ...p.peerDependencies })
+  for (const [family, dep] of Object.entries(FONTS)) {
+    if (!tokensPkg.dependencies?.[dep]) problems.push(`font ${family} is offered by the theme engine but ${dep} is not a dependency of ${tokensPkg.name}`)
+    for (const file of fontFiles(family)) if (!exists(at(`${TOKENS}/${file}`))) problems.push(`font ${family} has no ${TOKENS}/${file} — products could not load it`)
   }
-  if (exists(at("foundation.json"))) {
-    const manifest = JSON.parse(read(at("foundation.json")))
-    if (manifest.version !== pkg.version) problems.push(`foundation.json is ${manifest.version} but package.json is ${pkg.version} — regenerate the manifest`)
+  // A stylesheet a product imports may only import what its own package depends on (or its own files).
+  for (const [file, pkg] of [[FOUNDATION_CSS, tokensPkg], [STYLES_CSS, reactPkg], ...walk(at(`${TOKENS}/fonts`)).map((f) => [path.relative(root, f), tokensPkg])]) {
+    for (const m of read(at(file)).replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/@import\s+"([^".][^"]*)"/g)) {
+      const dep = m[1].startsWith("@") ? m[1].split("/").slice(0, 2).join("/") : m[1].split("/")[0]
+      if (dep !== "tailwindcss" && !runtimeDeps(pkg)[dep]) problems.push(`${file} imports ${m[1]} but ${dep} is not a dependency of ${pkg.name}`)
+    }
+  }
+  // Every module the components import must be a runtime dependency, or products would not install it.
+  for (const file of walk(at(`${REACT}/src`)).filter((f) => /\.tsx?$/.test(f) && !/\.(stories|test)\.tsx?$/.test(f) && !f.includes(`${path.sep}stories${path.sep}`))) {
+    const body = read(file)
+    if (/from\s+"@\//.test(body)) problems.push(`${path.relative(root, file)} imports through the "@/" alias — published type declarations cannot resolve it; use a relative import`)
+    for (const m of body.matchAll(/from\s+"([^".][^"]*)"/g)) {
+      const dep = m[1].startsWith("@") ? m[1].split("/").slice(0, 2).join("/") : m[1].split("/")[0]
+      if (!runtimeDeps(reactPkg)[dep]) problems.push(`${path.relative(root, file)} imports ${m[1]} but ${dep} is not a dependency of ${reactPkg.name}`)
+    }
+  }
+  const entry = read(at(`${REACT}/src/index.ts`))
+  for (const atom of atoms) if (!entry.includes(`"./components/ui/${atom}"`)) problems.push(`${REACT}/src/index.ts does not export ${atom} — products cannot import it`)
+
+  // ── release ───────────────────────────────────────────────────────────────────────────────────
+  const pkg = json("package.json")
+  for (const dir of RELEASED) {
+    const p = json(`${dir}/package.json`)
+    if (p.version !== pkg.version) problems.push(`${p.name} is ${p.version} but Feather is ${pkg.version} — packages release together`)
+  }
+  const manifestPath = `${REACT}/foundation.json`
+  if (exists(at(manifestPath))) {
+    const manifest = JSON.parse(read(at(manifestPath)))
+    if (manifest.version !== pkg.version) problems.push(`${manifestPath} is ${manifest.version} but Feather is ${pkg.version} — regenerate the manifest (pnpm manifest)`)
+    if (manifest.tokenSchema !== TOKEN_SCHEMA) problems.push(`${manifestPath} declares token schema ${manifest.tokenSchema}, but the engine writes ${TOKEN_SCHEMA} — regenerate the manifest`)
     const listed = (manifest.components ?? []).map((c) => (typeof c === "string" ? c : c.name ?? c.id)).map((n) => String(n).toLowerCase().replace(/\s+/g, "-")).sort()
     const missing = atoms.filter((a) => !listed.includes(a))
     const extra = listed.filter((n) => !atoms.includes(n))
-    if (missing.length || extra.length) problems.push(`foundation.json is out of sync with the atoms (missing: ${missing.join(", ") || "none"}; no longer exist: ${extra.join(", ") || "none"})`)
-  } else problems.push("foundation.json is missing — run `npm run manifest`")
+    if (missing.length || extra.length) problems.push(`${manifestPath} is out of sync with the atoms (missing: ${missing.join(", ") || "none"}; no longer exist: ${extra.join(", ") || "none"})`)
+  } else problems.push(`${manifestPath} is missing — run \`pnpm manifest\``)
   if (!/^\d+\.\d+\.\d+$/.test(pkg.version)) problems.push(`package.json version ${pkg.version} is not semver`)
   if (!exists(at("CHANGELOG.md")) || !read(at("CHANGELOG.md")).includes(`## ${pkg.version}`)) problems.push(`CHANGELOG.md has no entry for ${pkg.version}`)
 
   // ── themes ────────────────────────────────────────────────────────────────────────────────────
-  const themeDir = at("themes")
+  const themeDir = at(`${TOKENS}/themes`)
   const themes = exists(themeDir) ? fs.readdirSync(themeDir).filter((f) => f.endsWith(".json")) : []
-  if (themes.length < 2) problems.push("fewer than two reference themes in themes/ — upgrades cannot be proven themeable")
+  if (themes.length < 2) problems.push(`fewer than two reference themes in ${TOKENS}/themes — upgrades cannot be proven themeable`)
   for (const file of themes) {
     const theme = JSON.parse(read(path.join(themeDir, file)))
     const built = buildTheme(theme.tokens ?? {})
@@ -168,6 +203,11 @@ export function hygiene(root = ".") {
   return { ok: problems.length === 0, problems, notes }
 }
 
+/** The files in this package a font's stylesheet import points at ("fonts/inter.css"). */
+function fontFiles(family) {
+  return buildFontImports(family).map((spec) => spec.replace(/^@aleeforoughi\/feather-tokens\//, ""))
+}
+
 function walk(dir) {
   return exists(dir) ? fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)])) : []
 }
@@ -181,7 +221,7 @@ function distance(a, b) {
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)
 if (isMain) {
-  const result = hygiene(".")
+  const result = hygiene(path.resolve(import.meta.dirname, ".."))
   if (!result.ok) {
     console.log(`Feather hygiene failed (${result.problems.length}):\n- ${result.problems.join("\n- ")}`)
     process.exit(1)

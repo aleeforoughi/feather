@@ -1,8 +1,8 @@
 import * as React from "react"
 import { cn } from "cn"
 
-import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "./avatar"
+import { Badge } from "./badge"
 
 /** What a person or agent is doing right now. */
 export type RoleState = "idle" | "working" | "waiting" | "done"

@@ -3,12 +3,12 @@ import { createRoot } from "react-dom/client"
 
 import "./index.css"
 import App from "./App"
-import { FoundationProviders } from "@/foundation/providers"
+import { FeatherProvider } from "@aleeforoughi/feather-react"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <FoundationProviders>
+    <FeatherProvider>
       <App />
-    </FoundationProviders>
+    </FeatherProvider>
   </StrictMode>
 )

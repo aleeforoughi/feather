@@ -1,10 +1,10 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
-/* Product identity (layer 3): generated from brand/tokens.json by scripts/apply-brand.mjs. */
-@import "./styles/brand-fonts.css";
-@import "./styles/brand.css";
+/* Feather foundation tokens: the neutral theme every brand reshapes.
+ *
+ * Tier 2 of Feather's tokens (semantic roles: --primary, --card, --muted…), in light (:root) and dark (.dark), and
+ * their Tailwind mapping (@theme inline: bg-primary, text-success…). A brand overrides them with the CSS that
+ * feather-brand writes from its tokens, which uses a stronger selector (:root:root), so import order does not
+ * matter. Import inside a Tailwind CSS v4 stylesheet, after `@import "tailwindcss"`. */
+@import "../fonts/geist.css";
 
 @custom-variant dark (&:is(.dark *));
 

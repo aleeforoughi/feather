@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aleeforoughi/feather/schema/feather-tokens-2.json",
+  "title": "Feather brand tokens (feather-tokens/2)",
+  "description": "A brand, as Feather themes it. The theme engine (buildTheme) is the authority and reports readable problems; this schema is for editors and documentation. qooe-tokens/1 documents (no schema field) migrate to this unchanged.",
+  "type": "object",
+  "required": [
+    "colors",
+    "typography"
+  ],
+  "properties": {
+    "schema": {
+      "const": "feather-tokens/2"
+    },
+    "name": {
+      "type": "string"
+    },
+    "colors": {
+      "type": "object",
+      "required": [
+        "primary",
+        "background",
+        "surface",
+        "text"
+      ],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "background": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "surface": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "border": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "destructive": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "success": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "warning": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "info": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "primaryText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "successText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "warningText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "infoText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "mutedForeground": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        }
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+      }
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "fontFamily": {
+          "type": "object",
+          "properties": {
+            "display": {
+              "enum": [
+                "Geist",
+                "Inter",
+                "Sora",
+                "Space Grotesk",
+                "DM Sans",
+                "Plus Jakarta Sans",
+                "Outfit",
+                "Fraunces",
+                "Manrope",
+                "Nunito",
+                "Playfair Display",
+                "JetBrains Mono",
+                "Figtree",
+                "Poppins"
+              ]
+            },
+            "body": {
+              "enum": [
+                "Geist",
+                "Inter",
+                "Sora",
+                "Space Grotesk",
+                "DM Sans",
+                "Plus Jakarta Sans",
+                "Outfit",
+                "Fraunces",
+                "Manrope",
+                "Nunito",
+                "Playfair Display",
+                "JetBrains Mono",
+                "Figtree",
+                "Poppins"
+              ]
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "display"
+              ]
+            },
+            {
+              "required": [
+                "body"
+              ]
+            }
+          ]
+        },
+        "headingWeight": {
+          "enum": [
+            100,
+            200,
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900
+          ]
+        },
+        "scale": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "fontFamily"
+      ]
+    },
+    "spacing": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "radius": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "shape": {
+      "enum": [
+        "sharp",
+        "soft",
+        "rounded",
+        "pill"
+      ],
+      "default": "soft"
+    },
+    "density": {
+      "enum": [
+        "compact",
+        "comfortable",
+        "spacious"
+      ],
+      "default": "comfortable"
+    },
+    "elevation": {
+      "enum": [
+        "flat",
+        "soft",
+        "dramatic"
+      ],
+      "default": "soft"
+    },
+    "motion": {
+      "enum": [
+        "calm",
+        "snappy"
+      ],
+      "default": "calm"
+    },
+    "voice": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "components": {
+      "description": "Component tokens: per data-slot (\"button\") or per variant (\"button.outline\").",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z-]{1,40}(\\.[a-z][a-z0-9-]{0,30})?$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "radius": {
+            "anyOf": [
+              {
+                "enum": [
+                  "sharp",
+                  "soft",
+                  "rounded",
+                  "pill"
+                ]
+              },
+              {
+                "type": "string",
+                "pattern": "^\\d+(\\.\\d+)?(px|rem)$"
+              }
+            ]
+          },
+          "borderWidth": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d+)?px$"
+          },
+          "shadow": {
+            "enum": [
+              "none",
+              "xs",
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ]
+          },
+          "fontWeight": {
+            "enum": [
+              100,
+              200,
+              300,
+              400,
+              500,
+              600,
+              700,
+              800,
+              900,
+              "100",
+              "200",
+              "300",
+              "400",
+              "500",
+              "600",
+              "700",
+              "800",
+              "900"
+            ]
+          },
+          "letterSpacing": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d+)?em$"
+          },
+          "textTransform": {
+            "enum": [
+              "none",
+              "uppercase",
+              "lowercase",
+              "capitalize"
+            ]
+          },
+          "fontFamily": {
+            "enum": [
+              "display",
+              "body"
+            ]
+          },
+          "paddingX": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 16
+          },
+          "height": {
+            "type": "number",
+            "minimum": 4,
+            "maximum": 24
+          },
+          "background": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+              },
+              {
+                "enum": [
+                  "primary",
+                  "background",
+                  "surface",
+                  "text",
+                  "accent",
+                  "muted",
+                  "border",
+                  "destructive"
+                ]
+              }
+            ]
+          },
+          "foreground": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+              },
+              {
+                "enum": [
+                  "primary",
+                  "background",
+                  "surface",
+                  "text",
+                  "accent",
+                  "muted",
+                  "border",
+                  "destructive"
+                ]
+              }
+            ]
+          },
+          "borderColor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+              },
+              {
+                "enum": [
+                  "primary",
+                  "background",
+                  "surface",
+                  "text",
+                  "accent",
+                  "muted",
+                  "border",
+                  "destructive"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

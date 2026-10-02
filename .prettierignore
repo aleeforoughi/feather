@@ -1,7 +1,8 @@
 node_modules/
 coverage/
+dist/
+storybook-static/
 .pnpm-store/
 pnpm-lock.yaml
-package-lock.json
-pnpm-lock.yaml
-yarn.lock
+legacy/
+packages/documents/
