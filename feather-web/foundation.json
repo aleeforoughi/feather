@@ -1,0 +1,888 @@
+{
+  "name": "feather-design-system",
+  "version": "1.7.0",
+  "tokenSchema": "qooe-tokens/1",
+  "themeAxes": {
+    "shape": [
+      "sharp",
+      "soft",
+      "rounded",
+      "pill"
+    ],
+    "density": [
+      "compact",
+      "comfortable",
+      "spacious"
+    ],
+    "elevation": [
+      "flat",
+      "soft",
+      "dramatic"
+    ],
+    "motion": [
+      "calm",
+      "snappy"
+    ]
+  },
+  "fonts": [
+    "DM Sans",
+    "Figtree",
+    "Fraunces",
+    "Geist",
+    "Inter",
+    "JetBrains Mono",
+    "Manrope",
+    "Nunito",
+    "Outfit",
+    "Playfair Display",
+    "Plus Jakarta Sans",
+    "Poppins",
+    "Sora",
+    "Space Grotesk"
+  ],
+  "components": [
+    {
+      "name": "accordion",
+      "level": "atom",
+      "file": "src/components/ui/accordion.tsx",
+      "exports": [
+        "Accordion",
+        "AccordionContent",
+        "AccordionItem",
+        "AccordionTrigger"
+      ],
+      "slots": [
+        "accordion",
+        "accordion-content",
+        "accordion-item",
+        "accordion-trigger",
+        "accordion-trigger-icon"
+      ],
+      "stories": [
+        "Default",
+        "Multiple",
+        "Open By Default"
+      ]
+    },
+    {
+      "name": "activity-feed",
+      "level": "molecule",
+      "file": "src/components/ui/activity-feed.tsx",
+      "exports": [
+        "ActivityFeed",
+        "ActivityItem",
+        "LiveDot",
+        "TypedText",
+        "WorkingDots"
+      ],
+      "slots": [
+        "activity-feed",
+        "activity-feed-latest",
+        "activity-item",
+        "activity-item-detail",
+        "activity-item-time",
+        "live-dot",
+        "working-dots"
+      ],
+      "stories": [
+        "Empty",
+        "Live",
+        "Tones"
+      ]
+    },
+    {
+      "name": "alert",
+      "level": "atom",
+      "file": "src/components/ui/alert.tsx",
+      "exports": [
+        "Alert",
+        "AlertAction",
+        "AlertDescription",
+        "AlertTitle"
+      ],
+      "slots": [
+        "alert",
+        "alert-action",
+        "alert-description",
+        "alert-title"
+      ],
+      "stories": [
+        "Default",
+        "Destructive",
+        "With Button"
+      ]
+    },
+    {
+      "name": "attention-card",
+      "level": "molecule",
+      "file": "src/components/ui/attention-card.tsx",
+      "exports": [
+        "AttentionCard"
+      ],
+      "slots": [
+        "attention-card",
+        "attention-card-actions",
+        "attention-card-icon",
+        "attention-card-title"
+      ],
+      "stories": [
+        "Danger",
+        "Default"
+      ]
+    },
+    {
+      "name": "avatar",
+      "level": "atom",
+      "file": "src/components/ui/avatar.tsx",
+      "exports": [
+        "Avatar",
+        "AvatarBadge",
+        "AvatarFallback",
+        "AvatarGroup",
+        "AvatarGroupCount",
+        "AvatarImage"
+      ],
+      "slots": [
+        "avatar",
+        "avatar-badge",
+        "avatar-fallback",
+        "avatar-group",
+        "avatar-group-count",
+        "avatar-image"
+      ],
+      "stories": [
+        "Default",
+        "Fallback",
+        "Group",
+        "Sizes",
+        "With Badge"
+      ]
+    },
+    {
+      "name": "badge",
+      "level": "atom",
+      "file": "src/components/ui/badge.tsx",
+      "exports": [
+        "Badge",
+        "badgeVariants"
+      ],
+      "slots": [],
+      "stories": [
+        "Default",
+        "Destructive",
+        "Ghost",
+        "Link",
+        "Outline",
+        "Secondary",
+        "With Icon"
+      ]
+    },
+    {
+      "name": "breadcrumb",
+      "level": "atom",
+      "file": "src/components/ui/breadcrumb.tsx",
+      "exports": [
+        "Breadcrumb",
+        "BreadcrumbEllipsis",
+        "BreadcrumbItem",
+        "BreadcrumbLink",
+        "BreadcrumbList",
+        "BreadcrumbPage",
+        "BreadcrumbSeparator"
+      ],
+      "slots": [
+        "breadcrumb",
+        "breadcrumb-ellipsis",
+        "breadcrumb-item",
+        "breadcrumb-list",
+        "breadcrumb-page",
+        "breadcrumb-separator"
+      ],
+      "stories": [
+        "Default",
+        "With Ellipsis"
+      ]
+    },
+    {
+      "name": "budget-bar",
+      "level": "molecule",
+      "file": "src/components/ui/budget-bar.tsx",
+      "exports": [
+        "BudgetBar",
+        "budgetGeometry",
+        "budgetZone",
+        "DEFAULT_TARGET_SHARE"
+      ],
+      "slots": [
+        "budget-bar",
+        "budget-bar-caption",
+        "budget-bar-fill",
+        "budget-bar-marker",
+        "budget-bar-overshoot",
+        "budget-bar-reserved",
+        "budget-bar-track"
+      ],
+      "stories": [
+        "Hot",
+        "Mini",
+        "Ok",
+        "Over",
+        "Storage",
+        "Warm",
+        "With Reserved"
+      ]
+    },
+    {
+      "name": "button",
+      "level": "atom",
+      "file": "src/components/ui/button.tsx",
+      "exports": [
+        "Button",
+        "buttonVariants"
+      ],
+      "slots": [
+        "button"
+      ],
+      "stories": [
+        "Default",
+        "Destructive",
+        "Disabled",
+        "Ghost",
+        "Icon Only",
+        "Large",
+        "Link",
+        "Outline",
+        "Secondary",
+        "Small",
+        "With Icon"
+      ]
+    },
+    {
+      "name": "card",
+      "level": "atom",
+      "file": "src/components/ui/card.tsx",
+      "exports": [
+        "Card",
+        "CardAction",
+        "CardContent",
+        "CardDescription",
+        "CardFooter",
+        "CardHeader",
+        "CardTitle"
+      ],
+      "slots": [
+        "card",
+        "card-action",
+        "card-content",
+        "card-description",
+        "card-footer",
+        "card-header",
+        "card-title"
+      ],
+      "stories": [
+        "Default",
+        "Small",
+        "With Action"
+      ]
+    },
+    {
+      "name": "checkbox",
+      "level": "atom",
+      "file": "src/components/ui/checkbox.tsx",
+      "exports": [
+        "Checkbox"
+      ],
+      "slots": [
+        "checkbox",
+        "checkbox-indicator"
+      ],
+      "stories": [
+        "Checked",
+        "Default",
+        "Disabled",
+        "Invalid",
+        "With Label"
+      ]
+    },
+    {
+      "name": "dialog",
+      "level": "atom",
+      "file": "src/components/ui/dialog.tsx",
+      "exports": [
+        "Dialog",
+        "DialogClose",
+        "DialogContent",
+        "DialogDescription",
+        "DialogFooter",
+        "DialogHeader",
+        "DialogOverlay",
+        "DialogPortal",
+        "DialogTitle",
+        "DialogTrigger"
+      ],
+      "slots": [
+        "dialog",
+        "dialog-close",
+        "dialog-content",
+        "dialog-description",
+        "dialog-footer",
+        "dialog-header",
+        "dialog-overlay",
+        "dialog-portal",
+        "dialog-title",
+        "dialog-trigger"
+      ],
+      "stories": [
+        "Confirmation",
+        "Default",
+        "Open On Load"
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "level": "atom",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "exports": [
+        "DropdownMenu",
+        "DropdownMenuCheckboxItem",
+        "DropdownMenuContent",
+        "DropdownMenuGroup",
+        "DropdownMenuItem",
+        "DropdownMenuLabel",
+        "DropdownMenuPortal",
+        "DropdownMenuRadioGroup",
+        "DropdownMenuRadioItem",
+        "DropdownMenuSeparator",
+        "DropdownMenuShortcut",
+        "DropdownMenuSub",
+        "DropdownMenuSubContent",
+        "DropdownMenuSubTrigger",
+        "DropdownMenuTrigger"
+      ],
+      "slots": [
+        "dropdown-menu",
+        "dropdown-menu-checkbox-item",
+        "dropdown-menu-checkbox-item-indicator",
+        "dropdown-menu-content",
+        "dropdown-menu-group",
+        "dropdown-menu-item",
+        "dropdown-menu-label",
+        "dropdown-menu-portal",
+        "dropdown-menu-radio-group",
+        "dropdown-menu-radio-item",
+        "dropdown-menu-radio-item-indicator",
+        "dropdown-menu-separator",
+        "dropdown-menu-shortcut",
+        "dropdown-menu-sub",
+        "dropdown-menu-sub-content",
+        "dropdown-menu-sub-trigger",
+        "dropdown-menu-trigger"
+      ],
+      "stories": [
+        "Default",
+        "With Checkbox Items",
+        "With Radio Items",
+        "With Submenu"
+      ]
+    },
+    {
+      "name": "field",
+      "level": "atom",
+      "file": "src/components/ui/field.tsx",
+      "exports": [
+        "Field",
+        "FieldContent",
+        "FieldDescription",
+        "FieldError",
+        "FieldGroup",
+        "FieldLabel",
+        "FieldLegend",
+        "FieldSeparator",
+        "FieldSet",
+        "FieldTitle"
+      ],
+      "slots": [
+        "field",
+        "field-content",
+        "field-description",
+        "field-error",
+        "field-group",
+        "field-label",
+        "field-legend",
+        "field-separator",
+        "field-separator-content",
+        "field-set"
+      ],
+      "stories": [
+        "Default",
+        "Field Set Group",
+        "Horizontal",
+        "With Error"
+      ]
+    },
+    {
+      "name": "input",
+      "level": "atom",
+      "file": "src/components/ui/input.tsx",
+      "exports": [
+        "Input"
+      ],
+      "slots": [
+        "input"
+      ],
+      "stories": [
+        "Default",
+        "Disabled",
+        "File",
+        "Invalid",
+        "Password",
+        "With Label"
+      ]
+    },
+    {
+      "name": "label",
+      "level": "atom",
+      "file": "src/components/ui/label.tsx",
+      "exports": [
+        "Label"
+      ],
+      "slots": [
+        "label"
+      ],
+      "stories": [
+        "Default",
+        "With Input"
+      ]
+    },
+    {
+      "name": "lightbox",
+      "level": "molecule",
+      "file": "src/components/ui/lightbox.tsx",
+      "exports": [
+        "Lightbox",
+        "lightboxChecker"
+      ],
+      "slots": [
+        "lightbox",
+        "lightbox-caption",
+        "lightbox-nav",
+        "lightbox-stage"
+      ],
+      "stories": [
+        "Default",
+        "Single Image"
+      ]
+    },
+    {
+      "name": "media-gallery",
+      "level": "molecule",
+      "file": "src/components/ui/media-gallery.tsx",
+      "exports": [
+        "MediaGallery",
+        "MediaTile"
+      ],
+      "slots": [
+        "media-gallery",
+        "media-gallery-section",
+        "media-tile",
+        "media-tile-label"
+      ],
+      "stories": [
+        "Default",
+        "Empty"
+      ]
+    },
+    {
+      "name": "navigation-menu",
+      "level": "atom",
+      "file": "src/components/ui/navigation-menu.tsx",
+      "exports": [
+        "NavigationMenu",
+        "NavigationMenuContent",
+        "NavigationMenuIndicator",
+        "NavigationMenuItem",
+        "NavigationMenuLink",
+        "NavigationMenuList",
+        "NavigationMenuPositioner",
+        "NavigationMenuTrigger",
+        "navigationMenuTriggerStyle"
+      ],
+      "slots": [
+        "navigation-menu",
+        "navigation-menu-content",
+        "navigation-menu-indicator",
+        "navigation-menu-item",
+        "navigation-menu-link",
+        "navigation-menu-list",
+        "navigation-menu-trigger"
+      ],
+      "stories": [
+        "Default",
+        "Links Only"
+      ]
+    },
+    {
+      "name": "popover",
+      "level": "atom",
+      "file": "src/components/ui/popover.tsx",
+      "exports": [
+        "Popover",
+        "PopoverContent",
+        "PopoverDescription",
+        "PopoverHeader",
+        "PopoverTitle",
+        "PopoverTrigger"
+      ],
+      "slots": [
+        "popover",
+        "popover-content",
+        "popover-description",
+        "popover-header",
+        "popover-title",
+        "popover-trigger"
+      ],
+      "stories": [
+        "Aligned Top",
+        "Default",
+        "Open On Load"
+      ]
+    },
+    {
+      "name": "progress",
+      "level": "atom",
+      "file": "src/components/ui/progress.tsx",
+      "exports": [
+        "Progress",
+        "ProgressIndicator",
+        "ProgressLabel",
+        "ProgressTrack",
+        "ProgressValue"
+      ],
+      "slots": [
+        "progress",
+        "progress-indicator",
+        "progress-label",
+        "progress-track",
+        "progress-value"
+      ],
+      "stories": [
+        "Complete",
+        "Default",
+        "Empty",
+        "Indeterminate",
+        "With Label"
+      ]
+    },
+    {
+      "name": "radio-group",
+      "level": "atom",
+      "file": "src/components/ui/radio-group.tsx",
+      "exports": [
+        "RadioGroup",
+        "RadioGroupItem"
+      ],
+      "slots": [
+        "radio-group",
+        "radio-group-indicator",
+        "radio-group-item"
+      ],
+      "stories": [
+        "Default",
+        "Disabled",
+        "Horizontal"
+      ]
+    },
+    {
+      "name": "role-avatar",
+      "level": "molecule",
+      "file": "src/components/ui/role-avatar.tsx",
+      "exports": [
+        "overflow",
+        "RoleAvatar",
+        "RoleAvatarGroup",
+        "RoleCard",
+        "RoleChip",
+        "roleInitials"
+      ],
+      "slots": [
+        "role-avatar",
+        "role-avatar-group",
+        "role-card",
+        "role-chip",
+        "role-state"
+      ],
+      "stories": [
+        "Avatars",
+        "Cards",
+        "Chips",
+        "Group"
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "level": "atom",
+      "file": "src/components/ui/scroll-area.tsx",
+      "exports": [
+        "ScrollArea",
+        "ScrollBar"
+      ],
+      "slots": [
+        "scroll-area",
+        "scroll-area-scrollbar",
+        "scroll-area-thumb",
+        "scroll-area-viewport"
+      ],
+      "stories": [
+        "Default",
+        "Horizontal"
+      ]
+    },
+    {
+      "name": "select",
+      "level": "atom",
+      "file": "src/components/ui/select.tsx",
+      "exports": [
+        "Select",
+        "SelectContent",
+        "SelectGroup",
+        "SelectItem",
+        "SelectLabel",
+        "SelectScrollDownButton",
+        "SelectScrollUpButton",
+        "SelectSeparator",
+        "SelectTrigger",
+        "SelectValue"
+      ],
+      "slots": [
+        "select-content",
+        "select-group",
+        "select-item",
+        "select-label",
+        "select-scroll-down-button",
+        "select-scroll-up-button",
+        "select-separator",
+        "select-trigger",
+        "select-value"
+      ],
+      "stories": [
+        "Default",
+        "Disabled",
+        "Invalid",
+        "Small",
+        "With Value"
+      ]
+    },
+    {
+      "name": "separator",
+      "level": "atom",
+      "file": "src/components/ui/separator.tsx",
+      "exports": [
+        "Separator"
+      ],
+      "slots": [
+        "separator"
+      ],
+      "stories": [
+        "Default",
+        "Vertical"
+      ]
+    },
+    {
+      "name": "sheet",
+      "level": "atom",
+      "file": "src/components/ui/sheet.tsx",
+      "exports": [
+        "Sheet",
+        "SheetClose",
+        "SheetContent",
+        "SheetDescription",
+        "SheetFooter",
+        "SheetHeader",
+        "SheetTitle",
+        "SheetTrigger"
+      ],
+      "slots": [
+        "sheet",
+        "sheet-close",
+        "sheet-content",
+        "sheet-description",
+        "sheet-footer",
+        "sheet-header",
+        "sheet-overlay",
+        "sheet-portal",
+        "sheet-title",
+        "sheet-trigger"
+      ],
+      "stories": [
+        "Bottom",
+        "Default",
+        "Left",
+        "Open On Load",
+        "Top"
+      ]
+    },
+    {
+      "name": "skeleton",
+      "level": "atom",
+      "file": "src/components/ui/skeleton.tsx",
+      "exports": [
+        "Skeleton"
+      ],
+      "slots": [
+        "skeleton"
+      ],
+      "stories": [
+        "Avatar",
+        "Card Placeholder",
+        "Default"
+      ]
+    },
+    {
+      "name": "sonner",
+      "level": "atom",
+      "file": "src/components/ui/sonner.tsx",
+      "exports": [
+        "Toaster"
+      ],
+      "slots": [],
+      "stories": [
+        "Default",
+        "Error",
+        "Success",
+        "With Action"
+      ]
+    },
+    {
+      "name": "step-list",
+      "level": "molecule",
+      "file": "src/components/ui/step-list.tsx",
+      "exports": [
+        "StepItem",
+        "StepList"
+      ],
+      "slots": [
+        "step-item",
+        "step-item-detail",
+        "step-list",
+        "step-marker"
+      ],
+      "stories": [
+        "Plan"
+      ]
+    },
+    {
+      "name": "switch",
+      "level": "atom",
+      "file": "src/components/ui/switch.tsx",
+      "exports": [
+        "Switch"
+      ],
+      "slots": [
+        "switch",
+        "switch-thumb"
+      ],
+      "stories": [
+        "Checked",
+        "Default",
+        "Disabled",
+        "Small",
+        "With Label"
+      ]
+    },
+    {
+      "name": "table",
+      "level": "atom",
+      "file": "src/components/ui/table.tsx",
+      "exports": [
+        "Table",
+        "TableBody",
+        "TableCaption",
+        "TableCell",
+        "TableFooter",
+        "TableHead",
+        "TableHeader",
+        "TableRow"
+      ],
+      "slots": [
+        "table",
+        "table-body",
+        "table-caption",
+        "table-cell",
+        "table-container",
+        "table-footer",
+        "table-head",
+        "table-header",
+        "table-row"
+      ],
+      "stories": [
+        "Default",
+        "With Badges",
+        "With Caption And Footer"
+      ]
+    },
+    {
+      "name": "tabs",
+      "level": "atom",
+      "file": "src/components/ui/tabs.tsx",
+      "exports": [
+        "Tabs",
+        "TabsContent",
+        "TabsList",
+        "tabsListVariants",
+        "TabsTrigger"
+      ],
+      "slots": [
+        "tabs",
+        "tabs-content",
+        "tabs-list",
+        "tabs-trigger"
+      ],
+      "stories": [
+        "Default",
+        "Disabled Tab",
+        "Line",
+        "Vertical"
+      ]
+    },
+    {
+      "name": "textarea",
+      "level": "atom",
+      "file": "src/components/ui/textarea.tsx",
+      "exports": [
+        "Textarea"
+      ],
+      "slots": [
+        "textarea"
+      ],
+      "stories": [
+        "Default",
+        "Disabled",
+        "Invalid",
+        "With Label"
+      ]
+    },
+    {
+      "name": "tooltip",
+      "level": "atom",
+      "file": "src/components/ui/tooltip.tsx",
+      "exports": [
+        "Tooltip",
+        "TooltipContent",
+        "TooltipProvider",
+        "TooltipTrigger"
+      ],
+      "slots": [
+        "tooltip",
+        "tooltip-content",
+        "tooltip-provider",
+        "tooltip-trigger"
+      ],
+      "stories": [
+        "Default",
+        "Icon Button",
+        "Open On Load",
+        "Top"
+      ]
+    }
+  ]
+}

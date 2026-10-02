@@ -1,0 +1,22 @@
+{
+  "name": "paper-sharp",
+  "dark": false,
+  "tokens": {
+    "colors": {
+      "background": "#FAF7F2",
+      "surface": "#FFFFFF",
+      "text": "#1B1A17",
+      "primary": "#C2410C"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "Fraunces",
+        "body": "DM Sans"
+      }
+    },
+    "shape": "sharp",
+    "density": "comfortable",
+    "elevation": "flat",
+    "motion": "calm"
+  }
+}

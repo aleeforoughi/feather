@@ -1,0 +1,7 @@
+node_modules
+dist
+.qooe-shots
+.npm-cache
+storybook-static
+
+*storybook.log

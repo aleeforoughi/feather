@@ -1,0 +1,22 @@
+{
+  "name": "void-pill",
+  "dark": true,
+  "tokens": {
+    "colors": {
+      "background": "#050505",
+      "surface": "#141614",
+      "text": "#F2F0EA",
+      "primary": "#7BFFB2"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "Sora",
+        "body": "Inter"
+      }
+    },
+    "shape": "pill",
+    "density": "comfortable",
+    "elevation": "dramatic",
+    "motion": "snappy"
+  }
+}
