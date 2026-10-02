@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Telemetry off; Playwright browsers come from the container image.
+  STORYBOOK_DISABLE_TELEMETRY: "1"
+
+jobs:
+  check:
+    name: Lint, types, unit tests, build, hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm hygiene
+      - name: Build Storybook
+        run: pnpm build-storybook
+      - name: foundation.json matches the components and stories
+        run: node packages/react/scripts/foundation-manifest.mjs && git diff --exit-code packages/react/foundation.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: apps/storybook/storybook-static
+          retention-days: 7
+
+  a11y:
+    name: Accessibility (${{ matrix.theme }})
+    needs: check
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: [paper-sharp, void-pill]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Every story passes axe (known 1.7.0 debt in apps/storybook/.storybook/a11y-known.json)
+        run: pnpm test:a11y
+        env:
+          FEATHER_THEME: ${{ matrix.theme }}
+
+  visual:
+    name: Visual regression
+    needs: check
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v5
+        with:
+          name: storybook-static
+          path: apps/storybook/storybook-static
+      - name: Every story in both reference themes matches its baseline
+        run: pnpm test:visual
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-diff
+          path: |
+            apps/storybook/playwright-report
+            apps/storybook/test-results
+          retention-days: 7

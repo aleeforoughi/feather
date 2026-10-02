@@ -1,0 +1,62 @@
+name: Record visual baselines
+
+# Records apps/storybook/visual/__screenshots__ in CI's Playwright container and commits them to the branch.
+#   reference: feather-1.7.0  renders Feather 1.7.0 as imported from qooe-core (the L0 parity baseline: the
+#                             packages must match it pixel for pixel)
+#   reference: current        renders the branch itself (after an intentional visual change)
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        description: What to record the baselines from
+        type: choice
+        options: [feather-1.7.0, current]
+        default: current
+
+permissions:
+  contents: write
+
+env:
+  STORYBOOK_DISABLE_TELEMETRY: "1"
+  # The commit that imported Feather 1.7.0 unchanged.
+  FEATHER_1_7_0: b0045f3
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build the reference Storybook
+        run: |
+          if [ "${{ inputs.reference }}" = "feather-1.7.0" ]; then
+            git worktree add /tmp/reference "$FEATHER_1_7_0"
+            cd /tmp/reference/feather-web
+            npm ci --no-audit --no-fund
+            npx storybook build --quiet -o /tmp/reference-static
+          else
+            pnpm build && pnpm build-storybook
+            cp -r apps/storybook/storybook-static /tmp/reference-static
+          fi
+      - name: Record
+        run: |
+          rm -rf apps/storybook/visual/__screenshots__
+          pnpm --filter @feather-apps/storybook exec playwright test --update-snapshots
+        env:
+          STORYBOOK_DIR: /tmp/reference-static
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/storybook/visual/__screenshots__
+          git commit -m "Record visual baselines from ${{ inputs.reference }}" || echo "Baselines unchanged."
+          git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -1,0 +1,31 @@
+name: Publish
+
+# Publishes @aleeforoughi/feather-tokens and @aleeforoughi/feather-react to GitHub Packages when a version tag
+# (v1.7.0) is pushed. The tag must match the packages' version, and every CI gate must pass first.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: "@aleeforoughi"
+      - run: pnpm install --frozen-lockfile
+      - name: Tag matches the version
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+      - run: pnpm lint && pnpm build && pnpm typecheck && pnpm test && pnpm hygiene
+      - run: pnpm -r --filter "./packages/**" publish --no-git-checks --access restricted
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
