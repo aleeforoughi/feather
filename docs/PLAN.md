@@ -46,6 +46,10 @@ Feather is liquid when it has all five properties. Each one is testable.
 
 ## 4. Starting point: Feather 1.6.0 (in `qooe-core`)
 
+> The starting point turned out to be **1.7.0** (35 components: 1.6.0 plus status tokens, `BudgetBar` and
+> `RoleAvatar`), delivered as a release package without git history. It was imported unchanged as this repo's
+> first commit.
+
 Carry over, as the static foundation:
 
 - **Stack:** React, TypeScript, Vite, Tailwind CSS v4, Base UI primitives, shadcn/ui source, Lucide, Motion, Storybook (a11y), Vitest, Playwright.
@@ -63,6 +67,8 @@ Change on the move:
 ## 5. Architecture
 
 A monorepo with small packages. Arrows show what may import what.
+
+> Package names: `@feather/x` below is published as `@aleeforoughi/feather-x` (decision 12.2).
 
 ```text
 @feather/tokens      token schema, theme engine, CSS variables        (no deps)
@@ -234,6 +240,19 @@ Rules: the builder never reviews itself, writes from Cursor go through a worktre
 review, and every delegated task names its files and its exit test.
 
 ## 12. Decisions for the owner
+
+**Decided 2026-10-02:**
+
+1. Repo `aleeforoughi/feather`, private.
+2. GitHub Packages. Its npm scope must be the repo owner, so the packages are `@aleeforoughi/feather-*`
+   (`@aleeforoughi/feather-tokens`, `@aleeforoughi/feather-react`, …) wherever this plan says `@feather/*`.
+   They can be renamed once, at L7, when the IR freezes.
+3. `feather-tokens/2` keeps the `qooe-tokens/1` semantic role names; only the schema id changes, and
+   `qooe-tokens/1` migrates on read.
+4. `qooe-core` switches to the packages at L0.
+5. Proprietary (all rights reserved) for now.
+
+The original questions:
 
 1. Repo name and visibility (`aleeforoughi/feather`, private to start?).
 2. Package registry: GitHub Packages, npm private, or git dependency.

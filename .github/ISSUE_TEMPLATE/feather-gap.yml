@@ -1,0 +1,28 @@
+name: Feather gap
+description: Something a product needed that Feather could not do through its tokens or components.
+labels: [gap]
+body:
+  - type: textarea
+    id: gap
+    attributes:
+      label: The gap
+      description: What the product needed, where (product, screen), and why tokens or existing components could not do it.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: A token, a variant or prop on an existing component, or a new component. See FEATHER.md for what earns a place.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: [token, component variant, new component, liquid (IR, composer, manifestation), documents, other]
+    validations:
+      required: true
+  - type: input
+    id: caller
+    attributes:
+      label: Requested by
+      description: The product or system that hit the gap (for example QOOE Bootstrap, Qoco Panel).

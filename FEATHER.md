@@ -1,8 +1,9 @@
 # What belongs in Feather
 
-Feather is QOOE's master design system: every product is cut from it (a branch) and themed by its brand's
-tokens. Bootstrap owns it. Every upgrade must leave Feather clean, mapped, versioned, themeable, standard and
-ready to use. A component earns its place only when all of this holds:
+Feather is a design system that products install as packages and reshape with their brand's tokens, never by
+editing its components. Feather owns its releases; callers such as QOOE ask for
+upgrades as issues (a gap, the proposal, the owner's go-ahead). Every upgrade must leave Feather clean, mapped,
+versioned, themeable, standard and ready to use. A component earns its place only when all of this holds:
 
 1. **Reusable.** Another product would use it as it is: it solves a pattern, not one screen. A product's own
    compositions (its pages, its data wiring, its domain words) stay in the product.
@@ -17,7 +18,7 @@ ready to use. A component earns its place only when all of this holds:
 5. **Standard.** Accessible (roles, labels, keyboard), documented in Storybook with real examples, compiling
    in both reference themes, and listed in `foundation.json` (`level: atom | molecule`).
 6. **Versioned.** A minor version per addition, a CHANGELOG entry saying where it came from and why, and the
-   hygiene gate (`npm run hygiene`) green before release.
+   hygiene gate (`pnpm hygiene`) green before release.
 
 ## Molecules
 

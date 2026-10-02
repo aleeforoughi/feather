@@ -1,6 +1,6 @@
 # Feather 1.7.0: inventory
 
-35 components (28 atoms, 7 molecules), 133 stories. Token schema `qooe-tokens/1`.
+35 components (28 atoms, 7 molecules), 133 stories. Token schema `feather-tokens/2` (reads `qooe-tokens/1`).
 
 Theme axes: shape (sharp, soft, rounded, pill); density (compact, comfortable, spacious); elevation (flat, soft, dramatic); motion (calm, snappy).
 
@@ -44,4 +44,4 @@ Fonts: DM Sans, Figtree, Fraunces, Geist, Inter, JetBrains Mono, Manrope, Nunito
 | `role-avatar` | molecule | overflow, RoleAvatar, RoleAvatarGroup, RoleCard, RoleChip, roleInitials | 5 | 4 |
 | `step-list` | molecule | StepItem, StepList | 4 | 1 |
 
-Slot names per component are in `feather-web/foundation.json`.
+Slot names per component are in `packages/react/foundation.json`.

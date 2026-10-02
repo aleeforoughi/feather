@@ -1,7 +1,32 @@
-# Feather Design System — changelog
-
+# Feather — changelog
 
 ## 1.7.0 — 2026-10-03
+
+**Feather becomes independent (milestone L0).** The 1.7.0 components, unchanged, move out of qooe-core into
+this repository as packages: `@aleeforoughi/feather-tokens` and `@aleeforoughi/feather-react` on GitHub Packages.
+Every story renders pixel-identical to 1.7.0 in both reference themes.
+
+- `@aleeforoughi/feather-tokens`: the theme engine (was `scripts/apply-brand.mjs`; the same CSS, byte for byte),
+  the `feather-brand` CLI, the foundation CSS (the semantic tokens and their Tailwind mapping, was the top of
+  `src/index.css`), the reference themes, and the 14 fonts. Fonts now resolve through this package
+  (`@aleeforoughi/feather-tokens/fonts/<font>.css`), so a product no longer installs Fontsource itself.
+- Token schema `feather-tokens/2`: the same fields and semantic role names as `qooe-tokens/1`, now declared with
+  `"schema": "feather-tokens/2"`. `qooe-tokens/1` brands (no `schema` field) still work: they migrate on read, or
+  in place with `feather-brand --migrate`. A JSON Schema ships for editors (`schema/feather-tokens-2.json`).
+- `@aleeforoughi/feather-react`: every component from one entry point, one ES module per component, with type
+  declarations; `styles.css` for a product's Tailwind CSS v4 stylesheet; `foundation.json`. `FeatherProvider`
+  (color mode, tooltips, toasts) replaces QOOE's `FoundationProviders`; data fetching (React Query) stays in the
+  product.
+- Moved out of the component system: the app dependencies (`better-auth`, `@tanstack/react-router`,
+  `@tanstack/react-query`, `openapi-fetch`, `react-hook-form`, `zod`) belong to products. The copy-a-branch tools
+  (`feather-branch`, `check`, `shot`, `BranchSheet`) are kept in `legacy/branch-tools` for QOOE branches that have
+  not switched to the packages.
+- Gates: hygiene now also checks the packaging (no `@/` imports in published code, every component exported,
+  every import a dependency, one version across packages). New in CI: axe on every story in both reference themes
+  (in a real browser) and visual regression of every story in both themes. The axe run found 19 violations
+  1.7.0 already had (contrast of destructive and muted text, unnamed progress bars); they are recorded in
+  `apps/storybook/.storybook/a11y-known.json`, and the gate fails on any new one.
+- Dependencies are held at the exact versions 1.7.0 shipped with; installs need a release to be a day old.
 
 Status tokens plus two more molecules promoted from Qoco Panel (its SpendBar and CrewAvatar, made generic).
 
