@@ -2,12 +2,13 @@
 // utilities, so `cn("type-body", "type-label")` kept both roles and an override such as `cn("h-control", "h-auto")`
 // lost to CSS order. Each system utility is placed in the group it competes with, so the last one wins, as it does
 // for any Tailwind utility.
+import type { CnFunction } from "cn"
 import { createCn } from "cn/config"
 
 const ROLES = ["display", "heading-1", "heading-2", "heading-3", "title", "body-lg", "body", "body-sm", "label", "caption", "caps"]
 const MOTION = ["press", "focus", "hover", "state", "switch", "tooltip", "popover", "panel", "dialog", "toast", "page", "loading", "ping", "wiggle"]
 
-export const cn = createCn({
+export const cn: CnFunction = createCn({
   extend: {
     classGroups: {
       "type-role": [{ type: ROLES }],
