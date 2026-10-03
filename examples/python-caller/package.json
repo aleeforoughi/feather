@@ -1,0 +1,13 @@
+{
+  "name": "@feather-examples/python-caller",
+  "version": "1.13.1",
+  "private": true,
+  "description": "A complete Feather caller in standard-library Python, run end to end in CI.",
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
