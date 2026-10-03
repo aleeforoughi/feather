@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "storybook dev -p 6006",
     "build": "storybook build --quiet",
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p visual-audit/tsconfig.json",
     "test:a11y": "vitest run",
     "test:visual": "playwright test",
-    "test:visual:update": "playwright test --update-snapshots"
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:audit:self": "playwright test -c visual-audit/playwright.config.ts --project=selftest",
+    "test:audit": "playwright test -c visual-audit/playwright.config.ts --project=selftest && playwright test -c visual-audit/playwright.config.ts --project=audit"
   },
   "dependencies": {
     "@aleeforoughi/feather-react": "workspace:*",

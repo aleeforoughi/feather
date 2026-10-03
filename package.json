@@ -17,6 +17,7 @@
     "manifest": "pnpm build-storybook && node packages/react/scripts/foundation-manifest.mjs",
     "test:a11y": "pnpm --filter @feather-apps/storybook test:a11y",
     "test:visual": "pnpm --filter @feather-apps/storybook test:visual",
+    "test:audit": "pnpm --filter @feather-apps/storybook test:audit",
     "test:playground": "pnpm --filter @feather-apps/playground build && pnpm --filter @feather-apps/playground test:e2e",
     "format": "prettier --write \"**/*.{ts,tsx}\""
   },
