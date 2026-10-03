@@ -14,7 +14,7 @@ const viewport = { width: 960, height: 720 }
 
 export default defineConfig({
   testDir: here,
-  outputDir: path.join(app, "test-results/visual-audit"),
+  outputDir: process.env.AUDIT_OUT ? path.join(process.env.AUDIT_OUT, "test-results") : path.join(app, "test-results/visual-audit"),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,

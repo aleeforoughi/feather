@@ -1,0 +1,4 @@
+{
+  "$comment": "Optical exceptions (docs/visual-system.md section 9). A 0.5 spacing step, a one or two pixel nudge, or an arbitrary value is accepted by `pnpm hygiene` only when it is listed here. Each entry is { \"file\": path from the repository root, \"value\": the class token exactly as written (with or without its variants), \"reason\": why the system cannot express it, \"reviewer\": who approved it }. A repeated exception is promoted into the system instead of listed again.",
+  "exceptions": []
+}

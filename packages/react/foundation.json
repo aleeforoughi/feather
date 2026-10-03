@@ -563,6 +563,24 @@
       ]
     },
     {
+      "name": "icon",
+      "level": "atom",
+      "file": "src/components/ui/icon.tsx",
+      "exports": [
+        "Icon"
+      ],
+      "slots": [
+        "icon"
+      ],
+      "stories": [
+        "Default",
+        "Density Slot",
+        "Emphasis",
+        "Optical Registry",
+        "Sizes"
+      ]
+    },
+    {
       "name": "input",
       "level": "atom",
       "file": "src/components/ui/input.tsx",

@@ -1,0 +1,144 @@
+:root:root {
+  --background: #faf7f2;
+  --foreground: var(--text-primary);
+  --card: #ffffff;
+  --card-foreground: var(--text-primary);
+  --popover: #ffffff;
+  --popover-foreground: var(--text-primary);
+  --primary: #c2410c;
+  --primary-foreground: #ffffff;
+  --secondary: color-mix(in oklab, #1b1a17 10%, #ffffff);
+  --secondary-foreground: var(--text-primary);
+  --muted: color-mix(in oklab, #1b1a17 8%, #faf7f2);
+  --muted-foreground: var(--text-secondary);
+  --accent: color-mix(in oklab, #c2410c 18%, #faf7f2);
+  --accent-foreground: var(--text-primary);
+  --destructive: #e5484d;
+  --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+  --success: #2f9e5c;
+  --success-foreground: #000000;
+  --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));
+  --warning: #e8a215;
+  --warning-foreground: #000000;
+  --warning-muted: color-mix(in oklab, var(--warning) 12%, var(--card));
+  --info: #2f78c4;
+  --info-foreground: #000000;
+  --info-muted: color-mix(in oklab, var(--info) 12%, var(--card));
+  --text-primary: #1b1a17;
+  --text-secondary: #43413e;
+  --text-tertiary: #71706c;
+  --text-disabled: color-mix(in oklab, #1b1a17 38%, #faf7f2);
+  --text-inverse: #faf7f2;
+  --border-primary: #918f8b;
+  --border-secondary: color-mix(in oklab, #1b1a17 16%, #faf7f2);
+  --border-tertiary: color-mix(in oklab, #1b1a17 10%, #faf7f2);
+  --border-disabled: color-mix(in oklab, #1b1a17 8%, #faf7f2);
+  --border-inverse: color-mix(in oklab, #faf7f2 24%, #1b1a17);
+  --border: var(--border-secondary);
+  --input: var(--border-primary);
+  --surface-base: var(--background);
+  --surface-subtle: color-mix(in oklab, #1b1a17 4%, #faf7f2);
+  --surface-raised: var(--card);
+  --surface-overlay: var(--popover);
+  --surface-hover: color-mix(in oklab, #1b1a17 6%, var(--card));
+  --surface-pressed: color-mix(in oklab, #1b1a17 10%, var(--card));
+  --surface-selected: color-mix(in oklab, #c2410c 12%, var(--card));
+  --surface-disabled: color-mix(in oklab, #1b1a17 6%, var(--card));
+  --surface-inverse: #1b1a17;
+  --ring: #c2410c;
+  --ring-danger: var(--destructive);
+  --ring-inverse: var(--text-inverse);
+  --chart-1: #c2410c;
+  --chart-2: #c2410c;
+  --chart-3: color-mix(in oklab, #c2410c 55%, #1b1a17);
+  --chart-4: color-mix(in oklab, #c2410c 60%, #faf7f2);
+  --chart-5: color-mix(in oklab, #1b1a17 45%, #faf7f2);
+  --radius-xs: 0px;
+  --radius-control: 0px;
+  --radius-card: 0px;
+  --radius-dialog: 0px;
+  --radius: var(--radius-card);
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: #c2410c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: color-mix(in oklab, #c2410c 18%, #ffffff);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: color-mix(in oklab, #1b1a17 16%, #ffffff);
+  --sidebar-ring: #c2410c;
+  --brand-font-body: "DM Sans Variable", sans-serif;
+  --brand-font-display: "Fraunces Variable", sans-serif;
+  --spacing: 0.25rem;
+  --control-height: 2.75rem;
+  --control-px: 1rem;
+  --control-py: 0.75rem;
+  --icon-slot: 1.25rem;
+  --pad-x: 1.5rem;
+  --pad-y: 1rem;
+  --card-pad: 1.5rem;
+  --dialog-pad: 2rem;
+  --gap: 0.75rem;
+  --group-gap: 1.5rem;
+  --opacity-disabled: 0.5;
+  --elevation-1: none;
+  --elevation-2: none;
+  --elevation-3: 0 12px 32px rgb(0 0 0 / 0.12);
+  --shadow-xs: var(--elevation-1);
+  --shadow-sm: var(--elevation-1);
+  --shadow-md: var(--elevation-2);
+  --shadow-lg: var(--elevation-3);
+  --shadow-xl: var(--elevation-3);
+  --duration-micro: 100ms;
+  --duration-fast: 140ms;
+  --duration-base: 180ms;
+  --duration-medium: 240ms;
+  --duration-slow: 320ms;
+  --duration-large: 420ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-duration: var(--duration-base);
+  --motion-ease: var(--ease-standard);
+  color-scheme: light;
+}
+
+/* Density: any element with data-density overrides the density variables for its subtree. */
+[data-density="tight"],
+:root:root[data-density="tight"] {
+  --control-height: 2.25rem;
+  --control-px: 0.75rem;
+  --control-py: 0.5rem;
+  --icon-slot: 1rem;
+  --pad-x: 1rem;
+  --pad-y: 0.75rem;
+  --card-pad: 1rem;
+  --dialog-pad: 1.5rem;
+  --gap: 0.5rem;
+  --group-gap: 1rem;
+}
+
+[data-density="default"],
+:root:root[data-density="default"] {
+  --control-height: 2.75rem;
+  --control-px: 1rem;
+  --control-py: 0.75rem;
+  --icon-slot: 1.25rem;
+  --pad-x: 1.5rem;
+  --pad-y: 1rem;
+  --card-pad: 1.5rem;
+  --dialog-pad: 2rem;
+  --gap: 0.75rem;
+  --group-gap: 1.5rem;
+}
+
+[data-density="spacious"],
+:root:root[data-density="spacious"] {
+  --control-height: 3.25rem;
+  --control-px: 1.25rem;
+  --control-py: 1rem;
+  --icon-slot: 1.5rem;
+  --pad-x: 2rem;
+  --pad-y: 1.5rem;
+  --card-pad: 2rem;
+  --dialog-pad: 2.5rem;
+  --gap: 1rem;
+  --group-gap: 2rem;
+}

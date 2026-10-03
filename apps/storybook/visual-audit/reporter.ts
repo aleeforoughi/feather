@@ -6,7 +6,8 @@ import type { FullConfig, Reporter, Suite } from "@playwright/test/reporter"
 import { fromEngine, HERE, RULES } from "./expected"
 import type { Row } from "./run"
 
-const results = path.join(HERE, ".results")
+const OUT = process.env.AUDIT_OUT ?? HERE
+const results = path.join(OUT, ".results")
 let isAudit = false
 
 const top = (m: Map<string, number>, n: number) => [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n)
@@ -62,7 +63,7 @@ export default class AuditReporter implements Reporter {
       bySlot: obj(bySlot),
       rows,
     }
-    fs.writeFileSync(path.join(HERE, "report.json"), JSON.stringify(report))
+    fs.writeFileSync(path.join(OUT, "report.json"), JSON.stringify(report))
 
     const out: string[] = ["", `Visual audit: ${stories.size} stories, ${pages.size} story/theme pages, expected values from ${expected.source}, ${rows.length} failures (${exempted} exempted by optical-exceptions.json)`]
     out.push("", `${pad("rule", 18)}${pad("failures", 10)}${pad("unique", 8)}what it checks`)
@@ -71,7 +72,7 @@ export default class AuditReporter implements Reporter {
     for (const [k, v] of top(byComponent, 15)) out.push(`  ${pad(v, 8)}${k}`)
     out.push("", "Top 15 elements by data-slot (~ = nearest ancestor slot):")
     for (const [k, v] of top(bySlot, 15)) out.push(`  ${pad(v, 8)}${k}`)
-    out.push("", `Full report: ${path.join(HERE, "report.json")}`, "")
+    out.push("", `Full report: ${path.join(OUT, "report.json")}`, "")
     console.log(out.join("\n"))
   }
 }

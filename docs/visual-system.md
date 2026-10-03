@@ -170,13 +170,17 @@ surface:
 | `--text-secondary` | the brand's `mutedForeground`, or the lightest mix of text into background that reaches the floor | 4.5:1 (body text stays readable) |
 | `--text-tertiary` | the lightest mix reaching the floor | 4.5:1 (metadata is still text) |
 | `--text-disabled` | mix of text into background at 38% | none (WCAG exempts disabled controls) |
-| `--icon-*` | the same as the matching `--text-*` | 3:1 minimum for meaningful icons |
+| icons | the `--text-*` scale itself (`text-fg-*`, `currentColor`) | 3:1 minimum for meaningful icons |
 | `--border-primary` | the lightest mix reaching the floor | **3:1**: the boundary that identifies a control (inputs, selects, outline buttons) |
 | `--border-secondary` | mix of text into surface at 16% (today's `--border`) | none: cards, panels, popover edges |
 | `--border-tertiary` | mix at 10% | none: dividers, table rows, internal sections. Never the only boundary of a control. |
 | `--border-disabled` | mix at 8% | none |
 
 Further rules:
+- **Utilities.** Text and icons use `text-fg-primary`, `text-fg-secondary`, `text-fg-tertiary`, `text-fg-disabled`
+  and `text-fg-inverse` (icons take `currentColor`). Borders use `border-line-primary`, `border-line-secondary`,
+  `border-line-tertiary` and `border-line-disabled`. Surfaces use `bg-surface-*`. `text-primary`, `bg-secondary`
+  and similar keep their meaning as the brand's fills.
 - The existing names stay as aliases. `--foreground` is `--text-primary`, `--muted-foreground` is
   `--text-secondary`, `--border` is `--border-secondary`, and `--input` is `--border-primary`.
 - A label and its icon share one emphasis level.
@@ -309,7 +313,8 @@ Rules for motion:
   240 to 420ms.
 - **Allowed transition properties:** transform, opacity, color, background-color, border-color, outline-color,
   box-shadow and filter. Never `all`. Never width, height, margin, padding, top or left when a transform can do
-  it (accordions animate a clip or grid-rows track, not raw height).
+  it. The one exception is the `panel` role: accordions and collapsibles animate a `clip-path` or a
+  `grid-template-rows` track, never raw height.
 - **Interaction grammar:**
   - rest → hover: surface or border emphasis, optional 1px lift;
   - pressed: stronger tone, scale 0.985;

@@ -1,7 +1,25 @@
 import fs from "node:fs"
 import path from "node:path"
 import { describe, expect, it } from "vitest"
-import { DENSITY, ELEVATION, FONTS, MOTION, SHAPES, buildTheme, fontImports, migrateTokens } from "../src/index.mjs"
+import type { BrandTokens } from "../src/index.mjs"
+import {
+  CONTRAST_FLOORS,
+  DENSITIES,
+  DENSITY,
+  DURATIONS,
+  EASE_STANDARD,
+  ELEVATION,
+  FONTS,
+  MOTION,
+  RADIUS_PRIMITIVES,
+  RADIUS_TIERS,
+  SHADOW_ALIASES,
+  SHAPES,
+  buildTheme,
+  contrastRatio,
+  fontImports,
+  migrateTokens,
+} from "../src/index.mjs"
 
 const here = import.meta.dirname
 const read = (p: string) => fs.readFileSync(path.join(here, p), "utf8")
@@ -10,16 +28,16 @@ const json = (p: string) => JSON.parse(read(p))
 const body = (css: string) => css.slice(css.indexOf("\n") + 1)
 
 describe("buildTheme", () => {
-  // Golden files were written by the Feather 1.7.0 engine (qooe-core scripts/apply-brand.mjs). Moving the engine
-  // into @aleeforoughi/feather-tokens must not change one byte of a theme.
+  // The generated theme of each reference brand is a file snapshot: a change to the engine shows up as a diff to review,
+  // and `vitest -u` writes the new one.
   it.each([
     ["paper-sharp", () => json("../themes/paper-sharp.json").tokens],
     ["void-pill", () => json("../themes/void-pill.json").tokens],
     ["rich-brand", () => json("golden/rich-brand.json")],
-  ])("writes the same %s theme as Feather 1.7.0", (name, tokens) => {
+  ])("writes the %s theme the same way", async (name, tokens) => {
     const built = buildTheme(tokens())
     expect(built.ok).toBe(true)
-    if (built.ok) expect(body(built.css)).toBe(body(read(`golden/${name}.1.7.0.css`)))
+    if (built.ok) await expect(body(built.css)).toMatchFileSnapshot(`golden/${name}.v1.css`)
   })
 
   it("is deterministic", () => {
@@ -99,5 +117,265 @@ describe("schema/feather-tokens-2.json", () => {
     expect(schema.properties.elevation.enum).toEqual(Object.keys(ELEVATION))
     expect(schema.properties.motion.enum).toEqual(Object.keys(MOTION))
     expect(schema.properties.typography.properties.fontFamily.properties.body.enum).toEqual(Object.keys(FONTS))
+  })
+})
+
+// ── The visual system (docs/visual-system.md) ─────────────────────────────────────────────────────────────────────────
+
+const paper = (): BrandTokens => json("../themes/paper-sharp.json").tokens
+const voidPill = (): BrandTokens => json("../themes/void-pill.json").tokens
+const richBrand = (): BrandTokens => json("golden/rich-brand.json")
+const references: [string, () => BrandTokens][] = [["paper-sharp", paper], ["void-pill", voidPill], ["rich-brand", richBrand]]
+
+/** The variables of the first :root:root block, and the variables of any other block by its selector. */
+function declarations(css: string, selector = ":root:root") {
+  const start = css.indexOf(`${selector} {`)
+  if (start === -1) throw new Error(`no ${selector} block`)
+  const end = css.indexOf("}", start)
+  return Object.fromEntries([...css.slice(start, end).matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gm)].map((m) => [m[1], m[2]]))
+}
+/** A variable's value with var() aliases followed to the end. */
+function resolve(vars: Record<string, string>, name: string): string {
+  let value = vars[name]
+  for (let i = 0; i < 8 && value?.startsWith("var("); i++) value = vars[value.slice(4, -1)]
+  return value
+}
+const build = (tokens: object) => {
+  const built = buildTheme(tokens)
+  if (!built.ok) throw new Error(built.problems.join("; "))
+  return built
+}
+const theme = (patch: object) => build({ ...paper(), ...patch })
+const px = (value: string) => (value.endsWith("rem") ? Number.parseFloat(value) * 16 : Number.parseFloat(value))
+
+describe("the brand axes", () => {
+  it("defaults the shape to rounded", () => {
+    const vars = declarations(build({ ...paper(), shape: undefined }).css)
+    expect(vars["--radius-control"]).toBe(RADIUS_TIERS.rounded.control)
+    expect(vars["--radius-card"]).toBe("0.75rem")
+  })
+
+  it.each(Object.keys(RADIUS_TIERS))("shape %s writes its radius tiers", (shape) => {
+    const vars = declarations(theme({ shape }).css)
+    const tiers = RADIUS_TIERS[shape as keyof typeof RADIUS_TIERS]
+    expect(vars["--radius-xs"]).toBe(tiers.xs)
+    expect(vars["--radius-control"]).toBe(tiers.control)
+    expect(vars["--radius-card"]).toBe(tiers.card)
+    expect(vars["--radius-dialog"]).toBe(tiers.dialog)
+    expect(resolve(vars, "--radius")).toBe(tiers.card)
+  })
+
+  it("lists the exact tier values of section 7", () => {
+    expect(RADIUS_TIERS).toEqual({
+      sharp: { xs: "0px", control: "0px", card: "0px", dialog: "0px" },
+      soft: { xs: "0.25rem", control: "0.25rem", card: "0.5rem", dialog: "0.75rem" },
+      rounded: { xs: "0.25rem", control: "0.5rem", card: "0.75rem", dialog: "1rem" },
+      pill: { xs: "0.25rem", control: "9999px", card: "1rem", dialog: "1rem" },
+    })
+  })
+
+  it("keeps the unit at 4px for every density", () => {
+    for (const density of Object.keys(DENSITY)) expect(declarations(theme({ density }).css)["--spacing"]).toBe("0.25rem")
+  })
+
+  it.each(Object.entries(DENSITY))("density %s (%s) writes the density variables on :root and every data-density block", (density, semantic) => {
+    const css = theme({ density }).css
+    const vars = declarations(css)
+    for (const [name, value] of Object.entries(DENSITIES[semantic as keyof typeof DENSITIES])) expect(vars[name]).toBe(value)
+    for (const other of Object.keys(DENSITIES)) {
+      expect(declarations(css, `[data-density="${other}"],\n:root:root[data-density="${other}"]`)).toEqual(DENSITIES[other as keyof typeof DENSITIES])
+    }
+  })
+
+  it("sets the control heights, icon slots and gaps of section 3", () => {
+    const row = (name: string) => (["tight", "default", "spacious"] as const).map((d) => px(DENSITIES[d][name]))
+    const pair = (a: string, b: string) => (["tight", "default", "spacious"] as const).map((d) => [px(DENSITIES[d][a]), px(DENSITIES[d][b])])
+    expect(row("--control-height")).toEqual([36, 44, 52])
+    expect(row("--icon-slot")).toEqual([16, 20, 24])
+    expect(row("--card-pad")).toEqual([16, 24, 32])
+    expect(row("--dialog-pad")).toEqual([24, 32, 40])
+    expect(row("--gap")).toEqual([8, 12, 16])
+    expect(row("--group-gap")).toEqual([16, 24, 32])
+    expect(pair("--control-py", "--control-px")).toEqual([[8, 12], [12, 16], [16, 20]])
+    expect(pair("--pad-y", "--pad-x")).toEqual([[12, 16], [16, 24], [24, 32]])
+  })
+
+  it("keeps foundation.css's density defaults and blocks identical to the engine's", () => {
+    const foundation = read("../css/foundation.css")
+    for (const [name, set] of Object.entries(DENSITIES)) {
+      expect(declarations(foundation, `  [data-density="${name}"]`)).toEqual(set)
+    }
+    const base = declarations(foundation, "  :root")
+    for (const [name, value] of Object.entries(DENSITIES.default)) expect(base[name]).toBe(value)
+  })
+
+  it.each(Object.keys(ELEVATION))("elevation %s writes levels 1 to 3, and the Tailwind scale aliases them", (elevation) => {
+    const vars = declarations(theme({ elevation }).css)
+    const levels = ELEVATION[elevation as keyof typeof ELEVATION]
+    for (const level of [1, 2, 3] as const) expect(vars[`--elevation-${level}`]).toBe(levels[level])
+    for (const [name, level] of Object.entries(SHADOW_ALIASES)) expect(resolve(vars, `--shadow-${name}`)).toBe(levels[level])
+  })
+
+  it("lists the elevation values of section 8", () => {
+    expect(ELEVATION.flat).toEqual({ 1: "none", 2: "none", 3: "0 12px 32px rgb(0 0 0 / 0.12)" })
+    expect(ELEVATION.soft[2]).toBe("0 4px 12px rgb(0 0 0 / 0.08)")
+    expect(ELEVATION.dramatic[3]).toBe("0 20px 40px -10px rgb(0 0 0 / 0.4)")
+    expect(SHADOW_ALIASES).toEqual({ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 })
+  })
+
+  it.each(Object.keys(DURATIONS))("motion %s writes exactly the six durations and the one curve", (motion) => {
+    const vars = declarations(theme({ motion }).css)
+    const durations = Object.keys(vars).filter((name) => name.startsWith("--duration-"))
+    expect(durations.sort()).toEqual(["--duration-base", "--duration-fast", "--duration-large", "--duration-medium", "--duration-micro", "--duration-slow"])
+    for (const [name, ms] of Object.entries(DURATIONS[motion as keyof typeof DURATIONS])) expect(vars[`--duration-${name}`]).toBe(`${ms}ms`)
+    expect(vars["--ease-standard"]).toBe("cubic-bezier(0.4, 0, 0.2, 1)")
+    expect(EASE_STANDARD).toBe(vars["--ease-standard"])
+    // The old names remain, as aliases of base and the standard curve.
+    expect(resolve(vars, "--motion-duration")).toBe(vars["--duration-base"])
+    expect(resolve(vars, "--motion-ease")).toBe(vars["--ease-standard"])
+  })
+
+  it("lists the durations of section 10, and MOTION stays the same table", () => {
+    expect(DURATIONS.calm).toEqual({ micro: 100, fast: 140, base: 180, medium: 240, slow: 320, large: 420 })
+    expect(DURATIONS.snappy).toEqual({ micro: 80, fast: 100, base: 140, medium: 180, slow: 240, large: 320 })
+    expect(MOTION).toBe(DURATIONS)
+    for (const set of Object.values(DURATIONS)) expect(Object.keys(set)).toHaveLength(6)
+  })
+
+  it("keeps foundation.css's duration defaults on the calm axis", () => {
+    const base = declarations(read("../css/foundation.css"), "  :root")
+    for (const [name, ms] of Object.entries(DURATIONS.calm)) expect(base[`--duration-${name}`]).toBe(`${ms}ms`)
+  })
+
+  it("keeps every old variable name as an alias", () => {
+    const vars = declarations(paperBuilt().css)
+    for (const name of ["--foreground", "--muted-foreground", "--border", "--input", "--radius", "--shadow-xs", "--shadow-sm", "--shadow-md", "--shadow-lg", "--shadow-xl", "--motion-duration", "--motion-ease"]) {
+      expect(vars[name], name).toBeDefined()
+    }
+    expect(vars["--foreground"]).toBe("var(--text-primary)")
+    expect(vars["--muted-foreground"]).toBe("var(--text-secondary)")
+    expect(vars["--border"]).toBe("var(--border-secondary)")
+    expect(vars["--input"]).toBe("var(--border-primary)")
+  })
+})
+
+const paperBuilt = () => build(paper())
+
+describe("radius nesting", () => {
+  it.each(Object.entries(RADIUS_TIERS))("%s: xs <= card <= dialog, and a nested xs fits inside a card", (_shape, tiers) => {
+    const [xs, control, card, dialog] = [tiers.xs, tiers.control, tiers.card, tiers.dialog].map(px)
+    expect(xs).toBeLessThanOrEqual(card)
+    expect(card).toBeLessThanOrEqual(dialog)
+    expect(xs).toBeLessThanOrEqual(control)
+    // A flush child's radius is at most its parent's minus the gap between them (4px), never more than the parent's.
+    expect(xs).toBeLessThanOrEqual(Math.max(0, card - 4))
+    expect(Math.min(card, dialog)).toBeLessThanOrEqual(dialog)
+    // Full radius belongs to the control tier of the pill shape alone.
+    for (const [tier, value] of Object.entries(tiers)) expect(px(value) < 9999 || (tier === "control" && _shape === "pill")).toBe(true)
+  })
+
+  it("accepts a component radius that is a tier or a primitive, and nothing else", () => {
+    const radius = (value: unknown) => buildTheme({ ...paper(), components: { button: { radius: value } } })
+    for (const ok of ["xs", "control", "card", "dialog", "0", "4", "8", "12", "16", "full", 8]) expect(radius(ok).ok, String(ok)).toBe(true)
+    for (const bad of ["pill", "soft", "6px", "10", "0.5rem", "lg"]) expect(radius(bad).ok, String(bad)).toBe(false)
+    expect(Object.keys(RADIUS_PRIMITIVES)).toEqual(["0", "4", "8", "12", "16", "full"])
+  })
+})
+
+describe("heading weight", () => {
+  it.each([400, 500, 600, 700])("accepts %s", (weight) => {
+    const built = build({ ...paper(), typography: { ...paper().typography, headingWeight: weight } })
+    expect(declarations(built.css)["--heading-weight"]).toBe(String(weight))
+  })
+  it.each([100, 300, 450, 800, 900])("refuses %s", (weight) => {
+    const built = buildTheme({ ...paper(), typography: { ...paper().typography, headingWeight: weight } })
+    expect(built.ok).toBe(false)
+    if (!built.ok) expect(built.problems).toContain("typography.headingWeight must be one of 400, 500, 600, 700")
+  })
+})
+
+describe("emphasis", () => {
+  const floorsHold = (tokens: object) => {
+    const built = build(tokens)
+    const vars = declarations(built.css)
+    const hex = (name: string) => resolve(vars, name)
+    const on = [hex("--background"), hex("--card")]
+    const worst = (name: string) => Math.min(...on.map((s) => contrastRatio(hex(name), s) as number))
+    return { built, vars, worst, hex }
+  }
+
+  it.each(references)("%s: every derived emphasis color meets its contrast floor on --background and --card", (_name, tokens) => {
+    const { built, worst, hex, vars } = floorsHold(tokens())
+    expect(worst("--text-primary")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.textPrimary)
+    expect(worst("--text-secondary")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.textSecondary)
+    expect(worst("--text-tertiary")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.textTertiary)
+    expect(worst("--border-primary")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.borderPrimary)
+    // Icons take the text scale (text-fg-*, currentColor), so a meaningful icon reaches at least 3:1.
+    for (const level of ["primary", "secondary", "tertiary"]) expect(worst(`--text-${level}`)).toBeGreaterThanOrEqual(CONTRAST_FLOORS.icon)
+    // The engine reports exactly what it wrote.
+    expect(built.derived).toEqual({ textPrimary: hex("--text-primary"), textSecondary: hex("--text-secondary"), textTertiary: hex("--text-tertiary"), borderPrimary: hex("--border-primary") })
+    // The scale descends: primary is the strongest, then secondary, then tertiary.
+    expect(worst("--text-primary")).toBeGreaterThan(worst("--text-secondary"))
+    expect(worst("--text-secondary")).toBeGreaterThanOrEqual(worst("--text-tertiary"))
+    // Text stays readable on every tint the system lays beneath it.
+    const [primary, card] = [vars["--text-primary"], vars["--card"]]
+    expect(contrastRatio(primary, card)).toBeGreaterThanOrEqual(CONTRAST_FLOORS.textPrimary)
+  })
+
+  it("derives the lightest mix: one percent less would miss the floor", () => {
+    // The tertiary text is the lightest whole-percent mix that reaches 4.5:1, so it sits close to the floor.
+    const { worst } = floorsHold(paper())
+    expect(worst("--text-tertiary")).toBeLessThan(CONTRAST_FLOORS.textTertiary + 0.35)
+    expect(worst("--border-primary")).toBeLessThan(CONTRAST_FLOORS.borderPrimary + 0.2)
+  })
+
+  it("uses the brand's mutedForeground for secondary text when it meets the floor", () => {
+    const { vars } = floorsHold(richBrand())
+    expect(vars["--text-secondary"]).toBe("#57534e")
+  })
+
+  it("writes the full scale: text (icons share it), border, surface and status tints, on both sides of the theme", () => {
+    for (const [, tokens] of references) {
+      const vars = declarations(build(tokens()).css)
+      for (const name of [
+        "--text-primary", "--text-secondary", "--text-tertiary", "--text-disabled", "--text-inverse",
+
+        "--border-primary", "--border-secondary", "--border-tertiary", "--border-disabled", "--border-inverse",
+        "--surface-base", "--surface-subtle", "--surface-raised", "--surface-overlay", "--surface-hover", "--surface-pressed", "--surface-selected", "--surface-disabled", "--surface-inverse",
+        "--destructive-muted", "--success-muted", "--warning-muted", "--info-muted",
+        "--ring", "--ring-danger", "--ring-inverse", "--opacity-disabled",
+      ]) expect(vars[name], name).toBeDefined()
+      expect(vars["--text-disabled"]).toBe(`color-mix(in oklab, ${vars["--text-primary"]} 38%, ${vars["--background"]})`)
+      expect(vars["--border-tertiary"]).toContain(" 10%,")
+      expect(vars["--border-disabled"]).toContain(" 8%,")
+      expect(vars["--surface-hover"]).toContain(" 6%,")
+      expect(vars["--surface-pressed"]).toContain(" 10%,")
+      expect(vars["--surface-selected"]).toContain(" 12%,")
+      expect(vars["--opacity-disabled"]).toBe("0.5")
+    }
+  })
+
+  describe("a deliberately hard brand", () => {
+    const hard = {
+      colors: { primary: "#808080", background: "#888888", surface: "#8c8c8c", text: "#707070" },
+      typography: { fontFamily: { display: "Inter", body: "Inter" } },
+    }
+
+    it("produces a problem instead of a theme that misses a floor", () => {
+      const built = buildTheme(hard)
+      expect(built.ok).toBe(false)
+      if (!built.ok) expect(built.problems.join("\n")).toMatch(/--text-primary needs 7:1/)
+    })
+
+    it("names the floor that fails when only the muted text is too faint", () => {
+      const built = buildTheme({ ...paper(), colors: { ...paper().colors, mutedForeground: "#d8d4cc" } })
+      expect(built.ok).toBe(false)
+      if (!built.ok) expect(built.problems.join("\n")).toMatch(/colors\.mutedForeground reaches \d\.\d\d:1.*--text-secondary needs 4\.5:1/)
+    })
+
+    it("refuses a brand whose text can reach 7:1 on neither surface, even when the background alone would do", () => {
+      const built = buildTheme({ ...paper(), colors: { ...paper().colors, surface: "#1b1a17" } })
+      expect(built.ok).toBe(false)
+    })
   })
 })

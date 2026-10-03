@@ -9,7 +9,12 @@
 //              writes is consumed somewhere; component-token roles point at real tokens
 //   components every atom has stories, one data-slot owner, no raw colors, no near-duplicate name,
 //              no duplicate export; the manifest lists exactly the atoms that exist
-//   themes     every reference theme compiles and reads (WCAG AA text, contrasting primary text)
+//   themes     every reference theme compiles and reads (WCAG AA text, contrasting primary text), and every derived
+//              emphasis color meets its contrast floor (docs/visual-system.md section 5): always a hard failure
+//   visual     Gate 1 of the visual system (docs/visual-system.md section 12): static rules over the source of packages/react
+//              and every manifest-* package (spacing steps, arbitrary values, motion, radius, border, shadow, weight,
+//              opacity, icons, data-slot / data-variant, useThemeMotion). Components are normalized in a later phase, so
+//              these are warnings with a count per rule; FEATHER_HYGIENE_V1=1 makes every one a failure.
 //   release    fonts are installed, every package / manifest / changelog agrees on the version
 //   packaging  published source has no "@/" alias imports, the package entry exports every component,
 //              every stylesheet import is a dependency of its package, the IR package has no dependencies,
@@ -18,7 +23,7 @@
 // Deterministic: no network, no dependencies. Exit 1 with every problem listed.
 import fs from "node:fs"
 import path from "node:path"
-import { buildTheme, FONTS, TOKEN_SCHEMA, contrastRatio, fontImports as buildFontImports } from "../packages/tokens/src/index.mjs"
+import { buildTheme, CONTRAST_FLOORS, FONTS, TOKEN_SCHEMA, contrastRatio, fontImports as buildFontImports } from "../packages/tokens/src/index.mjs"
 
 const TOKENS = "packages/tokens"
 const REACT = "packages/react"
@@ -33,9 +38,12 @@ const exists = (p) => fs.existsSync(p)
 /** Tokens that are not colors, so are not mapped as --color-*. */
 const NON_COLOR = new Set(["--radius"])
 /** Engine-written variables Tailwind v4 consumes natively (its own theme namespace). */
-const TAILWIND_NATIVE = /^--(spacing|shadow-(xs|sm|md|lg|xl))$/
+const TAILWIND_NATIVE = /^--(spacing|shadow-(xs|sm|md|lg|xl)|radius-(xs|control|card|dialog))$/
 
-export function hygiene(root = ".") {
+/** Where the optical exceptions live (docs/visual-system.md section 9). */
+const OPTICAL_EXCEPTIONS = `${REACT}/optical-exceptions.json`
+
+export function hygiene(root = ".", { v1 = process.env.FEATHER_HYGIENE_V1 === "1" } = {}) {
   const at = (p) => path.join(root, p)
   const problems = []
   const notes = []
@@ -64,7 +72,9 @@ export function hygiene(root = ".") {
   // What the theme engine writes for a minimal brand.
   const sample = buildTheme({ colors: { primary: "#336699", background: "#ffffff", surface: "#f5f5f5", text: "#111111" }, typography: { fontFamily: { display: "Inter", body: "Inter" } } })
   if (!sample.ok) problems.push(`the theme engine rejects a minimal brand: ${sample.problems.join("; ")}`)
-  const written = new Set(sample.ok ? [...sample.css.matchAll(/^\s*(--[a-z0-9-]+):/gm)].map((m) => m[1]) : [])
+  // A brand that sets headingWeight writes one more variable.
+  const weighted = buildTheme({ colors: { primary: "#336699", background: "#ffffff", surface: "#f5f5f5", text: "#111111" }, typography: { fontFamily: { display: "Inter", body: "Inter" }, headingWeight: 600 } })
+  const written = new Set([sample, weighted].flatMap((built) => (built.ok ? [...built.css.matchAll(/^\s*(--[a-z0-9-]+):/gm)].map((m) => m[1]) : [])))
   const mapped = new Map()
   for (const [name, value] of scopes["@theme inline"]) {
     for (const ref of value.matchAll(/var\((--[a-z0-9-]+)/g)) {
@@ -93,7 +103,9 @@ export function hygiene(root = ".") {
     if (!corpus.includes(`var(${n}`)) problems.push(`the theme engine writes ${n} but nothing reads it — an orphan token (wire it or remove it)`)
   }
   // Every var() in components and styles resolves to something that exists.
-  const known = new Set([...semantic, ...written, ...scopes["@theme inline"].map(([n]) => n)])
+  // Every variable foundation.css declares anywhere (layout tokens, density defaults, theme primitives) is known too.
+  const declaredInFoundation = [...css.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1])
+  const known = new Set([...semantic, ...written, ...declaredInFoundation, ...scopes["@theme inline"].map(([n]) => n)])
   for (const file of sources) {
     for (const m of read(file).matchAll(/var\((--[a-z0-9-]+)/g)) {
       const n = m[1]
@@ -270,15 +282,44 @@ export function hygiene(root = ".") {
       problems.push(`reference theme ${file} no longer compiles: ${built.problems.join("; ")}`)
       continue
     }
-    const v = Object.fromEntries([...built.css.matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gm)].map((m) => [m[1], m[2]]))
+    const raw = Object.fromEntries([...built.css.matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gm)].map((m) => [m[1], m[2]]))
+    // Aliases (--foreground: var(--text-primary)) are followed to the color they name.
+    const v = (name) => follow(raw, name)
     const pairs = [["--foreground", "--background", 4.5], ["--card-foreground", "--card", 4.5], ["--primary-foreground", "--primary", 4.5]]
     for (const [fg, bg, min] of pairs) {
-      const ratio = contrastRatio(v[fg], v[bg])
+      const ratio = contrastRatio(v(fg), v(bg))
       if (ratio !== null && ratio < min) problems.push(`reference theme ${file}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, below WCAG AA ${min}:1`)
+    }
+    // Emphasis (section 5): every derived color meets its floor on --background and --card. Hard, always.
+    const floors = [
+      ["--text-primary", CONTRAST_FLOORS.textPrimary],
+      ["--text-secondary", CONTRAST_FLOORS.textSecondary],
+      ["--text-tertiary", CONTRAST_FLOORS.textTertiary],
+      ["--border-primary", CONTRAST_FLOORS.borderPrimary],
+    ]
+    for (const [token, min] of floors) {
+      for (const surface of ["--background", "--card"]) {
+        const ratio = contrastRatio(v(token), v(surface))
+        if (ratio === null) problems.push(`reference theme ${file}: ${token} (${raw[token]}) is not a plain color the audit can measure`)
+        else if (ratio < min) problems.push(`reference theme ${file}: ${token} on ${surface} is ${ratio.toFixed(2)}:1, below its ${min}:1 floor`)
+      }
     }
   }
   notes.push(`${atoms.length} components, ${semantic.size} semantic tokens, ${themes.length} reference themes`)
-  return { ok: problems.length === 0, problems, notes }
+
+  // ── visual (Gate 1, docs/visual-system.md section 12) ─────────────────────────────────────────────────────────────
+  const exceptions = loadExceptions(at(OPTICAL_EXCEPTIONS), problems)
+  const scan = scanVisual(root, exceptions)
+  const warnings = []
+  for (const rule of VISUAL_RULES) {
+    const found = scan.byRule.get(rule) ?? []
+    if (found.length === 0) continue
+    const sample = found.slice(0, 3).map((f) => `${f.file}: ${f.token}`).join("; ")
+    if (v1) problems.push(`visual/${rule}: ${found.length} in ${new Set(found.map((f) => f.file)).size} files (${sample})`)
+    else warnings.push(`visual/${rule}: ${found.length} in ${new Set(found.map((f) => f.file)).size} files (first: ${sample})`)
+  }
+  notes.push(`${scan.files} source files scanned for the visual rules (${scan.total} findings${v1 ? "" : ", warnings until components are normalized"})`)
+  return { ok: problems.length === 0, problems, notes, warnings, visual: { total: scan.total, counts: Object.fromEntries(VISUAL_RULES.map((r) => [r, (scan.byRule.get(r) ?? []).length])), findings: scan.findings } }
 }
 
 /** The files in this package a font's stylesheet import points at ("fonts/inter.css"). */
@@ -320,9 +361,183 @@ function distance(a, b) {
   return d[a.length][b.length]
 }
 
+/** A custom property's value, with var() aliases followed to the end. */
+function follow(vars, name) {
+  let value = vars[name]
+  for (let i = 0; i < 8 && typeof value === "string" && value.startsWith("var("); i++) value = vars[value.slice(4, -1).split(",")[0].trim()]
+  return value
+}
+
+// ── Gate 1: the static visual rules ───────────────────────────────────────────────────────────────────────────────
+
+/** Every rule the static scan has, in the order they are reported. */
+export const VISUAL_RULES = [
+  "spacing-step",
+  "arbitrary-value",
+  "transition-all",
+  "duration",
+  "ease",
+  "radius-tier",
+  "border-width",
+  "shadow",
+  "font-weight",
+  "opacity",
+  "slash-opacity",
+  "bare-icon",
+  "data-slot",
+  "data-variant",
+  "theme-motion",
+]
+
+/** The Tailwind steps the system allows (section 2): 0, 0.5 (optical only), 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32. */
+const STEPS = new Set(["0", "1", "2", "3", "4", "5", "6", "8", "10", "12", "16", "20", "24", "32"])
+const SPACING = "(?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap-x|gap-y|space-x|space-y|inset|inset-x|inset-y|top|right|bottom|left|start|end|size|w|h|min-w|min-h|max-w|max-h|basis|translate-x|translate-y|scroll-m|scroll-p)"
+const SPACING_RE = new RegExp(`^-?${SPACING}-(\\d+(?:\\.\\d+)?)$`)
+/** A one pixel nudge (mt-px, -translate-y-px), which is an optical exception. w-px, h-px and size-px are 1px lines and fine. */
+const NUDGE_RE = /^-?(?:p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|inset|inset-x|inset-y|top|right|bottom|left|translate-x|translate-y)-px$/
+const FONT_SIZES = new Set(["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl"])
+
+/** Class tokens of a source file: the whitespace-separated pieces of its string and template literals. */
+function classTokens(source) {
+  const out = []
+  const literal = /"((?:[^"\\\n]|\\.)*)"|'((?:[^'\\\n]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g
+  const text = stripComments(source)
+  for (const m of text.matchAll(literal)) {
+    const line = text.slice(0, m.index).split("\n").length
+    for (const piece of (m[1] ?? m[2] ?? m[3]).replace(/\$\{[^}]*\}/g, " ").split(/\s+/)) if (piece) out.push({ token: piece, line })
+  }
+  return out
+}
+
+/** A class token without its variants (hover:, data-[x]:, [&_svg]:), importance marks and negative sign: the utility itself. */
+function coreOf(token) {
+  let depth = 0
+  let cut = 0
+  for (let i = 0; i < token.length; i++) {
+    const ch = token[i]
+    if (ch === "[" || ch === "(") depth++
+    else if (ch === "]" || ch === ")") depth--
+    else if (ch === ":" && depth === 0) cut = i + 1
+  }
+  return token.slice(cut).replace(/^!/, "").replace(/!$/, "")
+}
+
+/** The visual rules one class token breaks (a token may break more than one). */
+function ruleOfToken(token) {
+  const core = coreOf(token)
+  const hit = []
+  const spacing = SPACING_RE.exec(core)
+  if (spacing && !STEPS.has(spacing[1])) hit.push("spacing-step")
+  else if (NUDGE_RE.test(core)) hit.push("spacing-step")
+  if (/-\[[^\]]*\d(?:px|rem|em|ms|%)[^\]]*\]/.test(token)) hit.push("arbitrary-value")
+  if (core === "transition-all") hit.push("transition-all")
+  if (/^duration-(?:\d+|\[.*\])$/.test(core)) hit.push("duration")
+  if (/^ease-/.test(core) && core !== "ease-standard") hit.push("ease")
+  if (/^rounded(?:-(?:t|b|l|r|s|e|tl|tr|bl|br|ss|se|ee|es))?-(?:sm|md|lg|xl|2xl|3xl|4xl)$/.test(core)) hit.push("radius-tier")
+  if (/^border(?:-[xytblrse])?-(?:2|4|8)$/.test(core) || /^border(?:-[xytblrse])?-\[/.test(core)) hit.push("border-width")
+  const shadow = /^shadow-(.+)$/.exec(core)
+  if (shadow && !["none", "1", "2", "3"].includes(shadow[1])) hit.push("shadow")
+  if (/^font-(?:thin|extralight|light|extrabold|black)$/.test(core)) hit.push("font-weight")
+  const opacity = /^opacity-(.+)$/.exec(core)
+  if (opacity && !["0", "100", "disabled"].includes(opacity[1])) hit.push("opacity")
+  const slash = /^(?:text|border(?:-[xytblrse])?|fill|stroke)-([a-z][a-z0-9-]*)\/(?:\d+|\[[^\]]*\])$/.exec(core)
+  if (slash && !FONT_SIZES.has(slash[1])) hit.push("slash-opacity")
+  return hit
+}
+
+/** The lucide components a source file imports, by the name it uses. */
+function lucideNames(source) {
+  const names = new Set()
+  for (const m of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"lucide-react"/g)) {
+    for (const part of m[1].split(",").map((x) => x.trim()).filter(Boolean)) names.add(part.split(/\s+as\s+/).pop().trim())
+  }
+  return names
+}
+
+/**
+ * The visual findings in one source file: [{ rule, file, token, line }]. `exceptions` is the allowlist of
+ * optical-exceptions.json ({ file, value }): a 0.5 step, a one pixel nudge or an arbitrary value listed there is accepted.
+ * `rel` is the file's path from the repository root.
+ */
+export function scanSource(rel, source, exceptions = []) {
+  const findings = []
+  const allowed = (token, core) => exceptions.some((e) => e.file === rel && (e.value === token || e.value === core))
+  const add = (rule, token, line) => findings.push({ rule, file: rel, token, line })
+  for (const { token, line } of classTokens(source)) {
+    const core = coreOf(token)
+    for (const rule of ruleOfToken(token)) if (!((rule === "spacing-step" || rule === "arbitrary-value") && allowed(token, core))) add(rule, token, line)
+  }
+  const text = stripComments(source)
+  for (const m of text.matchAll(/transition(?:-property)?\s*:\s*["']?\s*all\b/g)) add("transition-all", m[0], text.slice(0, m.index).split("\n").length)
+  // A bare lucide icon with its own size: a size class, or a size, width or height prop.
+  const lucide = lucideNames(text)
+  const isIcon = /(^|\/)components\/ui\/icon\.tsx$/.test(rel)
+  if (lucide.size > 0 && !isIcon) {
+    for (const m of text.matchAll(new RegExp(`<(${[...lucide].join("|")})\\b((?:[^<>{}]|\\{[^{}]*\\})*)/?>`, "g"))) {
+      const attrs = m[2]
+      if (/\bclassName\s*=\s*(?:"[^"]*|\{[^}]*)\b(?:size|w|h)-/.test(attrs) || /\b(?:size|width|height)\s*=/.test(attrs)) add("bare-icon", `<${m[1]}>`, text.slice(0, m.index).split("\n").length)
+    }
+  }
+  // Components: every part carries data-slot, every variant data-variant, and animated components read the theme's motion.
+  if (/(^|\/)components\//.test(rel) && /\.tsx$/.test(rel) && !isIcon) {
+    const usesRender = /\buseRender\b/.test(text)
+    if (!usesRender) {
+      for (const m of text.matchAll(/<([a-z][a-zA-Z0-9]*|[A-Z][A-Za-z0-9]*\.[A-Z][A-Za-z0-9]*)\b((?:[^<>{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)>/g)) {
+        const [, tag, attrs] = m
+        if (/^(svg|path|g|circle|rect|line|polyline|polygon|defs|use|stop|linearGradient|clipPath)$/.test(tag)) continue
+        if (/\bclassName\s*=/.test(attrs) && !/\bdata-slot\s*=/.test(attrs)) add("data-slot", `<${tag}>`, text.slice(0, m.index).split("\n").length)
+      }
+    }
+    // A component with variants says which: data-variant, or the `state: { slot, variant }` that useRender turns into one.
+    if (/\bcva\s*\(/.test(text) && !/\bdata-variant\s*=/.test(text) && !/\bslot\s*:\s*"[^"]+"\s*,\s*variant\b/.test(text)) add("data-variant", "cva variants without data-variant", 1)
+    if (/from\s+"motion\/react"/.test(text) && !/\buseThemeMotion\b/.test(text) && !/lib\/motion\.ts$/.test(rel)) add("theme-motion", "motion/react without useThemeMotion", 1)
+  }
+  return findings
+}
+
+/** The files the visual rules cover: packages/react/src and every manifest-*'s src, without stories, tests and test dirs. */
+function visualFiles(root) {
+  const dirs = [`${REACT}/src`, ...fs.readdirSync(path.join(root, "packages")).filter((d) => d.startsWith("manifest-")).map((d) => `packages/${d}/src`)]
+  return dirs.flatMap((dir) => sourceFiles(path.join(root, dir)))
+}
+
+function scanVisual(root, exceptions) {
+  const files = visualFiles(root)
+  const findings = files.flatMap((file) => scanSource(path.relative(root, file).split(path.sep).join("/"), read(file), exceptions))
+  const byRule = new Map()
+  for (const f of findings) byRule.set(f.rule, [...(byRule.get(f.rule) ?? []), f])
+  return { files: files.length, findings, byRule, total: findings.length }
+}
+
+/** optical-exceptions.json: { "exceptions": [{ file, value, reason, reviewer }] }. A malformed entry is a problem. */
+function loadExceptions(file, problems) {
+  if (!exists(file)) {
+    problems.push(`${OPTICAL_EXCEPTIONS} is missing — it lists the optical exceptions (an empty "exceptions" array when there are none)`)
+    return []
+  }
+  let data
+  try {
+    data = JSON.parse(read(file))
+  } catch (error) {
+    problems.push(`${OPTICAL_EXCEPTIONS} is not valid JSON: ${error.message}`)
+    return []
+  }
+  const list = Array.isArray(data.exceptions) ? data.exceptions : null
+  if (!list) {
+    problems.push(`${OPTICAL_EXCEPTIONS} needs an "exceptions" array`)
+    return []
+  }
+  list.forEach((e, i) => {
+    for (const key of ["file", "value", "reason", "reviewer"]) if (typeof e?.[key] !== "string" || e[key].trim() === "") problems.push(`${OPTICAL_EXCEPTIONS} exceptions[${i}] needs a "${key}"`)
+  })
+  return list.filter((e) => e && typeof e.file === "string" && typeof e.value === "string")
+}
+
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)
 if (isMain) {
   const result = hygiene(path.resolve(import.meta.dirname, ".."))
+  for (const warning of result.warnings) console.log(`warning: ${warning}`)
+  if (process.env.FEATHER_HYGIENE_DETAIL === "1") for (const f of result.visual.findings) console.log(`  ${f.rule}  ${f.file}:${f.line}  ${f.token}`)
   if (!result.ok) {
     console.log(`Feather hygiene failed (${result.problems.length}):\n- ${result.problems.join("\n- ")}`)
     process.exit(1)

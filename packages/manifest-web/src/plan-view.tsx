@@ -102,14 +102,13 @@ export function PlanView({ plan, onReply, experience, onRejectedReply, autoFocus
           data-feather-experience={plan.experience}
           data-manifestation={plan.manifestation}
           data-chrome={plan.chrome}
-          data-density={plan.density}
+          data-density={DENSITY[plan.density]}
           data-min-target={plan.minTarget}
           data-motion={plan.motion}
           data-contrast={plan.contrast}
           data-cues={plan.cues}
           lang={plan.locale}
           dir={directionOf(plan.locale)}
-          style={{ "--spacing": DENSITY[plan.density] } as React.CSSProperties}
           className={classes}
         >
           {plan.chrome === "card" ? (

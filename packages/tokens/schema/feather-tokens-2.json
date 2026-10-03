@@ -148,15 +148,10 @@
         },
         "headingWeight": {
           "enum": [
-            100,
-            200,
-            300,
             400,
             500,
             600,
-            700,
-            800,
-            900
+            700
           ]
         },
         "scale": {
@@ -189,7 +184,7 @@
         "rounded",
         "pill"
       ],
-      "default": "soft"
+      "default": "rounded"
     },
     "density": {
       "enum": [
@@ -231,33 +226,42 @@
         "additionalProperties": false,
         "properties": {
           "radius": {
-            "anyOf": [
-              {
-                "enum": [
-                  "sharp",
-                  "soft",
-                  "rounded",
-                  "pill"
-                ]
-              },
-              {
-                "type": "string",
-                "pattern": "^\\d+(\\.\\d+)?(px|rem)$"
-              }
+            "description": "A radius tier or one of the radius primitives (docs/visual-system.md section 2).",
+            "enum": [
+              "xs",
+              "control",
+              "card",
+              "dialog",
+              "0",
+              "4",
+              "8",
+              "12",
+              "16",
+              "full",
+              0,
+              4,
+              8,
+              12,
+              16
             ]
           },
           "borderWidth": {
-            "type": "string",
-            "pattern": "^\\d+(\\.\\d+)?px$"
+            "enum": ["0px", "1px"]
           },
           "shadow": {
             "enum": [
               "none",
+              "1",
+              "2",
+              "3",
               "xs",
               "sm",
               "md",
               "lg",
-              "xl"
+              "xl",
+              1,
+              2,
+              3
             ]
           },
           "fontWeight": {

@@ -73,10 +73,12 @@ describe("chrome", () => {
 describe("density, targets, motion and contrast", () => {
   failOnConsole()
 
-  it("density sets --spacing from the tokens", () => {
-    expect(rootOf(view("ad-campaign-launch", phone).container).style.getPropertyValue("--spacing")).toBe("0.25rem")
-    expect(rootOf(view("ad-campaign-launch", desktop).container).style.getPropertyValue("--spacing")).toBe("0.22rem")
-    expect(rootOf(view("ad-campaign-launch", lowVision).container).style.getPropertyValue("--spacing")).toBe("0.29rem")
+  it("density sets data-density from the plan: compact is tight, comfortable default, spacious spacious", () => {
+    expect(rootOf(view("ad-campaign-launch", phone).container).getAttribute("data-density")).toBe("default")
+    expect(rootOf(view("ad-campaign-launch", desktop).container).getAttribute("data-density")).toBe("tight")
+    expect(rootOf(view("ad-campaign-launch", lowVision).container).getAttribute("data-density")).toBe("spacious")
+    // The unit never scales with density any more.
+    expect(rootOf(view("ad-campaign-launch", desktop).container).style.getPropertyValue("--spacing")).toBe("")
   })
 
   it("minTarget 44 makes every control at least 44 px", () => {

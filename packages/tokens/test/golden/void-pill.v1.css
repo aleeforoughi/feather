@@ -1,0 +1,144 @@
+:root:root {
+  --background: #050505;
+  --foreground: var(--text-primary);
+  --card: #141614;
+  --card-foreground: var(--text-primary);
+  --popover: #141614;
+  --popover-foreground: var(--text-primary);
+  --primary: #7bffb2;
+  --primary-foreground: #000000;
+  --secondary: color-mix(in oklab, #f2f0ea 10%, #141614);
+  --secondary-foreground: var(--text-primary);
+  --muted: color-mix(in oklab, #f2f0ea 8%, #050505);
+  --muted-foreground: var(--text-secondary);
+  --accent: color-mix(in oklab, #7bffb2 18%, #050505);
+  --accent-foreground: var(--text-primary);
+  --destructive: #e5484d;
+  --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+  --success: #4cc27d;
+  --success-foreground: #000000;
+  --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));
+  --warning: #f0b84a;
+  --warning-foreground: #000000;
+  --warning-muted: color-mix(in oklab, var(--warning) 12%, var(--card));
+  --info: #5aa0e6;
+  --info-foreground: #000000;
+  --info-muted: color-mix(in oklab, var(--info) 12%, var(--card));
+  --text-primary: #f2f0ea;
+  --text-secondary: #b8b7b2;
+  --text-tertiary: #82817e;
+  --text-disabled: color-mix(in oklab, #f2f0ea 38%, #050505);
+  --text-inverse: #050505;
+  --border-primary: #646361;
+  --border-secondary: color-mix(in oklab, #f2f0ea 16%, #050505);
+  --border-tertiary: color-mix(in oklab, #f2f0ea 10%, #050505);
+  --border-disabled: color-mix(in oklab, #f2f0ea 8%, #050505);
+  --border-inverse: color-mix(in oklab, #050505 24%, #f2f0ea);
+  --border: var(--border-secondary);
+  --input: var(--border-primary);
+  --surface-base: var(--background);
+  --surface-subtle: color-mix(in oklab, #f2f0ea 4%, #050505);
+  --surface-raised: var(--card);
+  --surface-overlay: var(--popover);
+  --surface-hover: color-mix(in oklab, #f2f0ea 6%, var(--card));
+  --surface-pressed: color-mix(in oklab, #f2f0ea 10%, var(--card));
+  --surface-selected: color-mix(in oklab, #7bffb2 12%, var(--card));
+  --surface-disabled: color-mix(in oklab, #f2f0ea 6%, var(--card));
+  --surface-inverse: #f2f0ea;
+  --ring: #7bffb2;
+  --ring-danger: var(--destructive);
+  --ring-inverse: var(--text-inverse);
+  --chart-1: #7bffb2;
+  --chart-2: #7bffb2;
+  --chart-3: color-mix(in oklab, #7bffb2 55%, #f2f0ea);
+  --chart-4: color-mix(in oklab, #7bffb2 60%, #050505);
+  --chart-5: color-mix(in oklab, #f2f0ea 45%, #050505);
+  --radius-xs: 0.25rem;
+  --radius-control: 9999px;
+  --radius-card: 1rem;
+  --radius-dialog: 1rem;
+  --radius: var(--radius-card);
+  --sidebar: #141614;
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: #7bffb2;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: color-mix(in oklab, #7bffb2 18%, #141614);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: color-mix(in oklab, #f2f0ea 16%, #141614);
+  --sidebar-ring: #7bffb2;
+  --brand-font-body: "Inter Variable", sans-serif;
+  --brand-font-display: "Sora Variable", sans-serif;
+  --spacing: 0.25rem;
+  --control-height: 2.75rem;
+  --control-px: 1rem;
+  --control-py: 0.75rem;
+  --icon-slot: 1.25rem;
+  --pad-x: 1.5rem;
+  --pad-y: 1rem;
+  --card-pad: 1.5rem;
+  --dialog-pad: 2rem;
+  --gap: 0.75rem;
+  --group-gap: 1.5rem;
+  --opacity-disabled: 0.5;
+  --elevation-1: 0 2px 4px rgb(0 0 0 / 0.18);
+  --elevation-2: 0 10px 24px -6px rgb(0 0 0 / 0.32);
+  --elevation-3: 0 20px 40px -10px rgb(0 0 0 / 0.4);
+  --shadow-xs: var(--elevation-1);
+  --shadow-sm: var(--elevation-1);
+  --shadow-md: var(--elevation-2);
+  --shadow-lg: var(--elevation-3);
+  --shadow-xl: var(--elevation-3);
+  --duration-micro: 80ms;
+  --duration-fast: 100ms;
+  --duration-base: 140ms;
+  --duration-medium: 180ms;
+  --duration-slow: 240ms;
+  --duration-large: 320ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-duration: var(--duration-base);
+  --motion-ease: var(--ease-standard);
+  color-scheme: dark;
+}
+
+/* Density: any element with data-density overrides the density variables for its subtree. */
+[data-density="tight"],
+:root:root[data-density="tight"] {
+  --control-height: 2.25rem;
+  --control-px: 0.75rem;
+  --control-py: 0.5rem;
+  --icon-slot: 1rem;
+  --pad-x: 1rem;
+  --pad-y: 0.75rem;
+  --card-pad: 1rem;
+  --dialog-pad: 1.5rem;
+  --gap: 0.5rem;
+  --group-gap: 1rem;
+}
+
+[data-density="default"],
+:root:root[data-density="default"] {
+  --control-height: 2.75rem;
+  --control-px: 1rem;
+  --control-py: 0.75rem;
+  --icon-slot: 1.25rem;
+  --pad-x: 1.5rem;
+  --pad-y: 1rem;
+  --card-pad: 1.5rem;
+  --dialog-pad: 2rem;
+  --gap: 0.75rem;
+  --group-gap: 1.5rem;
+}
+
+[data-density="spacious"],
+:root:root[data-density="spacious"] {
+  --control-height: 3.25rem;
+  --control-px: 1.25rem;
+  --control-py: 1rem;
+  --icon-slot: 1.5rem;
+  --pad-x: 2rem;
+  --pad-y: 1.5rem;
+  --card-pad: 2rem;
+  --dialog-pad: 2.5rem;
+  --gap: 1rem;
+  --group-gap: 2rem;
+}

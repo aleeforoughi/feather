@@ -14,6 +14,34 @@
     /* Motion axis (calm | snappy): every transition utility follows the brand's motion. */
     --default-transition-duration: var(--motion-duration, 150ms);
     --default-transition-timing-function: var(--motion-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    /* Emphasis (docs/visual-system.md section 5): text-fg-primary (text and icons), border-line-primary...
+       The names repeat the token because text-primary, border-primary and bg-secondary already mean the brand's fills. */
+    --color-fg-primary: var(--text-primary);
+    --color-fg-secondary: var(--text-secondary);
+    --color-fg-tertiary: var(--text-tertiary);
+    --color-fg-disabled: var(--text-disabled);
+    --color-fg-inverse: var(--text-inverse);
+    --color-line-primary: var(--border-primary);
+    --color-line-secondary: var(--border-secondary);
+    --color-line-tertiary: var(--border-tertiary);
+    --color-line-disabled: var(--border-disabled);
+    --color-border-inverse: var(--border-inverse);
+    /* Surfaces (section 6): bg-surface-raised... */
+    --color-surface-base: var(--surface-base);
+    --color-surface-subtle: var(--surface-subtle);
+    --color-surface-raised: var(--surface-raised);
+    --color-surface-overlay: var(--surface-overlay);
+    --color-surface-hover: var(--surface-hover);
+    --color-surface-pressed: var(--surface-pressed);
+    --color-surface-selected: var(--surface-selected);
+    --color-surface-disabled: var(--surface-disabled);
+    --color-surface-inverse: var(--surface-inverse);
+    --color-destructive-muted: var(--destructive-muted);
+    --color-success-muted: var(--success-muted);
+    --color-warning-muted: var(--warning-muted);
+    --color-info-muted: var(--info-muted);
+    --color-ring-danger: var(--ring-danger);
+    --color-ring-inverse: var(--ring-inverse);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -60,6 +88,50 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* The primitives a brand's theme overrides (feather-brand writes them at :root:root). Neutral defaults, so Feather
+   works without a brand: shape "rounded", elevation "soft". Utilities: rounded-xs|control|card|dialog, shadow-1|2|3,
+   ease-standard, and the type scale. */
+@theme static {
+    --radius-xs: 0.25rem;
+    --radius-control: 0.5rem;
+    --radius-card: 0.75rem;
+    --radius-dialog: 1rem;
+    /* Shadows reference the elevation variables, so a brand's elevation axis reaches every utility (Tailwind inlines a
+       literal shadow value, which a brand's override could never change). */
+    --shadow-1: var(--elevation-1);
+    --shadow-2: var(--elevation-2);
+    --shadow-3: var(--elevation-3);
+    --shadow-xs: var(--elevation-1);
+    --shadow-sm: var(--elevation-1);
+    --shadow-md: var(--elevation-2);
+    --shadow-lg: var(--elevation-3);
+    --shadow-xl: var(--elevation-3);
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    /* Type scale (section 2): sizes in rem, every line height on the 4px grid, written in rem. */
+    --text-xs: 0.75rem;
+    --text-xs--line-height: 1rem;
+    --text-sm: 0.875rem;
+    --text-sm--line-height: 1.25rem;
+    --text-base: 1rem;
+    --text-base--line-height: 1.5rem;
+    --text-lg: 1.125rem;
+    --text-lg--line-height: 1.75rem;
+    --text-xl: 1.25rem;
+    --text-xl--line-height: 1.75rem;
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: 2rem;
+    --text-3xl: 1.75rem;
+    --text-3xl--line-height: 2.25rem;
+    --text-4xl: 2rem;
+    --text-4xl--line-height: 2.5rem;
+    --text-5xl: 2.5rem;
+    --text-5xl--line-height: 3rem;
+    --text-6xl: 3rem;
+    --text-6xl--line-height: 3.5rem;
+    --text-7xl: 4rem;
+    --text-7xl--line-height: 4.5rem;
+}
+
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -83,14 +155,39 @@
     --info: oklch(0.58 0.14 245);
     --info-foreground: oklch(0.985 0 0);
     --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
+    --input: var(--border-primary);
+    --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+    --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));
+    --warning-muted: color-mix(in oklab, var(--warning) 12%, var(--card));
+    --info-muted: color-mix(in oklab, var(--info) 12%, var(--card));
+    --text-primary: var(--foreground);
+    --text-secondary: var(--muted-foreground);
+    --text-tertiary: color-mix(in oklab, var(--foreground) 56%, var(--background));
+    --text-disabled: color-mix(in oklab, var(--foreground) 38%, var(--background));
+    --text-inverse: var(--background);
+    --border-primary: oklch(0.62 0 0);
+    --border-secondary: var(--border);
+    --border-tertiary: color-mix(in oklab, var(--foreground) 10%, var(--background));
+    --border-disabled: color-mix(in oklab, var(--foreground) 8%, var(--background));
+    --border-inverse: color-mix(in oklab, var(--background) 24%, var(--foreground));
+    --surface-base: var(--background);
+    --surface-subtle: color-mix(in oklab, var(--foreground) 4%, var(--background));
+    --surface-raised: var(--card);
+    --surface-overlay: var(--popover);
+    --surface-hover: color-mix(in oklab, var(--foreground) 6%, var(--card));
+    --surface-pressed: color-mix(in oklab, var(--foreground) 10%, var(--card));
+    --surface-selected: color-mix(in oklab, var(--primary) 12%, var(--card));
+    --surface-disabled: color-mix(in oklab, var(--foreground) 6%, var(--card));
+    --surface-inverse: var(--foreground);
+    --ring-danger: var(--destructive);
+    --ring-inverse: var(--text-inverse);
     --ring: oklch(0.708 0 0);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
+    --radius: var(--radius-card);
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -124,7 +221,32 @@
     --info: oklch(0.7 0.13 245);
     --info-foreground: oklch(0.2 0.03 245);
     --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
+    --input: var(--border-primary);
+    --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+    --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));
+    --warning-muted: color-mix(in oklab, var(--warning) 12%, var(--card));
+    --info-muted: color-mix(in oklab, var(--info) 12%, var(--card));
+    --text-primary: var(--foreground);
+    --text-secondary: var(--muted-foreground);
+    --text-tertiary: color-mix(in oklab, var(--foreground) 56%, var(--background));
+    --text-disabled: color-mix(in oklab, var(--foreground) 38%, var(--background));
+    --text-inverse: var(--background);
+    --border-primary: oklch(0.58 0 0);
+    --border-secondary: var(--border);
+    --border-tertiary: color-mix(in oklab, var(--foreground) 10%, var(--background));
+    --border-disabled: color-mix(in oklab, var(--foreground) 8%, var(--background));
+    --border-inverse: color-mix(in oklab, var(--background) 24%, var(--foreground));
+    --surface-base: var(--background);
+    --surface-subtle: color-mix(in oklab, var(--foreground) 4%, var(--background));
+    --surface-raised: var(--card);
+    --surface-overlay: var(--popover);
+    --surface-hover: color-mix(in oklab, var(--foreground) 6%, var(--card));
+    --surface-pressed: color-mix(in oklab, var(--foreground) 10%, var(--card));
+    --surface-selected: color-mix(in oklab, var(--primary) 12%, var(--card));
+    --surface-disabled: color-mix(in oklab, var(--foreground) 6%, var(--card));
+    --surface-inverse: var(--foreground);
+    --ring-danger: var(--destructive);
+    --ring-inverse: var(--text-inverse);
     --ring: oklch(0.556 0 0);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
@@ -141,14 +263,336 @@
     --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Density defaults (section 3): "default" (the brand axis "comfortable"). feather-brand writes the brand's own at
+   :root:root, and any element with data-density="tight|default|spacious" overrides them for its subtree. */
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  :root {
+    --opacity-disabled: 0.5;
+    --elevation-1: 0 1px 2px rgb(0 0 0 / 0.06);
+    --elevation-2: 0 4px 12px rgb(0 0 0 / 0.08);
+    --elevation-3: 0 12px 32px rgb(0 0 0 / 0.12);
+    --control-height: 2.75rem;
+    --control-px: 1rem;
+    --control-py: 0.75rem;
+    --icon-slot: 1.25rem;
+    --pad-x: 1.5rem;
+    --pad-y: 1rem;
+    --card-pad: 1.5rem;
+    --dialog-pad: 2rem;
+    --gap: 0.75rem;
+    --group-gap: 1.5rem;
+    /* Six durations and the one curve (section 10): the calm axis. */
+    --duration-micro: 100ms;
+    --duration-fast: 140ms;
+    --duration-base: 180ms;
+    --duration-medium: 240ms;
+    --duration-slow: 320ms;
+    --duration-large: 420ms;
+    --motion-duration: var(--duration-base);
+    --motion-ease: var(--ease-standard);
+    /* Layout grid (section 11): mobile first. */
+    --layout-columns: 4;
+    --layout-gutter: 1rem;
+    --layout-margin: 1rem;
+    --layout-max: 100%;
+  }
+  [data-density="tight"] {
+    --control-height: 2.25rem;
+    --control-px: 0.75rem;
+    --control-py: 0.5rem;
+    --icon-slot: 1rem;
+    --pad-x: 1rem;
+    --pad-y: 0.75rem;
+    --card-pad: 1rem;
+    --dialog-pad: 1.5rem;
+    --gap: 0.5rem;
+    --group-gap: 1rem;
+  }
+  [data-density="default"] {
+    --control-height: 2.75rem;
+    --control-px: 1rem;
+    --control-py: 0.75rem;
+    --icon-slot: 1.25rem;
+    --pad-x: 1.5rem;
+    --pad-y: 1rem;
+    --card-pad: 1.5rem;
+    --dialog-pad: 2rem;
+    --gap: 0.75rem;
+    --group-gap: 1.5rem;
+  }
+  [data-density="spacious"] {
+    --control-height: 3.25rem;
+    --control-px: 1.25rem;
+    --control-py: 1rem;
+    --icon-slot: 1.5rem;
+    --pad-x: 2rem;
+    --pad-y: 1.5rem;
+    --card-pad: 2rem;
+    --dialog-pad: 2.5rem;
+    --gap: 1rem;
+    --group-gap: 2rem;
+  }
+  @media (min-width: 640px) {
+    :root {
+      --layout-columns: 8;
+      --layout-gutter: 1.5rem;
+      --layout-margin: 1.5rem;
     }
+  }
+  @media (min-width: 1024px) {
+    :root {
+      --layout-columns: 12;
+      --layout-margin: 2rem;
+      --layout-max: 90rem;
+    }
+  }
+  @media (min-width: 1440px) {
+    :root {
+      --layout-margin: 3rem;
+    }
+  }
+
+  * {
+    @apply border-border;
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
   html {
     @apply font-sans;
-    }
+    /* Rendering (section 4). Never scale() a container of persistent text, never CSS zoom, never a fractional size. */
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    font-synthesis: none;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Focus (section 8): one 2px ring, offset 2px, on every focusable element. It never changes geometry. */
+  :where(*):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  :where([aria-invalid="true"]):focus-visible {
+    outline-color: var(--ring-danger);
+  }
+  :where([data-surface="inverse"], [data-surface="inverse"] *):focus-visible {
+    outline-color: var(--ring-inverse);
+  }
+}
+
+/* Smooth scrolling only where motion is welcome (section 10). */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="reduced"]) {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Reduced motion is built in (section 10): under the system preference and wherever data-motion="reduced" is set
+   (a plan's motion), every transition and animation ends at once and plays once. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+[data-motion="reduced"],
+[data-motion="reduced"] *,
+[data-motion="reduced"] *::before,
+[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* The control frame and density (section 3): h-control, size-control (an icon-only control is square), size-icon-slot,
+   px-control, py-control, px-container, py-container, p-card, p-dialog, gap-element, gap-group. */
+@utility h-control {
+  height: var(--control-height);
+}
+@utility size-control {
+  width: var(--control-height);
+  height: var(--control-height);
+}
+@utility size-icon-slot {
+  width: var(--icon-slot);
+  height: var(--icon-slot);
+}
+@utility px-control {
+  padding-inline: var(--control-px);
+}
+@utility py-control {
+  padding-block: var(--control-py);
+}
+@utility px-container {
+  padding-inline: var(--pad-x);
+}
+@utility py-container {
+  padding-block: var(--pad-y);
+}
+@utility p-card {
+  padding: var(--card-pad);
+}
+@utility p-dialog {
+  padding: var(--dialog-pad);
+}
+@utility gap-element {
+  gap: var(--gap);
+}
+@utility gap-group {
+  gap: var(--group-gap);
+}
+@utility opacity-disabled {
+  opacity: var(--opacity-disabled);
+}
+
+/* Layout (section 11): margins and gutters follow the breakpoints; content stops at 1440px. */
+@utility feather-container {
+  box-sizing: border-box;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+  max-width: calc(var(--layout-max) + 2 * var(--layout-margin));
+}
+
+/* Typography roles (section 4): components use roles, not sizes. Line heights are rem on the 4px grid. The heading
+   roles use the brand's display font and its headingWeight when it sets one. */
+@utility type-display {
+  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-size: 3rem;
+  line-height: 3.5rem;
+  font-weight: var(--heading-weight, 700);
+  letter-spacing: -0.025em;
+}
+@utility type-heading-1 {
+  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-size: 2.5rem;
+  line-height: 3rem;
+  font-weight: var(--heading-weight, 700);
+  letter-spacing: -0.02em;
+}
+@utility type-heading-2 {
+  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: var(--heading-weight, 600);
+  letter-spacing: -0.015em;
+}
+@utility type-heading-3 {
+  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: var(--heading-weight, 600);
+  letter-spacing: -0.01em;
+}
+@utility type-title {
+  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: var(--heading-weight, 600);
+  letter-spacing: 0;
+}
+@utility type-body-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+@utility type-body {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+@utility type-body-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+@utility type-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+@utility type-caption {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+}
+@utility type-caps {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Motion roles (section 10): a component picks a role, never milliseconds. Each lists the properties it transitions
+   (never all), its duration primitive and the one curve. Distances are the component's, from the same section. */
+@utility motion-press {
+  transition-property: transform, background-color, box-shadow;
+  transition-duration: var(--duration-micro);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-focus {
+  transition-property: outline-color, box-shadow;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-hover {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-state {
+  transition-property: color, background-color, border-color, outline-color, box-shadow, opacity;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-switch {
+  transition-property: transform, background-color, border-color;
+  transition-duration: var(--duration-medium);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-tooltip {
+  transition-property: opacity, transform;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-popover {
+  transition-property: opacity, transform;
+  transition-duration: var(--duration-medium);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-panel {
+  transition-property: opacity, clip-path, grid-template-rows;
+  transition-duration: var(--duration-medium);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-dialog {
+  transition-property: opacity, transform;
+  transition-duration: var(--duration-slow);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-toast {
+  transition-property: opacity, transform;
+  transition-duration: var(--duration-medium);
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-page {
+  transition-property: opacity, transform;
+  transition-duration: var(--duration-large);
+  transition-timing-function: var(--ease-standard);
 }

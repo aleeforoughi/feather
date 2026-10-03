@@ -14,7 +14,8 @@ const stories = Object.values(index.entries)
   .map((e) => e.id)
   .sort()
 const only = process.env.AUDIT_STORY ? new RegExp(process.env.AUDIT_STORY) : null
-const results = path.join(HERE, ".results")
+// AUDIT_OUT lets several audits run side by side without sharing results.
+const results = path.join(process.env.AUDIT_OUT ?? HERE, ".results")
 const exceptions = loadExceptions()
 const expected = await fromEngine()
 

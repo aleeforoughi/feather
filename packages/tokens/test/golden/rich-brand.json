@@ -11,14 +11,29 @@
     "success": "#15803D",
     "mutedForeground": "#57534E"
   },
-  "typography": { "fontFamily": { "display": "Poppins", "body": "Figtree" }, "headingWeight": 800 },
+  "typography": {
+    "fontFamily": {
+      "display": "Poppins",
+      "body": "Figtree"
+    },
+    "headingWeight": 700
+  },
   "shape": "rounded",
   "density": "spacious",
   "elevation": "soft",
   "motion": "snappy",
   "components": {
-    "button": { "radius": "pill", "fontWeight": 600 },
-    "button.outline": { "borderWidth": "2px", "borderColor": "primary" },
-    "card": { "shadow": "md", "paddingX": 6 }
+    "button": {
+      "radius": "full",
+      "fontWeight": 600
+    },
+    "button.outline": {
+      "borderWidth": "1px",
+      "borderColor": "primary"
+    },
+    "card": {
+      "shadow": "md",
+      "paddingX": 6
+    }
   }
 }
