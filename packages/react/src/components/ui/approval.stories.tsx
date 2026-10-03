@@ -50,7 +50,7 @@ export const Irreversible: Story = {
   args: { intent: "approve the payment", request: "Pay the venue deposit", reversible: false, consequence: { spend: { amount: 1050, currency: "AED" } } },
 }
 
-export const ReversibleWithConsequence: Story = {
+export const SendArmsFirst: Story = {
   args: { request: "Send the draft to the board", consequence: { send: { to: "the board", channel: "email" } } },
 }
 
