@@ -7,3 +7,7 @@
 /* The web manifestation's own classes (its src, as a product adds it), and its stories' layout classes. */
 @source "../../../packages/manifest-web/src";
 @source not "../../../packages/manifest-web/src/**/*.test.tsx";
+
+/* The switch manifestation's own classes (the scanning ring), and its stories' layout classes. */
+@source "../../../packages/manifest-switch/src";
+@source not "../../../packages/manifest-switch/src/**/*.test.tsx";

@@ -1,4 +1,5 @@
-// Words and numbers for the person: money, dates and URLs as the plan's locale writes them. Pure helpers.
+// Words and numbers for the person: money, dates and URLs as the plan's locale writes them. Pure helpers, shared by
+// every body (web, text, voice) so they all say the same thing.
 
 /** Money in the reader's locale; a code the runtime does not know falls back to "{code} {amount}". */
 export function formatMoney(amount: number, currency: string, locale: string): string {
@@ -6,8 +7,8 @@ export function formatMoney(amount: number, currency: string, locale: string): s
   try {
     return new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: fractionDigits, maximumFractionDigits: 2 })
       .format(amount)
-      .replaceAll(" ", " ")
-      .replaceAll(" ", " ")
+      .replaceAll("\u00a0", " ")
+      .replaceAll("\u202f", " ")
   } catch {
     return `${currency} ${amount}`
   }

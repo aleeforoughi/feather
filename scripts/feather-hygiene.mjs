@@ -12,7 +12,8 @@
 //   themes     every reference theme compiles and reads (WCAG AA text, contrasting primary text)
 //   release    fonts are installed, every package / manifest / changelog agrees on the version
 //   packaging  published source has no "@/" alias imports, the package entry exports every component,
-//              every stylesheet import is a dependency of its package, the IR package has no dependencies
+//              every stylesheet import is a dependency of its package, the IR package has no dependencies,
+//              the dialog engine is pure (no DOM, no node:, no clock) and the text body imports only dialog
 //
 // Deterministic: no network, no dependencies. Exit 1 with every problem listed.
 import fs from "node:fs"
@@ -25,7 +26,7 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/documents"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/documents"]
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 
@@ -177,13 +178,49 @@ export function hygiene(root = ".") {
       if (!m[1].startsWith("./") && m[1] !== "@aleeforoughi/feather-intent" && m[1] !== "@aleeforoughi/feather-context") problems.push(`${path.relative(root, file)} imports ${m[1]}; the composer imports only the IR, the context and its own modules`)
     }
   }
+  // The dialog engine is pure, like the composer: it imports the IR, the composer and its own modules, nothing from
+  // Node (no I/O) and no DOM, and it reads no clock and no randomness (docs/manifestations.md section 1).
+  const DIALOG_IMPORTS = new Set(["@aleeforoughi/feather-intent", "@aleeforoughi/feather-liquid"])
+  for (const file of sourceFiles(at("packages/dialog/src"))) {
+    const source = read(file)
+    const text = code(source)
+    for (const spec of importsOf(stripComments(source))) {
+      if (spec.startsWith("node:")) problems.push(`${path.relative(root, file)} imports ${spec}; the dialog engine does no I/O (it is pure, and runs in a browser)`)
+      else if (!spec.startsWith("./") && !DIALOG_IMPORTS.has(spec)) problems.push(`${path.relative(root, file)} imports ${spec}; the dialog engine imports only the IR, the composer and its own modules`)
+    }
+    const dom = text.match(/\b(document|window|navigator|localStorage|sessionStorage|HTMLElement|requestAnimationFrame|queueMicrotask|setTimeout|setInterval|fetch|process|Buffer)\b/)
+    if (dom) problems.push(`${path.relative(root, file)} uses the global ${dom[1]}; the dialog engine has no DOM and no I/O`)
+    if (/\bDate\.now\b|\bnew Date\(\s*\)|\bMath\.random\b|\bperformance\.now\b/.test(text)) problems.push(`${path.relative(root, file)} reads the clock or randomness; the dialog engine is deterministic`)
+  }
+  const dialogPkg = json("packages/dialog/package.json")
+  for (const dep of Object.keys(dialogPkg.dependencies ?? {})) if (!DIALOG_IMPORTS.has(dep)) problems.push(`${dialogPkg.name} depends on ${dep}; it depends only on the IR and the composer`)
+  // The text manifestation is a body over the dialog engine: Feather's IR, composer and dialog, its own modules, and
+  // Node's built-ins (it talks to a terminal).
+  const TEXT_IMPORTS = new Set(["@aleeforoughi/feather-dialog", "@aleeforoughi/feather-liquid", "@aleeforoughi/feather-intent"])
+  for (const file of sourceFiles(at("packages/manifest-text/src"))) {
+    for (const spec of importsOf(stripComments(read(file)))) {
+      if (!spec.startsWith("./") && !spec.startsWith("node:") && !TEXT_IMPORTS.has(spec)) problems.push(`${path.relative(root, file)} imports ${spec}; the text manifestation imports only the dialog engine, the composer, the IR, its own modules and node: built-ins`)
+    }
+  }
+  const textPkg = json("packages/manifest-text/package.json")
+  for (const dep of Object.keys(textPkg.dependencies ?? {})) if (!TEXT_IMPORTS.has(dep)) problems.push(`${textPkg.name} depends on ${dep}; it depends only on the dialog engine, the composer and the IR`)
   // The web manifestation renders plans with Feather: it imports Feather's packages and React, never the network or
   // a model, and reads semantic tokens only, like every component.
-  const WEB_IMPORTS = new Set(["react", "@aleeforoughi/feather-intent", "@aleeforoughi/feather-context", "@aleeforoughi/feather-liquid", "@aleeforoughi/feather-react", "@aleeforoughi/feather-tokens"])
+  const WEB_IMPORTS = new Set(["react", "@aleeforoughi/feather-intent", "@aleeforoughi/feather-context", "@aleeforoughi/feather-liquid", "@aleeforoughi/feather-dialog", "@aleeforoughi/feather-react", "@aleeforoughi/feather-tokens"])
   for (const file of walk(at("packages/manifest-web/src")).filter((f) => /\.tsx?$/.test(f) && !/\.(test|stories)\.tsx?$/.test(f) && !f.includes(`${path.sep}test${path.sep}`))) {
     const text = read(file)
     for (const m of text.matchAll(/from\s+"([^"]+)"/g)) {
       if (!m[1].startsWith("./") && !WEB_IMPORTS.has(m[1])) problems.push(`${path.relative(root, file)} imports ${m[1]}; the web manifestation imports only Feather's packages and React`)
+    }
+    if (/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\boklch\(|\bhsla?\(/.test(text)) problems.push(`${path.relative(root, file)} uses a raw color; read semantic tokens`)
+  }
+  // The switch manifestation scans what the web manifestation renders: Feather's packages and React only, and semantic
+  // tokens only.
+  const SWITCH_IMPORTS = new Set([...WEB_IMPORTS, "@aleeforoughi/feather-manifest-web"])
+  for (const file of walk(at("packages/manifest-switch/src")).filter((f) => /\.tsx?$/.test(f) && !/\.(test|stories)\.tsx?$/.test(f) && !f.includes(`${path.sep}test${path.sep}`))) {
+    const text = read(file)
+    for (const m of text.matchAll(/from\s+"([^"]+)"/g)) {
+      if (!m[1].startsWith("./") && !SWITCH_IMPORTS.has(m[1])) problems.push(`${path.relative(root, file)} imports ${m[1]}; the switch manifestation imports only Feather's packages and React`)
     }
     if (/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\boklch\(|\bhsla?\(/.test(text)) problems.push(`${path.relative(root, file)} uses a raw color; read semantic tokens`)
   }
@@ -234,6 +271,29 @@ export function hygiene(root = ".") {
 /** The files in this package a font's stylesheet import points at ("fonts/inter.css"). */
 function fontFiles(family) {
   return buildFontImports(family).map((spec) => spec.replace(/^@aleeforoughi\/feather-tokens\//, ""))
+}
+
+/** TypeScript sources of a package, without tests, stories and test helpers. */
+function sourceFiles(dir) {
+  return walk(dir).filter((f) => /\.tsx?$/.test(f) && !/\.(test|stories)\.tsx?$/.test(f) && !f.includes(`${path.sep}test${path.sep}`))
+}
+
+/** Source without comments, so prose is not read as code. Strings stay (an import names its module in one). */
+function stripComments(text) {
+  return text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`\\])\/\/.*$/gm, "$1")
+}
+
+/** Source without comments and without the inside of string literals, so a word in a message is not read as code. */
+function code(text) {
+  return stripComments(text)
+    .replace(/"(?:[^"\\\n]|\\.)*"/g, '""')
+    .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
+    .replace(/`(?:[^`\\]|\\.)*`/g, "``")
+}
+
+/** Every module a source file imports or re-exports from: from "x", import "x", import("x"), require("x"). */
+function importsOf(text) {
+  return [...text.matchAll(/\b(?:from|import|require)\s*\(?\s*"([^"]+)"/g)].map((m) => m[1])
 }
 
 function walk(dir) {

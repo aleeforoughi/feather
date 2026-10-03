@@ -1,13 +1,13 @@
 {
-  "name": "@aleeforoughi/feather-manifest-web",
+  "name": "@aleeforoughi/feather-manifest-switch",
   "version": "1.10.0",
-  "description": "The web manifestation: renders a liquid layout plan with Feather's organisms and atoms, and turns every act into a validated reply.",
+  "description": "The switch manifestation: scanning and dwell over the web manifestation, so a plan can be operated with one or two switches.",
   "license": "UNLICENSED",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aleeforoughi/feather.git",
-    "directory": "packages/manifest-web"
+    "directory": "packages/manifest-switch"
   },
   "exports": {
     ".": {
@@ -35,9 +35,9 @@
   },
   "dependencies": {
     "@aleeforoughi/feather-context": "workspace:^",
-    "@aleeforoughi/feather-dialog": "workspace:^",
     "@aleeforoughi/feather-intent": "workspace:^",
     "@aleeforoughi/feather-liquid": "workspace:^",
+    "@aleeforoughi/feather-manifest-web": "workspace:^",
     "@aleeforoughi/feather-react": "workspace:^",
     "@aleeforoughi/feather-tokens": "workspace:^"
   },

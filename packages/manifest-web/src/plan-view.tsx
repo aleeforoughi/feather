@@ -4,7 +4,7 @@ import { validateReply, type Experience, type ReplyEvent, type ReplyIssue } from
 import type { LayoutPlan, PlanNode } from "@aleeforoughi/feather-liquid"
 import { Card, CardContent, MotionPreference } from "@aleeforoughi/feather-react"
 import { DENSITY } from "@aleeforoughi/feather-tokens"
-import { directionOf } from "./format"
+import { directionOf } from "@aleeforoughi/feather-dialog"
 import { NodeView } from "./nodes"
 import { experienceCurrency, experienceOf, firstControl, nodeIndex } from "./plan-utils"
 import { RenderingContext, type Emit, type Rendering } from "./rendering"

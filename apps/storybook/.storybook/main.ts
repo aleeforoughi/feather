@@ -9,7 +9,7 @@ function getAbsolutePath(value: string) {
 
 // The stories live next to their components in packages/react, and next to the renderers in packages/manifest-web.
 const config: StorybookConfig = {
-  stories: ["../../../packages/react/src/**/*.mdx", "../../../packages/react/src/**/*.stories.@(js|jsx|mjs|ts|tsx)", "../../../packages/manifest-web/src/**/*.stories.@(ts|tsx)"],
+  stories: ["../../../packages/react/src/**/*.mdx", "../../../packages/react/src/**/*.stories.@(js|jsx|mjs|ts|tsx)", "../../../packages/manifest-web/src/**/*.stories.@(ts|tsx)", "../../../packages/manifest-switch/src/**/*.stories.@(ts|tsx)"],
   addons: [
     getAbsolutePath("@chromatic-com/storybook"),
     getAbsolutePath("@storybook/addon-vitest"),

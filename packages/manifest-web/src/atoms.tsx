@@ -52,7 +52,7 @@ import {
   type Expandable,
 } from "@aleeforoughi/feather-react"
 import type { PlanNode } from "@aleeforoughi/feather-liquid"
-import { formatDate, formatMoney, periodText, plainProblem, safeUrl, upperFirst } from "./format"
+import { formatDate, formatMoney, periodText, plainProblem, safeUrl, upperFirst } from "@aleeforoughi/feather-dialog"
 import { useRendering, type EmitResult } from "./rendering"
 
 const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(" ")

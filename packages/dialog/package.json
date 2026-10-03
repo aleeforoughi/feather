@@ -1,0 +1,28 @@
+{
+  "name": "@aleeforoughi/feather-dialog",
+  "version": "1.10.0",
+  "description": "The dialog engine: turn-based interaction over a layout plan for the bodies that talk (text, voice). Pure and deterministic: no DOM, no I/O, no clock.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/aleeforoughi/feather.git", "directory": "packages/dialog" },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "src", "!src/**/*.test.ts"],
+  "sideEffects": false,
+  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aleeforoughi/feather-intent": "workspace:^",
+    "@aleeforoughi/feather-liquid": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "vitest": "5.0.3"
+  }
+}

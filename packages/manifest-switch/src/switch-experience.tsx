@@ -1,0 +1,320 @@
+// SwitchExperience: a plan rendered by the web manifestation, operated with one or two switches.
+//
+// Scanning is a layer over PlanView, not a second renderer: it finds the controls in the DOM (see targets.ts), gives
+// the highlighted one real focus, and selects it with `click()`, so every act reaches `onReply` exactly as it does by
+// mouse or keyboard. Nothing here re-decides what the plan decided.
+//
+// The highlight is three signals, none of them colour alone: real focus (so assistive technology reads the control),
+// a thick outline with an offset in the `ring` token (shape, not hue), and "Selected for scanning" as a sr-only
+// description on the control (aria-describedby, read once on focus; there is no live region). The wrapper's
+// `data-variant` is "scanned" while a control is highlighted, and the control carries `data-scanned="true"`.
+import * as React from "react"
+import type { RenderContext } from "@aleeforoughi/feather-context"
+import type { Experience, Issue, ReplyEvent, ReplyIssue } from "@aleeforoughi/feather-intent"
+import { compose, type LayoutPlan } from "@aleeforoughi/feather-liquid"
+import { PlanView } from "@aleeforoughi/feather-manifest-web"
+import { isCommitting, isTextEntry, targetAt, targetsIn } from "./targets"
+
+export interface SwitchKeys {
+  /** Keys (KeyboardEvent.key) that select the highlighted target. */
+  select: string[]
+  /** Keys that move to the next target (step mode; in auto mode they act as select keys do not). */
+  next: string[]
+}
+
+/** The timers scanning uses. Inject one to drive scanning without waiting; the default is the window's. */
+export interface ScanClock {
+  setTimeout: (fn: () => void, ms: number) => unknown
+  clearTimeout: (id: unknown) => void
+  setInterval: (fn: () => void, ms: number) => unknown
+  clearInterval: (id: unknown) => void
+}
+
+const windowClock: ScanClock = {
+  setTimeout: (fn, ms) => globalThis.setTimeout(fn, ms),
+  clearTimeout: (id) => globalThis.clearTimeout(id as number),
+  setInterval: (fn, ms) => globalThis.setInterval(fn, ms),
+  clearInterval: (id) => globalThis.clearInterval(id as number),
+}
+
+export const DEFAULT_KEYS: Record<"auto" | "step", SwitchKeys> = {
+  auto: { select: [" ", "Enter"], next: [] },
+  step: { select: ["Enter"], next: ["Tab", " "] },
+}
+
+export interface SwitchExperienceProps {
+  plan: LayoutPlan
+  onReply: (reply: ReplyEvent) => void
+  experience?: Experience
+  onRejectedReply?: (issues: ReplyIssue[], reply: unknown) => void
+  /** "auto": one switch, the highlight advances by itself; "step": two switches, one moves and one selects. Default "auto". */
+  scan?: "auto" | "step"
+  /** How long the highlight rests on a target in auto mode (default 1500). */
+  scanMs?: number
+  /** Resting the pointer on a target this long selects it. Never a committing control. Unset: no dwell. */
+  dwellMs?: number
+  keys?: SwitchKeys
+  /** Timers, injectable for tests. */
+  clock?: ScanClock
+  className?: string
+}
+
+type ScanState = "idle" | "scanned" | "paused"
+
+const HINT_TEXT = "Selected for scanning"
+
+function addDescribedBy(el: HTMLElement, id: string) {
+  const ids = (el.getAttribute("aria-describedby") ?? "").split(/\s+/).filter(Boolean)
+  if (!ids.includes(id)) el.setAttribute("aria-describedby", [...ids, id].join(" "))
+}
+function removeDescribedBy(el: HTMLElement, id: string) {
+  const ids = (el.getAttribute("aria-describedby") ?? "").split(/\s+/).filter((x) => x && x !== id)
+  if (ids.length) el.setAttribute("aria-describedby", ids.join(" "))
+  else el.removeAttribute("aria-describedby")
+}
+
+export function SwitchExperience({ plan, onReply, experience, onRejectedReply, scan = "auto", scanMs = 1500, dwellMs, keys, clock = windowClock, className }: SwitchExperienceProps) {
+  const root = React.useRef<HTMLDivElement>(null)
+  const hintId = React.useId()
+  const [state, setState] = React.useState<ScanState>("idle")
+  const reduced = plan.motion === "reduced"
+
+  // Everything the listeners read, kept in a ref so the listeners are attached once per configuration.
+  const live = React.useRef({ scan, scanMs, dwellMs, keys: keys ?? DEFAULT_KEYS[scan], clock })
+  React.useLayoutEffect(() => {
+    live.current = { scan, scanMs, dwellMs, keys: keys ?? DEFAULT_KEYS[scan], clock }
+  })
+
+  React.useEffect(() => {
+    const host = root.current
+    if (!host) return
+    const doc = host.ownerDocument
+    let current: HTMLElement | null = null
+    let started = false // auto mode: the first press has happened
+    let paused = false
+    let interval: unknown = null
+    let dwell: { el: HTMLElement; id: unknown } | null = null
+
+    const targets = () => targetsIn(host)
+    const publish = () => setState(paused ? "paused" : current ? "scanned" : "idle")
+
+    const unmark = () => {
+      if (!current) return
+      current.removeAttribute("data-scanned")
+      removeDescribedBy(current, hintId)
+    }
+    const mark = (el: HTMLElement) => {
+      if (current && current !== el) unmark()
+      current = el
+      el.setAttribute("data-scanned", "true")
+      addDescribedBy(el, hintId)
+      // Real focus is how assistive technology announces the target. Where the highlight sits is never scrolled to
+      // abruptly when motion is reduced.
+      el.focus({ preventScroll: false })
+      if (isTextEntry(el)) paused = true
+      publish()
+    }
+    const clear = () => {
+      unmark()
+      current = null
+      publish()
+    }
+    const stopTimer = () => {
+      if (interval !== null) live.current.clock.clearInterval(interval)
+      interval = null
+    }
+    /** Move the highlight on by one, wrapping. With none left, scanning stops. */
+    const advance = () => {
+      const list = targets()
+      if (list.length === 0) {
+        stopTimer()
+        started = false
+        clear()
+        return
+      }
+      const at = current ? list.indexOf(current) : -1
+      // A highlighted control that has gone (disarming removes "Yes, …") leaves the next one at its old place.
+      mark(list[(at + 1) % list.length])
+    }
+    const startTimer = () => {
+      stopTimer()
+      if (live.current.scan !== "auto" || !started) return
+      interval = live.current.clock.setInterval(() => {
+        if (!paused) advance()
+      }, live.current.scanMs)
+    }
+    /** Select a target: a click, so the organism's own handlers run. */
+    const select = (el: HTMLElement) => {
+      if (isTextEntry(el)) {
+        mark(el)
+        return
+      }
+      el.click()
+      // What the act changed decides where the highlight goes: an organism that moved focus (arming moves it to the
+      // confirm button) is followed; otherwise the highlight stays where it was if that control is still there.
+      const list = targets()
+      const focused = targetAt(doc.activeElement, list)
+      if (focused && host.contains(focused)) mark(focused)
+      else if (list.length === 0) {
+        stopTimer()
+        started = false
+        clear()
+        return
+      } else if (!list.includes(el)) {
+        mark(list[0])
+      }
+      startTimer()
+    }
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
+      const k = live.current.keys
+      if (paused) {
+        if (e.key === "Escape") {
+          paused = false
+          const active = doc.activeElement
+          if (active instanceof HTMLElement && host.contains(active) && isTextEntry(active)) active.blur()
+          publish()
+        }
+        return
+      }
+      const isSelect = k.select.includes(e.key)
+      const isNext = k.next.includes(e.key)
+      if (!isSelect && !isNext) return
+      // A switch press is handled wherever focus is inside the page, unless focus is in a field elsewhere.
+      if (isTextEntry(doc.activeElement) && !host.contains(doc.activeElement)) return
+      e.preventDefault()
+      if (live.current.scan === "auto") {
+        if (!started) {
+          // The first press only starts scanning. It never selects.
+          started = true
+          advance()
+          startTimer()
+        } else if (current && targets().includes(current)) select(current)
+        else advance()
+        return
+      }
+      // step mode
+      if (isNext) {
+        if (!current) {
+          const list = targets()
+          const here = targetAt(doc.activeElement, list)
+          if (here && list.length > 0 && host.contains(here)) mark(list[(list.indexOf(here) + 1) % list.length])
+          else advance()
+        } else advance()
+      } else if (isSelect) {
+        const list = targets()
+        const target = current && list.includes(current) ? current : targetAt(doc.activeElement, list)
+        if (target) select(target)
+      }
+    }
+    // A key that selects must not also do what the browser does on release (Space clicks a focused button).
+    const onKeyUp = (e: KeyboardEvent) => {
+      const k = live.current.keys
+      if (!paused && (k.select.includes(e.key) || k.next.includes(e.key)) && host.contains(doc.activeElement) && !isTextEntry(doc.activeElement)) e.preventDefault()
+    }
+    const onFocusIn = (e: FocusEvent) => {
+      const el = e.target instanceof HTMLElement ? e.target : null
+      if (!el) return
+      if (isTextEntry(el)) {
+        paused = true
+        publish()
+        return
+      }
+      if (paused) {
+        paused = false
+        publish()
+      }
+      // Focus that the organisms moved (arming, a result) becomes the highlight once scanning has begun.
+      if (started || live.current.scan === "step") {
+        const t = targetAt(el, targets())
+        if (t && t !== current && current) mark(t)
+      }
+    }
+
+    const cancelDwell = () => {
+      if (dwell) live.current.clock.clearTimeout(dwell.id)
+      dwell = null
+    }
+    const onEnter = (e: Event) => {
+      const ms = live.current.dwellMs
+      if (ms === undefined) return
+      const el = targetAt(e.target, targets())
+      if (!el) return
+      if (dwell?.el === el) return
+      cancelDwell()
+      const id = live.current.clock.setTimeout(() => {
+        dwell = null
+        // Dwell may arm. It may not commit: that takes the switch itself.
+        if (isCommitting(el) || !targets().includes(el)) return
+        mark(el)
+        select(el)
+      }, ms)
+      dwell = { el, id }
+    }
+    const onLeave = (e: Event) => {
+      if (!dwell) return
+      const to = (e as PointerEvent).relatedTarget
+      if (e.type === "pointerout" && to instanceof Node && dwell.el.contains(to)) return
+      if (e.type === "pointerleave" && e.target !== dwell.el && !dwell.el.contains(e.target as Node)) return
+      cancelDwell()
+    }
+
+    doc.addEventListener("keydown", onKeyDown, true)
+    doc.addEventListener("keyup", onKeyUp, true)
+    host.addEventListener("focusin", onFocusIn)
+    host.addEventListener("pointerenter", onEnter, true)
+    host.addEventListener("pointerover", onEnter)
+    host.addEventListener("pointerleave", onLeave, true)
+    host.addEventListener("pointerout", onLeave)
+    return () => {
+      doc.removeEventListener("keydown", onKeyDown, true)
+      doc.removeEventListener("keyup", onKeyUp, true)
+      host.removeEventListener("focusin", onFocusIn)
+      host.removeEventListener("pointerenter", onEnter, true)
+      host.removeEventListener("pointerover", onEnter)
+      host.removeEventListener("pointerleave", onLeave, true)
+      host.removeEventListener("pointerout", onLeave)
+      stopTimer()
+      cancelDwell()
+      unmark()
+    }
+    // One scanner per plan and mode; the rest is read from `live`.
+  }, [plan, scan, scanMs, dwellMs, clock, hintId])
+
+  // The ring, in the `ring` token: an outline of a fixed weight with an offset, so it is a shape and not only a hue.
+  // With reduced motion nothing about it transitions.
+  const ring =
+    "[&_[data-scanned=true]]:outline-[3px] [&_[data-scanned=true]]:outline-offset-[3px] [&_[data-scanned=true]]:outline-solid [&_[data-scanned=true]]:outline-ring"
+  const motion = reduced ? "[&_[data-scanned]]:transition-none" : "[&_[data-scanned]]:transition-[outline-offset] [&_[data-scanned]]:duration-150"
+  return (
+    <div ref={root} data-slot="switch-scanner" data-variant={state} data-scan={scan} data-motion={plan.motion} className={[ring, motion, className ?? ""].filter(Boolean).join(" ")}>
+      <span id={hintId} data-slot="switch-scan-hint" className="sr-only">
+        {HINT_TEXT}
+      </span>
+      <PlanView plan={plan} onReply={onReply} experience={experience} onRejectedReply={onRejectedReply} />
+    </div>
+  )
+}
+
+export interface FeatherSwitchExperienceProps extends Omit<SwitchExperienceProps, "plan" | "experience"> {
+  /** The Experience IR, as the caller sent it. It is validated; it need not be trusted. */
+  experience: unknown
+  context: RenderContext
+  /** Called with the validator's issues when the IR is invalid; the component then renders nothing. */
+  onIssues?: (issues: Issue[]) => void
+}
+
+/** Composes `experience` for `context` and renders it for switch access. An invalid IR renders nothing. */
+export function FeatherSwitchExperience({ experience, context, onIssues, ...rest }: FeatherSwitchExperienceProps) {
+  const result = React.useMemo(() => compose(experience, context), [experience, context])
+  const report = React.useRef(onIssues)
+  React.useEffect(() => {
+    report.current = onIssues
+  })
+  React.useEffect(() => {
+    if (!result.ok) report.current?.(result.issues)
+  }, [result])
+  if (!result.ok) return null
+  return <SwitchExperience plan={result.plan} experience={experience as Experience} {...rest} />
+}

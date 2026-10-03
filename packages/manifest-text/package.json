@@ -1,0 +1,30 @@
+{
+  "name": "@aleeforoughi/feather-manifest-text",
+  "version": "1.10.0",
+  "description": "The text manifestation: a layout plan as plain text and a conversation in the terminal, with the feather-text CLI. Replies are the same events every body sends.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/aleeforoughi/feather.git", "directory": "packages/manifest-text" },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./package.json": "./package.json"
+  },
+  "bin": { "feather-text": "./dist/cli.js" },
+  "files": ["dist", "src", "!src/**/*.test.ts"],
+  "sideEffects": false,
+  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aleeforoughi/feather-dialog": "workspace:^",
+    "@aleeforoughi/feather-intent": "workspace:^",
+    "@aleeforoughi/feather-liquid": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "vitest": "5.0.3"
+  }
+}
