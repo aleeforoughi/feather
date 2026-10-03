@@ -23,6 +23,8 @@ What is built so far:
 - **More than one body (L4):** the same experience as [web, switch scanning, voice and plain text](docs/manifestations.md).
   A conformance suite proves every act reaches the same reply in all four, and that an irreversible act needs a
   deliberate act in each.
+- **Callers:** any system can [call Feather](docs/callers.md). A Python SDK builds and validates experiences and
+  replies, and a one-import browser bundle renders them in any page.
 
 | Package | What it is |
 |---|---|
@@ -35,14 +37,19 @@ What is built so far:
 | [`@aleeforoughi/feather-dialog`](packages/dialog) | The turn-based engine text and voice share: what to present, what the person may answer, and the reply it becomes. No I/O. |
 | [`@aleeforoughi/feather-manifest-text`](packages/manifest-text) | Plain text and the terminal, with the `feather-text` CLI (conversation on stderr, replies as JSON lines on stdout). |
 | [`@aleeforoughi/feather-manifest-voice`](packages/manifest-voice) | Prompts, spoken confirmations and readback for any speech engine. |
+| [`feather-sdk`](packages/python) (Python) | For callers: build and validate experiences and replies, and serve the browser bundle. A wheel on every release. No dependencies. |
+| [`@aleeforoughi/feather-embed`](packages/embed) | Feather in any web page with one script import: `mount(element, experience, { onReply })`. Self-contained and style-scoped. |
 | [`@aleeforoughi/feather-react`](packages/react) | 28 atoms, 7 molecules and 10 organisms on Base UI and Tailwind CSS v4, styled only through tokens. |
 | [`@aleeforoughi/feather-documents`](packages/documents) | Token-themed HTML/CSS document templates and the render and verify kit (not published yet). |
 | [`apps/storybook`](apps/storybook) | Every component and story, switchable between the reference themes; home of the a11y and visual suites. |
 | [`apps/showcase`](apps/showcase) | The component sheet, built against the packages exactly as a product would. |
 | [`apps/playground`](apps/playground) | Edit an experience, change the person and the device, and see the plan, the trace and the result in four contexts, each in its own body. |
-| [`conformance`](conformance) | IR fixtures, and the cross-body suite: every act, in every body, reaches the same reply. |
+| [`conformance`](conformance) | IR fixtures, the cross-body suite (every act, in every body, reaches the same reply), and the Python parity corpus. |
+| [`examples/python-caller`](examples/python-caller) | A complete caller in one file of standard-library Python, run end to end in CI. |
 
 ## Ask Feather for an experience
+
+From Python (Godpip), or from a page without React: see [Calling Feather](docs/callers.md).
 
 Callers describe the interaction as meaning, in `feather.ir/0`, and validate it before sending:
 
@@ -156,6 +163,10 @@ pnpm test:visual           # every story in all four reference themes against vi
 pnpm --filter @feather-apps/playground dev   # the playground
 node packages/manifest-text/dist/cli.js conformance/ir/valid/ad-campaign-launch.json   # an experience in the terminal
 pnpm test:playground       # build the playground and run its end-to-end tests (CHROMIUM_PATH to reuse a browser)
+pnpm test:python           # the Python SDK, including parity with the TypeScript validators
+pnpm test:embed            # the embed inside a foreign page (Godpip's own stylesheet)
+pnpm build:wheel           # the feather-sdk wheel, with the browser bundle inside
+pnpm test:caller           # the Python reference caller, end to end (feather-sdk importable by python3)
 ```
 
 The visual baselines are recorded in CI's Playwright container (the *Record visual baselines* workflow), so a

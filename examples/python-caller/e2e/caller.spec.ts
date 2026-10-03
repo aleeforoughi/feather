@@ -8,9 +8,9 @@ test("the experience renders inside the caller's page, and leaves the page's own
   const root = page.locator(".feather-root").first()
   await expect(root.getByText("Recommended test: 7 days, purchase objective")).toBeVisible()
   // The caller's heading keeps the caller's font; Feather's text is in Feather's.
-  const font = (selector: string) => page.locator(selector).first().evaluate((e) => getComputedStyle(e).fontFamily)
-  expect(await font("h1")).toContain("system-ui")
-  expect(await font(".feather-root [data-slot=button]")).toContain("JetBrains Mono")
+  const font = (element: ReturnType<typeof page.locator>) => element.evaluate((e) => getComputedStyle(e).fontFamily)
+  expect(await font(page.locator("h1"))).toContain("system-ui")
+  expect(await font(root.getByRole("button", { name: /^Confirm spend…/ }))).toContain("JetBrains Mono")
 })
 
 test("confirming the spend sends one validated reply to the server", async ({ page, request }) => {

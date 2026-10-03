@@ -123,3 +123,14 @@ class Formatting(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class StaticDirTest(unittest.TestCase):
+    def test_it_is_the_bundle_or_says_how_to_build_it(self):
+        try:
+            folder = Path(feather_sdk.static_dir())
+        except FileNotFoundError as error:
+            self.assertIn("pnpm build:wheel", str(error))
+        else:
+            self.assertTrue((folder / "feather-embed.js").is_file())
+            self.assertTrue((folder / "feather-embed.css").is_file())

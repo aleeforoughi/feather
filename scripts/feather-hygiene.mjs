@@ -31,7 +31,7 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/documents"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/embed", "packages/documents"]
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 

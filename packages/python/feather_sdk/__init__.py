@@ -1,4 +1,5 @@
-"""feather-sdk: write and check Feather Experience IR (feather.ir/0) from Python. No dependencies.
+"""feather-sdk: call Feather from Python. Build and check Experience IR (feather.ir/0), check replies, and serve the
+browser bundle that renders experiences (static_dir()). No dependencies.
 
     from feather_sdk import experience, nodes, validate
 
@@ -9,6 +10,7 @@
 from . import nodes
 from ._experience import experience
 from ._reply import ReplyIssue, ReplyResult, acts_for, validate_reply
+from ._static import static_dir
 from ._spec import DEFAULT_MAX_LENGTH, IR_VERSION, MAX_ISSUES
 from ._validate import Issue, ValidationResult, format_issues, parse_date, validate
 from ._version import __version__
@@ -27,6 +29,7 @@ __all__ = [
     "format_issues",
     "nodes",
     "parse_date",
+    "static_dir",
     "validate",
     "validate_reply",
 ]

@@ -117,6 +117,56 @@ jobs:
             apps/playground/test-results
           retention-days: 7
 
+  python:
+    name: Python SDK (${{ matrix.python }}; parity with the TypeScript validator)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests
+        working-directory: packages/python
+
+  callers:
+    name: Callers (the embed in a foreign page; the Python reference caller on the wheel)
+    needs: check
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Python for the wheel and the reference caller
+        run: apt-get update -qq && apt-get install -y -qq python3 python3-venv python3-pip >/dev/null
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test:embed
+      - name: Build the wheel and install it as a caller would
+        run: |
+          pnpm build:wheel /tmp/wheel
+          python3 -m venv /tmp/caller
+          /tmp/caller/bin/pip install -q /tmp/wheel/feather_sdk-*.whl
+          echo "/tmp/caller/bin" >> "$GITHUB_PATH"
+      - run: pnpm test:caller
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: callers-report
+          path: |
+            packages/embed/playwright-report
+            packages/embed/test-results
+            examples/python-caller/playwright-report
+            examples/python-caller/test-results
+          retention-days: 7
+
   visual:
     name: Visual regression
     needs: check

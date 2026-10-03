@@ -2,3 +2,5 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+# The browser bundle, copied from packages/embed/dist by scripts/build-wheel.mjs.
+feather_sdk/static/

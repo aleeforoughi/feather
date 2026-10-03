@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-manifest-text",
-  "version": "1.13.1",
+  "version": "1.14.0",
   "description": "The text manifestation: a layout plan as plain text and a conversation in the terminal, with the feather-text CLI. Replies are the same events every body sends.",
   "license": "UNLICENSED",
   "type": "module",

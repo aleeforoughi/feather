@@ -3,7 +3,8 @@ name: Publish
 # Releases Feather from main: when the version in package.json has no v<version> tag yet, every gate runs again,
 # the packages are published to GitHub Packages, and the tag and a GitHub release (notes from CHANGELOG.md) are
 # created. Pushing to main with an unchanged version publishes nothing. To release, bump the version in every
-# package.json, add the CHANGELOG entry, and merge to main.
+# package.json (and packages/python/feather_sdk/_version.py), add the CHANGELOG entry, and merge to main. The
+# feather-sdk wheel is attached to the release.
 on:
   push:
     branches: [main]
@@ -48,7 +49,7 @@ jobs:
         if: steps.version.outputs.release == 'true'
         run: |
           pnpm install --frozen-lockfile
-          pnpm lint && pnpm build && pnpm typecheck && pnpm test && pnpm hygiene
+          pnpm lint && pnpm build && pnpm typecheck && pnpm test && pnpm test:python && pnpm hygiene
           grep -q "^## ${{ steps.version.outputs.version }} " CHANGELOG.md
       - name: Publish the packages
         if: steps.version.outputs.release == 'true'
@@ -63,5 +64,8 @@ jobs:
           version="${{ steps.version.outputs.version }}"
           awk -v v="$version" '$0 ~ "^## "v" " {on=1; next} /^## / {on=0} on' CHANGELOG.md > release-notes.md
           gh release create "v$version" --target "$GITHUB_SHA" --title "Feather $version" --notes-file release-notes.md
+          # Python callers (Godpip) install the feather-sdk wheel from the release; it holds the browser bundle too.
+          pnpm build:wheel wheel
+          gh release upload "v$version" wheel/feather_sdk-$version-py3-none-any.whl
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

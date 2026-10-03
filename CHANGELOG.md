@@ -1,5 +1,36 @@
 # Feather — changelog
 
+## 1.14.0 — 2026-10-03
+
+**Callers can use Feather.** A system that decides what a person must do, Godpip first, can now install Feather and
+use it without React, npm or a build step. The guide is [docs/callers.md](docs/callers.md).
+
+- **`feather-sdk` (Python 3.11+, no dependencies)**, a wheel attached to every release from now on:
+  - `experience()` and one typed builder per node type (`feather_sdk.nodes`, generated from spec.ts with the field
+    docs);
+  - `validate()`, `validate_reply()` and `format_issues()`;
+  - `static_dir()`, the browser bundle shipped inside the wheel, so the server and the page are always one
+    version.
+- **The Python validators are Feather's validators.** They give the same issue codes, JSON Pointer paths, order,
+  messages and issue limit as the TypeScript ones. A parity corpus, written from the TypeScript validators by
+  `packages/intent/scripts/parity.ts`, proves it on every conformance fixture plus 2389 generated experiences, 3512
+  replies and 94 URLs. A test fails when the corpus is stale.
+- **`@aleeforoughi/feather-embed`**: Feather in any web page with one `<script type="module">` import.
+  - `mount(element, experience, { context, theme, onReply, onIssues })` returns `update()`, `unmount()` and
+    `ready`. It is also published to GitHub Packages.
+  - The bundle is self-contained: React and Base UI are inside it. It weighs 254 kB gzipped, plus 16 kB of CSS.
+  - It leaves the host page alone. Styles and CSS variables are scoped to `.feather-root`, and popups open in one
+    scoped layer.
+    - Nothing is written to `<html>`, `<body>` or storage.
+    - `unmount()` restores the document exactly.
+    - A test checks this against Godpip's own stylesheet.
+- **Popups can be given a container:** `FeatherProvider portalContainer`, or `FeatherPortalProvider`. Every Feather
+  popup (select, menu, popover, tooltip, dialog, sheet, navigation) uses it.
+- **Reference caller:** `examples/python-caller` is a complete caller in one file of standard-library Python. CI runs
+  it end to end on the installed wheel, and the server accepts only validated replies.
+- **Gates.** CI adds the Python SDK on 3.11 and 3.13, and a callers job: the embed in a foreign page, and the
+  reference caller on the wheel. Publish attaches the wheel to the release.
+
 ## 1.13.1 — 2026-10-03
 
 **JetBrains Mono everywhere.** Every font Feather sets on its own is JetBrains Mono.

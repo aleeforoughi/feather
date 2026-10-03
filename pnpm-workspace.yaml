@@ -2,6 +2,7 @@ packages:
   - packages/*
   - apps/*
   - conformance/manifest
+  - examples/*
 
 # A dependency must be public for a day before it can be installed: new releases get time to be
 # pulled or patched first (the rule Feather kept under QOOE).

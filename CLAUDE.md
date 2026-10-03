@@ -33,6 +33,14 @@ section 12.
 - `conformance/manifest`: the cross-body suite. Every fixture and act through all four bodies; same reply, and a
   deliberate act for anything irreversible. Written independently of the bodies; a body bug fails it, never a
   driver workaround.
+- `packages/python` (`feather-sdk`, import `feather_sdk`): the caller API for Python, no dependencies. Its validators
+  must match the TypeScript ones case for case: `conformance/parity` is written from TypeScript by
+  `packages/intent/scripts/parity.ts`, and `_spec.json`/`nodes.py` by the intent `generate` script. Never edit those
+  by hand. Its version (`feather_sdk/_version.py`) moves with the others.
+- `packages/embed` (`@aleeforoughi/feather-embed`): Feather in any page with one import, `mount(el, experience,
+  options)`. Its CSS is scoped to `.feather-root` at build time; it must never change the host page (its e2e proves it
+  on Godpip's stylesheet). The wheel ships it (`pnpm build:wheel`). Callers start at `docs/callers.md`;
+  `examples/python-caller` is the reference caller.
 - `packages/documents`: document templates and the render kit. Private.
 - `apps/storybook`: Storybook config, the axe suite (`vitest.config.ts`) and the visual suite (`visual/`).
 - `apps/showcase`: consumes the built packages like an outside product.

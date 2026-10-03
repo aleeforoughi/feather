@@ -2,6 +2,7 @@ import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/naviga
 import { cn } from "../../lib/cn"
 import { ChevronDownIcon } from "lucide-react"
 import { Icon } from "./icon"
+import { usePortalContainer } from "../../lib/portal-container"
 
 function NavigationMenu({
   align = "start",
@@ -102,8 +103,9 @@ function NavigationMenuPositioner({
   alignOffset = 0,
   ...props
 }: NavigationMenuPrimitive.Positioner.Props) {
+  const container = usePortalContainer()
   return (
-    <NavigationMenuPrimitive.Portal>
+    <NavigationMenuPrimitive.Portal container={container}>
       <NavigationMenuPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}

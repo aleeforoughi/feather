@@ -64,7 +64,6 @@ PAGE = """<!doctype html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>A Feather caller</title>
-    <link rel="stylesheet" href="/feather/feather-embed.css">
     <style>
       body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 44rem; padding: 0 1rem; }
       #status { margin-top: 1.5rem; }

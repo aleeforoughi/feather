@@ -1,0 +1,125 @@
+<!-- The markup of Godpip's godpip/static/index.html, used as the hostile host page for the
+     embed's e2e. Changes: no app.js; two Feather slots in the transcript; a plain <script type="module"> that loads the bundle. -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Godpip compiles a short task into model-ready output for a downstream model."
+    />
+    <title>Godpip · Compiler</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#prompt-form">Skip to prompt composer</a>
+
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">G</span>
+        <div>
+          <p class="eyebrow">Brief → compile → model-ready output</p>
+          <h1>Godpip</h1>
+        </div>
+      </div>
+      <p class="header-copy">
+        Compile a short task into output the target model can run directly.
+      </p>
+    </header>
+
+    <main class="workspace">
+      <section class="chat-panel" aria-labelledby="chat-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Compiler workspace</p>
+            <h2 id="chat-heading">Compile model-ready output</h2>
+          </div>
+          <span id="stage-badge" class="stage-badge">Ready</span>
+        </div>
+
+        <div id="transcript" class="transcript">
+          <div id="slot-a" data-testid="slot-a"></div>
+          <div id="slot-b" data-testid="slot-b"></div>
+          <div id="empty-state" class="empty-state">
+            <p class="empty-title">Start with the outcome you need.</p>
+            <p>
+              Godpip expands your brief, collapses it into a canonical
+              requirement ledger, then projects it through a target adapter into
+              output the downstream model can run directly.
+            </p>
+          </div>
+        </div>
+
+        <form id="prompt-form" class="composer" action="/api/generate" method="post">
+          <label for="task">General task</label>
+          <p id="task-hint" class="field-hint">
+            Be brief or include constraints. Press Enter to send; Shift + Enter
+            adds a line.
+          </p>
+          <textarea
+            id="task"
+            name="task"
+            rows="4"
+            minlength="3"
+            maxlength="12000"
+            required
+            enterkeyhint="send"
+            aria-describedby="task-hint"
+            placeholder="Example: Write a launch plan for a developer tool. Include owners, risks, and success metrics."
+          ></textarea>
+          <div class="composer-footer">
+            <span class="text-only">Keeps the requested medium · copy is model-ready only</span>
+            <button id="submit-button" type="submit">Compile output</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="log-panel" aria-labelledby="log-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Live pipeline</p>
+            <h2 id="log-heading">Execution log</h2>
+          </div>
+          <span id="event-count" class="event-count">0 events</span>
+        </div>
+        <ol
+          id="pipeline-log"
+          class="pipeline-log"
+          aria-describedby="log-description"
+        ></ol>
+        <p id="log-description" class="log-description">
+          Pipeline events appear here while the prompt is built.
+        </p>
+      </aside>
+    </main>
+
+    <div
+      id="status"
+      class="visually-hidden"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+      <script type="module">
+      import * as embed from "/feather/feather-embed.js"
+      // The page's own code: it keeps the views it mounted and what they reported.
+      window.__feather = {
+        embed,
+        views: {},
+        replies: [],
+        issues: [],
+        mount(slot, experience, options = {}) {
+          const view = embed.mount(document.getElementById(slot), experience, {
+            ...options,
+            onReply: (reply) => this.replies.push({ slot, reply }),
+            onIssues: (issues) => this.issues.push({ slot, issues }),
+          })
+          this.views[slot] = view
+          return view
+        },
+      }
+      window.__featherReady = true
+    </script>
+  </body>
+</html>

@@ -25,7 +25,8 @@ Two pieces do the work, and one install brings both:
 
 ## 1. Install
 
-The SDK is a wheel attached to each Feather release, so a caller pins an exact version:
+The SDK is a wheel attached to each Feather release (the repository is private, so use a token that can read
+it), and a caller pins an exact version:
 
 ```bash
 gh release download v1.14.0 --repo aleeforoughi/feather --pattern 'feather_sdk-*.whl' --dir vendor/
@@ -72,10 +73,10 @@ import feather_sdk
 app.mount("/feather", StaticFiles(directory=feather_sdk.static_dir()), name="feather")
 ```
 
-Then, in plain JavaScript, with no build step:
+Then, in plain JavaScript, with no build step. One import is enough: the bundle links its stylesheet (from next
+to itself) on the first mount.
 
 ```html
-<link rel="stylesheet" href="/feather/feather-embed.css">
 <div id="decision"></div>
 <script type="module">
   import { mount } from "/feather/feather-embed.js"
@@ -83,22 +84,40 @@ Then, in plain JavaScript, with no build step:
   const experience = await (await fetch("/api/experience")).json()
   const view = mount(document.getElementById("decision"), experience, {
     context: { device: { surface: "desktop" } },   // optional: who this is for, and where
+    theme: "feather",                              // or "feather-dark", or a brand's feather-tokens/2 object
     onReply: (reply) => fetch("/api/reply", { method: "POST", body: JSON.stringify(reply) }),
+    onIssues: (issues) => console.error(issues),   // the experience was invalid; nothing renders
   })
-  // view.update(nextExperience) to change it; view.unmount() when it is done.
+  await view.ready                                 // styled and rendered
+  // view.update(nextExperience, nextContext) to change it; view.unmount() when it is done.
 </script>
 ```
 
-Feather stays inside the element it is given. Its styles and CSS variables are scoped to its own root, so the
-page's styles, fonts and variables are untouched, and it never writes to `<html>`, `<body>` or storage. Menus and
-popups open in one Feather layer at the end of `<body>`.
+| `mount` option | |
+|---|---|
+| `context` | Who the experience is for, and where (below). |
+| `theme` | `"feather"` (default), `"feather-dark"`, or a `feather-tokens/2` brand object. |
+| `onReply(reply)` | The person's decision, already validated in the browser. |
+| `onIssues(issues)` | The experience failed validation; nothing renders. |
+| `autoFocus` | Move focus into the experience when it renders. Default `false`: an embed never takes focus from the page. |
+| `css` | The stylesheet's URL, or `false` when the page links `feather-embed.css` itself. |
+
+**It leaves the page alone.** Everything Feather renders sits in a `.feather-root` element inside the one it is
+given, and its menus and popups open in one Feather layer at the end of `<body>`. Its styles and CSS variables are
+scoped to those roots, so the page's styles, fonts and variables are untouched (a test proves it on Godpip's own
+stylesheet). It never writes to storage and leaves no listeners behind. `unmount()` returns the document to
+exactly what it was. Limits:
+- While a modal menu or dialog is open, it locks the page's scroll, as any modal does.
+- A page's own rules for bare elements, such as `h2 { … }`, still reach unclassed elements inside Feather.
+  Feather's components style everything they render.
+- A brand's fonts, other than JetBrains Mono, must be loaded by the page.
 
 **Context** says who the experience is for and where: `persona` (density, explanation depth, motion), `capability`
 (vision, motor precision, input), `device` (surface, input mode). It is passed on every render and never stored.
 The [composer](composer.md) uses it to choose the layout, the emphasis and the body.
 
 **Theme** is `"feather"` (the default, black and white), `"feather-dark"`, or a brand's `feather-tokens/2`
-object, the same file `feather-brand` reads.
+object, the same file `feather-brand` reads. Each view takes its own, and its popups follow it.
 
 ## 4. Receive the reply (server)
 
@@ -125,6 +144,7 @@ a `consequence`) only ever replies after a deliberate confirmation, in every bod
 the ad campaign experience, and validates the reply. CI runs it end to end in a browser.
 
 ```bash
+pnpm build && pnpm build:wheel           # the bundle, into the SDK
 python3 examples/python-caller/server.py   # then open http://localhost:8765
 ```
 

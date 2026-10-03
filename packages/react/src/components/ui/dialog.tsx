@@ -6,6 +6,7 @@ import { Button } from "./button"
 import { XIcon } from "lucide-react"
 
 import { Icon } from "./icon"
+import { usePortalContainer } from "../../lib/portal-container"
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -16,7 +17,8 @@ function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
 }
 
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+  const container = usePortalContainer()
+  return <DialogPrimitive.Portal data-slot="dialog-portal" container={container} {...props} />
 }
 
 function DialogClose({ ...props }: DialogPrimitive.Close.Props) {

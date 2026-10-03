@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-manifest-switch",
-  "version": "1.13.1",
+  "version": "1.14.0",
   "description": "The switch manifestation: scanning and dwell over the web manifestation, so a plan can be operated with one or two switches.",
   "license": "UNLICENSED",
   "type": "module",

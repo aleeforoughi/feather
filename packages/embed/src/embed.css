@@ -1,0 +1,9 @@
+/* The embed's one stylesheet, as a product would write it (Tailwind, then Feather's styles), plus the sources of the web
+ * manifestation. The build then scopes the result to `.feather-root` (build/scope-css.ts), so nothing here reaches the
+ * page that loads it. */
+@import "tailwindcss";
+@import "@aleeforoughi/feather-react/styles.css";
+
+@source "../../manifest-web/src";
+@source not "../../manifest-web/src/**/*.test.tsx";
+@source not "../../manifest-web/src/**/*.stories.tsx";

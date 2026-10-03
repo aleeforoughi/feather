@@ -1,10 +1,18 @@
 # feather-sdk
 
-Write and check Feather Experience IR (`feather.ir/0`) from Python. Python 3.11 or later, no dependencies.
+Call Feather from Python: build and check Experience IR (`feather.ir/0`), check the replies, and serve the browser
+bundle that renders experiences (`static_dir()`). Python 3.11 or later, no dependencies. The full guide is
+[docs/callers.md](../../docs/callers.md).
+
+It is not on PyPI (and a package there with this name would not be Feather). Install the wheel attached to a
+Feather release, pinned to that release:
 
 ```sh
-pip install feather-sdk
+gh release download v1.14.0 --repo aleeforoughi/feather --pattern 'feather_sdk-*.whl' --dir vendor/
+pip install vendor/feather_sdk-1.14.0-py3-none-any.whl
 ```
+
+In this repository, `pnpm build && pnpm build:wheel` builds it with the bundle inside.
 
 ## Build an experience
 

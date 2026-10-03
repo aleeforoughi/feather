@@ -1,0 +1,57 @@
+{
+  "name": "@aleeforoughi/feather-embed",
+  "version": "1.14.0",
+  "description": "Feather in any web page with one script import: a self-contained, style-scoped bundle that renders an Experience IR and hands back the person's reply.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleeforoughi/feather.git",
+    "directory": "packages/embed"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/feather-embed.d.ts",
+      "default": "./dist/feather-embed.js"
+    },
+    "./feather-embed.css": "./dist/feather-embed.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "build": "rm -rf dist && vite build && node build/bundle-dts.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@aleeforoughi/feather-context": "workspace:^",
+    "@aleeforoughi/feather-intent": "workspace:^",
+    "@aleeforoughi/feather-liquid": "workspace:^",
+    "@aleeforoughi/feather-manifest-web": "workspace:^",
+    "@aleeforoughi/feather-react": "workspace:^",
+    "@aleeforoughi/feather-tokens": "workspace:^",
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "postcss": "8.5.28",
+    "postcss-selector-parser": "7.1.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.1",
+    "vitest": "5.0.3"
+  }
+}

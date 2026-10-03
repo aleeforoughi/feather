@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "feather-sdk"
 dynamic = ["version"]
-description = "Write and check Feather Experience IR (feather.ir/0) from Python: builders, validate() and validate_reply(). No dependencies."
+description = "Call Feather from Python: build and validate Experience IR (feather.ir/0), validate replies, and serve the browser bundle that renders them. No dependencies."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
@@ -16,11 +16,13 @@ classifiers = [
   "Typing :: Typed",
 ]
 
-[tool.setuptools]
-packages = ["feather_sdk"]
+[tool.setuptools.packages.find]
+# namespaces: the browser bundle folders (feather_sdk/static, copied in by scripts/build-wheel.mjs) are data, not code.
+include = ["feather_sdk*"]
+namespaces = true
 
 [tool.setuptools.dynamic]
 version = { attr = "feather_sdk._version.__version__" }
 
 [tool.setuptools.package-data]
-feather_sdk = ["_spec.json", "py.typed"]
+feather_sdk = ["_spec.json", "py.typed", "static/*", "static/fonts/*"]
