@@ -1,0 +1,13 @@
+{
+  "description": "Date range where end is before start.",
+  "expect": [
+    {"code": "out-of-range", "path": "/nodes/0/until"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Date", "id": "n1", "value": "2026-12-31", "until": "2026-01-01"}
+    ]
+  }
+}

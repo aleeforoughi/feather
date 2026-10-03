@@ -1,0 +1,13 @@
+{
+  "description": "Node has an unknown field.",
+  "expect": [
+    {"code": "unknown-field", "path": "/nodes/0/badfield"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Text", "id": "n1", "text": "hello", "badfield": "value"}
+    ]
+  }
+}

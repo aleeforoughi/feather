@@ -1,0 +1,14 @@
+{
+  "description": "Launch a paid ad campaign with spending approval (from PLAN.md section 6, verbatim).",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "approve_campaign",
+    "nodes": [
+      {"type": "Recommendation", "id": "rec", "intent": "launch the recommended test", "importance": "high", "reversible": false, "summary": "Recommended test: 7 days, purchase objective", "expandable": {"why": "Enough to test three creative directions without overspending."}},
+      {"type": "Price", "id": "cap", "amount": 1050, "currency": "AED", "label": "Maximum spend"},
+      {"type": "IrreversibleAction", "id": "go", "intent": "confirm spend", "importance": "critical", "reversible": false, "consequence": {"spend": {"amount": 1050, "currency": "AED"}}, "primary": true},
+      {"type": "Alternative", "id": "less", "intent": "spend less"},
+      {"type": "Alternative", "id": "own", "intent": "set my own budget", "input": "Price"}
+    ]
+  }
+}

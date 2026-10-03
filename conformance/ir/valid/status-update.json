@@ -1,0 +1,11 @@
+{
+  "description": "A status update shows the current state of something in progress.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "order_status",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "Your order is being processed."},
+      {"type": "Status", "id": "stat", "state": "working", "label": "Order processing"}
+    ]
+  }
+}

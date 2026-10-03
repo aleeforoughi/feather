@@ -1,0 +1,10 @@
+{
+  "description": "A one-line text-only experience with no decision.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "simple_message",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "Your payment has been received."}
+    ]
+  }
+}

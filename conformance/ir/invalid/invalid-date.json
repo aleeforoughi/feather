@@ -1,0 +1,13 @@
+{
+  "description": "Invalid date format.",
+  "expect": [
+    {"code": "invalid-date", "path": "/nodes/0/value"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Date", "id": "n1", "value": "not-a-date"}
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "description": "Expandable object with no content.",
+  "expect": [
+    {"code": "empty-expandable", "path": "/nodes/0/expandable"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Action", "id": "n1", "intent": "action", "expandable": {}}
+    ]
+  }
+}

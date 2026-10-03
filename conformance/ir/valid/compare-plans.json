@@ -1,0 +1,19 @@
+{
+  "description": "Comparing three subscription plans with criteria.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "compare_plans",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Choose the right plan for your needs."},
+      {"type": "Recommendation", "id": "pro", "intent": "select professional plan", "summary": "Professional: the best value for growing teams"},
+      {"type": "Price", "id": "starter", "amount": 29, "currency": "USD", "label": "Starter plan", "period": "month"},
+      {"type": "Price", "id": "pro_price", "amount": 99, "currency": "USD", "label": "Professional plan", "period": "month"},
+      {"type": "Price", "id": "enterprise", "amount": 299, "currency": "USD", "label": "Enterprise plan", "period": "month"},
+      {"type": "Comparison", "id": "comp", "items": ["starter", "pro_price", "enterprise"], "criteria": [
+        {"label": "Users", "values": {"starter": "up to 5", "pro_price": "up to 50", "enterprise": "unlimited"}},
+        {"label": "Storage", "values": {"starter": "10 GB", "pro_price": "500 GB", "enterprise": "unlimited"}},
+        {"label": "Support", "values": {"starter": "email", "pro_price": "phone + email", "enterprise": "24/7 dedicated"}}
+      ]}
+    ]
+  }
+}

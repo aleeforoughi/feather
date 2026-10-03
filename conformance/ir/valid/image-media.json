@@ -1,0 +1,10 @@
+{
+  "description": "An image with alt text.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "product_view",
+    "nodes": [
+      {"type": "Media", "id": "img", "kind": "image", "src": "https://example.com/product.jpg", "alt": "A blue ceramic vase with geometric patterns"}
+    ]
+  }
+}

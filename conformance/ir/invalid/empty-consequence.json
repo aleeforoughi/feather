@@ -1,0 +1,13 @@
+{
+  "description": "Empty consequence object.",
+  "expect": [
+    {"code": "empty-consequence", "path": "/nodes/0/consequence"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "IrreversibleAction", "id": "n1", "intent": "action", "consequence": {}}
+    ]
+  }
+}

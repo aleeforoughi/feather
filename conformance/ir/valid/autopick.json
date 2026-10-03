@@ -1,0 +1,11 @@
+{
+  "description": "A decision already made (autopick) that the person can keep or undo within a time window.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "delivery_scheduled",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "We automatically scheduled your delivery for tomorrow."},
+      {"type": "Autopick", "id": "auto", "intent": "confirm delivery time", "summary": "Delivery scheduled for tomorrow at 2pm", "undoWithin": 300}
+    ]
+  }
+}

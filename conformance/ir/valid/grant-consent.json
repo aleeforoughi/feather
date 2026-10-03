@@ -1,0 +1,11 @@
+{
+  "description": "Granting data consent with consent consequence.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "grant_analytics",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "Allow us to collect usage analytics to improve your experience?"},
+      {"type": "IrreversibleAction", "id": "consent", "intent": "grant consent", "consequence": {"consent": {"to": "Analytics Provider", "scope": "usage data collection"}}, "primary": true}
+    ]
+  }
+}

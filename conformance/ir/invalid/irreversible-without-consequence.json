@@ -1,0 +1,13 @@
+{
+  "description": "Irreversible action without consequence.",
+  "expect": [
+    {"code": "irreversible-without-consequence", "path": "/nodes/0/consequence"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "IrreversibleAction", "id": "n1", "intent": "delete", "reversible": false}
+    ]
+  }
+}

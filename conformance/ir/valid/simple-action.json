@@ -1,0 +1,11 @@
+{
+  "description": "A simple action that the person can take.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "refresh_data",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "Your data is out of date."},
+      {"type": "Action", "id": "refresh", "intent": "refresh data", "label": "Refresh now", "primary": true}
+    ]
+  }
+}

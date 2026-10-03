@@ -1,0 +1,10 @@
+{
+  "description": "Expandable content with both why and detail.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "info_expand",
+    "nodes": [
+      {"type": "Recommendation", "id": "rec", "intent": "upgrade plan", "summary": "We recommend upgrading to Pro for better performance", "expandable": {"why": "Your usage is approaching the Standard plan limit.", "detail": "Pro includes 10x more API calls per month, priority support, and advanced analytics. Most customers see a 40% improvement in response times."}, "primary": true}
+    ]
+  }
+}

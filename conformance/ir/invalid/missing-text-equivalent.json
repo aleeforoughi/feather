@@ -1,0 +1,13 @@
+{
+  "description": "Image media without alt text.",
+  "expect": [
+    {"code": "missing-text-equivalent", "path": "/nodes/0"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Media", "id": "n1", "kind": "image", "src": "https://example.com/image.jpg"}
+    ]
+  }
+}

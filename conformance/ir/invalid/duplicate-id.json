@@ -1,0 +1,14 @@
+{
+  "description": "Two nodes with the same id.",
+  "expect": [
+    {"code": "duplicate-id", "path": "/nodes/1/id"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Text", "id": "same", "text": "first"},
+      {"type": "Text", "id": "same", "text": "second"}
+    ]
+  }
+}

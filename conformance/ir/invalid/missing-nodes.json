@@ -1,0 +1,10 @@
+{
+  "description": "Missing required 'nodes' field.",
+  "expect": [
+    {"code": "missing-field", "path": "/nodes"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test"
+  }
+}

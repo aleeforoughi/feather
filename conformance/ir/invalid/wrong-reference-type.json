@@ -1,0 +1,14 @@
+{
+  "description": "Reference to wrong node type.",
+  "expect": [
+    {"code": "wrong-reference-type", "path": "/nodes/1/of"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Text", "id": "n1", "text": "hello"},
+      {"type": "PredictedChoice", "id": "n2", "intent": "predict", "of": "n1", "option": "opt1"}
+    ]
+  }
+}

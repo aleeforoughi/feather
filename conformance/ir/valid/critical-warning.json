@@ -1,0 +1,10 @@
+{
+  "description": "A critical-importance warning that is never hidden.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "security_alert",
+    "nodes": [
+      {"type": "Warning", "id": "alert", "text": "Unusual login detected from a new device. If this is not you, please change your password immediately.", "severity": "danger", "importance": "critical", "acknowledge": true}
+    ]
+  }
+}

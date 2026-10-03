@@ -1,0 +1,11 @@
+{
+  "description": "An approval request from a specific person.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "manager_approval",
+    "nodes": [
+      {"type": "Person", "id": "mgr", "name": "Sarah Chen", "role": "project manager"},
+      {"type": "Approval", "id": "app", "intent": "approve budget increase", "request": "Please approve a 20% budget increase for Q4", "requester": "mgr", "scope": "Budget allocation for marketing", "primary": true}
+    ]
+  }
+}

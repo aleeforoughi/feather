@@ -1,0 +1,10 @@
+{
+  "description": "A document media reference.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "view_invoice",
+    "nodes": [
+      {"type": "Media", "id": "doc", "kind": "document", "src": "https://example.com/invoice-2024.pdf"}
+    ]
+  }
+}

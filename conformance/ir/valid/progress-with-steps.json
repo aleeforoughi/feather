@@ -1,0 +1,15 @@
+{
+  "description": "A progress stream snapshot showing current progress with multiple steps.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "file_upload_progress",
+    "nodes": [
+      {"type": "Progress", "id": "prog", "label": "Uploading your files", "value": 0.65, "steps": [
+        {"id": "s1", "label": "Validating files", "state": "done"},
+        {"id": "s2", "label": "Compressing", "state": "active"},
+        {"id": "s3", "label": "Uploading to server", "state": "pending"},
+        {"id": "s4", "label": "Processing", "state": "pending"}
+      ]}
+    ]
+  }
+}

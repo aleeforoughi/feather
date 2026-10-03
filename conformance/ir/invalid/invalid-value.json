@@ -1,0 +1,13 @@
+{
+  "description": "Invalid enum value.",
+  "expect": [
+    {"code": "invalid-value", "path": "/nodes/0/importance"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Action", "id": "n1", "intent": "action", "importance": "super-critical"}
+    ]
+  }
+}

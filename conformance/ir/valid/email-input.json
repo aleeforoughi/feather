@@ -1,0 +1,10 @@
+{
+  "description": "An email input field.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "email_signup",
+    "nodes": [
+      {"type": "Input", "id": "email", "intent": "enter email", "prompt": "What is your email address?", "kind": "email", "required": true, "primary": true}
+    ]
+  }
+}

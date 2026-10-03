@@ -1,0 +1,13 @@
+{
+  "description": "Selected option does not exist in choice.",
+  "expect": [
+    {"code": "unknown-option", "path": "/nodes/0/selected/0"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Choice", "id": "n1", "intent": "choose", "prompt": "Pick one", "options": [{"id": "opt1", "label": "Option 1"}, {"id": "opt2", "label": "Option 2"}], "selected": ["badopt"]}
+    ]
+  }
+}

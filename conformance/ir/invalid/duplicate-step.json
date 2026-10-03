@@ -1,0 +1,16 @@
+{
+  "description": "Progress with duplicate step ids.",
+  "expect": [
+    {"code": "duplicate-step", "path": "/nodes/0/steps/1/id"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Progress", "id": "n1", "label": "Progress", "steps": [
+        {"id": "step1", "label": "Step 1", "state": "done"},
+        {"id": "step1", "label": "Step 2", "state": "pending"}
+      ]}
+    ]
+  }
+}

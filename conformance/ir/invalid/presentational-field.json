@@ -1,0 +1,13 @@
+{
+  "description": "Node has a presentational field (color).",
+  "expect": [
+    {"code": "presentational-field", "path": "/nodes/0/color"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Text", "id": "n1", "text": "hello", "color": "blue"}
+    ]
+  }
+}

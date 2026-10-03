@@ -1,0 +1,15 @@
+{
+  "description": "A predicted choice that the system expects the person to pick.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "language_preference",
+    "nodes": [
+      {"type": "Choice", "id": "lang", "intent": "select language", "prompt": "What language do you prefer?", "options": [
+        {"id": "en", "label": "English"},
+        {"id": "ar", "label": "Arabic"},
+        {"id": "fr", "label": "French"}
+      ]},
+      {"type": "PredictedChoice", "id": "pred", "intent": "predict English preference", "of": "lang", "option": "en", "summary": "Based on your browser settings", "confidence": 0.85}
+    ]
+  }
+}

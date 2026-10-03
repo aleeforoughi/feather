@@ -1,0 +1,13 @@
+{
+  "description": "Multiple selections in a single-choice.",
+  "expect": [
+    {"code": "too-many-selected", "path": "/nodes/0/selected"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Choice", "id": "n1", "intent": "choose", "prompt": "Pick one", "options": [{"id": "opt1", "label": "Option 1"}, {"id": "opt2", "label": "Option 2"}], "selected": ["opt1", "opt2"]}
+    ]
+  }
+}

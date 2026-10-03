@@ -1,0 +1,13 @@
+{
+  "description": "Node type that cannot be primary marked as primary.",
+  "expect": [
+    {"code": "not-primary-capable", "path": "/nodes/0/primary"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Text", "id": "n1", "text": "hello", "primary": true}
+    ]
+  }
+}

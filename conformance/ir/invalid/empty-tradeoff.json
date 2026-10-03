@@ -1,0 +1,14 @@
+{
+  "description": "Tradeoff with no gains or costs.",
+  "expect": [
+    {"code": "empty-tradeoff", "path": "/nodes/1"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Choice", "id": "n1", "intent": "choose", "prompt": "Pick", "options": [{"id": "opt1", "label": "A"}, {"id": "opt2", "label": "B"}]},
+      {"type": "Tradeoff", "id": "n2"}
+    ]
+  }
+}

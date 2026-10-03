@@ -1,0 +1,14 @@
+{
+  "description": "Multiple nodes marked as primary.",
+  "expect": [
+    {"code": "multiple-primary", "path": "/nodes/1/primary"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Action", "id": "a1", "intent": "action 1", "primary": true},
+      {"type": "Action", "id": "a2", "intent": "action 2", "primary": true}
+    ]
+  }
+}

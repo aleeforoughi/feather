@@ -1,0 +1,13 @@
+{
+  "description": "A hotel booking with Date range and Location.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "book_hotel",
+    "nodes": [
+      {"type": "Location", "id": "loc", "name": "Burj Al Arab", "address": "Jumeirah, Dubai, UAE", "coordinates": {"lat": 25.1413, "lng": 55.1847}},
+      {"type": "Date", "id": "dates", "value": "2026-12-15", "until": "2026-12-18", "label": "3-night stay"},
+      {"type": "Price", "id": "total", "amount": 3500, "currency": "AED", "label": "Total price"},
+      {"type": "Action", "id": "book", "intent": "confirm booking", "primary": true}
+    ]
+  }
+}

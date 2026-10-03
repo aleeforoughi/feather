@@ -1,0 +1,11 @@
+{
+  "description": "Node with unknown type.",
+  "expect": [
+    {"code": "unknown-node-type", "path": "/nodes/0/type"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [{"type": "BadNodeType", "id": "n1"}]
+  }
+}

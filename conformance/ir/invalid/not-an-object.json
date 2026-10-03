@@ -1,0 +1,7 @@
+{
+  "description": "The IR is not a JSON object.",
+  "expect": [
+    {"code": "not-an-object", "path": ""}
+  ],
+  "ir": "not an object"
+}

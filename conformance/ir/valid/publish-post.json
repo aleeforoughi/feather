@@ -1,0 +1,11 @@
+{
+  "description": "Publishing a post with publish consequence.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "publish_announcement",
+    "nodes": [
+      {"type": "Text", "id": "preview", "text": "Your announcement will be visible to all team members."},
+      {"type": "IrreversibleAction", "id": "pub", "intent": "publish", "consequence": {"publish": {"audience": "all team members"}}, "primary": true}
+    ]
+  }
+}

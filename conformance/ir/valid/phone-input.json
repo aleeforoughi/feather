@@ -1,0 +1,10 @@
+{
+  "description": "A phone number input field.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "phone_verification",
+    "nodes": [
+      {"type": "Input", "id": "phone", "intent": "enter phone", "prompt": "Your phone number", "kind": "phone", "required": true, "primary": true}
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "description": "Audio with transcript.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "listen_message",
+    "nodes": [
+      {"type": "Media", "id": "audio", "kind": "audio", "src": "https://example.com/message.mp3", "transcript": "This is a recorded message about your delivery. Your package will arrive tomorrow between 10am and 2pm."}
+    ]
+  }
+}

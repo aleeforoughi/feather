@@ -1,0 +1,15 @@
+{
+  "description": "Comparison with mismatched item and criteria values.",
+  "expect": [
+    {"code": "comparison-mismatch", "path": "/nodes/2/criteria/0/values"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Price", "id": "p1", "amount": 10, "currency": "USD"},
+      {"type": "Price", "id": "p2", "amount": 20, "currency": "USD"},
+      {"type": "Comparison", "id": "n1", "items": ["p1", "p2"], "criteria": [{"label": "Cost", "values": {"p1": 10}}]}
+    ]
+  }
+}

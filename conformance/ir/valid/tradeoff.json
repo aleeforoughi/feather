@@ -1,0 +1,14 @@
+{
+  "description": "A tradeoff showing gains and costs of a decision.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "flight_choice",
+    "nodes": [
+      {"type": "Choice", "id": "flight", "intent": "choose flight", "prompt": "Which flight?", "options": [
+        {"id": "early", "label": "Early morning 6am", "description": "arrives 10am"},
+        {"id": "late", "label": "Evening 6pm", "description": "arrives 10pm"}
+      ]},
+      {"type": "Tradeoff", "id": "trade", "of": "flight", "summary": "Early flights give you the whole day; evening flights let you sleep longer", "gains": ["full day at destination", "earlier arrival"], "costs": ["wake up early", "more tired"]}
+    ]
+  }
+}

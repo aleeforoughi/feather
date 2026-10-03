@@ -1,0 +1,13 @@
+{
+  "description": "Choice with fewer than two options.",
+  "expect": [
+    {"code": "too-few-items", "path": "/nodes/0/options"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Choice", "id": "n1", "intent": "choose", "prompt": "Pick one", "options": [{"id": "opt1", "label": "Option 1"}]}
+    ]
+  }
+}

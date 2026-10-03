@@ -1,0 +1,13 @@
+{
+  "description": "The person corrects something the system misunderstood.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "fix_booking",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "We understood you wanted a flight to New York on October 10."},
+      {"type": "Date", "id": "orig_date", "value": "2026-10-10", "label": "Original date"},
+      {"type": "Location", "id": "orig_loc", "name": "New York", "address": "New York, USA"},
+      {"type": "Correction", "id": "fix", "intent": "correct the booking", "target": "orig_loc", "prompt": "Which city were you looking for?", "original": "New York"}
+    ]
+  }
+}

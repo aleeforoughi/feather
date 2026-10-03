@@ -1,0 +1,13 @@
+{
+  "description": "Field with wrong data type.",
+  "expect": [
+    {"code": "wrong-type", "path": "/nodes/0/amount"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Price", "id": "n1", "amount": "not a number", "currency": "USD"}
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "description": "A long-text feedback input.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "feedback_form",
+    "nodes": [
+      {"type": "Input", "id": "feedback", "intent": "provide feedback", "prompt": "Tell us what you think", "kind": "long-text", "maxLength": 5000, "primary": true}
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "description": "An option to explore more topics on request.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "product_details",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Here's a summary of the product."},
+      {"type": "ExploreMore", "id": "more", "intent": "learn more", "label": "Explore details", "topics": ["features", "pricing", "reviews", "warranty"]}
+    ]
+  }
+}

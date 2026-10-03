@@ -1,0 +1,13 @@
+{
+  "description": "Node referencing itself.",
+  "expect": [
+    {"code": "self-reference", "path": "/nodes/0/target"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Correction", "id": "n1", "intent": "correct", "target": "n1", "prompt": "What did you mean?"}
+    ]
+  }
+}

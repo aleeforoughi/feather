@@ -1,0 +1,13 @@
+{
+  "description": "Invalid currency code.",
+  "expect": [
+    {"code": "invalid-currency", "path": "/nodes/0/currency"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Price", "id": "n1", "amount": 100, "currency": "INVALID"}
+    ]
+  }
+}

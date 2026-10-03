@@ -1,0 +1,10 @@
+{
+  "description": "A preference setting that can be toggled with fixed options.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "theme_preference",
+    "nodes": [
+      {"type": "Preference", "id": "theme", "intent": "set theme", "key": "color_theme", "label": "Color theme", "value": "light", "options": ["light", "dark", "auto"]}
+    ]
+  }
+}

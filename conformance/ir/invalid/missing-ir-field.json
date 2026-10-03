@@ -1,0 +1,11 @@
+{
+  "description": "Missing required 'ir' field.",
+  "expect": [
+    {"code": "missing-field", "path": "/ir"},
+    {"code": "empty-experience", "path": "/nodes"}
+  ],
+  "ir": {
+    "experience": "test",
+    "nodes": []
+  }
+}

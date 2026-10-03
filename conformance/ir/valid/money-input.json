@@ -1,0 +1,10 @@
+{
+  "description": "A money input with currency and min/max constraints.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "set_budget",
+    "nodes": [
+      {"type": "Input", "id": "amt", "intent": "set budget", "prompt": "What is your budget?", "kind": "money", "currency": "USD", "min": 100, "max": 10000, "value": 500, "primary": true}
+    ]
+  }
+}

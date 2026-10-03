@@ -1,0 +1,15 @@
+{
+  "description": "A completed progress with all steps done.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "installation_complete",
+    "nodes": [
+      {"type": "Progress", "id": "prog", "label": "Installation", "value": 1.0, "steps": [
+        {"id": "s1", "label": "Downloading", "state": "done"},
+        {"id": "s2", "label": "Installing", "state": "done"},
+        {"id": "s3", "label": "Configuring", "state": "done"}
+      ]},
+      {"type": "Confirmation", "id": "done", "text": "Installation complete!"}
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "description": "Text field exceeding max length.",
+  "expect": [
+    {"code": "too-long", "path": "/nodes/0/intent"}
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "test",
+    "nodes": [
+      {"type": "Action", "id": "n1", "intent": "this is a very long intent that exceeds the maximum allowed length of one hundred twenty characters for the intent field on action nodes"}
+    ]
+  }
+}

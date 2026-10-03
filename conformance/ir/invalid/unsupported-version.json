@@ -1,0 +1,11 @@
+{
+  "description": "The IR version is not supported.",
+  "expect": [
+    {"code": "unsupported-version", "path": "/ir"}
+  ],
+  "ir": {
+    "ir": "feather.ir/1",
+    "experience": "test",
+    "nodes": []
+  }
+}
