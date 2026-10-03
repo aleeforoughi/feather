@@ -3,7 +3,7 @@
   "expect": [
     {
       "code": "missing-text-equivalent",
-      "path": "/nodes/1"
+      "path": "/nodes/1/alt"
     }
   ],
   "ir": {

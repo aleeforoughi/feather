@@ -3,7 +3,7 @@
 // The test suite fails when either file is out of date. With --check it only reports.
 import fs from "node:fs"
 import path from "node:path"
-import { NODES, commonFields, primaryField, type Field, type NodeSpec } from "../src/spec.ts"
+import { DEFAULT_MAX_LENGTH, NODES, commonFields, primaryField, type Field, type NodeSpec } from "../src/spec.ts"
 import { IR_VERSION } from "../src/types.ts"
 
 const pkg = path.resolve(import.meta.dirname, "..")
@@ -16,7 +16,11 @@ function fieldSchema(field: Field): Schema {
   const base: Schema = { description: field.doc }
   switch (field.kind) {
     case "string":
-      return { ...base, type: "string", pattern: "\\S", ...(field.maxLength ? { maxLength: field.maxLength } : {}) }
+      return { ...base, type: "string", pattern: "\\S", maxLength: field.maxLength ?? DEFAULT_MAX_LENGTH }
+    case "id":
+      return { ...base, $ref: "#/$defs/id" }
+    case "text-or-number":
+      return { ...base, anyOf: [{ type: "string", maxLength: DEFAULT_MAX_LENGTH }, { type: "number" }] }
     case "ref":
       return { ...base, $ref: "#/$defs/id" }
     case "number":
@@ -32,9 +36,9 @@ function fieldSchema(field: Field): Schema {
     case "scalar":
       return { ...base, type: ["string", "number", "boolean"] }
     case "refs":
-      return { ...base, type: "array", items: { $ref: "#/$defs/id" }, ...(field.minItems ? { minItems: field.minItems } : {}) }
+      return { ...base, type: "array", items: { $ref: "#/$defs/id" }, ...(field.minItems ? { minItems: field.minItems } : {}), ...(field.unique ? { uniqueItems: true } : {}) }
     case "strings":
-      return { ...base, type: "array", items: { type: "string", pattern: "\\S" }, ...(field.minItems ? { minItems: field.minItems } : {}) }
+      return { ...base, type: "array", items: { type: "string", pattern: "\\S", maxLength: DEFAULT_MAX_LENGTH }, ...(field.minItems ? { minItems: field.minItems } : {}) }
     case "scalars":
       return { ...base, type: "array", items: { type: ["string", "number", "boolean"] }, ...(field.minItems ? { minItems: field.minItems } : {}) }
     case "array":
@@ -69,6 +73,7 @@ function nodeSchema(spec: NodeSpec): Schema {
       ...(object.properties as Schema),
       id: { description: commonFields.id.doc, $ref: "#/$defs/id" },
       ...(spec.defaults?.reversible === false ? { reversible: { description: "Always false: this act cannot be undone.", const: false } } : {}),
+      ...(spec.importance ? { importance: { description: commonFields.importance.doc, enum: [...spec.importance] } } : {}),
     },
     required: [...new Set(required)],
   }
@@ -122,6 +127,10 @@ function fieldType(field: Field): string {
       return "{ node id: value }"
     case "currency":
       return "ISO 4217 code"
+    case "id":
+      return "id"
+    case "text-or-number":
+      return "string or number"
     case "date":
       return "ISO 8601"
     default:
@@ -154,6 +163,7 @@ export function buildDocs(): string {
       lines.push(`### ${spec.type}`, "", spec.doc, "")
       const traits = [spec.act ? "an act (needs `intent`)" : "not an act", spec.primaryCapable ? "may be primary" : ""].filter(Boolean)
       if (spec.defaults) traits.push(`defaults: ${Object.entries(spec.defaults).map(([k, v]) => `${k} ${v}`).join(", ")}`)
+      if (spec.importance) traits.push(`importance only ${spec.importance.join(" or ")}`)
       lines.push(`*${traits.join("; ")}.*`, "")
       if (Object.keys(spec.fields).length) {
         lines.push("| Field | Required | Type | Meaning |", "|---|---|---|---|", ...Object.entries(spec.fields).map(([k, f]) => row(k, f, !!f.required)), "")

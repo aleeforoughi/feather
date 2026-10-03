@@ -13,7 +13,7 @@ How to use the IR, and what the validator checks, is in [README.md](README.md).
 | `importance` |  | `low` \| `normal` \| `high` \| `critical` | How much it matters. Default normal; critical is never hidden behind expansion. |
 | `reversible` |  | boolean | Whether the effect can be undone. Default true. |
 | `expandable` |  | { why?, detail? } | Detail on demand, behind "Why?". At least one entry. |
-| `primary` |  | boolean | This node is the experience's main act. At most one per experience. |
+| `primary` |  | boolean | This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience. |
 
 `intent` is required on act nodes. `primary` exists only on Action, Choice, Input, Approval, Recommendation and IrreversibleAction.
 
@@ -54,7 +54,7 @@ Pick one, or several, of a known set.
 | `prompt` | yes | string | The question. |
 | `options` | yes | list of { id, label, description? } | The options, at least two, ids unique. |
 | `multiple` |  | boolean | Several may be picked. Default false. |
-| `selected` |  | strings | Option ids already picked. |
+| `selected` |  | strings | Option ids already picked: the preselection. |
 
 **Replies:** `choose` (with value): The picked option id (an array of ids when multiple).
 
@@ -69,13 +69,13 @@ A fact the caller does not have yet, asked of the person.
 | `prompt` | yes | string | The question. |
 | `kind` | yes | `text` \| `long-text` \| `number` \| `email` \| `phone` \| `url` \| `date` \| `money` | What kind of value. |
 | `required` |  | boolean | An answer is needed to continue. |
-| `value` |  | string, number or boolean | The current value, if any. |
+| `value` |  | string or number | The current value, if any. |
 | `min` |  | number | For number and money: the smallest accepted. |
 | `max` |  | number | For number and money: the largest accepted. |
 | `maxLength` |  | number | For text kinds: the longest accepted. |
 | `currency` |  | ISO 4217 code | For money: the currency. |
 
-**Replies:** `submit` (with value): The value given.
+**Replies:** `submit` (with value): The value given: a string for text kinds, an ISO 8601 string for date, a number for number and for money (in the Input's currency). `skip`: The person chose not to answer (only when the Input is not required).
 
 ### Price
 
@@ -187,7 +187,7 @@ Something the person did took effect.
 | Field | Required | Type | Meaning |
 |---|---|---|---|
 | `text` | yes | string | What happened. |
-| `of` |  | node id | The node whose act this confirms. |
+| `of` |  | id of a Action or Choice or Input or Approval or Recommendation or PredictedChoice or Alternative or Autopick or Correction or Preference or IrreversibleAction or ExploreMore | The act this confirms. |
 
 **Replies:** none.
 
@@ -218,7 +218,7 @@ A request for the person's authority: approve or reject.
 | `scope` |  | string | What the approval covers. |
 | `consequence` |  | { spend?, publish?, send?, consent?, delete?, statement? } | What the act does, stated so it can be shown verbatim. At least one entry. |
 
-**Replies:** `approve`: Approved. `reject` (value optional): Rejected, optionally with a reason.
+**Replies:** `approve`: Approved. `reject` (value optional): Rejected, optionally with the reason as a string.
 
 ## Decision nodes
 
@@ -234,7 +234,7 @@ What the caller recommends. It comes first; alternatives follow.
 | `confidence` |  | number | 0 to 1. |
 | `consequence` |  | { spend?, publish?, send?, consent?, delete?, statement? } | What the act does, stated so it can be shown verbatim. At least one entry. |
 
-**Replies:** `accept`: The person took the recommendation.
+**Replies:** `accept`: The person took the recommendation. When it cannot be undone and states no consequence of its own, accepting only moves on to the IrreversibleAction that confirms it; it never commits.
 
 ### PredictedChoice
 
@@ -249,7 +249,7 @@ The option the caller expects the person to pick in a Choice.
 | `summary` |  | string | Why, in one line. |
 | `confidence` |  | number | 0 to 1. |
 
-**Replies:** `accept`: The prediction was right. `change` (with value): The option id picked instead.
+**Replies:** `accept`: The prediction was right. `change` (with value): The option id picked instead (not the predicted one).
 
 ### Alternative
 
@@ -260,10 +260,10 @@ Another way to go than the recommendation.
 | Field | Required | Type | Meaning |
 |---|---|---|---|
 | `label` |  | string | The words for it; defaults to the intent. |
-| `for` |  | node id | The node this is an alternative to. |
+| `for` |  | id of a Recommendation or Alternative or Choice or Action or Approval or IrreversibleAction | The node this is an alternative to; it must come before. Required when the experience has several Recommendations. |
 | `input` |  | `Price` \| `Date` \| `Text` \| `Location` \| `Person` | The person supplies a value of this kind when choosing it. |
 
-**Replies:** `choose` (value optional): Chosen; carries the value when the alternative takes an input.
+**Replies:** `choose` (value optional): Chosen. With an input it carries the value: { amount, currency } for Price, an ISO 8601 string for Date, a string for Text, Location and Person.
 
 ### Tradeoff
 
@@ -273,7 +273,7 @@ What one option gains and costs. At least one gain or cost.
 
 | Field | Required | Type | Meaning |
 |---|---|---|---|
-| `of` |  | node id | The node the tradeoff describes. |
+| `of` |  | id of a Recommendation or Alternative or Choice or Action or Approval or IrreversibleAction | The option the tradeoff describes. |
 | `summary` |  | string | The tradeoff, in one line. |
 | `gains` |  | strings | What it gains. |
 | `costs` |  | strings | What it costs. |
@@ -289,8 +289,8 @@ A decision already made for the person, which they may keep or undo.
 | Field | Required | Type | Meaning |
 |---|---|---|---|
 | `summary` | yes | string | What was decided, in one line. |
-| `of` |  | node id | The node decided on. |
-| `undoWithin` |  | number | Seconds the person has to undo. |
+| `of` |  | id of a Recommendation or Alternative or Choice or Action or Approval or IrreversibleAction | The option decided on. |
+| `undoWithin` |  | number | Seconds the person has to undo. The caller, which owns time, refuses a late undo. |
 
 **Replies:** `keep`: Kept. `undo`: Undone.
 
@@ -331,7 +331,7 @@ Several nodes side by side on the same criteria.
 
 | Field | Required | Type | Meaning |
 |---|---|---|---|
-| `items` | yes | node ids | The compared node ids, at least two. |
+| `items` | yes | ids of Recommendation or Alternative or Action or Price or Person or Location or Media | The compared node ids: at least two, each once. |
 | `criteria` | yes | list of { label, values } | What they are compared on; each gives a value for every item. |
 
 **Replies:** none.
@@ -340,12 +340,13 @@ Several nodes side by side on the same criteria.
 
 An act that cannot be undone: spending, publishing, sending, consent. Always explicit, never the default focus.
 
-*an act (needs `intent`); may be primary; defaults: importance critical, reversible false.*
+*an act (needs `intent`); may be primary; defaults: importance critical, reversible false; importance only high or critical.*
 
 | Field | Required | Type | Meaning |
 |---|---|---|---|
 | `label` |  | string | The words for the act; defaults to the intent. |
 | `consequence` | yes | { spend?, publish?, send?, consent?, delete?, statement? } | What the act does, stated so it can be shown verbatim. At least one entry. |
+| `confirms` |  | id of a Recommendation or Approval or Action or Alternative | The irreversible act this commits (a Recommendation or Approval marked reversible: false). When an experience has a single IrreversibleAction, it confirms them implicitly. |
 
 **Replies:** `confirm`: Confirmed by a deliberate act. `cancel`: Not done.
 
@@ -360,4 +361,4 @@ More is available on request; the caller sends it when the person asks.
 | `label` |  | string | The words for it; defaults to the intent. |
 | `topics` |  | strings | What more is available. |
 
-**Replies:** `expand` (value optional): The person asked for more, optionally about one topic.
+**Replies:** `expand` (value optional): The person asked for more, optionally about one of its topics.

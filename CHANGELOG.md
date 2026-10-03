@@ -15,8 +15,25 @@ as meaning. New package `@aleeforoughi/feather-intent`, with no dependencies.
   consequence (principle 6), that every medium has a text equivalent, that references resolve, and it rejects
   presentational fields (principle 1) and unknown ones, suggesting the name a typo meant. `validateReply()`
   checks a reply against its experience. `feather-ir validate <file>` runs it from a shell.
-- Conformance fixtures in `conformance/ir`: realistic valid experiences covering every node type, and invalid ones
-  that each list exactly the issues the validator must report.
+- Contract rules settled after an adversarial review:
+  - `primary` gives emphasis, never default focus.
+  - An irreversible act without its own consequence is committed by the IrreversibleAction that `confirms` it,
+    implied when there is only one; accepting such a recommendation never commits.
+  - An IrreversibleAction is `high` or `critical`.
+  - References are typed, and an Alternative follows what it replaces (and names it when there are several
+    Recommendations).
+  - One PredictedChoice per Choice, agreeing with `selected`.
+  - Option and step ids follow the id pattern.
+  - Text fields are capped at 4,000 code points.
+  - Zoned and wall-clock date-times are never compared.
+  - Every reply value has one encoding (money as a number in the Input's currency, a Price alternative as
+    `{ amount, currency }`, dates as ISO 8601), and an optional Input can be skipped.
+- Hardened: validate() and validateReply() never throw (prototype-named types and fields included), report at
+  most 100 issues, escape JSON Pointer segments, and check every node, including those with a bad id.
+  validateReply() validates the experience first and checks each value against its node.
+- Conformance fixtures in `conformance/ir`: 43 realistic valid experiences that together cover every node type
+  and IR feature, and 52 invalid ones, each a valid fixture with one deliberate mistake. Together they cover
+  every issue code except `too-many-issues`, and each lists exactly the issues the validator must report.
 - Docs: `docs/ir/README.md` (how the IR works, the rules, the codes, versioning).
 - `docs/PLAN.md`: the `qooe-core` switch is set aside; Feather builds on the 1.7.0 handoff alone.
 

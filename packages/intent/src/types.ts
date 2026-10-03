@@ -32,6 +32,7 @@ export interface NodeBase {
 
 /** Nodes that are the experience's main act may say so. At most one node per experience is primary. */
 export interface PrimaryCapable {
+  /** The main act: it gets the emphasis, never the default focus by itself. */
   primary?: boolean
 }
 
@@ -83,7 +84,7 @@ export interface ChoiceNode extends NodeBase, PrimaryCapable {
   options: ChoiceOption[]
   /** Several may be picked. Default `false`. */
   multiple?: boolean
-  /** Option ids already picked. */
+  /** Option ids already picked: the preselection. */
   selected?: string[]
 }
 
@@ -236,7 +237,7 @@ export interface AlternativeNode extends NodeBase {
   type: "Alternative"
   intent: string
   label?: string
-  /** The node this is an alternative to. */
+  /** The node this is an alternative to; it comes before. Required when there are several Recommendations. */
   for?: string
   /** The person supplies a value of this kind when choosing it ("set my own budget": Price). */
   input?: "Price" | "Date" | "Text" | "Location" | "Person"
@@ -288,7 +289,7 @@ export interface PreferenceNode extends NodeBase {
 export interface ComparisonCriterion {
   label: string
   /** One value per compared node id. */
-  values: Record<string, string | number>
+  values: Record<string, string | number | boolean>
 }
 
 /** Several nodes side by side on the same criteria. */
@@ -305,7 +306,10 @@ export interface IrreversibleActionNode extends NodeBase, PrimaryCapable {
   intent: string
   label?: string
   consequence: Consequence
+  /** The irreversible act this commits. Implied when the experience has a single IrreversibleAction. */
+  confirms?: string
   reversible?: false
+  importance?: "high" | "critical"
 }
 
 /** More is available on request; the caller sends it when the person asks. */
@@ -362,5 +366,9 @@ export interface ReplyEvent {
   experience: string
   node: string
   act: string
-  value?: string | number | boolean | string[]
+  /**
+   * Only when the act carries one: an option id (an array of them for a multiple Choice); a string, number or ISO 8601
+   * date for an Input, by its kind; { amount, currency } for a Price Alternative; a string for the other inputs.
+   */
+  value?: string | number | boolean | string[] | Money
 }

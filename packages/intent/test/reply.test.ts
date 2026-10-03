@@ -29,7 +29,7 @@ describe("validateReply", () => {
     expect(reply("addons", "choose", ["sso", "audit"]).ok).toBe(true)
     expect(reply("guess", "accept").ok).toBe(true)
     expect(reply("guess", "change", "basic").ok).toBe(true)
-    expect(reply("own", "choose", 300).ok).toBe(true)
+    expect(reply("own", "choose", { amount: 300, currency: "USD" }).ok).toBe(true)
     expect(reply("ack", "acknowledge").ok).toBe(true)
     expect(reply("billing", "set", "yearly").ok).toBe(true)
   })

@@ -1,0 +1,35 @@
+{
+  "description": "The account deletion is marked low importance; something that cannot be undone is high or critical.",
+  "expect": [
+    {
+      "code": "invalid-value",
+      "path": "/nodes/1/importance"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "delete_account_confirm",
+    "nodes": [
+      {
+        "type": "Warning",
+        "id": "danger",
+        "text": "Deleting your account is permanent. All data will be permanently removed and cannot be recovered.",
+        "severity": "danger",
+        "importance": "critical",
+        "acknowledge": true
+      },
+      {
+        "type": "IrreversibleAction",
+        "id": "confirm_delete",
+        "intent": "delete account",
+        "consequence": {
+          "delete": {
+            "what": "your account, all data, and all backups"
+          }
+        },
+        "primary": true,
+        "importance": "low"
+      }
+    ]
+  }
+}

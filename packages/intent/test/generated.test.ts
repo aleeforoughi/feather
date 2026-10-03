@@ -4,6 +4,12 @@ import { Ajv2020 } from "ajv/dist/2020.js"
 import { describe, expect, it } from "vitest"
 import { DOCS_PATH, SCHEMA_PATH, buildDocs, buildSchema } from "../scripts/generate.ts"
 
+const VALIDATOR_ONLY = [
+  "duplicate-id", "dangling-reference", "self-reference", "wrong-reference-type", "out-of-order", "ambiguous-alternative", "unneeded-confirmation",
+  "multiple-primary", "irreversible-without-consequence", "missing-text-equivalent", "duplicate-option", "unknown-option", "too-many-selected",
+  "conflicting-prediction", "duplicate-step", "empty-tradeoff", "comparison-mismatch", "out-of-range", "invalid-date", "too-many-issues",
+]
+
 const fixtures = (dir: string) => {
   const root = path.resolve(import.meta.dirname, "../../../conformance/ir", dir)
   return fs.existsSync(root) ? fs.readdirSync(root).filter((f) => f.endsWith(".json")).map((f) => [f, JSON.parse(fs.readFileSync(path.join(root, f), "utf8"))] as const) : []
@@ -23,8 +29,13 @@ describe("the JSON Schema", () => {
   it.each(fixtures("valid"))("accepts %s", (_, fixture) => {
     expect(check(fixture.ir), JSON.stringify(check.errors)).toBe(true)
   })
-  // The schema checks structure only; issues that need several nodes or semantic rules are the validator's alone.
-  const semantic = new Set(["duplicate-id", "dangling-reference", "self-reference", "wrong-reference-type", "multiple-primary", "irreversible-without-consequence", "missing-text-equivalent", "duplicate-option", "unknown-option", "too-many-selected", "duplicate-step", "empty-tradeoff", "comparison-mismatch", "out-of-range", "invalid-date", "unsupported-version"])
+  // The schema checks structure; these codes need several nodes or several fields at once, so only validate()
+  // reports them. docs/ir/README.md lists the same codes.
+  const semantic = new Set(VALIDATOR_ONLY)
+  it("lists only real issue codes as validator-only", () => {
+    const codes = fs.readFileSync(path.resolve(import.meta.dirname, "../src/validate.ts"), "utf8")
+    for (const code of VALIDATOR_ONLY) expect(codes).toContain(`| "${code}"`)
+  })
   it.each(fixtures("invalid").filter(([, f]) => f.expect.every((e: { code: string }) => !semantic.has(e.code))))("rejects %s", (_, fixture) => {
     expect(check(fixture.ir)).toBe(false)
   })

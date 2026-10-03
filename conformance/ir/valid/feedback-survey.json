@@ -6,10 +6,10 @@
     "nodes": [
       {"type": "Text", "id": "intro", "text": "How was your purchase experience?"},
       {"type": "Choice", "id": "rating", "intent": "rate experience", "prompt": "Rate your experience", "options": [
-        {"id": "1", "label": "Poor"},
-        {"id": "2", "label": "Fair"},
-        {"id": "3", "label": "Good"},
-        {"id": "4", "label": "Excellent"}
+        {"id": "poor", "label": "Poor"},
+        {"id": "fair", "label": "Fair"},
+        {"id": "good", "label": "Good"},
+        {"id": "excellent", "label": "Excellent"}
       ], "multiple": false},
       {"type": "Input", "id": "comments", "intent": "provide comments", "prompt": "Any additional comments? (optional)", "kind": "long-text", "maxLength": 1000},
       {"type": "Action", "id": "submit", "intent": "submit feedback", "label": "Submit", "primary": true}

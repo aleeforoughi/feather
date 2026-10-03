@@ -57,10 +57,20 @@ Every node carries:
 | `expandable` | Detail on demand: `why` and/or `detail`, behind "Why?". |
 
 Words the person sees (`label`, `summary`, `prompt`, `text`) are content, so the caller writes them. Where
-`label` is optional, Feather uses the `intent`.
+`label` is optional, Feather uses the `intent`. Text fields hold at most 4,000 characters unless the
+reference gives a lower limit. Length is counted in Unicode code points, not UTF-16 units, so a simple emoji
+counts as one.
 
-References point at other nodes by id: an Alternative `for` a Recommendation, a PredictedChoice `of` a Choice,
-a Comparison's `items`, a Correction's `target`. They must resolve inside the same experience.
+References point at other nodes by id, and each points at the kinds of node it means. An Alternative is `for`
+a Recommendation, Choice, Action, Approval or IrreversibleAction, and comes after it. A PredictedChoice is `of`
+a Choice. A Comparison's `items` are the options compared, each listed once. A Correction's `target` is
+whatever was misunderstood. The [node reference](nodes.md) lists the allowed kinds for each field.
+
+**Dates** are ISO 8601. A date-time with `Z` or an offset names an instant; one without names a wall-clock
+time. Feather never compares the two kinds, because the answer would depend on where it runs.
+
+**`primary`** marks the main act. It gets the emphasis but never takes the default focus by itself, and an
+IrreversibleAction never takes the default focus at all (composer rule 2).
 
 ## Acts and replies
 
@@ -72,30 +82,63 @@ When the person acts, Feather sends a reply to the caller:
 ```
 
 Each node type takes a fixed set of acts. For example, `IrreversibleAction` takes `confirm` or `cancel`,
-`Choice` takes `choose` with the option id (an array when `multiple`), and `Approval` takes `approve` or
-`reject`. The [node reference](nodes.md) lists them all. Every manifestation must produce the same reply for
-the same act, whether the person clicked, spoke, scanned with a switch or typed a number. `validateReply`
-checks a reply against its experience.
+`Choice` takes `choose`, and `Approval` takes `approve` or `reject`. The [node reference](nodes.md) lists them
+all. Every manifestation must produce the same reply for the same act, whether the person clicked, spoke,
+scanned with a switch or typed a number, so each value has one encoding:
+
+| Act | Value |
+|---|---|
+| `choose` on a Choice | the option id; an array of distinct ids when `multiple` |
+| `change` on a PredictedChoice | another option id (the predicted one is `accept`) |
+| `submit` on an Input | a string for the text kinds (respecting `maxLength`, and a valid email, phone or URL for those kinds); a number for `number`, and for `money` in the Input's `currency`, within `min` and `max`; an ISO 8601 string for `date` |
+| `skip` on an Input | none; only when the Input is not `required` |
+| `choose` on an Alternative with `input` | `{ "amount", "currency" }` for Price, an ISO 8601 string for Date, words for Text, Location and Person |
+| `set` on a Preference | a string, number or boolean, one of its `options` when it has them |
+| `reject` on an Approval, `submit` on a Correction, `expand` on an ExploreMore | a string (for `expand`, one of its `topics` when it has them) |
+
+An irreversible Recommendation that states no consequence of its own is committed by its IrreversibleAction:
+`accept` on the recommendation only moves on to that confirmation, and never commits by itself. An Autopick's
+`undoWithin` is enforced by the caller, which owns time.
+
+`validateReply(experience, reply)` validates the experience first, then checks the reply's node, act and value,
+and rejects fields other than `experience`, `node`, `act` and `value`.
 
 ## The rules
 
 The validator checks structure, and these rules across nodes:
 
 1. **One primary act.** At most one node has `"primary": true`. Only Action, Choice, Input, Approval,
-   Recommendation and IrreversibleAction can be primary.
-2. **Irreversible means explicit.** An `IrreversibleAction` must state its `consequence`: `spend`, `publish`,
-   `send`, `consent`, `delete` or a `statement`, so Feather can show it verbatim and ask for a deliberate act. Any
-   other act marked `reversible: false` needs a consequence of its own (Approval and Recommendation take one) or
-   an `IrreversibleAction` in the same experience.
+   Recommendation and IrreversibleAction can be primary. `"primary": false` is allowed anywhere and means
+   nothing.
+2. **Irreversible means explicit.** An `IrreversibleAction` must state its `consequence` (`spend`, `publish`,
+   `send`, `consent`, `delete` or a `statement`), so Feather can show it verbatim and ask for a deliberate act.
+   Its importance is `high` or `critical`. Any other act marked `reversible: false` either states a consequence
+   of its own (Approval and Recommendation take one) or is confirmed by an IrreversibleAction. The
+   IrreversibleAction names that act in `confirms`; when the experience has exactly one IrreversibleAction, it
+   confirms implicitly.
 3. **Every medium has a text equivalent.** An image or video has `alt`, audio has a `transcript`, and video
    also has `captions` or a `transcript`.
-4. **References resolve** to a node of the right type, never to the node itself.
-5. **No presentation.** Fields such as `color`, `style`, `component`, `size` or `position` are rejected with a
+4. **References resolve** to a node of a kind the field allows, never to the node itself. An Alternative comes
+   after what it is an alternative to. With several Recommendations, every Alternative says which one it is
+   `for`.
+5. **Preselection is decided once.** A Choice has at most one PredictedChoice, and it agrees with the Choice's
+   `selected` when there is one.
+6. **No presentation.** Fields such as `color`, `style`, `component`, `size` or `position` are rejected with a
    pointer to principle 1. Unknown fields are rejected too, with a suggestion when they look like a typo.
 
+Some rules belong to the composer and are documented here so callers can rely on them. For example, a
+`critical` node is never hidden behind expansion: if it has `expandable` detail, Feather shows that detail
+(composer rule 4).
+
 The structure is also published as a JSON Schema, `@aleeforoughi/feather-intent/schema/feather.ir-0.json`,
-for editors and for callers in other languages. The schema covers structure only. Rules 1–4 need
-`validate()`.
+for editors and for callers in other languages. The schema checks the shape of every node. It cannot check
+rules that span several nodes or fields, so these codes come only from `validate()`: `duplicate-id`,
+`dangling-reference`, `self-reference`, `wrong-reference-type`, `out-of-order`, `ambiguous-alternative`,
+`unneeded-confirmation`, `multiple-primary`, `irreversible-without-consequence` (for acts other than an
+IrreversibleAction), `missing-text-equivalent`, `duplicate-option`, `unknown-option`, `too-many-selected`,
+`conflicting-prediction`, `duplicate-step`, `empty-tradeoff`, `comparison-mismatch`, `out-of-range` (a date
+range or `min` above `max`), `invalid-date` (a well-formed but impossible date, such as February 30),
+`missing-field` (a money Input's `currency`) and `too-many-issues`.
 
 ## Validating
 
@@ -114,7 +157,8 @@ npx feather-ir validate experience.json
 ```
 
 Every issue has a stable `code`, a JSON Pointer `path`, the `node` id when there is one, and a `message` that
-says what to change:
+says what to change. `validate()` never throws, and reports at most 100 issues; past that, a last issue,
+`too-many-issues`, says to fix those first.
 
 ```text
 - /nodes/2/consequence: IrreversibleAction "go" cannot be undone, so it must state its consequence exactly (spend, publish, send, consent, delete or a statement). Principle 6: irreversible means explicit. [irreversible-without-consequence]
@@ -129,18 +173,20 @@ says what to change:
 | `presentational-field` | Presentation, not meaning. |
 | `invalid-id`, `duplicate-id` | Ids start with a letter and are unique. |
 | `invalid-value`, `out-of-range`, `invalid-currency`, `invalid-date` | A value outside what the field accepts. |
-| `too-few-items`, `empty-experience`, `empty-expandable`, `empty-consequence`, `empty-tradeoff` | Not enough content to mean anything. |
-| `dangling-reference`, `self-reference`, `wrong-reference-type` | References that do not resolve. |
+| `too-few-items`, `duplicate-item`, `empty-experience`, `empty-expandable`, `empty-consequence`, `empty-tradeoff` | Not enough content to mean anything, or the same thing twice. |
 | `multiple-primary`, `not-primary-capable` | Rule 1. |
-| `irreversible-without-consequence`, `irreversible-marked-reversible` | Rule 2. |
+| `irreversible-without-consequence`, `irreversible-marked-reversible`, `unneeded-confirmation` | Rule 2. |
 | `missing-text-equivalent` | Rule 3. |
+| `dangling-reference`, `self-reference`, `wrong-reference-type`, `out-of-order`, `ambiguous-alternative` | Rule 4. |
+| `conflicting-prediction` | Rule 5. |
 | `duplicate-option`, `unknown-option`, `too-many-selected`, `duplicate-step`, `comparison-mismatch` | Rules of single node types. |
+| `too-many-issues` | More than 100 problems; the rest are not listed. |
 
 ## Fixtures
 
 `conformance/ir/valid` holds at least 40 realistic experiences, covering every node type.
-`conformance/ir/invalid` holds documents with one deliberate mistake each, and lists exactly the issues the
-validator must report. The fixtures are the contract's examples, and later milestones compose and render them
+`conformance/ir/invalid` holds documents with one deliberate mistake each, made from a valid fixture, and lists
+exactly the issues the validator must report. The fixtures are the contract's examples, and later milestones compose and render them
 in every manifestation.
 
 ## Versioning

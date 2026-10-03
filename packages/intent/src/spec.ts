@@ -1,9 +1,12 @@
 // The Experience IR, as data. One table describes every node type: its fields, whether it is an act, which reply
 // acts it takes. The validator (validate.ts) reads it at runtime; scripts/generate.ts writes the JSON Schema and the
-// reference docs from it, so the three cannot drift apart. The TypeScript types (types.ts) mirror it by hand.
+// reference docs from it, so the three cannot drift apart. The TypeScript types (types.ts) mirror it by hand, and
+// test/types.test.ts checks that they agree.
 
 export type Field =
   | { kind: "string"; doc: string; required?: boolean; maxLength?: number }
+  | { kind: "id"; doc: string; required?: boolean }
+  | { kind: "text-or-number"; doc: string; required?: boolean }
   | { kind: "number"; doc: string; required?: boolean; min?: number; max?: number; integer?: boolean }
   | { kind: "boolean"; doc: string; required?: boolean }
   | { kind: "enum"; doc: string; required?: boolean; values: readonly string[] }
@@ -11,7 +14,7 @@ export type Field =
   | { kind: "date"; doc: string; required?: boolean }
   | { kind: "scalar"; doc: string; required?: boolean }
   | { kind: "ref"; doc: string; required?: boolean; to?: readonly string[] }
-  | { kind: "refs"; doc: string; required?: boolean; to?: readonly string[]; minItems?: number }
+  | { kind: "refs"; doc: string; required?: boolean; to?: readonly string[]; minItems?: number; unique?: boolean }
   | { kind: "strings"; doc: string; required?: boolean; minItems?: number }
   | { kind: "scalars"; doc: string; required?: boolean; minItems?: number }
   | { kind: "array"; doc: string; required?: boolean; minItems?: number; of: Record<string, Field> }
@@ -31,6 +34,8 @@ export interface NodeSpec {
   fields: Record<string, Field>
   /** Default values the composer assumes when the caller leaves a field out. */
   defaults?: { importance?: string; reversible?: boolean }
+  /** The importance values this node accepts, when narrower than all four. */
+  importance?: readonly string[]
 }
 
 const money: Record<string, Field> = {
@@ -60,6 +65,14 @@ export const consequenceField: Field = {
   },
 }
 
+/** The longest any text field may be unless it says otherwise: long enough for any honest content. */
+export const DEFAULT_MAX_LENGTH = 4000
+
+/** Nodes a person acts on, which a Confirmation can confirm. */
+const ACTS = ["Action", "Choice", "Input", "Approval", "Recommendation", "PredictedChoice", "Alternative", "Autopick", "Correction", "Preference", "IrreversibleAction", "ExploreMore"] as const
+/** Nodes that offer a way to go, which Alternatives, Tradeoffs and Autopicks attach to. */
+const OPTIONS = ["Recommendation", "Alternative", "Choice", "Action", "Approval", "IrreversibleAction"] as const
+
 /** Fields every node carries. `primary` is added for primary-capable nodes. */
 export const commonFields: Record<string, Field> = {
   id: { kind: "string", doc: "Stable within the experience; replies and references use it.", required: true, maxLength: 64 },
@@ -74,7 +87,10 @@ export const commonFields: Record<string, Field> = {
   },
 }
 
-export const primaryField: Field = { kind: "boolean", doc: "This node is the experience's main act. At most one per experience." }
+export const primaryField: Field = {
+  kind: "boolean",
+  doc: "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+}
 
 const none = {} as NodeSpec["acts"]
 const ALTERNATIVE_INPUTS = ["Price", "Date", "Text", "Location", "Person"] as const
@@ -114,13 +130,13 @@ export const NODES: NodeSpec[] = [
         required: true,
         minItems: 2,
         of: {
-          id: { kind: "string", doc: "Unique among the options.", required: true, maxLength: 64 },
+          id: { kind: "id", doc: "Unique among the options.", required: true },
           label: { kind: "string", doc: "The words for it.", required: true },
           description: { kind: "string", doc: "One line more." },
         },
       },
       multiple: { kind: "boolean", doc: "Several may be picked. Default false." },
-      selected: { kind: "strings", doc: "Option ids already picked." },
+      selected: { kind: "strings", doc: "Option ids already picked: the preselection." },
     },
   },
   {
@@ -129,12 +145,15 @@ export const NODES: NodeSpec[] = [
     doc: "A fact the caller does not have yet, asked of the person.",
     act: true,
     primaryCapable: true,
-    acts: { submit: { value: "required", doc: "The value given." } },
+    acts: {
+      submit: { value: "required", doc: "The value given: a string for text kinds, an ISO 8601 string for date, a number for number and for money (in the Input's currency)." },
+      skip: { value: "none", doc: "The person chose not to answer (only when the Input is not required)." },
+    },
     fields: {
       prompt: { kind: "string", doc: "The question.", required: true },
       kind: { kind: "enum", doc: "What kind of value.", required: true, values: ["text", "long-text", "number", "email", "phone", "url", "date", "money"] },
       required: { kind: "boolean", doc: "An answer is needed to continue." },
-      value: { kind: "scalar", doc: "The current value, if any." },
+      value: { kind: "text-or-number", doc: "The current value, if any." },
       min: { kind: "number", doc: "For number and money: the smallest accepted." },
       max: { kind: "number", doc: "For number and money: the largest accepted." },
       maxLength: { kind: "number", doc: "For text kinds: the longest accepted.", min: 1, integer: true },
@@ -226,7 +245,7 @@ export const NODES: NodeSpec[] = [
         kind: "array",
         doc: "The plan, step by step.",
         of: {
-          id: { kind: "string", doc: "Unique among the steps.", required: true, maxLength: 64 },
+          id: { kind: "id", doc: "Unique among the steps.", required: true },
           label: { kind: "string", doc: "The step.", required: true },
           state: { kind: "enum", doc: "Where it stands.", required: true, values: ["pending", "active", "done", "blocked"] },
         },
@@ -258,7 +277,7 @@ export const NODES: NodeSpec[] = [
     acts: none,
     fields: {
       text: { kind: "string", doc: "What happened.", required: true },
-      of: { kind: "ref", doc: "The node whose act this confirms." },
+      of: { kind: "ref", doc: "The act this confirms.", to: ACTS },
     },
   },
   {
@@ -281,7 +300,7 @@ export const NODES: NodeSpec[] = [
     doc: "A request for the person's authority: approve or reject.",
     act: true,
     primaryCapable: true,
-    acts: { approve: { value: "none", doc: "Approved." }, reject: { value: "optional", doc: "Rejected, optionally with a reason." } },
+    acts: { approve: { value: "none", doc: "Approved." }, reject: { value: "optional", doc: "Rejected, optionally with the reason as a string." } },
     fields: {
       request: { kind: "string", doc: "What is being asked.", required: true },
       requester: { kind: "ref", doc: "The Person node asking.", to: ["Person"] },
@@ -297,7 +316,12 @@ export const NODES: NodeSpec[] = [
     doc: "What the caller recommends. It comes first; alternatives follow.",
     act: true,
     primaryCapable: true,
-    acts: { accept: { value: "none", doc: "The person took the recommendation." } },
+    acts: {
+      accept: {
+        value: "none",
+        doc: "The person took the recommendation. When it cannot be undone and states no consequence of its own, accepting only moves on to the IrreversibleAction that confirms it; it never commits.",
+      },
+    },
     fields: {
       summary: { kind: "string", doc: "The recommendation, in one line.", required: true },
       confidence: { kind: "number", doc: "0 to 1.", min: 0, max: 1 },
@@ -310,7 +334,7 @@ export const NODES: NodeSpec[] = [
     doc: "The option the caller expects the person to pick in a Choice.",
     act: true,
     primaryCapable: false,
-    acts: { accept: { value: "none", doc: "The prediction was right." }, change: { value: "required", doc: "The option id picked instead." } },
+    acts: { accept: { value: "none", doc: "The prediction was right." }, change: { value: "required", doc: "The option id picked instead (not the predicted one)." } },
     fields: {
       of: { kind: "ref", doc: "The Choice node.", required: true, to: ["Choice"] },
       option: { kind: "string", doc: "The predicted option's id in that Choice.", required: true },
@@ -324,10 +348,15 @@ export const NODES: NodeSpec[] = [
     doc: "Another way to go than the recommendation.",
     act: true,
     primaryCapable: false,
-    acts: { choose: { value: "optional", doc: "Chosen; carries the value when the alternative takes an input." } },
+    acts: {
+      choose: {
+        value: "optional",
+        doc: "Chosen. With an input it carries the value: { amount, currency } for Price, an ISO 8601 string for Date, a string for Text, Location and Person.",
+      },
+    },
     fields: {
       label: { kind: "string", doc: "The words for it; defaults to the intent.", maxLength: 60 },
-      for: { kind: "ref", doc: "The node this is an alternative to." },
+      for: { kind: "ref", doc: "The node this is an alternative to; it must come before. Required when the experience has several Recommendations.", to: OPTIONS },
       input: { kind: "enum", doc: "The person supplies a value of this kind when choosing it.", values: ALTERNATIVE_INPUTS },
     },
   },
@@ -339,7 +368,7 @@ export const NODES: NodeSpec[] = [
     primaryCapable: false,
     acts: none,
     fields: {
-      of: { kind: "ref", doc: "The node the tradeoff describes." },
+      of: { kind: "ref", doc: "The option the tradeoff describes.", to: OPTIONS },
       summary: { kind: "string", doc: "The tradeoff, in one line." },
       gains: { kind: "strings", doc: "What it gains." },
       costs: { kind: "strings", doc: "What it costs." },
@@ -354,8 +383,8 @@ export const NODES: NodeSpec[] = [
     acts: { keep: { value: "none", doc: "Kept." }, undo: { value: "none", doc: "Undone." } },
     fields: {
       summary: { kind: "string", doc: "What was decided, in one line.", required: true },
-      of: { kind: "ref", doc: "The node decided on." },
-      undoWithin: { kind: "number", doc: "Seconds the person has to undo.", min: 1, integer: true },
+      of: { kind: "ref", doc: "The option decided on.", to: OPTIONS },
+      undoWithin: { kind: "number", doc: "Seconds the person has to undo. The caller, which owns time, refuses a late undo.", min: 1, integer: true },
     },
   },
   {
@@ -393,7 +422,14 @@ export const NODES: NodeSpec[] = [
     primaryCapable: false,
     acts: none,
     fields: {
-      items: { kind: "refs", doc: "The compared node ids, at least two.", required: true, minItems: 2 },
+      items: {
+        kind: "refs",
+        doc: "The compared node ids: at least two, each once.",
+        required: true,
+        minItems: 2,
+        unique: true,
+        to: ["Recommendation", "Alternative", "Action", "Price", "Person", "Location", "Media"],
+      },
       criteria: {
         kind: "array",
         doc: "What they are compared on; each gives a value for every item.",
@@ -414,9 +450,15 @@ export const NODES: NodeSpec[] = [
     primaryCapable: true,
     acts: { confirm: { value: "none", doc: "Confirmed by a deliberate act." }, cancel: { value: "none", doc: "Not done." } },
     defaults: { importance: "critical", reversible: false },
+    importance: ["high", "critical"],
     fields: {
       label: { kind: "string", doc: "The words for the act; defaults to the intent.", maxLength: 60 },
       consequence: { ...consequenceField, required: true },
+      confirms: {
+        kind: "ref",
+        doc: "The irreversible act this commits (a Recommendation or Approval marked reversible: false). When an experience has a single IrreversibleAction, it confirms them implicitly.",
+        to: ["Recommendation", "Approval", "Action", "Alternative"],
+      },
     },
   },
   {
@@ -425,7 +467,7 @@ export const NODES: NodeSpec[] = [
     doc: "More is available on request; the caller sends it when the person asks.",
     act: true,
     primaryCapable: false,
-    acts: { expand: { value: "optional", doc: "The person asked for more, optionally about one topic." } },
+    acts: { expand: { value: "optional", doc: "The person asked for more, optionally about one of its topics." } },
     fields: {
       label: { kind: "string", doc: "The words for it; defaults to the intent.", maxLength: 60 },
       topics: { kind: "strings", doc: "What more is available." },
@@ -433,7 +475,11 @@ export const NODES: NodeSpec[] = [
   },
 ]
 
-export const NODE_SPECS: Record<string, NodeSpec> = Object.fromEntries(NODES.map((n) => [n.type, n]))
+/** Node specs by type. A null-prototype object, so "constructor" or "__proto__" never look like node types. */
+export const NODE_SPECS: Record<string, NodeSpec> = Object.assign(Object.create(null) as Record<string, NodeSpec>, Object.fromEntries(NODES.map((n) => [n.type, n])))
+
+/** The spec for a type name, if it is one. */
+export const specFor = (type: unknown): NodeSpec | undefined => (typeof type === "string" && Object.hasOwn(NODE_SPECS, type) ? NODE_SPECS[type] : undefined)
 
 /**
  * Field names that describe presentation, not meaning. A caller never sends them (principle 1: semantics, not

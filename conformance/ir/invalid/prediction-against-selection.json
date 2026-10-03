@@ -1,0 +1,55 @@
+{
+  "description": "The delivery choice already has Standard selected, but a prediction says Express.",
+  "expect": [
+    {
+      "code": "conflicting-prediction",
+      "path": "/nodes/2/option"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "pick_delivery_speed",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "ctx",
+        "text": "How quickly do you need your order?"
+      },
+      {
+        "type": "Choice",
+        "id": "speed",
+        "intent": "choose delivery speed",
+        "prompt": "Select your preferred delivery speed",
+        "options": [
+          {
+            "id": "std",
+            "label": "Standard (5-7 days)",
+            "description": "Free shipping"
+          },
+          {
+            "id": "fast",
+            "label": "Express (2-3 days)",
+            "description": "5% surcharge"
+          },
+          {
+            "id": "next",
+            "label": "Next day",
+            "description": "Premium service"
+          }
+        ],
+        "selected": [
+          "std"
+        ],
+        "primary": true
+      },
+      {
+        "type": "PredictedChoice",
+        "id": "likely_speed",
+        "intent": "likely delivery speed",
+        "of": "speed",
+        "option": "fast",
+        "summary": "You chose Express for your last three orders"
+      }
+    ]
+  }
+}
