@@ -2,7 +2,7 @@
 // they arm and disarm, so the list is read afresh whenever it is needed, never cached.
 
 const CONTROLS =
-  'button, input:not([type="hidden"]), textarea, select, a[href], summary, [role="radio"], [role="checkbox"], [role="switch"], [contenteditable=""], [contenteditable="true"], [tabindex]:not([tabindex="-1"])'
+  'button, input:not([type="hidden"]), textarea, select, a[href], summary, [role="radio"], [role="checkbox"], [role="switch"], [contenteditable=""], [contenteditable="true"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="option"], [tabindex]:not([tabindex="-1"])'
 
 function hiddenOrDisabled(el: HTMLElement): boolean {
   if (el.hasAttribute("disabled") || el.getAttribute("aria-disabled") === "true") return true
@@ -40,4 +40,24 @@ export function isCommitting(el: Element): boolean {
   const slot = el.closest("[data-slot]")?.getAttribute("data-slot") ?? ""
   const own = el.getAttribute("data-slot") ?? slot
   return own === "confirm" || own.endsWith("-confirm")
+}
+
+const POPUP_ROLES = '[role="menu"], [role="listbox"], [role="dialog"], [role="alertdialog"]'
+
+/**
+ * Where the targets are: the open popup of a control in the experience, if there is one, else the experience itself.
+ * A popup is open when a control in `host` has `aria-expanded="true"` with an `aria-controls` that names a visible
+ * element, or when focus has moved into a menu, listbox or dialog outside `host` (a portal).
+ */
+export function scopeOf(host: HTMLElement): HTMLElement {
+  const doc = host.ownerDocument
+  for (const owner of Array.from(host.querySelectorAll<HTMLElement>('[aria-expanded="true"][aria-controls]'))) {
+    for (const id of (owner.getAttribute("aria-controls") ?? "").split(/\s+/)) {
+      const popup = id ? doc.getElementById(id) : null
+      if (popup && !host.contains(popup) && !hiddenOrDisabled(popup)) return popup
+    }
+  }
+  const inPopup = doc.activeElement?.closest<HTMLElement>(POPUP_ROLES)
+  if (inPopup && !host.contains(inPopup)) return inPopup
+  return host
 }

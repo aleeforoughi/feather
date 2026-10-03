@@ -237,3 +237,82 @@ describe("every valid fixture", () => {
     })
   }
 })
+
+describe("leaving a text field", () => {
+  failOnConsole()
+
+  it("Escape in a field never reaches the organism: Reject with a reason is sent by switch", () => {
+    const onReply = vi.fn()
+    render(<FeatherSwitchExperience experience={fixture("purchase-approval")} context={switchContext} scan="step" onReply={onReply} />)
+    nextUntil((el) => /^Reject/.test(el.textContent ?? ""))
+    press("Enter")
+    const reason = document.activeElement as HTMLTextAreaElement
+    expect(reason).toBeInstanceOf(HTMLTextAreaElement)
+    fireEvent.change(reason, { target: { value: "too dear" } })
+    const escape = fireEvent.keyDown(reason, { key: "Escape" })
+    // Caught: prevented, and the form is still open with the typed value.
+    expect(escape).toBe(false)
+    expect(document.querySelector("textarea")).toBe(reason)
+    expect(reason.value).toBe("too dear")
+    // Scanning resumed on the next target after the field.
+    expect((document.activeElement as HTMLElement).textContent).toMatch(/Send rejection/)
+    press("Enter")
+    expect(onReply).toHaveBeenCalledWith({ experience: "purchase_approval", node: "approve", act: "reject", value: "too dear" })
+  })
+
+  it("an Alternative with an input can be submitted: Escape leaves the field, the value stays", () => {
+    const onReply = vi.fn()
+    render(<FeatherSwitchExperience experience={fixture("ad-campaign-launch")} context={switchContext} scan="step" onReply={onReply} />)
+    nextUntil((el) => el.textContent === "set my own budget")
+    press("Enter")
+    const field = screen.getByRole("spinbutton", { name: /Price for set my own budget/ }) as HTMLInputElement
+    if (document.activeElement !== field) nextUntil((el) => el === field)
+    fireEvent.change(field, { target: { value: "800" } })
+    fireEvent.keyDown(field, { key: "Escape" })
+    expect(field.value).toBe("800")
+    nextUntil((el) => el.textContent === "Use this")
+    press("Enter")
+    expect(onReply).toHaveBeenLastCalledWith({ experience: "approve_campaign", node: "own", act: "choose", value: { amount: 800, currency: "AED" } })
+  })
+
+  it("in step mode Tab leaves a field, but a printable next key (Space) is typed", () => {
+    render(<FeatherSwitchExperience experience={fixture("newsletter-signup")} context={switchContext} scan="step" onReply={vi.fn()} />)
+    nextUntil((el) => el instanceof HTMLInputElement)
+    const field = document.activeElement as HTMLInputElement
+    expect(fireEvent.keyDown(field, { key: " " })).toBe(true)
+    expect(document.activeElement).toBe(field)
+    expect(fireEvent.keyDown(field, { key: "Tab" })).toBe(false)
+    expect(document.activeElement).not.toBe(field)
+    expect(document.activeElement?.getAttribute("data-scanned")).toBe("true")
+  })
+})
+
+describe("popups", () => {
+  failOnConsole()
+
+  it("targets only the open menu's controls, then returns to the experience", async () => {
+    const onReply = vi.fn()
+    render(<FeatherSwitchExperience experience={fixture("news-article")} context={switchContext} scan="step" onReply={onReply} />)
+    const trigger = () => document.querySelector<HTMLElement>("[data-slot=explore-more-trigger], [data-slot=explore-more] [aria-haspopup]")
+    expect(trigger()).not.toBeNull()
+    nextUntil((el) => el === trigger())
+    press("Enter")
+    await screen.findAllByRole("menuitem")
+    const items = screen.getAllByRole("menuitem")
+    // Next now moves through the menu's items only, and wraps within them.
+    const seen = new Set<Element>()
+    for (let i = 0; i < items.length + 1; i++) {
+      press("Tab")
+      expect(items).toContain(document.activeElement)
+      seen.add(document.activeElement as Element)
+    }
+    expect(seen.size).toBe(items.length)
+    press("Enter")
+    expect(onReply).toHaveBeenCalledTimes(1)
+    expect(onReply.mock.calls[0][0]).toMatchObject({ node: expect.any(String), act: "expand" })
+    // The popup closed: the experience's controls are the targets again.
+    await vi.waitFor(() => expect(screen.queryAllByRole("menuitem")).toHaveLength(0))
+    press("Tab")
+    expect(document.activeElement?.closest("[data-slot=switch-scanner]")).not.toBeNull()
+  })
+})

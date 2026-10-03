@@ -193,8 +193,14 @@ Switch access on the web, built on `manifest-web` (`PlanView`).
 - **Inputs:**
   - **auto (one switch):** the highlight advances every `scanMs`. Space or Enter selects (clicks) it.
   - **step (two switches):** Tab or Space moves to the next target, and Enter selects.
-  - The keys are configurable. Scanning pauses while a text field has focus: typing goes to it, and Escape
-    resumes scanning.
+  - The keys are configurable. Scanning pauses while a text field has focus, and typing goes to it.
+- **Leaving a text field.** In a text field, Escape belongs to the scanner. It is caught before the organism sees
+  it, never backs out of a form, and never clears what was typed. Scanning resumes on the next target after the
+  field. In step mode, a "next" key that is not a printable character (Tab) does the same. Backing out of a form is
+  done by selecting its own Back or Cancel control.
+- **Popups.** While a control the scanner selected has an open popup (`aria-expanded="true"` with
+  `aria-controls`, or focus has moved into a menu, listbox or dialog outside the scanner's root), the targets are
+  the popup's controls only. When it closes, scanning returns to the experience.
 - **Dwell** (`dwellMs` set): resting the pointer on a target for `dwellMs` selects it. Dwell never selects the
   committing control of an armed irreversible act (the organisms' `*-confirm` slots). That control needs the
   switch itself. Dwell may arm; it may not commit.

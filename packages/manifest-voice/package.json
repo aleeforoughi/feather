@@ -1,0 +1,42 @@
+{
+  "name": "@aleeforoughi/feather-manifest-voice",
+  "version": "1.10.0",
+  "description": "The voice manifestation: prompts, confirmations and readback for any speech engine, over the dialog engine. Replies are the same events every body sends.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleeforoughi/feather.git",
+    "directory": "packages/manifest-voice"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aleeforoughi/feather-dialog": "workspace:^",
+    "@aleeforoughi/feather-intent": "workspace:^",
+    "@aleeforoughi/feather-liquid": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "vitest": "5.0.3"
+  }
+}

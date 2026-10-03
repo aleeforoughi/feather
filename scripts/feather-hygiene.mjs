@@ -26,7 +26,7 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/documents"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/documents"]
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 
@@ -204,6 +204,19 @@ export function hygiene(root = ".") {
   }
   const textPkg = json("packages/manifest-text/package.json")
   for (const dep of Object.keys(textPkg.dependencies ?? {})) if (!TEXT_IMPORTS.has(dep)) problems.push(`${textPkg.name} depends on ${dep}; it depends only on the dialog engine, the composer and the IR`)
+  // The voice manifestation speaks and listens through whatever the host provides: the dialog engine, the composer and the
+  // IR, its own modules, nothing from Node and no DOM (a speech engine is the host's, not the core's).
+  const VOICE_IMPORTS = new Set(["@aleeforoughi/feather-dialog", "@aleeforoughi/feather-liquid", "@aleeforoughi/feather-intent"])
+  for (const file of sourceFiles(at("packages/manifest-voice/src"))) {
+    const source = read(file)
+    for (const spec of importsOf(stripComments(source))) {
+      if (!spec.startsWith("./") && !VOICE_IMPORTS.has(spec)) problems.push(`${path.relative(root, file)} imports ${spec}; the voice manifestation imports only the dialog engine, the composer, the IR and its own modules`)
+    }
+    const dom = code(source).match(/\b(document|window|navigator|localStorage|sessionStorage|HTMLElement|speechSynthesis|SpeechRecognition|webkitSpeechRecognition|SpeechSynthesisUtterance|fetch|process|Buffer)\b/)
+    if (dom) problems.push(`${path.relative(root, file)} uses the global ${dom[1]}; the voice manifestation has no DOM and no speech engine of its own`)
+  }
+  const voicePkg = json("packages/manifest-voice/package.json")
+  for (const dep of Object.keys(voicePkg.dependencies ?? {})) if (!VOICE_IMPORTS.has(dep)) problems.push(`${voicePkg.name} depends on ${dep}; it depends only on the dialog engine, the composer and the IR`)
   // The web manifestation renders plans with Feather: it imports Feather's packages and React, never the network or
   // a model, and reads semantic tokens only, like every component.
   const WEB_IMPORTS = new Set(["react", "@aleeforoughi/feather-intent", "@aleeforoughi/feather-context", "@aleeforoughi/feather-liquid", "@aleeforoughi/feather-dialog", "@aleeforoughi/feather-react", "@aleeforoughi/feather-tokens"])

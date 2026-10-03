@@ -13,7 +13,7 @@ import type { RenderContext } from "@aleeforoughi/feather-context"
 import type { Experience, Issue, ReplyEvent, ReplyIssue } from "@aleeforoughi/feather-intent"
 import { compose, type LayoutPlan } from "@aleeforoughi/feather-liquid"
 import { PlanView } from "@aleeforoughi/feather-manifest-web"
-import { isCommitting, isTextEntry, targetAt, targetsIn } from "./targets"
+import { isCommitting, isTextEntry, scopeOf, targetAt, targetsIn } from "./targets"
 
 export interface SwitchKeys {
   /** Keys (KeyboardEvent.key) that select the highlighted target. */
@@ -95,7 +95,7 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
     let interval: unknown = null
     let dwell: { el: HTMLElement; id: unknown } | null = null
 
-    const targets = () => targetsIn(host)
+    const targets = () => targetsIn(scopeOf(host))
     const publish = () => setState(paused ? "paused" : current ? "scanned" : "idle")
 
     const unmark = () => {
@@ -169,15 +169,26 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
       const k = live.current.keys
-      if (paused) {
-        if (e.key === "Escape") {
-          paused = false
-          const active = doc.activeElement
-          if (active instanceof HTMLElement && host.contains(active) && isTextEntry(active)) active.blur()
-          publish()
+      const active = doc.activeElement
+      const inField = active instanceof HTMLElement && host.contains(active) && isTextEntry(active)
+      if (inField && (e.key === "Escape" || (live.current.scan === "step" && k.next.includes(e.key) && e.key.length > 1))) {
+        // In a text field, Escape (and a non-printable "next" key) belongs to the scanner: the organism never sees it, so
+        // nothing backs out and nothing typed is lost. Scanning resumes on the next target after the field.
+        e.preventDefault()
+        e.stopPropagation()
+        paused = false
+        if (current !== active) {
+          unmark()
+          current = active
         }
+        if (live.current.scan === "auto" && !started) {
+          // Scanning has not begun, so there is nothing to resume: the field just lets go.
+          active.blur()
+          publish()
+        } else advance()
         return
       }
+      if (paused) return
       const isSelect = k.select.includes(e.key)
       const isNext = k.next.includes(e.key)
       if (!isSelect && !isNext) return
