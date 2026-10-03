@@ -5,14 +5,16 @@ name: Record visual baselines
 # name; the recording commit deletes that file.
 #   reference: feather-1.7.0  renders Feather 1.7.0 as imported from qooe-core (the L0 parity baseline: the
 #                             packages must match it pixel for pixel)
-#   reference: current        renders the branch itself (after an intentional visual change)
+#   reference: current        renders the branch itself (after an intentional visual change), replacing every baseline
+#   reference: missing        renders the branch itself, adding baselines only for stories that have none and
+#                             leaving every existing one untouched (after adding stories)
 on:
   workflow_dispatch:
     inputs:
       reference:
         description: What to record the baselines from
         type: choice
-        options: [feather-1.7.0, current]
+        options: [feather-1.7.0, current, missing]
         default: current
   push:
     paths: [apps/storybook/visual/RECORD]
@@ -54,16 +56,20 @@ jobs:
             cd /tmp/reference/feather-web
             npm ci --no-audit --no-fund
             npx storybook build --quiet -o /tmp/reference-static
-          elif [ "$REFERENCE" = "current" ]; then
+          elif [ "$REFERENCE" = "current" ] || [ "$REFERENCE" = "missing" ]; then
             pnpm build && pnpm build-storybook
             cp -r apps/storybook/storybook-static /tmp/reference-static
           else
-            echo "Unknown reference \"$REFERENCE\" (feather-1.7.0 or current)"; exit 1
+            echo "Unknown reference \"$REFERENCE\" (feather-1.7.0, current or missing)"; exit 1
           fi
       - name: Record
         run: |
-          rm -rf apps/storybook/visual/__screenshots__
-          pnpm --filter @feather-apps/storybook exec playwright test --update-snapshots
+          if [ "$REFERENCE" = "missing" ]; then
+            pnpm --filter @feather-apps/storybook exec playwright test --update-snapshots=missing
+          else
+            rm -rf apps/storybook/visual/__screenshots__
+            pnpm --filter @feather-apps/storybook exec playwright test --update-snapshots
+          fi
         env:
           STORYBOOK_DIR: /tmp/reference-static
       - name: Commit

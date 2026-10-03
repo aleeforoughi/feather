@@ -52,6 +52,10 @@ This page is the contract every organism follows. Stories, tests and review chec
   Format money with `Intl.NumberFormat` in the organism's `locale` (default: the document's `lang`, else
   `en`).
 - Irreversible acts never take the default focus and never auto-submit.
+- **An irreversible act happens once.** After `confirm` (or an Approval's `approve` or `reject`), the organism
+  enters a `done` state (`data-variant="done"`): it shows the outcome ("Confirmed: spends AED 1,050"), and offers
+  no control that could act again. The caller collapses the experience. Focus moves to the outcome text
+  (`tabIndex={-1}`), so keyboard and screen-reader users land on what happened.
 
 **Accessibility (the gate)**
 
@@ -64,7 +68,8 @@ This page is the contract every organism follows. Stories, tests and review chec
   State changes a sighted user would notice are announced through a polite live region, such as "Armed: press
   again to spend AED 1,050".
 - **Meaning never depends on color alone.** Gains and costs carry words or icons with text alternatives. The
-  danger state carries text.
+  danger state carries text ("Cannot be undone"). The destructive color fails AA contrast for text in both
+  reference themes, so it is used for borders and icons only, never for text.
 - Target size is at least 24×24 px (WCAG 2.2 AA), and density follows the theme's tokens.
 
 **Stories**
@@ -96,18 +101,19 @@ in both reference themes in Storybook, the axe suite and the visual suite.
 
 - Props: `intent`, `summary`, `label?`, `confidence?` (0–1), `consequence?`, `reversible?`, `importance?`,
   `expandable?`, `primary?`, `locale?`, `onAct(act: "accept")`.
-- It shows the summary. Confidence shows as text ("Confidence: high (78%)"), never as a bare number or color.
+- It shows the summary. Confidence shows as text ("Confidence: medium (78%)"), never as a bare number or color.
   Labels: below 0.5 "low", below 0.8 "medium", otherwise "high".
 - One button, labelled by `label` or the intent, performs `accept`.
-- When `reversible` is false and it has its own `consequence`, the consequence shows verbatim.
-- When it has no consequence, the button's description says what happens next: "Next, you confirm the
-  spend." An irreversible recommendation never commits on accept.
+- A `consequence`, when given, shows verbatim.
+- Without one, the button's description says what happens next: for an irreversible recommendation, "Next,
+  you confirm. Nothing is done until you do." (it never commits on accept); otherwise, "Accepting applies it.
+  You can undo it."
 
 ### `IrreversibleAction` (IR node: IrreversibleAction)
 
 - Props: `intent`, `label?`, `consequence` (required), `importance?` ("high" | "critical", default
-  "critical"), `expandable?`, `locale?`, `mode?: "confirm" | "hold"` (default "confirm"),
-  `onAct(act: "confirm" | "cancel")`.
+  "critical"), `expandable?`, `locale?`, `mode?: "confirm" | "hold"` (default "confirm"), `holdMs?` (default
+  1500), `onAct(act: "confirm" | "cancel")`.
 - The consequence is always visible before any act.
 - **Confirm mode (default): two deliberate steps.**
   1. The first button ("Spend AED 1,050…", from the label or intent plus the consequence) **arms**:
@@ -139,7 +145,7 @@ in both reference themes in Storybook, the axe suite and the visual suite.
 ### `AlternativeList` (IR nodes: Alternative, with their Tradeoffs)
 
 - Props: `alternatives: Array<{ id, intent, label?, input?: "Price" | "Date" | "Text" | "Location" | "Person",
-  tradeoff?: { gains?, costs?, summary? }, currency? }>`, `locale?`, `onAct(id, act: "choose", value?)`.
+  tradeoff?: { gains?, costs?, summary? }, currency? }>`, `onAct(id, act: "choose", value?)`.
 - The alternatives show in order, each as a button labelled by its label or intent. Its tradeoff, if any, sits
   under it through `Tradeoff`.
 - **An alternative with an `input`** opens an inline labelled field when chosen, before calling `onAct`:

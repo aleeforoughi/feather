@@ -11,7 +11,8 @@ section 12.
   migration. Also the theme engine (`src/engine.mjs`, browser-safe, no dependencies), the `feather-brand` CLI,
   `css/foundation.css` (semantic tokens and their Tailwind mapping), the reference themes and the fonts.
 - `packages/react` (`@aleeforoughi/feather-react`): components in `src/components/ui` (stories and tests next
-  to them), the `src/index.ts` entry, `styles.css`, and `foundation.json` (generated).
+  to them), the `src/index.ts` entry, `styles.css`, and `foundation.json` (generated). Atoms, molecules and
+  organisms; an organism renders one IR node and follows the contract in `docs/organisms.md`.
 - `packages/intent` (`@aleeforoughi/feather-intent`): the Experience IR `feather.ir/0`. `src/spec.ts` is the
   single table of node types; `validate.ts` and `reply.ts` read it; `scripts/generate.ts` writes
   `schema/feather.ir-0.json` and `docs/ir/nodes.md` from it (run `pnpm --filter @aleeforoughi/feather-intent
@@ -33,7 +34,8 @@ section 12.
 - Before pushing, run: `pnpm lint && pnpm build && pnpm typecheck && pnpm test && pnpm hygiene`. After
   changing components or stories, also run `pnpm manifest` and commit `foundation.json`.
 - Visual baselines come from CI's Playwright container (the *Record visual baselines* workflow). Never record
-  them locally. A local Chromium differs, so set `CHROMIUM_PATH` and `SNAPSHOT_DIR` to compare two builds
+  them locally. After adding stories, push `apps/storybook/visual/RECORD` containing `missing`; the workflow adds
+  baselines for new stories only and commits them. A local Chromium differs, so set `CHROMIUM_PATH` and `SNAPSHOT_DIR` to compare two builds
   locally instead.
 - Accessibility debt from 1.7.0 is listed in `apps/storybook/.storybook/a11y-known.json`. Only remove
   entries; never add one to get a build green.

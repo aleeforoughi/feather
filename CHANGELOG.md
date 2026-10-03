@@ -1,5 +1,32 @@
 # Feather — changelog
 
+## 1.9.0 — 2026-10-03
+
+**Decision organisms (milestone L2).** Ten components that each render one Experience IR node as a complete,
+accessible interaction, the pieces the composer will assemble at L3. `foundation.json` gains the level
+`organism`; there are now 28 atoms, 7 molecules and 10 organisms.
+
+- `Recommendation`, `IrreversibleAction`, `Approval`, `Tradeoff`, `AlternativeList`, `PredictedChoice`,
+  `ExploreMore`, `CorrectionInput`, plus the shared `ConsequenceStatement` and `WhyDisclosure`.
+- One contract for all of them, `docs/organisms.md`:
+  - props mirror the IR node's fields;
+  - one `onAct(act, value?)` callback carries exactly the node's reply acts and value encodings, so the composer
+    wires replies with no translation;
+  - `data-slot` and `data-variant` on every part, so brands restyle states such as
+    `"irreversible-action.armed"`.
+- Irreversible acts:
+  - the consequence always shows verbatim ("Spends AED 1,050") and describes the act for screen readers;
+  - confirming takes a deliberate act: arm and then "Yes, …", or a 1.5 s hold by pointer or key;
+  - an irreversible act never takes the default focus, and happens once: afterwards the organism shows the
+    outcome, offers no control that could act again, and moves focus to the outcome;
+  - accepting an irreversible recommendation never commits.
+- Critical detail is never hidden behind "Why?". Meaning never depends on color: the destructive color fails AA
+  contrast for text in both reference themes, so it marks borders and icons only, and the danger state is
+  spoken and written ("Cannot be undone").
+- Every organism passes axe with zero violations in both reference themes, and completes its main act by
+  keyboard alone in a play test that asserts the reply (208 stories, 0 new accessibility debt).
+- Visual baselines: the recording workflow gains a `missing` mode that adds baselines for new stories only.
+
 ## 1.8.0 — 2026-10-03
 
 **The Experience IR, `feather.ir/0` (milestone L1).** The public contract: what a caller asks Feather to render,

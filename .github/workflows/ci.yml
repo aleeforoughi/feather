@@ -3,6 +3,8 @@ name: CI
 on:
   push:
   pull_request:
+  # Also by hand: the visual-baselines workflow commits with GITHUB_TOKEN, which never starts CI by itself.
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}

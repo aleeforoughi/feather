@@ -207,7 +207,7 @@ export function hygiene(root = ".") {
       if (ratio !== null && ratio < min) problems.push(`reference theme ${file}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1, below WCAG AA ${min}:1`)
     }
   }
-  notes.push(`${atoms.length} atoms, ${semantic.size} semantic tokens, ${themes.length} reference themes`)
+  notes.push(`${atoms.length} components, ${semantic.size} semantic tokens, ${themes.length} reference themes`)
   return { ok: problems.length === 0, problems, notes }
 }
 

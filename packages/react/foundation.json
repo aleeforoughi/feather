@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-react",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "tokenSchema": "feather-tokens/2",
   "themeAxes": {
     "shape": [
@@ -110,6 +110,79 @@
         "Default",
         "Destructive",
         "With Button"
+      ]
+    },
+    {
+      "name": "alternative-list",
+      "level": "organism",
+      "file": "src/components/ui/alternative-list.tsx",
+      "exports": [
+        "alternativeLabel",
+        "AlternativeList",
+        "encodeAlternativeValue",
+        "isIsoDate",
+        "normalizeCurrency"
+      ],
+      "slots": [
+        "alternative-list",
+        "alternative-list-button",
+        "alternative-list-chosen",
+        "alternative-list-currency",
+        "alternative-list-field",
+        "alternative-list-input",
+        "alternative-list-item",
+        "alternative-list-status",
+        "alternative-list-submit"
+      ],
+      "stories": [
+        "Chosen",
+        "Default",
+        "Input Kinds",
+        "Keyboard: choose with a price",
+        "Keyboard: choose without a value",
+        "Long Text",
+        "Price Input Open"
+      ]
+    },
+    {
+      "name": "approval",
+      "level": "organism",
+      "file": "src/components/ui/approval.tsx",
+      "exports": [
+        "Approval",
+        "approvalOutcome",
+        "rejectionReason",
+        "requesterTag"
+      ],
+      "slots": [
+        "approval",
+        "approval-actions",
+        "approval-approve",
+        "approval-back",
+        "approval-cancel",
+        "approval-confirm",
+        "approval-confirm-row",
+        "approval-outcome",
+        "approval-reason",
+        "approval-reject",
+        "approval-reject-form",
+        "approval-requester",
+        "approval-scope",
+        "approval-send-rejection",
+        "approval-status",
+        "approval-warning"
+      ],
+      "stories": [
+        "Critical",
+        "Default",
+        "Irreversible",
+        "Keyboard Approve",
+        "Keyboard Approve Irreversible",
+        "Keyboard Reject",
+        "Keyboard Reject Without Reason",
+        "Long Text",
+        "Reversible With Consequence",
+        "With Expandable"
       ]
     },
     {
@@ -305,6 +378,49 @@
       ]
     },
     {
+      "name": "consequence-statement",
+      "level": "organism",
+      "file": "src/components/ui/consequence-statement.tsx",
+      "exports": [
+        "consequenceSentences",
+        "ConsequenceStatement"
+      ],
+      "slots": [
+        "consequence-statement",
+        "consequence-statement-item"
+      ],
+      "stories": [
+        "Every Kind",
+        "German",
+        "Long Text",
+        "Spend"
+      ]
+    },
+    {
+      "name": "correction-input",
+      "level": "organism",
+      "file": "src/components/ui/correction-input.tsx",
+      "exports": [
+        "CorrectionInput",
+        "correctionValue"
+      ],
+      "slots": [
+        "correction-input",
+        "correction-input-field",
+        "correction-input-original",
+        "correction-input-status",
+        "correction-input-submit"
+      ],
+      "stories": [
+        "Default",
+        "Keyboard: submit with the button",
+        "Keyboard: type and press Enter",
+        "Long Text",
+        "With Input",
+        "Without Original"
+      ]
+    },
+    {
       "name": "dialog",
       "level": "atom",
       "file": "src/components/ui/dialog.tsx",
@@ -386,6 +502,31 @@
       ]
     },
     {
+      "name": "explore-more",
+      "level": "organism",
+      "file": "src/components/ui/explore-more.tsx",
+      "exports": [
+        "ExploreMore",
+        "exploreMoreLabel"
+      ],
+      "slots": [
+        "explore-more",
+        "explore-more-button",
+        "explore-more-menu",
+        "explore-more-topic",
+        "explore-more-trigger"
+      ],
+      "stories": [
+        "Default",
+        "Keyboard: ask for more",
+        "Keyboard: Escape closes the menu",
+        "Keyboard: pick a topic",
+        "Long Text",
+        "With Label",
+        "With Topics"
+      ]
+    },
+    {
       "name": "field",
       "level": "atom",
       "file": "src/components/ui/field.tsx",
@@ -437,6 +578,43 @@
         "Invalid",
         "Password",
         "With Label"
+      ]
+    },
+    {
+      "name": "irreversible-action",
+      "level": "organism",
+      "file": "src/components/ui/irreversible-action.tsx",
+      "exports": [
+        "HOLD_MS",
+        "holdLabel",
+        "holdProgress",
+        "IrreversibleAction",
+        "outcomeText"
+      ],
+      "slots": [
+        "irreversible-action",
+        "irreversible-action-arm",
+        "irreversible-action-cancel",
+        "irreversible-action-confirm",
+        "irreversible-action-fill",
+        "irreversible-action-hint",
+        "irreversible-action-hold",
+        "irreversible-action-outcome",
+        "irreversible-action-status",
+        "irreversible-action-warning"
+      ],
+      "stories": [
+        "Armed",
+        "Critical",
+        "Default",
+        "High",
+        "Hold",
+        "Keyboard Cancel",
+        "Keyboard Confirm",
+        "Keyboard Hold",
+        "Long Text",
+        "Multiple Consequences",
+        "With Expandable"
       ]
     },
     {
@@ -548,6 +726,35 @@
       ]
     },
     {
+      "name": "predicted-choice",
+      "level": "organism",
+      "file": "src/components/ui/predicted-choice.tsx",
+      "exports": [
+        "predictedAction",
+        "PredictedChoice"
+      ],
+      "slots": [
+        "predicted-choice",
+        "predicted-choice-action",
+        "predicted-choice-description",
+        "predicted-choice-likely",
+        "predicted-choice-option",
+        "predicted-choice-prompt",
+        "predicted-choice-status",
+        "predicted-choice-summary"
+      ],
+      "stories": [
+        "Default",
+        "Keyboard: change the option",
+        "Keyboard: keep the prediction",
+        "Keyboard: picking the likely option again shows Keep",
+        "Long Text",
+        "Low Confidence",
+        "Mark Only",
+        "Without Confidence"
+      ]
+    },
+    {
       "name": "progress",
       "level": "atom",
       "file": "src/components/ui/progress.tsx",
@@ -590,6 +797,36 @@
         "Default",
         "Disabled",
         "Horizontal"
+      ]
+    },
+    {
+      "name": "recommendation",
+      "level": "organism",
+      "file": "src/components/ui/recommendation.tsx",
+      "exports": [
+        "confidenceLabel",
+        "confidenceText",
+        "nextStepText",
+        "Recommendation"
+      ],
+      "slots": [
+        "recommendation",
+        "recommendation-accept",
+        "recommendation-confidence",
+        "recommendation-eyebrow",
+        "recommendation-next",
+        "recommendation-summary"
+      ],
+      "stories": [
+        "Critical",
+        "Default",
+        "Irreversible Needs Confirmation",
+        "Irreversible With Consequence",
+        "Keyboard",
+        "Long Text",
+        "Low Confidence",
+        "Primary",
+        "With Expandable"
       ]
     },
     {
@@ -882,6 +1119,53 @@
         "Icon Button",
         "Open On Load",
         "Top"
+      ]
+    },
+    {
+      "name": "tradeoff",
+      "level": "organism",
+      "file": "src/components/ui/tradeoff.tsx",
+      "exports": [
+        "Tradeoff"
+      ],
+      "slots": [
+        "tradeoff",
+        "tradeoff-columns",
+        "tradeoff-item",
+        "tradeoff-summary",
+        "tradeoff-title"
+      ],
+      "stories": [
+        "Costs Only",
+        "Critical",
+        "Default",
+        "Gains Only",
+        "High",
+        "Long Text",
+        "With Summary"
+      ]
+    },
+    {
+      "name": "why-disclosure",
+      "level": "organism",
+      "file": "src/components/ui/why-disclosure.tsx",
+      "exports": [
+        "disclosureEntries",
+        "WhyDisclosure"
+      ],
+      "slots": [
+        "why-disclosure",
+        "why-disclosure-entry",
+        "why-disclosure-panel",
+        "why-disclosure-trigger"
+      ],
+      "stories": [
+        "Closed",
+        "Forced Open",
+        "Keyboard",
+        "Long Text",
+        "Open",
+        "Why Only"
       ]
     }
   ]
