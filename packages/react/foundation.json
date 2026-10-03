@@ -54,6 +54,9 @@
       "slots": [
         "accordion",
         "accordion-content",
+        "accordion-content-body",
+        "accordion-content-clip",
+        "accordion-header",
         "accordion-item",
         "accordion-trigger",
         "accordion-trigger-icon"
@@ -77,11 +80,24 @@
       ],
       "slots": [
         "activity-feed",
+        "activity-feed-empty",
         "activity-feed-latest",
+        "activity-feed-latest-anchor",
+        "activity-feed-list",
+        "activity-feed-scroller",
         "activity-item",
+        "activity-item-body",
         "activity-item-detail",
+        "activity-item-icon",
+        "activity-item-meta",
+        "activity-item-meta-row",
+        "activity-item-text",
         "activity-item-time",
         "live-dot",
+        "live-dot-core",
+        "live-dot-ping",
+        "typed-text-caret",
+        "working-dot",
         "working-dots"
       ],
       "stories": [
@@ -128,9 +144,14 @@
         "alternative-list-button",
         "alternative-list-chosen",
         "alternative-list-currency",
+        "alternative-list-currency-group",
         "alternative-list-field",
+        "alternative-list-field-group",
+        "alternative-list-hint",
         "alternative-list-input",
         "alternative-list-item",
+        "alternative-list-items",
+        "alternative-list-row",
         "alternative-list-status",
         "alternative-list-submit"
       ],
@@ -162,12 +183,15 @@
         "approval-cancel",
         "approval-confirm",
         "approval-confirm-row",
+        "approval-content",
         "approval-outcome",
         "approval-reason",
         "approval-reject",
+        "approval-reject-actions",
         "approval-reject-form",
         "approval-requester",
         "approval-scope",
+        "approval-scope-label",
         "approval-send-rejection",
         "approval-status",
         "approval-warning"
@@ -196,7 +220,12 @@
       "slots": [
         "attention-card",
         "attention-card-actions",
+        "attention-card-body",
+        "attention-card-content",
+        "attention-card-description",
+        "attention-card-eyebrow",
         "attention-card-icon",
+        "attention-card-pulse",
         "attention-card-title"
       ],
       "stories": [
@@ -290,10 +319,13 @@
       "slots": [
         "budget-bar",
         "budget-bar-caption",
+        "budget-bar-clip",
         "budget-bar-fill",
         "budget-bar-marker",
+        "budget-bar-marker-label",
         "budget-bar-overshoot",
         "budget-bar-reserved",
+        "budget-bar-scale",
         "budget-bar-track"
       ],
       "stories": [
@@ -409,6 +441,8 @@
         "correction-input",
         "correction-input-field",
         "correction-input-original",
+        "correction-input-original-text",
+        "correction-input-row",
         "correction-input-status",
         "correction-input-submit"
       ],
@@ -440,6 +474,7 @@
       "slots": [
         "dialog",
         "dialog-close",
+        "dialog-close-label",
         "dialog-content",
         "dialog-description",
         "dialog-footer",
@@ -485,6 +520,7 @@
         "dropdown-menu-item",
         "dropdown-menu-label",
         "dropdown-menu-portal",
+        "dropdown-menu-positioner",
         "dropdown-menu-radio-group",
         "dropdown-menu-radio-item",
         "dropdown-menu-radio-item-indicator",
@@ -548,6 +584,7 @@
         "field-content",
         "field-description",
         "field-error",
+        "field-error-list",
         "field-group",
         "field-label",
         "field-legend",
@@ -612,14 +649,19 @@
       ],
       "slots": [
         "irreversible-action",
+        "irreversible-action-actions",
         "irreversible-action-arm",
+        "irreversible-action-body",
         "irreversible-action-cancel",
         "irreversible-action-confirm",
         "irreversible-action-fill",
+        "irreversible-action-header",
         "irreversible-action-hint",
         "irreversible-action-hold",
+        "irreversible-action-hold-label",
         "irreversible-action-outcome",
         "irreversible-action-status",
+        "irreversible-action-track",
         "irreversible-action-warning"
       ],
       "stories": [
@@ -662,8 +704,10 @@
       "slots": [
         "lightbox",
         "lightbox-caption",
+        "lightbox-image",
         "lightbox-nav",
-        "lightbox-stage"
+        "lightbox-stage",
+        "lightbox-steps"
       ],
       "stories": [
         "Default",
@@ -680,9 +724,15 @@
       ],
       "slots": [
         "media-gallery",
+        "media-gallery-count",
+        "media-gallery-item",
+        "media-gallery-list",
         "media-gallery-section",
+        "media-gallery-title",
         "media-tile",
-        "media-tile-label"
+        "media-tile-image",
+        "media-tile-label",
+        "media-tile-stage"
       ],
       "stories": [
         "Default",
@@ -708,10 +758,14 @@
         "navigation-menu",
         "navigation-menu-content",
         "navigation-menu-indicator",
+        "navigation-menu-indicator-arrow",
         "navigation-menu-item",
         "navigation-menu-link",
         "navigation-menu-list",
-        "navigation-menu-trigger"
+        "navigation-menu-popup",
+        "navigation-menu-positioner",
+        "navigation-menu-trigger",
+        "navigation-menu-viewport"
       ],
       "stories": [
         "Default",
@@ -735,6 +789,7 @@
         "popover-content",
         "popover-description",
         "popover-header",
+        "popover-positioner",
         "popover-title",
         "popover-trigger"
       ],
@@ -755,7 +810,9 @@
       "slots": [
         "predicted-choice",
         "predicted-choice-action",
+        "predicted-choice-body",
         "predicted-choice-description",
+        "predicted-choice-label",
         "predicted-choice-likely",
         "predicted-choice-option",
         "predicted-choice-prompt",
@@ -809,6 +866,7 @@
       ],
       "slots": [
         "radio-group",
+        "radio-group-dot",
         "radio-group-indicator",
         "radio-group-item"
       ],
@@ -831,10 +889,13 @@
       "slots": [
         "recommendation",
         "recommendation-accept",
+        "recommendation-actions",
+        "recommendation-body",
         "recommendation-cancel",
         "recommendation-confidence",
         "recommendation-confirm",
         "recommendation-eyebrow",
+        "recommendation-header",
         "recommendation-next",
         "recommendation-outcome",
         "recommendation-status",
@@ -868,9 +929,19 @@
       "slots": [
         "role-avatar",
         "role-avatar-group",
+        "role-avatar-initials",
+        "role-avatar-title",
         "role-card",
+        "role-card-body",
+        "role-card-heading",
+        "role-card-meta",
+        "role-card-metrics",
+        "role-card-title",
         "role-chip",
-        "role-state"
+        "role-chip-tag",
+        "role-chip-title",
+        "role-state",
+        "role-state-dot"
       ],
       "stories": [
         "Avatars",
@@ -917,8 +988,12 @@
       "slots": [
         "select-content",
         "select-group",
+        "select-icon",
         "select-item",
+        "select-item-indicator",
+        "select-item-text",
         "select-label",
+        "select-positioner",
         "select-scroll-down-button",
         "select-scroll-up-button",
         "select-separator",
@@ -965,6 +1040,7 @@
       "slots": [
         "sheet",
         "sheet-close",
+        "sheet-close-label",
         "sheet-content",
         "sheet-description",
         "sheet-footer",
@@ -1023,9 +1099,15 @@
       ],
       "slots": [
         "step-item",
+        "step-item-body",
         "step-item-detail",
+        "step-item-heading",
+        "step-item-status",
+        "step-item-title",
         "step-list",
-        "step-marker"
+        "step-marker",
+        "step-marker-index",
+        "step-marker-pulse"
       ],
       "stories": [
         "Plan"
@@ -1134,7 +1216,9 @@
       ],
       "slots": [
         "tooltip",
+        "tooltip-arrow",
         "tooltip-content",
+        "tooltip-positioner",
         "tooltip-provider",
         "tooltip-trigger"
       ],
@@ -1156,6 +1240,10 @@
         "tradeoff",
         "tradeoff-columns",
         "tradeoff-item",
+        "tradeoff-item-icon",
+        "tradeoff-item-prefix",
+        "tradeoff-item-text",
+        "tradeoff-items",
         "tradeoff-summary",
         "tradeoff-title"
       ],
