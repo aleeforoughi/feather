@@ -44,12 +44,14 @@ const components = fs
   .map((file) => {
     const name = file.replace(/\.tsx$/, "")
     const source = fs.readFileSync(path.join(uiDir, file), "utf8")
-    // A molecule composes atoms or behaviour into a reusable pattern (its stories live under "Molecules/").
+    // A molecule composes atoms or behaviour into a reusable pattern (stories under "Molecules/"); an organism renders
+    // one Experience IR node as a whole interaction (stories under "Organisms/").
     const storyFile = path.join(uiDir, `${name}.stories.tsx`)
-    const molecule = fs.existsSync(storyFile) && /title:\s*"Molecules\//.test(fs.readFileSync(storyFile, "utf8"))
+    const stories = fs.existsSync(storyFile) ? fs.readFileSync(storyFile, "utf8") : ""
+    const level = /title:\s*"Organisms\//.test(stories) ? "organism" : /title:\s*"Molecules\//.test(stories) ? "molecule" : "atom"
     return {
       name,
-      level: molecule ? "molecule" : "atom",
+      level,
       file: `src/components/ui/${file}`,
       exports: exportsOf(source),
       slots: sorted([...source.matchAll(/data-slot="([^"]+)"/g)].map((m) => m[1])),

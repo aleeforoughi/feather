@@ -16,7 +16,7 @@ versioned, themeable, standard and ready to use. A component earns its place onl
    variant or state is a `data-variant`, so brand tokens (`"slot"` or `"slot.variant"`) can restyle it without
    touching code. Motion comes from the theme (`useThemeMotion`) and honours reduced motion.
 5. **Standard.** Accessible (roles, labels, keyboard), documented in Storybook with real examples, compiling
-   in both reference themes, and listed in `foundation.json` (`level: atom | molecule`).
+   in both reference themes, and listed in `foundation.json` (`level: atom | molecule | organism`).
 6. **Versioned.** A minor version per addition, a CHANGELOG entry saying where it came from and why, and the
    hygiene gate (`pnpm hygiene`) green before release.
 
@@ -25,3 +25,13 @@ versioned, themeable, standard and ready to use. A component earns its place onl
 Compositions of atoms that any product reuses (`"level": "molecule"` in `foundation.json`): `lightbox`,
 `media-gallery`, `activity-feed`, `attention-card`, `step-list`, `budget-bar` (budgets, quotas, storage) and
 `role-avatar` (RoleAvatar, RoleChip, RoleCard, RoleAvatarGroup: people and agent roles).
+
+## Organisms
+
+An organism renders one Experience IR node as a whole interaction, built from atoms and molecules
+(`"level": "organism"` in `foundation.json`, stories under `Organisms/`). Its props mirror the node's fields
+(`docs/ir/nodes.md`), and it reports what the person did through `onAct(act, value?)` using exactly the node's
+reply acts, so the composer can wire it to reply events without translation. `@aleeforoughi/feather-react` never
+imports the IR package; the mirroring is a convention, checked by review and stories. The contract every organism
+follows is in `docs/organisms.md`.
+
