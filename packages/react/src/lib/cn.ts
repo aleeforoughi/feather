@@ -16,10 +16,10 @@ export const cn: CnFunction = createCn({
       h: [{ h: ["control", "indicator"] }],
       w: [{ w: ["indicator"] }],
       size: [{ size: ["control", "icon-slot"] }],
-      p: [{ p: ["card", "dialog"] }],
+      "region-inset": [{ inset: ["content", "header", "action", "utility", "display"] }],
       px: [{ px: ["control", "container"] }],
       py: [{ py: ["control", "container"] }],
-      gap: [{ gap: ["element", "group"] }],
+      gap: [{ gap: ["element", "group", "action", "label", "field"] }],
       rounded: [{ rounded: ["xs", "control", "card", "dialog"] }],
       shadow: [{ shadow: ["1", "2", "3"] }],
       opacity: [{ opacity: ["disabled"] }],
@@ -29,6 +29,8 @@ export const cn: CnFunction = createCn({
       "type-role": ["font-size", "leading", "font-weight", "tracking"],
       // A motion role sets the transitioned properties, duration and curve.
       "motion-role": ["transition", "duration", "ease"],
+      // A region inset sets all four paddings, so a later one replaces any earlier padding utility.
+      "region-inset": ["p", "px", "py", "pt", "pr", "pb", "pl", "ps", "pe"],
     },
   },
 })

@@ -40,7 +40,7 @@ function MediaGallery({ sections, empty = "No images yet.", className }: { secti
   const motionTheme = useThemeMotion("toast")
   if (all.length === 0) {
     return (
-      <div data-slot="media-gallery" className={cn("flex flex-col items-center justify-center gap-element px-8 py-20 text-center type-body text-fg-secondary", className)}>
+      <div data-slot="media-gallery" data-region="display" className={cn("flex flex-col items-center justify-center gap-element inset-display text-center type-body text-fg-secondary", className)}>
         <Icon icon={ImagesIcon} size={32} />
         <p>{empty}</p>
       </div>

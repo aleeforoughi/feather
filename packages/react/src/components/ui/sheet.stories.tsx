@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Button } from "./button"
 import { Input } from "./input"
 import { Label } from "./label"
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./sheet"
+import { Sheet, SheetBody, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./sheet"
 
 const meta = {
   title: "Atoms/Sheet",
@@ -19,10 +19,12 @@ const meta = {
           <SheetTitle>Edit profile</SheetTitle>
           <SheetDescription>Make changes to your profile here.</SheetDescription>
         </SheetHeader>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="sheet-name">Name</Label>
-          <Input id="sheet-name" defaultValue="Jordan Lee" />
-        </div>
+        <SheetBody>
+          <div className="flex flex-col gap-label">
+            <Label htmlFor="sheet-name">Name</Label>
+            <Input id="sheet-name" defaultValue="Jordan Lee" />
+          </div>
+        </SheetBody>
         <SheetFooter>
           <Button>Save changes</Button>
           <SheetClose render={<Button variant="outline" />}>Close</SheetClose>

@@ -4,7 +4,7 @@ import { cn } from "../../lib/cn"
 
 import { Button } from "./button"
 import { Icon } from "./icon"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog"
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog"
 
 export type LightboxImage = { src: string; alt: string; caption?: string; downloadName?: string }
 
@@ -55,12 +55,14 @@ function Lightbox({
           </DialogDescription>
         </DialogHeader>
         {image && (
-          <div data-slot="lightbox-stage" className={cn("flex max-h-[60vh] items-center justify-center overflow-hidden rounded-card", checker)}>
-            <img data-slot="lightbox-image" src={image.src} alt={image.alt} className="max-h-[60vh] w-auto max-w-full object-contain" />
-          </div>
+          <DialogBody data-slot="lightbox-body">
+            <div data-slot="lightbox-stage" className={cn("flex max-h-[60vh] items-center justify-center overflow-hidden rounded-card", checker)}>
+              <img data-slot="lightbox-image" src={image.src} alt={image.alt} className="max-h-[60vh] w-auto max-w-full object-contain" />
+            </div>
+          </DialogBody>
         )}
-        <div data-slot="lightbox-nav" className="flex items-center justify-between gap-2">
-          <div data-slot="lightbox-steps" className="flex gap-2">
+        <div data-slot="lightbox-nav" data-region="utility" className="flex items-center justify-between gap-action inset-utility">
+          <div data-slot="lightbox-steps" className="flex gap-action">
             <Button variant="outline" disabled={!many} onClick={() => step(-1)}>
               <Icon icon={ChevronLeftIcon} /> Previous
             </Button>

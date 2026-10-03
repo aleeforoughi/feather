@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Button } from "./button"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./dialog"
+import { Dialog, DialogBody, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./dialog"
 import { Input } from "./input"
 
 const meta = {
@@ -18,7 +18,9 @@ const meta = {
           <DialogTitle>Edit profile</DialogTitle>
           <DialogDescription>Update your display name. Changes apply right away.</DialogDescription>
         </DialogHeader>
-        <Input defaultValue="Jordan Lee" aria-label="Display name" />
+        <DialogBody>
+          <Input defaultValue="Jordan Lee" aria-label="Display name" />
+        </DialogBody>
         <DialogFooter>
           <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
           <Button>Save changes</Button>

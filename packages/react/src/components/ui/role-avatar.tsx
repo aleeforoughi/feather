@@ -75,7 +75,7 @@ function RoleCard({ title, icon, emphasis, kind, state, meta, metrics, className
 }) {
   const stats = (metrics ?? []).filter(Boolean)
   return (
-    <div data-slot="role-card" data-variant="card" className={cn("flex items-start gap-element rounded-card border border-line-secondary bg-card p-card text-fg-primary", className)}>
+    <div data-slot="role-card" data-region="content" data-variant="card" className={cn("flex items-start gap-element rounded-card border border-line-secondary bg-card inset-content text-fg-primary", className)}>
       <RoleAvatar title={title} icon={icon} emphasis={emphasis} size="lg" />
       <div data-slot="role-card-body" className="min-w-0 flex-1 space-y-1">
         <div data-slot="role-card-heading" className="flex flex-wrap items-center gap-2">

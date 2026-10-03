@@ -173,7 +173,7 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
       data-variant={variant}
       data-mode={mode}
       data-importance={importance}
-      className={cn("gap-3 border-destructive px-(--card-spacing)", className)}
+      className={cn("border-destructive", className)}
       onKeyDown={(e) => {
         if (e.key !== "Escape" || done) return
         if (mode === "confirm" && armed) {
@@ -186,7 +186,7 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
       }}
     >
       {/* The icon belongs to the warning, so the consequence and the action share one left edge. */}
-      <div data-slot="irreversible-action-header" className="min-w-0">
+      <div data-slot="irreversible-action-header" data-region="header" className="min-w-0 inset-header">
         <div data-slot="irreversible-action-body" className="min-w-0 space-y-1">
           <p data-slot="irreversible-action-warning" className="flex items-center gap-2 type-caps text-fg-primary">
             <Icon icon={TriangleAlertIcon} size={16} aria-hidden className="text-destructive" />
@@ -196,12 +196,22 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
         </div>
       </div>
 
-      {done && (
-        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="irreversible-action-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">
-          {outcomeText(consequence, locale)}
-        </p>
+      {(done || mode === "hold" || expandable) && (
+        <div data-slot="irreversible-action-detail" data-region="content" className="flex flex-col gap-element inset-content">
+          {done && (
+            <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="irreversible-action-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">
+              {outcomeText(consequence, locale)}
+            </p>
+          )}
+          {!done && mode === "hold" && (
+            <p id={hintId} data-slot="irreversible-action-hint" className="type-body-sm text-fg-secondary">
+              Press and hold for {(holdMs / 1000).toFixed(holdMs % 1000 === 0 ? 0 : 1)} seconds, with the pointer or by holding Space or Enter. Letting go early does nothing.
+            </p>
+          )}
+          {expandable && !done && <WhyDisclosure expandable={expandable} open={whyOpen} onOpenChange={setWhyOpen} forceOpen={importance === "critical"} />}
+        </div>
       )}
-      {!done && <div data-slot="irreversible-action-actions" className="flex flex-wrap items-center gap-2">
+      {!done && <div data-slot="irreversible-action-actions" data-region="action" className="flex flex-wrap items-center gap-action inset-action">
         {mode === "confirm" ? (
           <>
             <Button
@@ -281,18 +291,10 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
             <span data-slot="irreversible-action-hold-label" className="relative">{holdLabel(act)}</span>
           </Button>
         )}
-      </div>}
-      {!done && mode === "hold" && (
-        <p id={hintId} data-slot="irreversible-action-hint" className="type-body-sm text-fg-secondary">
-          Press and hold for {(holdMs / 1000).toFixed(holdMs % 1000 === 0 ? 0 : 1)} seconds, with the pointer or by holding Space or Enter. Letting go early does nothing.
+        <p role="status" data-slot="irreversible-action-status" data-variant={showArmed ? "armed" : "idle"} className={cn("type-label", status ? "basis-full text-fg-primary" : "sr-only")}>
+          {status}
         </p>
-      )}
-
-      <p role="status" data-slot="irreversible-action-status" data-variant={showArmed ? "armed" : "idle"} className={cn("type-label", status ? "text-fg-primary" : "sr-only")}>
-        {status}
-      </p>
-
-      {expandable && !done && <WhyDisclosure expandable={expandable} open={whyOpen} onOpenChange={setWhyOpen} forceOpen={importance === "critical"} />}
+      </div>}
     </Card>
   )
 }

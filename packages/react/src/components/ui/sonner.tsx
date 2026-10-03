@@ -34,7 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          toast: "cn-toast font-sans! shadow-2! type-body-sm!",
+          toast: "cn-toast font-sans! inset-utility! shadow-2! type-body-sm!",
           title: "type-label! text-fg-primary!",
           description: "type-body-sm! text-fg-secondary!",
           actionButton: "hit-area h-control! rounded-control! bg-primary! px-control! type-label! text-primary-foreground!",

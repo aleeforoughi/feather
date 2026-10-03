@@ -61,7 +61,7 @@ describe("scanSource: the rules", () => {
 
   it.each([
     "p-0 p-1 p-2 p-3 p-4 p-5 p-6 p-8 p-10 p-12 p-16 p-20 p-24 p-32",
-    "gap-element gap-group h-control size-control size-icon-slot px-control p-card p-dialog",
+    "gap-element gap-group h-control size-control size-icon-slot px-control inset-content inset-action",
     "w-px h-px size-px w-full h-full min-h-0 top-1/2 inset-0 -translate-y-1/2",
     "rounded-xs rounded-control rounded-card rounded-dialog rounded-full rounded-none",
     "border border-t border-x border-line-primary border-transparent",
@@ -128,6 +128,6 @@ describe("scanSource: the rules", () => {
   })
 
   it("names every rule it reports", () => {
-    expect(VISUAL_RULES).toEqual(["spacing-step", "arbitrary-value", "transition-all", "duration", "ease", "radius-tier", "border-width", "shadow", "font-weight", "opacity", "slash-opacity", "bare-icon", "data-slot", "data-variant", "theme-motion"])
+    expect(VISUAL_RULES).toEqual(["spacing-step", "arbitrary-value", "transition-all", "duration", "ease", "radius-tier", "border-width", "shadow", "font-weight", "opacity", "slash-opacity", "bare-icon", "data-slot", "data-variant", "theme-motion", "region"])
   })
 })

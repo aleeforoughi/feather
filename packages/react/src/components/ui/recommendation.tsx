@@ -118,7 +118,7 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
       data-variant={done ? "done" : armed ? "armed" : reversible === false ? "irreversible" : "default"}
       data-importance={importance}
       data-primary={primary ? "true" : undefined}
-      className={cn("gap-3 px-(--card-spacing)", className)}
+      className={className}
       onKeyDown={(e) => {
         if (e.key === "Escape" && armed) {
           e.preventDefault()
@@ -127,7 +127,7 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
       }}
     >
       {/* The icon belongs to the eyebrow, so the summary and everything below share one left edge. */}
-      <div data-slot="recommendation-header" className="min-w-0">
+      <div data-slot="recommendation-header" data-region="header" className="min-w-0 inset-header">
         <div data-slot="recommendation-body" className="min-w-0 space-y-1">
           <p data-slot="recommendation-eyebrow" className="flex items-center gap-2 type-caps text-fg-secondary">
             <Icon icon={SparklesIcon} size={16} aria-hidden className="text-primary" />
@@ -139,15 +139,17 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
           )}
         </div>
       </div>
-      {consequence && <ConsequenceStatement id={`${id}-consequence`} consequence={consequence} locale={locale} />}
-      {!hasConsequence && <p id={`${id}-next`} data-slot="recommendation-next" className="type-body-sm text-fg-secondary">{nextStepText(reversible)}</p>}
-      {done && (
-        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="recommendation-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">
-          {acceptOutcome(consequence, locale)}
-        </p>
-      )}
+      <div data-slot="recommendation-detail" data-region="content" className="flex flex-col gap-element inset-content">
+        {consequence && <ConsequenceStatement id={`${id}-consequence`} consequence={consequence} locale={locale} />}
+        {!hasConsequence && <p id={`${id}-next`} data-slot="recommendation-next" className="type-body-sm text-fg-secondary">{nextStepText(reversible)}</p>}
+        {done && (
+          <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="recommendation-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">
+            {acceptOutcome(consequence, locale)}
+          </p>
+        )}
+      </div>
       {!done && (
-        <div data-slot="recommendation-actions" className="flex flex-wrap items-center gap-2">
+        <div data-slot="recommendation-actions" data-region="action" className="flex flex-wrap items-center gap-action inset-action">
           <Button
             ref={firstRef}
             data-slot="recommendation-accept"
@@ -186,10 +188,10 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
             </>
           )}
           {expandable && <WhyDisclosure expandable={expandable} open={whyOpen} onOpenChange={setWhyOpen} forceOpen={importance === "critical"} className="basis-full" />}
+          {needsConfirm && (
+            <p role="status" data-slot="recommendation-status" data-variant={armed ? "armed" : "idle"} className={cn("type-label", armed ? "basis-full text-fg-primary" : "sr-only")}>{status}</p>
+          )}
         </div>
-      )}
-      {needsConfirm && (
-        <p role="status" data-slot="recommendation-status" data-variant={armed ? "armed" : "idle"} className={cn("type-label", armed ? "text-fg-primary" : "sr-only")}>{status}</p>
       )}
     </Card>
   )

@@ -462,6 +462,7 @@
       "file": "src/components/ui/dialog.tsx",
       "exports": [
         "Dialog",
+        "DialogBody",
         "DialogClose",
         "DialogContent",
         "DialogDescription",
@@ -474,6 +475,7 @@
       ],
       "slots": [
         "dialog",
+        "dialog-body",
         "dialog-close",
         "dialog-close-label",
         "dialog-content",
@@ -655,6 +657,7 @@
         "irreversible-action-body",
         "irreversible-action-cancel",
         "irreversible-action-confirm",
+        "irreversible-action-detail",
         "irreversible-action-fill",
         "irreversible-action-header",
         "irreversible-action-hint",
@@ -704,6 +707,7 @@
       ],
       "slots": [
         "lightbox",
+        "lightbox-body",
         "lightbox-caption",
         "lightbox-image",
         "lightbox-nav",
@@ -895,6 +899,7 @@
         "recommendation-cancel",
         "recommendation-confidence",
         "recommendation-confirm",
+        "recommendation-detail",
         "recommendation-eyebrow",
         "recommendation-header",
         "recommendation-next",
@@ -1030,6 +1035,7 @@
       "file": "src/components/ui/sheet.tsx",
       "exports": [
         "Sheet",
+        "SheetBody",
         "SheetClose",
         "SheetContent",
         "SheetDescription",
@@ -1040,6 +1046,7 @@
       ],
       "slots": [
         "sheet",
+        "sheet-body",
         "sheet-close",
         "sheet-close-label",
         "sheet-content",

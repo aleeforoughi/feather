@@ -271,7 +271,7 @@ export function MediaAtom({ ir, textEquivalent = false }: { ir: MediaNode; textE
 
 export function ConfirmationAtom({ ir }: { ir: ConfirmationNode }) {
   return (
-    <div role="status" data-slot="experience-confirmation" className="flex items-start gap-2 rounded-card bg-surface-subtle p-3 type-body-sm text-fg-primary">
+    <div role="status" data-slot="experience-confirmation" data-region="utility" className="flex items-start gap-2 rounded-card bg-surface-subtle inset-utility type-body-sm text-fg-primary">
       {/* A text glyph: this package imports only Feather and React, and Feather exports no Icon glyph for a check. */}
       <span aria-hidden data-slot="experience-confirmation-icon" className="flex w-4 shrink-0 justify-center">✓</span>
       <span className="min-w-0 break-words">
@@ -437,7 +437,7 @@ export function InputAtom({ ir }: { ir: InputNode }) {
         />
       )}
       {hint && <p id={hintId} data-slot="experience-input-hint" className="text-fg-secondary">{hint}</p>}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-action">
         <Button type="submit" data-slot="experience-input-submit" disabled={text === ""}>Send answer</Button>
         {ir.required !== true && (
           <Button
@@ -552,7 +552,7 @@ function FieldPreference({ ir }: { ir: PreferenceNode }) {
       }}
     >
       <Label htmlFor={`${id}-field`}>{ir.label}</Label>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-action">
         <Input
           id={`${id}-field`}
           data-slot="experience-preference-field"
@@ -662,7 +662,7 @@ export function AutopickAtom({ ir }: { ir: AutopickNode }) {
       {outcome ? (
         <Outcome>{outcome === "kept" ? "Kept." : "Undone."}</Outcome>
       ) : (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-action">
           <Button type="button" data-slot="experience-autopick-keep" aria-label={`Keep: ${ir.summary}`} onClick={() => act("keep")}>Keep this</Button>
           <Button type="button" data-slot="experience-autopick-undo" variant="outline" aria-label={`Undo: ${ir.summary}`} onClick={() => act("undo")}>Undo</Button>
         </div>

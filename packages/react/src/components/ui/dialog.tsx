@@ -53,7 +53,7 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "motion-dialog fixed inset-4 z-50 m-auto grid h-fit max-h-[calc(100dvh-var(--spacing)*8)] w-auto overflow-y-auto translate-y-0 scale-100 gap-group rounded-dialog border border-line-secondary bg-surface-overlay p-dialog type-body-sm text-fg-primary opacity-100 shadow-3 outline-none sm:max-w-sm data-starting-style:translate-y-4 data-starting-style:scale-[0.985] data-starting-style:opacity-0 data-ending-style:translate-y-4 data-ending-style:scale-[0.985] data-ending-style:opacity-0",
+          "motion-dialog fixed inset-4 z-50 m-auto grid h-fit max-h-[calc(100dvh-var(--spacing)*8)] w-auto overflow-y-auto translate-y-0 scale-100 rounded-dialog border border-line-secondary bg-surface-overlay type-body-sm text-fg-primary opacity-100 shadow-3 outline-none sm:max-w-sm data-starting-style:translate-y-4 data-starting-style:scale-[0.985] data-starting-style:opacity-0 data-ending-style:translate-y-4 data-ending-style:scale-[0.985] data-ending-style:opacity-0",
           className
         )}
         {...props}
@@ -83,7 +83,20 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2", className)}
+      data-region="header"
+      className={cn("flex flex-col gap-element inset-header", className)}
+      {...props}
+    />
+  )
+}
+
+/** The dialog's body: the content region between the header and the footer. */
+function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-body"
+      data-region="content"
+      className={cn("flex flex-col gap-field inset-content", className)}
       {...props}
     />
   )
@@ -100,8 +113,9 @@ function DialogFooter({
   return (
     <div
       data-slot="dialog-footer"
+      data-region="action"
       className={cn(
-        "relative -mx-(--dialog-pad) -mb-(--dialog-pad) flex flex-col-reverse gap-2 rounded-b-dialog bg-surface-subtle px-(--dialog-pad) py-container before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-line-tertiary sm:flex-row sm:justify-end",
+        "relative flex flex-col-reverse gap-action rounded-b-dialog bg-surface-subtle inset-action before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-line-tertiary sm:flex-row sm:justify-end",
         className
       )}
       {...props}
@@ -148,6 +162,7 @@ function DialogDescription({
 export {
   Dialog,
   DialogClose,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,

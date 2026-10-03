@@ -387,6 +387,7 @@ export const VISUAL_RULES = [
   "data-slot",
   "data-variant",
   "theme-motion",
+  "region",
 ]
 
 /** The Tailwind steps the system allows (section 2): 0, 0.5 (optical only), 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32. */
@@ -431,6 +432,8 @@ function ruleOfToken(token) {
   else if (NUDGE_RE.test(core)) hit.push("spacing-step")
   if (/-\[[^\]]*\d(?:px|rem|em|ms|%)[^\]]*\]/.test(token)) hit.push("arbitrary-value")
   if (core === "transition-all") hit.push("transition-all")
+  // Surface padding is a region's (section 3a): the retired one-value paddings are findings.
+  if (core === "p-card" || core === "p-dialog") hit.push("region")
   if (/^duration-(?:\d+|\[.*\])$/.test(core)) hit.push("duration")
   if (/^ease-/.test(core) && core !== "ease-standard") hit.push("ease")
   if (/^rounded(?:-(?:t|b|l|r|s|e|tl|tr|bl|br|ss|se|ee|es))?-(?:sm|md|lg|xl|2xl|3xl|4xl)$/.test(core)) hit.push("radius-tier")
@@ -469,6 +472,13 @@ export function scanSource(rel, source, exceptions = []) {
   }
   const text = stripComments(source)
   for (const m of text.matchAll(/transition(?:-property)?\s*:\s*["']?\s*all\b/g)) add("transition-all", m[0], text.slice(0, m.index).split("\n").length)
+  // Every region uses its role's inset utility (section 3a), on the same element.
+  for (const m of text.matchAll(/<[A-Za-z][\w.]*\b((?:[^<>{}]|\{[^{}]*\})*)>/g)) {
+    const role = /\bdata-region\s*=\s*"(\w+)"/.exec(m[1])?.[1]
+    if (!role) continue
+    if (!["content", "header", "action", "utility", "display"].includes(role)) add("region", `data-region="${role}"`, text.slice(0, m.index).split("\n").length)
+    else if (!new RegExp(`\\binset-${role}\\b`).test(m[1])) add("region", `data-region="${role}" without inset-${role}`, text.slice(0, m.index).split("\n").length)
+  }
   // A bare lucide icon with its own size: a size class, or a size, width or height prop.
   const lucide = lucideNames(text)
   const isIcon = /(^|\/)components\/ui\/icon\.tsx$/.test(rel)

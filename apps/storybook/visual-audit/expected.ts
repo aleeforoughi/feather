@@ -75,6 +75,15 @@ export const RADIUS_TIERS: Record<string, number[]> = {
 /** The radius step per brand shape: a surface is at least one step larger than a rounded surface inside it. */
 export const RADIUS_STEP: Record<string, number> = { sharp: 0, soft: 4, rounded: 4, pill: 4 }
 
+/** Region insets per density, in px (section 3a): [top, right, bottom, left]. */
+export const REGION_INSETS: Record<string, Record<string, [number, number, number, number]>> = {
+  content: { tight: [16, 24, 16, 24], default: [20, 32, 20, 32], spacious: [24, 40, 24, 40] },
+  header: { tight: [20, 24, 12, 24], default: [24, 32, 16, 32], spacious: [32, 40, 20, 40] },
+  action: { tight: [16, 16, 16, 16], default: [20, 20, 20, 20], spacious: [24, 24, 24, 24] },
+  utility: { tight: [8, 12, 8, 12], default: [12, 16, 12, 16], spacious: [16, 20, 16, 20] },
+  display: { tight: [24, 24, 24, 24], default: [32, 32, 32, 32], spacious: [48, 48, 48, 48] },
+}
+
 /** The six durations per brand motion axis, in ms (section 10). */
 export const DURATIONS: Record<string, number[]> = {
   calm: [100, 140, 180, 240, 320, 420],
@@ -203,6 +212,8 @@ export const RULES: Record<string, string> = {
   "type.size": "font-size is on the scale",
   "type.weight": "font-weight is 400/500/600/700",
   "type.line-height": "line-height is a multiple of 4px",
+  "regions.inset": "a data-region uses its role's inset for its density (section 3a)",
+  "regions.shell": "a shell divided into regions has no padding of its own",
   "radius.tier": "border-radius is in the theme's tier set",
   "radius.nesting": "flush child radius is at most its parent's",
   "icons.size": "icon box is 16/20/24/32",

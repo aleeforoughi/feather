@@ -293,6 +293,18 @@
     --dialog-pad: 2rem;
     --gap: 0.75rem;
     --group-gap: 1.5rem;
+    --inset-content-y: 1.25rem;
+    --inset-content-x: 2rem;
+    --inset-header-top: 1.5rem;
+    --inset-header-bottom: 1rem;
+    --inset-header-x: 2rem;
+    --inset-action: 1.25rem;
+    --inset-utility-y: 0.75rem;
+    --inset-utility-x: 1rem;
+    --inset-display: 2rem;
+    --gap-action: 0.5rem;
+    --gap-label: 0.5rem;
+    --gap-field: 1rem;
     /* Six durations and the one curve (section 10): the calm axis. */
     --duration-micro: 100ms;
     --duration-fast: 140ms;
@@ -319,6 +331,18 @@
     --dialog-pad: 1.5rem;
     --gap: 0.5rem;
     --group-gap: 1rem;
+    --inset-content-y: 1rem;
+    --inset-content-x: 1.5rem;
+    --inset-header-top: 1.25rem;
+    --inset-header-bottom: 0.75rem;
+    --inset-header-x: 1.5rem;
+    --inset-action: 1rem;
+    --inset-utility-y: 0.5rem;
+    --inset-utility-x: 0.75rem;
+    --inset-display: 1.5rem;
+    --gap-action: 0.5rem;
+    --gap-label: 0.25rem;
+    --gap-field: 0.75rem;
   }
   [data-density="default"] {
     --control-height: 2.75rem;
@@ -331,6 +355,18 @@
     --dialog-pad: 2rem;
     --gap: 0.75rem;
     --group-gap: 1.5rem;
+    --inset-content-y: 1.25rem;
+    --inset-content-x: 2rem;
+    --inset-header-top: 1.5rem;
+    --inset-header-bottom: 1rem;
+    --inset-header-x: 2rem;
+    --inset-action: 1.25rem;
+    --inset-utility-y: 0.75rem;
+    --inset-utility-x: 1rem;
+    --inset-display: 2rem;
+    --gap-action: 0.5rem;
+    --gap-label: 0.5rem;
+    --gap-field: 1rem;
   }
   [data-density="spacious"] {
     --control-height: 3.25rem;
@@ -343,6 +379,18 @@
     --dialog-pad: 2.5rem;
     --gap: 1rem;
     --group-gap: 2rem;
+    --inset-content-y: 1.5rem;
+    --inset-content-x: 2.5rem;
+    --inset-header-top: 2rem;
+    --inset-header-bottom: 1.25rem;
+    --inset-header-x: 2.5rem;
+    --inset-action: 1.5rem;
+    --inset-utility-y: 1rem;
+    --inset-utility-x: 1.25rem;
+    --inset-display: 3rem;
+    --gap-action: 0.75rem;
+    --gap-label: 0.5rem;
+    --gap-field: 1.25rem;
   }
   @media (min-width: 640px) {
     :root {
@@ -502,6 +550,43 @@
 }
 .rounded-dialog:has(.rounded-card .rounded-card .rounded-card) {
   --surface-extra: 2;
+}
+
+/* Regions (docs/visual-system.md section 3a): each semantic region owns its inset, by role, scaled by density.
+   content and utility are axis insets (block and inline), action and display are perimeter insets (all sides equal),
+   header is directional (more above than below, so the heading attaches to what follows). A shell divided into
+   regions has no padding of its own. */
+@utility inset-content {
+  padding-block: var(--inset-content-y);
+  padding-inline: var(--inset-content-x);
+}
+@utility inset-header {
+  padding: var(--inset-header-top) var(--inset-header-x) var(--inset-header-bottom);
+}
+@utility inset-action {
+  padding: var(--inset-action);
+}
+/* A header attaches to the content directly below it (section 3a): with no boundary between them, the content's top
+   inset collapses, so the header's smaller bottom inset alone sets the heading-to-body distance. A divider or surface
+   change between them is a boundary (data-boundary on the content), and both insets stay. */
+[data-region="header"] + [data-region="content"]:not([data-boundary]) {
+  padding-block-start: 0;
+}
+@utility inset-utility {
+  padding-block: var(--inset-utility-y);
+  padding-inline: var(--inset-utility-x);
+}
+@utility inset-display {
+  padding: var(--inset-display);
+}
+@utility gap-action {
+  gap: var(--gap-action);
+}
+@utility gap-label {
+  gap: var(--gap-label);
+}
+@utility gap-field {
+  gap: var(--gap-field);
 }
 
 /* Hit area (section 3): an invisible extension of at least 44 x 44px, centered on the element, so a smaller visual (a

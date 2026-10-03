@@ -156,13 +156,13 @@ function Approval({ intent, request, requester, scope, consequence, arm, importa
         <div data-slot="approval-reject-form" className="space-y-2">
           <Label htmlFor={`${id}-reason`}>Reason for rejecting (optional)</Label>
           <Textarea ref={reasonRef} id={`${id}-reason`} data-slot="approval-reason" value={reason} onChange={(e) => setReason(e.target.value)} />
-          <div data-slot="approval-reject-actions" className="flex flex-wrap gap-2">
+          <div data-slot="approval-reject-actions" className="flex flex-wrap gap-action">
             <Button type="button" data-slot="approval-send-rejection" variant="outline" onClick={sendRejection}>Send rejection</Button>
             <Button type="button" data-slot="approval-back" variant="outline" onClick={backOut}>Back</Button>
           </div>
         </div>
       ) : mode === "armed" ? (
-        <div data-slot="approval-confirm-row" className="flex flex-wrap gap-2">
+        <div data-slot="approval-confirm-row" className="flex flex-wrap gap-action">
           <Button
             ref={confirmRef}
             type="button"
@@ -179,7 +179,7 @@ function Approval({ intent, request, requester, scope, consequence, arm, importa
           <Button type="button" data-slot="approval-cancel" variant="outline" onClick={backOut}>Cancel</Button>
         </div>
       ) : (
-        <div data-slot="approval-actions" className="flex flex-wrap gap-2">
+        <div data-slot="approval-actions" className="flex flex-wrap gap-action">
           <Button ref={approveRef} type="button" data-slot="approval-approve" aria-label={`Approve: ${request}`} aria-describedby={describedBy} onClick={startApprove}>
             Approve{needsConfirm ? "…" : ""}
           </Button>

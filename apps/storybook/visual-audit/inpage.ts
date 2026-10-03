@@ -17,6 +17,7 @@
 export interface Consts {
   controlSlots: string[]
   controlHeights: number[]
+  regionInsets: Record<string, Record<string, [number, number, number, number]>>
   sizeHeights: Record<string, number>
   interactive: string
   target: number
@@ -511,6 +512,32 @@ export function install(c: Consts): void {
         const lh = px(s.lineHeight)
         if (s.lineHeight === "normal" || !Number.isFinite(lh) || !near(lh / c.lineGrid, Math.round(lh / c.lineGrid), 0.01 / c.lineGrid))
           out.push(make("type.line-height", "line-height", el, `a multiple of ${c.lineGrid}px`, s.lineHeight))
+      }
+
+      // 4b. regions (section 3a): each data-region uses its role's inset for its density, and a shell holding regions
+      // has no padding of its own.
+      for (const el of els.filter((e) => e.hasAttribute("data-region"))) {
+        const role = el.getAttribute("data-region") ?? ""
+        const table = c.regionInsets[role]
+        if (!table) {
+          out.push(make("regions.inset", "data-region", el, Object.keys(c.regionInsets).join(" | "), role))
+          continue
+        }
+        const base = table[densityOf(el, o).name] ?? table.default
+        // Content right after a header, with no boundary, attaches to it: its top inset is 0 (section 3a, rule 4).
+        const prev = el.previousElementSibling
+        const attached = role === "content" && prev?.getAttribute("data-region") === "header" && !el.hasAttribute("data-boundary")
+        const want: [number, number, number, number] = attached ? [0, base[1], base[2], base[3]] : base
+        const s = cs(el)
+        const got = [s.paddingTop, s.paddingRight, s.paddingBottom, s.paddingLeft].map(px)
+        if (!got.every((g, i) => near(g, want[i], 0.5))) out.push(make("regions.inset", "padding", el, `${role}: ${want.join(" ")}px (${densityOf(el, o).name})`, `${got.map(f2).join(" ")}px`))
+      }
+      for (const el of els) {
+        const regions = [...el.children].filter((ch) => ch.hasAttribute("data-region"))
+        if (regions.length < 2) continue
+        const s = cs(el)
+        const pad = [s.paddingTop, s.paddingRight, s.paddingBottom, s.paddingLeft].map(px)
+        if (pad.some((p) => p > 0.5)) out.push(make("regions.shell", "padding", el, "0 (a shell divided into regions; each region owns its inset)", `${pad.map(f2).join(" ")}px`))
       }
 
       // 5. radius

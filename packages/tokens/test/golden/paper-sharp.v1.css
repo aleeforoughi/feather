@@ -81,6 +81,18 @@
   --dialog-pad: 2rem;
   --gap: 0.75rem;
   --group-gap: 1.5rem;
+  --inset-content-y: 1.25rem;
+  --inset-content-x: 2rem;
+  --inset-header-top: 1.5rem;
+  --inset-header-bottom: 1rem;
+  --inset-header-x: 2rem;
+  --inset-action: 1.25rem;
+  --inset-utility-y: 0.75rem;
+  --inset-utility-x: 1rem;
+  --inset-display: 2rem;
+  --gap-action: 0.5rem;
+  --gap-label: 0.5rem;
+  --gap-field: 1rem;
   --opacity-disabled: 0.5;
   --elevation-1: none;
   --elevation-2: none;
@@ -115,6 +127,18 @@
   --dialog-pad: 1.5rem;
   --gap: 0.5rem;
   --group-gap: 1rem;
+  --inset-content-y: 1rem;
+  --inset-content-x: 1.5rem;
+  --inset-header-top: 1.25rem;
+  --inset-header-bottom: 0.75rem;
+  --inset-header-x: 1.5rem;
+  --inset-action: 1rem;
+  --inset-utility-y: 0.5rem;
+  --inset-utility-x: 0.75rem;
+  --inset-display: 1.5rem;
+  --gap-action: 0.5rem;
+  --gap-label: 0.25rem;
+  --gap-field: 0.75rem;
 }
 
 [data-density="default"],
@@ -129,6 +153,18 @@
   --dialog-pad: 2rem;
   --gap: 0.75rem;
   --group-gap: 1.5rem;
+  --inset-content-y: 1.25rem;
+  --inset-content-x: 2rem;
+  --inset-header-top: 1.5rem;
+  --inset-header-bottom: 1rem;
+  --inset-header-x: 2rem;
+  --inset-action: 1.25rem;
+  --inset-utility-y: 0.75rem;
+  --inset-utility-x: 1rem;
+  --inset-display: 2rem;
+  --gap-action: 0.5rem;
+  --gap-label: 0.5rem;
+  --gap-field: 1rem;
 }
 
 [data-density="spacious"],
@@ -143,4 +179,16 @@
   --dialog-pad: 2.5rem;
   --gap: 1rem;
   --group-gap: 2rem;
+  --inset-content-y: 1.5rem;
+  --inset-content-x: 2.5rem;
+  --inset-header-top: 2rem;
+  --inset-header-bottom: 1.25rem;
+  --inset-header-x: 2.5rem;
+  --inset-action: 1.5rem;
+  --inset-utility-y: 1rem;
+  --inset-utility-x: 1.25rem;
+  --inset-display: 3rem;
+  --gap-action: 0.75rem;
+  --gap-label: 0.5rem;
+  --gap-field: 1.25rem;
 }

@@ -96,8 +96,6 @@ semantic density:
 | control padding (y × x) | 8 × 12 | 12 × 16 | 16 × 20 |
 | icon slot in a control | 16px | 20px | 24px |
 | container padding (y × x) | 12 × 16 | 16 × 24 | 24 × 32 |
-| card padding | 16px | 24px | 32px |
-| dialog padding | 24px | 32px | 40px |
 | element gap | 8px | 12px | 16px |
 | group gap | 16px | 24px | 32px |
 
@@ -145,6 +143,62 @@ No fourth height exists.
 - `default` and `icon` sizes follow the surrounding density; only `xs`, `sm` and `lg` (and their `icon-` twins)
   pin a height. A tight 36px control and a 16px
 checkbox reach it through an invisible extended hit area (`::after` inset), never by growing visually.
+
+## 3a. Regions: who owns the space
+
+Spacing comes from the **role of each region**, never mechanically from the parent or the neighbours. A
+container divided into semantic regions has **no padding of its own**: the shell gives structure, and every
+region owns its inset.
+
+```text
+Dialog (shell: padding 0)
+├── header   inset-header    directional: 24 above, 16 below, 32 at the sides
+├── content  inset-content   axis: 20 block, 32 inline
+└── action   inset-action    perimeter: 20 on every side
+               └── buttons   gap-action 8
+                     └── a button keeps its own control padding
+```
+
+**Four kinds of spacing.** Never collapse them into one value:
+
+| kind | owned by | tokens |
+|---|---|---|
+| component padding | the component (a button, an input) | `px-control`, `py-control` |
+| region inset | the region, by role | `inset-content`, `inset-header`, `inset-action`, `inset-utility`, `inset-display` |
+| inter-element gap | the parent of siblings | `gap-action` (button↔button), `gap-label` (label↔input), `gap-element` (heading↔body), `gap-field` (field↔field), `gap-group` |
+| region separation | the boundary | a divider, a surface change or a strong space. It starts a new spacing context. |
+
+**Region roles.** Mark each region with `data-region`; that tells the audit its pattern:
+
+| `data-region` | for | pattern | tight | default | spacious |
+|---|---|---|---|---|---|
+| `content` | body, forms, information, settings | **axis**: T = B, L = R, inline ≥ block | 16 / 24 | 20 / 32 | 24 / 40 |
+| `header` | a heading attached to what follows | **directional**: L = R, top > bottom | 20 · 24 · 12 | 24 · 32 · 16 | 32 · 40 · 20 |
+| `action` | footers, action bars, decisions | **perimeter**: T = R = B = L | 16 | 20 | 24 |
+| `utility` | toolbars, filters, metadata | **axis** | 8 / 12 | 12 / 16 | 16 / 20 |
+| `display` | empty states, presentation, centered panels | **perimeter** | 24 | 32 | 48 |
+
+Axis values are given as block / inline. Header values are top · sides · bottom. Gaps per density: action 8 · 8
+· 12, label 4 · 8 · 8, field 12 · 16 · 20, and heading↔body is the element gap (8 · 12 · 16).
+
+**Rules.**
+1. **Same role, same inset.** A dialog footer, a card's action area and a sheet footer all use `inset-action`.
+2. **Different role, new spacing context.** A divider or surface change resets ownership. The footer does not
+   inherit the body's 32px sides; its 20px perimeter balances the controls inside its own edges.
+3. **Equivalent edges match.** A perimeter region has all four sides equal, and an axis region has
+   top = bottom and left = right. Only a header is directional, and its asymmetry ties it to the content below.
+4. **A header attaches to the content below it.** When content follows a header directly with no boundary,
+   the content's top inset collapses to 0, and the header's bottom inset (16 by default) alone sets the
+   heading-to-body distance. A divider or surface change between them is a boundary (`data-boundary` on the
+   content region), and both insets stay.
+5. **A single-region surface** (a card that is only content) puts the region on the surface itself
+   (`data-region="content"` with `inset-content`). A surface with several regions keeps padding 0.
+6. **Ownership nests.** The shell owns structure, a region its inset, a group its gap, and a control its padding.
+7. **Optical correction comes last**, inside the §9 budget, only after the structural spacing is right.
+
+`p-card` and `p-dialog` are retired: a surface's spacing is always a region's. The rendered audit checks every
+`data-region` against its pattern and density values, and checks that a shell holding regions has no padding.
+Static hygiene checks that each region uses its inset utility.
 
 ## 4. Typography roles
 

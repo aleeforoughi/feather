@@ -1,6 +1,6 @@
 // Drives one rendered page through every check. Used for stories (audit.spec.ts) and for fixtures (selftest.spec.ts).
 import type { Page } from "@playwright/test"
-import { BORDER_WIDTHS, CONTROL_HEIGHT, CONTROL_HEIGHT_SET, CONTROL_SLOTS, CURVE, DENSITIES, FOCUS, ICON_SIZES, INTERACTIVE_SELECTOR, LINE_GRID, SIZE_HEIGHT, TARGET, TYPE_SIZES, WEIGHTS } from "./expected"
+import { REGION_INSETS, BORDER_WIDTHS, CONTROL_HEIGHT, CONTROL_HEIGHT_SET, CONTROL_SLOTS, CURVE, DENSITIES, FOCUS, ICON_SIZES, INTERACTIVE_SELECTOR, LINE_GRID, SIZE_HEIGHT, TARGET, TYPE_SIZES, WEIGHTS } from "./expected"
 import type { Density, ThemeSpec } from "./expected"
 import { install } from "./inpage"
 import type { Consts, Failure, InteractiveRef, StaticOpts } from "./inpage"
@@ -30,6 +30,7 @@ export const PROGRAMMATIC_CAP = 16
 const consts = (): Consts => ({
   controlSlots: CONTROL_SLOTS,
   controlHeights: CONTROL_HEIGHT_SET,
+  regionInsets: REGION_INSETS,
   sizeHeights: SIZE_HEIGHT,
   interactive: INTERACTIVE_SELECTOR,
   target: TARGET,

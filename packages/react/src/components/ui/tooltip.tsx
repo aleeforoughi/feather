@@ -49,7 +49,7 @@ function TooltipContent({
         <TooltipPrimitive.Popup
           data-slot="tooltip-content"
           className={cn(
-            "z-50 inline-flex w-fit max-w-xs items-center gap-2 rounded-xs bg-surface-inverse px-3 py-1 type-caption text-fg-inverse has-data-[slot=kbd]:pr-1 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-xs",
+            "z-50 inline-flex w-fit max-w-xs items-center gap-2 rounded-control bg-surface-inverse px-3 py-1 type-caption text-fg-inverse has-data-[slot=kbd]:pr-1 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-xs",
             tooltipMotion,
             className
           )}

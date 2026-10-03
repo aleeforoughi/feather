@@ -24,6 +24,20 @@
   `:has()`, so every component follows it without knowing where it sits. A list that insets its items by 4px is
   exactly concentric with them. The `pill` shape's cards and dialogs are now 16 and 20, and the rendered audit
   checks the hierarchy (`radius.nesting`).
+- **Spacing belongs to regions** (docs/visual-system.md §3a). A surface divided into regions (dialog, sheet, card,
+  the organism cards) has no padding of its own; each region owns an inset by role, scaled by density:
+  - content (axis, 20/32);
+  - header (directional: 24 above, 16 below);
+  - action (perimeter, 20 all sides);
+  - utility (axis, 12/16);
+  - display (perimeter, 32).
+
+  Gaps have roles too: action 8, label 8, field 16, heading↔body 12. Content directly under a header attaches to
+  it, so the heading sits 16px above the body. `p-card` and `p-dialog` are retired. New: `DialogBody` and
+  `SheetBody`. Hygiene checks that every region uses its inset; the audit checks each region's values and that
+  shells have no padding.
+- **Tooltip:** a surface's radius starts at the control radius, so tooltips are 8 and their arrow stays a step
+  tighter.
 - **Table:** a table wider than its container becomes a focusable, named region while it scrolls, so a keyboard
   user can reach it. Mono text made the comparison table scroll and exposed this.
 - **Gates.** Storybook opens in feather. Accessibility runs in all four reference themes, and visual regression

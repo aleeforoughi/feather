@@ -25,7 +25,7 @@ function variables(name) {
 
 /** Sizes, durations, radii and elevation are the system's own (the base layer below); a theme block carries only what a
  * brand chooses here: colors, fonts and heading weight. An unlayered size here would beat [data-density] on <html>. */
-const SYSTEM = /^--(spacing|control-|icon-slot|pad-|card-pad|dialog-pad|gap|group-gap|opacity-|elevation-|shadow-|duration-|ease-|motion-|radius-)/
+const SYSTEM = /^--(spacing|control-|icon-slot|pad-|card-pad|dialog-pad|inset-|gap|group-gap|opacity-|elevation-|shadow-|duration-|ease-|motion-|radius-)/
 const themed = (vars) => Object.fromEntries(Object.entries(vars).filter(([k]) => !SYSTEM.test(k)))
 
 /** The generated region: every themed variable, in light and in dark (complete, so hygiene can check every pair). */

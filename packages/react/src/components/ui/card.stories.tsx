@@ -19,7 +19,7 @@ const meta = {
       <CardContent>
         <p className="text-sm">Twelve tasks completed and three still in review.</p>
       </CardContent>
-      <CardFooter className="gap-2">
+      <CardFooter>
         <Button>View details</Button>
         <Button variant="ghost">Dismiss</Button>
       </CardFooter>

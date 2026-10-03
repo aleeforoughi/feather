@@ -89,7 +89,7 @@ export function Showcase() {
               <Progress value={64} />
               <p className="text-sm text-muted-foreground">64% complete</p>
             </CardContent>
-            <CardFooter className="gap-2">
+            <CardFooter>
               <Button>
                 <Sparkles /> Continue
               </Button>
