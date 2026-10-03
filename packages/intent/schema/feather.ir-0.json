@@ -129,14 +129,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -159,12 +157,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -173,7 +171,7 @@
         "text": {
           "description": "The words.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         }
       },
       "required": [
@@ -192,14 +190,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -222,12 +218,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -240,7 +236,7 @@
         "label": {
           "description": "The words for the act; defaults to the intent.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 60
         }
       },
@@ -260,14 +256,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -290,12 +284,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -308,7 +302,7 @@
         "prompt": {
           "description": "The question.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "options": {
           "description": "The options, at least two, ids unique.",
@@ -319,18 +313,18 @@
               "id": {
                 "description": "Unique among the options.",
                 "type": "string",
-                "minLength": 1,
+                "pattern": "\\S",
                 "maxLength": 64
               },
               "label": {
                 "description": "The words for it.",
                 "type": "string",
-                "minLength": 1
+                "pattern": "\\S"
               },
               "description": {
                 "description": "One line more.",
                 "type": "string",
-                "minLength": 1
+                "pattern": "\\S"
               }
             },
             "required": [
@@ -350,7 +344,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "pattern": "\\S"
           }
         }
       },
@@ -372,14 +366,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -402,12 +394,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -420,7 +412,7 @@
         "prompt": {
           "description": "The question.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "kind": {
           "description": "What kind of value.",
@@ -483,14 +475,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -513,12 +503,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -536,7 +526,7 @@
         "label": {
           "description": "What the amount is.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "period": {
           "description": "How often it is charged. Default once.",
@@ -567,14 +557,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -597,12 +585,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -611,12 +599,12 @@
         "name": {
           "description": "Their name.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "role": {
           "description": "What they do here.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "kind": {
           "description": "Default human.",
@@ -642,14 +630,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -672,12 +658,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -694,7 +680,7 @@
         "label": {
           "description": "What the date is.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         }
       },
       "required": [
@@ -713,14 +699,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -743,12 +727,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -757,12 +741,12 @@
         "name": {
           "description": "Its name.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "address": {
           "description": "Postal address.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "coordinates": {
           "description": "Latitude and longitude.",
@@ -804,14 +788,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -834,12 +816,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -859,7 +841,7 @@
         "label": {
           "description": "What is in that state.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         }
       },
       "required": [
@@ -879,14 +861,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -909,12 +889,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -923,7 +903,7 @@
         "label": {
           "description": "What is progressing.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "value": {
           "description": "0 to 1.",
@@ -940,13 +920,13 @@
               "id": {
                 "description": "Unique among the steps.",
                 "type": "string",
-                "minLength": 1,
+                "pattern": "\\S",
                 "maxLength": 64
               },
               "label": {
                 "description": "The step.",
                 "type": "string",
-                "minLength": 1
+                "pattern": "\\S"
               },
               "state": {
                 "description": "Where it stands.",
@@ -983,14 +963,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1013,12 +991,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1036,27 +1014,27 @@
         "src": {
           "description": "Where it is (URL).",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "alt": {
           "description": "Required for image and video: what it shows.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "transcript": {
           "description": "Required for audio; for video, this or captions.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "captions": {
           "description": "URL of a caption track (WebVTT), for video.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "caption": {
           "description": "A visible caption.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         }
       },
       "required": [
@@ -1076,14 +1054,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1106,12 +1082,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1120,7 +1096,7 @@
         "text": {
           "description": "What happened.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "of": {
           "description": "The node whose act this confirms.",
@@ -1143,14 +1119,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1173,12 +1147,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1187,7 +1161,7 @@
         "text": {
           "description": "The risk.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "severity": {
           "description": "Default caution.",
@@ -1217,14 +1191,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1247,12 +1219,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1265,7 +1237,7 @@
         "request": {
           "description": "What is being asked.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "requester": {
           "description": "The Person node asking.",
@@ -1274,7 +1246,7 @@
         "scope": {
           "description": "What the approval covers.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "consequence": {
           "description": "What the act does, stated so it can be shown verbatim. At least one entry.",
@@ -1307,7 +1279,7 @@
                 "audience": {
                   "description": "Who will see it.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1322,12 +1294,12 @@
                 "to": {
                   "description": "The recipient.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 },
                 "channel": {
                   "description": "How: email, SMS…",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1342,12 +1314,12 @@
                 "to": {
                   "description": "Who receives it.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 },
                 "scope": {
                   "description": "What it covers.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1363,7 +1335,7 @@
                 "what": {
                   "description": "What.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1374,7 +1346,7 @@
             "statement": {
               "description": "The consequence in the caller's own words.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1398,14 +1370,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1428,12 +1398,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1446,7 +1416,7 @@
         "summary": {
           "description": "The recommendation, in one line.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "confidence": {
           "description": "0 to 1.",
@@ -1485,7 +1455,7 @@
                 "audience": {
                   "description": "Who will see it.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1500,12 +1470,12 @@
                 "to": {
                   "description": "The recipient.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 },
                 "channel": {
                   "description": "How: email, SMS…",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1520,12 +1490,12 @@
                 "to": {
                   "description": "Who receives it.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 },
                 "scope": {
                   "description": "What it covers.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1541,7 +1511,7 @@
                 "what": {
                   "description": "What.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -1552,7 +1522,7 @@
             "statement": {
               "description": "The consequence in the caller's own words.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1576,14 +1546,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1606,12 +1574,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1624,12 +1592,12 @@
         "option": {
           "description": "The predicted option's id in that Choice.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "summary": {
           "description": "Why, in one line.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "confidence": {
           "description": "0 to 1.",
@@ -1656,14 +1624,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1686,12 +1652,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1700,7 +1666,7 @@
         "label": {
           "description": "The words for it; defaults to the intent.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 60
         },
         "for": {
@@ -1734,14 +1700,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1764,12 +1728,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1782,14 +1746,14 @@
         "summary": {
           "description": "The tradeoff, in one line.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "gains": {
           "description": "What it gains.",
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "pattern": "\\S"
           }
         },
         "costs": {
@@ -1797,7 +1761,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "pattern": "\\S"
           }
         }
       },
@@ -1816,14 +1780,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1846,12 +1808,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1860,7 +1822,7 @@
         "summary": {
           "description": "What was decided, in one line.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "of": {
           "description": "The node decided on.",
@@ -1889,14 +1851,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1919,12 +1879,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -1937,12 +1897,12 @@
         "prompt": {
           "description": "The question.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "original": {
           "description": "What was understood, in words.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         }
       },
       "required": [
@@ -1963,14 +1923,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -1993,12 +1951,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -2007,12 +1965,12 @@
         "key": {
           "description": "The caller's name for the setting.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "label": {
           "description": "The words for it.",
           "type": "string",
-          "minLength": 1
+          "pattern": "\\S"
         },
         "value": {
           "description": "The current value.",
@@ -2054,14 +2012,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -2084,12 +2040,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -2112,7 +2068,7 @@
               "label": {
                 "description": "The criterion.",
                 "type": "string",
-                "minLength": 1
+                "pattern": "\\S"
               },
               "values": {
                 "description": "One value per compared node id.",
@@ -2152,14 +2108,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -2172,8 +2126,8 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
-          "type": "boolean"
+          "description": "Always false: this act cannot be undone.",
+          "const": false
         },
         "expandable": {
           "description": "Detail on demand, behind \"Why?\". At least one entry.",
@@ -2182,12 +2136,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -2200,7 +2154,7 @@
         "label": {
           "description": "The words for the act; defaults to the intent.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 60
         },
         "consequence": {
@@ -2234,7 +2188,7 @@
                 "audience": {
                   "description": "Who will see it.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -2249,12 +2203,12 @@
                 "to": {
                   "description": "The recipient.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 },
                 "channel": {
                   "description": "How: email, SMS…",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -2269,12 +2223,12 @@
                 "to": {
                   "description": "Who receives it.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 },
                 "scope": {
                   "description": "What it covers.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -2290,7 +2244,7 @@
                 "what": {
                   "description": "What.",
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\S"
                 }
               },
               "required": [
@@ -2301,7 +2255,7 @@
             "statement": {
               "description": "The consequence in the caller's own words.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -2325,14 +2279,12 @@
         },
         "id": {
           "description": "Stable within the experience; replies and references use it.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
+          "$ref": "#/$defs/id"
         },
         "intent": {
           "description": "What the human is doing here, in a few words. Required on act nodes.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 120
         },
         "importance": {
@@ -2355,12 +2307,12 @@
             "why": {
               "description": "The reason, in a sentence or two.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             },
             "detail": {
               "description": "Longer supporting detail.",
               "type": "string",
-              "minLength": 1
+              "pattern": "\\S"
             }
           },
           "minProperties": 1,
@@ -2369,7 +2321,7 @@
         "label": {
           "description": "The words for it; defaults to the intent.",
           "type": "string",
-          "minLength": 1,
+          "pattern": "\\S",
           "maxLength": 60
         },
         "topics": {
@@ -2377,7 +2329,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "pattern": "\\S"
           }
         }
       },

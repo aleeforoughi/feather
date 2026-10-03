@@ -1,0 +1,12 @@
+{
+  "description": "Approval for data access with a consent consequence.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "approve_data_access",
+    "nodes": [
+      {"type": "Person", "id": "requester", "name": "Analytics Team", "role": "data analyst", "kind": "agent"},
+      {"type": "Text", "id": "context", "text": "The Analytics Team is requesting permission to analyze your usage data."},
+      {"type": "Approval", "id": "approve", "intent": "grant data access", "request": "Allow analytics team to process your usage data", "requester": "requester", "scope": "Historical usage patterns for the past 6 months", "consequence": {"consent": {"to": "Analytics Team", "scope": "usage data analysis"}}, "primary": true}
+    ]
+  }
+}

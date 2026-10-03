@@ -1,0 +1,13 @@
+{
+  "description": "Reading a news article with explore more options.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "read_article",
+    "nodes": [
+      {"type": "Text", "id": "headline", "text": "New AI Model Shows Promise in Medical Diagnosis"},
+      {"type": "Text", "id": "byline", "text": "Published October 3, 2026 · 5 minute read"},
+      {"type": "Text", "id": "excerpt", "text": "Researchers have developed an AI system that can diagnose certain diseases with accuracy comparable to experienced physicians..."},
+      {"type": "ExploreMore", "id": "explore", "intent": "read more", "label": "Explore related topics", "topics": ["artificial intelligence", "medical research", "healthcare technology", "similar articles"]}
+    ]
+  }
+}

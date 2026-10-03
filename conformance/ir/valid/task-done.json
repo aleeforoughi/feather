@@ -1,0 +1,12 @@
+{
+  "description": "A completed task status.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "task_completed",
+    "nodes": [
+      {"type": "Status", "id": "stat", "state": "done", "label": "Export completed"},
+      {"type": "Confirmation", "id": "conf", "text": "Your data export has completed. Download your file now."},
+      {"type": "Action", "id": "download", "intent": "download file", "label": "Download"}
+    ]
+  }
+}

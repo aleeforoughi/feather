@@ -1,0 +1,19 @@
+{
+  "description": "Setting a budget with input, reference prices, and comparison.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "set_marketing_budget",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Set your marketing budget for this quarter."},
+      {"type": "Input", "id": "budget", "intent": "set budget", "prompt": "What is your total budget?", "kind": "money", "currency": "USD", "min": 1000, "max": 100000, "value": 5000, "required": true},
+      {"type": "Price", "id": "typical_low", "amount": 2000, "currency": "USD", "label": "Typical small campaign"},
+      {"type": "Price", "id": "typical_mid", "amount": 5000, "currency": "USD", "label": "Typical mid campaign"},
+      {"type": "Price", "id": "typical_high", "amount": 10000, "currency": "USD", "label": "Typical large campaign"},
+      {"type": "Comparison", "id": "comp", "items": ["typical_low", "typical_mid", "typical_high"], "criteria": [
+        {"label": "Reach", "values": {"typical_low": "10k people", "typical_mid": "50k people", "typical_high": "200k people"}},
+        {"label": "Duration", "values": {"typical_low": "1 week", "typical_mid": "2 weeks", "typical_high": "4 weeks"}}
+      ]},
+      {"type": "Action", "id": "confirm", "intent": "confirm budget", "label": "Set budget", "primary": true}
+    ]
+  }
+}

@@ -1,13 +1,34 @@
 {
-  "description": "Node referencing itself.",
+  "description": "The correction targets itself instead of the address it corrects.",
   "expect": [
-    {"code": "self-reference", "path": "/nodes/0/target"}
+    {
+      "code": "self-reference",
+      "path": "/nodes/2/target"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "verify_shipping_address",
     "nodes": [
-      {"type": "Correction", "id": "n1", "intent": "correct", "target": "n1", "prompt": "What did you mean?"}
+      {
+        "type": "Text",
+        "id": "context",
+        "text": "We understood your shipping address as:"
+      },
+      {
+        "type": "Location",
+        "id": "understood_address",
+        "name": "Downtown Dubai",
+        "address": "123 Sheikh Zayed Road, Dubai, UAE"
+      },
+      {
+        "type": "Correction",
+        "id": "correct_address",
+        "intent": "verify address",
+        "target": "correct_address",
+        "prompt": "Is this correct? If not, what is your actual address?",
+        "original": "Downtown Dubai - Sheikh Zayed Road"
+      }
     ]
   }
 }

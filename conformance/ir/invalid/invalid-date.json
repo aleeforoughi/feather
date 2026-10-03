@@ -1,13 +1,60 @@
 {
-  "description": "Invalid date format.",
+  "description": "The appointment is on a day that does not exist (October 32).",
   "expect": [
-    {"code": "invalid-date", "path": "/nodes/0/value"}
+    {
+      "code": "invalid-date",
+      "path": "/nodes/2/value"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "book_consultation",
     "nodes": [
-      {"type": "Date", "id": "n1", "value": "not-a-date"}
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "Schedule your consultation with Dr. Patel."
+      },
+      {
+        "type": "Person",
+        "id": "doctor",
+        "name": "Dr. Patel",
+        "role": "medical consultant",
+        "kind": "agent"
+      },
+      {
+        "type": "Date",
+        "id": "appointment_time",
+        "value": "2026-10-32T14:00:00+04:00",
+        "label": "Appointment time"
+      },
+      {
+        "type": "Location",
+        "id": "clinic",
+        "name": "Downtown Medical Center",
+        "address": "123 Health Ave, Dubai",
+        "coordinates": {
+          "lat": 25.2048,
+          "lng": 55.2708
+        }
+      },
+      {
+        "type": "Input",
+        "id": "duration",
+        "intent": "select duration",
+        "prompt": "How long do you need (minutes)?",
+        "kind": "number",
+        "min": 30,
+        "max": 120,
+        "value": 30
+      },
+      {
+        "type": "Action",
+        "id": "book",
+        "intent": "confirm booking",
+        "label": "Confirm appointment",
+        "primary": true
+      }
     ]
   }
 }

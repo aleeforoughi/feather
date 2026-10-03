@@ -1,0 +1,72 @@
+{
+  "description": "The recipe's audio guide has no transcript, so it cannot reach someone who cannot hear it.",
+  "expect": [
+    {
+      "code": "missing-text-equivalent",
+      "path": "/nodes/1"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "cooking_step_three",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "step",
+        "text": "Step 3: Prepare the sauce"
+      },
+      {
+        "type": "Media",
+        "id": "audio_guide",
+        "kind": "audio",
+        "src": "https://example.com/audio/step3.mp3"
+      },
+      {
+        "type": "Media",
+        "id": "video_demo",
+        "kind": "video",
+        "src": "https://example.com/video/step3.mp4",
+        "alt": "Chef mixing oil and garlic in a pan",
+        "captions": "https://example.com/video/step3.vtt"
+      },
+      {
+        "type": "Input",
+        "id": "portions",
+        "intent": "specify portions",
+        "prompt": "How many portions are you making?",
+        "kind": "number",
+        "min": 1,
+        "max": 12,
+        "value": 4
+      },
+      {
+        "type": "Progress",
+        "id": "cooking_progress",
+        "label": "Cooking progress",
+        "steps": [
+          {
+            "id": "prep",
+            "label": "Prep ingredients",
+            "state": "done"
+          },
+          {
+            "id": "sauce",
+            "label": "Make sauce",
+            "state": "active"
+          },
+          {
+            "id": "cook",
+            "label": "Cook main dish",
+            "state": "pending"
+          }
+        ]
+      },
+      {
+        "type": "Action",
+        "id": "next",
+        "intent": "continue",
+        "label": "Next step"
+      }
+    ]
+  }
+}

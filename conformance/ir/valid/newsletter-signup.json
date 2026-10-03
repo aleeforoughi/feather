@@ -1,0 +1,13 @@
+{
+  "description": "Newsletter signup with email and frequency preference.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "newsletter_subscription",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Stay updated with our weekly digest"},
+      {"type": "Input", "id": "email", "intent": "provide email", "prompt": "Your email address", "kind": "email", "required": true, "value": ""},
+      {"type": "Preference", "id": "frequency", "intent": "choose frequency", "key": "newsletter_frequency", "label": "How often?", "value": "weekly", "options": ["daily", "weekly", "monthly"]},
+      {"type": "Action", "id": "subscribe", "intent": "subscribe", "label": "Subscribe", "primary": true}
+    ]
+  }
+}

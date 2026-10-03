@@ -1,14 +1,59 @@
 {
-  "description": "Multiple nodes marked as primary.",
+  "description": "Both the recommendation and the spend are marked as the primary act.",
   "expect": [
-    {"code": "multiple-primary", "path": "/nodes/1/primary"}
+    {
+      "code": "multiple-primary",
+      "path": "/nodes/2/primary"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "approve_campaign",
     "nodes": [
-      {"type": "Action", "id": "a1", "intent": "action 1", "primary": true},
-      {"type": "Action", "id": "a2", "intent": "action 2", "primary": true}
+      {
+        "type": "Recommendation",
+        "id": "rec",
+        "intent": "launch the recommended test",
+        "importance": "high",
+        "reversible": false,
+        "summary": "Recommended test: 7 days, purchase objective",
+        "expandable": {
+          "why": "Enough to test three creative directions without overspending."
+        },
+        "primary": true
+      },
+      {
+        "type": "Price",
+        "id": "cap",
+        "amount": 1050,
+        "currency": "AED",
+        "label": "Maximum spend"
+      },
+      {
+        "type": "IrreversibleAction",
+        "id": "go",
+        "intent": "confirm spend",
+        "importance": "critical",
+        "reversible": false,
+        "consequence": {
+          "spend": {
+            "amount": 1050,
+            "currency": "AED"
+          }
+        },
+        "primary": true
+      },
+      {
+        "type": "Alternative",
+        "id": "less",
+        "intent": "spend less"
+      },
+      {
+        "type": "Alternative",
+        "id": "own",
+        "intent": "set my own budget",
+        "input": "Price"
+      }
     ]
   }
 }

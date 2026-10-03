@@ -1,0 +1,54 @@
+{
+  "description": "The campaign launch from docs/PLAN.md with its links made explicit: the spend is the primary act and both alternatives point at the recommendation.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "approve_campaign_linked",
+    "nodes": [
+      {
+        "type": "Recommendation",
+        "id": "rec",
+        "intent": "launch the recommended test",
+        "importance": "high",
+        "reversible": false,
+        "summary": "Recommended test: 7 days, purchase objective",
+        "expandable": {
+          "why": "Enough to test three creative directions without overspending."
+        }
+      },
+      {
+        "type": "Price",
+        "id": "cap",
+        "amount": 1050,
+        "currency": "AED",
+        "label": "Maximum spend"
+      },
+      {
+        "type": "IrreversibleAction",
+        "id": "go",
+        "intent": "confirm spend",
+        "importance": "critical",
+        "reversible": false,
+        "consequence": {
+          "spend": {
+            "amount": 1050,
+            "currency": "AED"
+          }
+        },
+        "primary": true
+      },
+      {
+        "type": "Alternative",
+        "id": "less",
+        "intent": "spend less",
+        "for": "rec"
+      },
+      {
+        "type": "Alternative",
+        "id": "own",
+        "intent": "set my own budget",
+        "for": "rec",
+        "input": "Price"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "description": "Upload a photo with preview and crop options.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "upload_profile_photo",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Upload a profile photo."},
+      {"type": "Media", "id": "preview", "kind": "image", "src": "https://example.com/photos/preview.jpg", "alt": "Selected profile photo for upload"},
+      {"type": "Choice", "id": "crop_choice", "intent": "choose crop", "prompt": "Crop your photo?", "options": [
+        {"id": "auto", "label": "Auto-crop (recommended)"},
+        {"id": "square", "label": "Square (1:1)"},
+        {"id": "keep", "label": "Keep original"}
+      ], "selected": ["auto"]},
+      {"type": "Action", "id": "confirm", "intent": "confirm upload", "label": "Set as profile photo", "primary": true}
+    ]
+  }
+}

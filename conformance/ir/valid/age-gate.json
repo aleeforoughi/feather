@@ -1,0 +1,12 @@
+{
+  "description": "Age verification with date input.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "verify_age",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "Please verify your age to continue."},
+      {"type": "Input", "id": "birthdate", "intent": "enter birthdate", "prompt": "When were you born?", "kind": "date", "required": true},
+      {"type": "Action", "id": "verify", "intent": "verify", "label": "Continue", "primary": true}
+    ]
+  }
+}

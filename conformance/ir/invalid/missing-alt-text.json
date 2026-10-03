@@ -1,0 +1,58 @@
+{
+  "description": "The tutorial video has captions but no alt text saying what it shows.",
+  "expect": [
+    {
+      "code": "missing-text-equivalent",
+      "path": "/nodes/1"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "watch_tutorial",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "title",
+        "text": "Getting started with the editor: Advanced techniques"
+      },
+      {
+        "type": "Media",
+        "id": "video",
+        "kind": "video",
+        "src": "https://example.com/tutorials/advanced.mp4",
+        "captions": "https://example.com/tutorials/advanced.vtt"
+      },
+      {
+        "type": "Progress",
+        "id": "progress",
+        "label": "Video playback"
+      },
+      {
+        "type": "Choice",
+        "id": "feedback",
+        "intent": "rate tutorial",
+        "prompt": "Was this helpful?",
+        "options": [
+          {
+            "id": "yes",
+            "label": "Yes, very helpful"
+          },
+          {
+            "id": "partial",
+            "label": "Somewhat helpful"
+          },
+          {
+            "id": "no",
+            "label": "Not helpful"
+          }
+        ]
+      },
+      {
+        "type": "Action",
+        "id": "next",
+        "intent": "continue learning",
+        "label": "Next tutorial"
+      }
+    ]
+  }
+}

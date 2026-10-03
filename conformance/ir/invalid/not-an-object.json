@@ -1,7 +1,16 @@
 {
-  "description": "The IR is not a JSON object.",
+  "description": "A caller sends the node list alone, without the experience around it.",
   "expect": [
-    {"code": "not-an-object", "path": ""}
+    {
+      "code": "not-an-object",
+      "path": ""
+    }
   ],
-  "ir": "not an object"
+  "ir": [
+    {
+      "type": "Text",
+      "id": "msg",
+      "text": "Your payment has been received and will be processed within 24 hours."
+    }
+  ]
 }

@@ -1,0 +1,12 @@
+{
+  "description": "An error state with status, warning, and recovery action.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "payment_failed",
+    "nodes": [
+      {"type": "Status", "id": "stat", "state": "failed", "label": "Payment processing"},
+      {"type": "Warning", "id": "warn", "text": "Your card was declined. Please check the card number and expiration date.", "severity": "danger", "importance": "high", "acknowledge": true},
+      {"type": "Action", "id": "retry", "intent": "try payment again", "label": "Try another card", "primary": true}
+    ]
+  }
+}

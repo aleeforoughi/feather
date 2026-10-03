@@ -1,14 +1,89 @@
 {
-  "description": "Tradeoff with no gains or costs.",
+  "description": "A tradeoff names neither gains nor costs.",
   "expect": [
-    {"code": "empty-tradeoff", "path": "/nodes/1"}
+    {
+      "code": "empty-tradeoff",
+      "path": "/nodes/4"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "book_flight",
     "nodes": [
-      {"type": "Choice", "id": "n1", "intent": "choose", "prompt": "Pick", "options": [{"id": "opt1", "label": "A"}, {"id": "opt2", "label": "B"}]},
-      {"type": "Tradeoff", "id": "n2"}
+      {
+        "type": "Text",
+        "id": "trip",
+        "text": "Flights from Dubai to New York on October 15"
+      },
+      {
+        "type": "Recommendation",
+        "id": "recommended_flight",
+        "intent": "recommend flight",
+        "summary": "Emirates EK-001: Departs 2pm, arrives 6pm next day (direct)",
+        "confidence": 0.88
+      },
+      {
+        "type": "Price",
+        "id": "price_rec",
+        "amount": 850,
+        "currency": "USD",
+        "label": "Recommended price"
+      },
+      {
+        "type": "Alternative",
+        "id": "alt_early",
+        "intent": "early departure",
+        "for": "recommended_flight",
+        "label": "Early morning (7am)"
+      },
+      {
+        "type": "Tradeoff",
+        "id": "trade_early",
+        "of": "alt_early",
+        "summary": "Early flight gets you there faster but requires waking up early"
+      },
+      {
+        "type": "Alternative",
+        "id": "alt_budget",
+        "intent": "budget option",
+        "for": "recommended_flight",
+        "label": "Budget with connection"
+      },
+      {
+        "type": "Tradeoff",
+        "id": "trade_budget",
+        "of": "alt_budget",
+        "summary": "Budget flights save money but take longer",
+        "gains": [
+          "$200 cheaper",
+          "Better flight time"
+        ],
+        "costs": [
+          "One connection",
+          "Arrive next morning"
+        ]
+      },
+      {
+        "type": "Choice",
+        "id": "select_flight",
+        "intent": "choose flight",
+        "prompt": "Which flight do you prefer?",
+        "options": [
+          {
+            "id": "rec",
+            "label": "Recommended - 2pm direct"
+          },
+          {
+            "id": "early",
+            "label": "Early - 7am direct"
+          },
+          {
+            "id": "budget",
+            "label": "Budget - 8pm with connection"
+          }
+        ],
+        "primary": true
+      }
     ]
   }
 }

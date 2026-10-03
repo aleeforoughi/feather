@@ -1,0 +1,12 @@
+{
+  "description": "A task in waiting state.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "task_status",
+    "nodes": [
+      {"type": "Text", "id": "task_name", "text": "Your content review is pending"},
+      {"type": "Status", "id": "stat", "state": "waiting", "label": "Waiting for team approval"},
+      {"type": "Text", "id": "note", "text": "Your submission has been received. A moderator will review it within 24 hours.", "importance": "low"}
+    ]
+  }
+}

@@ -1,11 +1,14 @@
 {
-  "description": "Experience with no nodes.",
+  "description": "An experience with no nodes.",
   "expect": [
-    {"code": "empty-experience", "path": "/nodes"}
+    {
+      "code": "empty-experience",
+      "path": "/nodes"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "payment_received",
     "nodes": []
   }
 }

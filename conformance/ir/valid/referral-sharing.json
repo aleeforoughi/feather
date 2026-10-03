@@ -1,0 +1,16 @@
+{
+  "description": "Share a referral link with friends.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "share_referral",
+    "nodes": [
+      {"type": "Text", "id": "heading", "text": "Earn rewards by inviting friends!"},
+      {"type": "Price", "id": "reward", "amount": 10, "currency": "USD", "label": "You get $10 credit per referral"},
+      {"type": "Choice", "id": "share_method", "intent": "choose sharing method", "prompt": "How would you like to share?", "options": [
+        {"id": "email", "label": "Share by email"},
+        {"id": "link", "label": "Copy link"},
+        {"id": "social", "label": "Share on social media"}
+      ], "primary": true}
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "description": "The account-creation act has no intent, so voice and text manifestations would not know what it does.",
+  "expect": [
+    {
+      "code": "missing-field",
+      "path": "/nodes/3/intent"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "user_signup",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "welcome",
+        "text": "Create your account in two steps."
+      },
+      {
+        "type": "Input",
+        "id": "email",
+        "intent": "provide email",
+        "prompt": "What is your email address?",
+        "kind": "email",
+        "required": true
+      },
+      {
+        "type": "Input",
+        "id": "phone",
+        "intent": "provide phone",
+        "prompt": "Your phone number for verification",
+        "kind": "phone",
+        "required": true
+      },
+      {
+        "type": "Action",
+        "id": "create",
+        "label": "Create account",
+        "primary": true
+      }
+    ]
+  }
+}

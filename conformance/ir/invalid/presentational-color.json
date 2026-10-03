@@ -1,0 +1,48 @@
+{
+  "description": "The caller tries to color the delivery choice green; colors are Feather's decision.",
+  "expect": [
+    {
+      "code": "presentational-field",
+      "path": "/nodes/1/color"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "pick_delivery_speed",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "ctx",
+        "text": "How quickly do you need your order?"
+      },
+      {
+        "type": "Choice",
+        "id": "speed",
+        "intent": "choose delivery speed",
+        "prompt": "Select your preferred delivery speed",
+        "options": [
+          {
+            "id": "std",
+            "label": "Standard (5-7 days)",
+            "description": "Free shipping"
+          },
+          {
+            "id": "fast",
+            "label": "Express (2-3 days)",
+            "description": "5% surcharge"
+          },
+          {
+            "id": "next",
+            "label": "Next day",
+            "description": "Premium service"
+          }
+        ],
+        "selected": [
+          "std"
+        ],
+        "primary": true,
+        "color": "green"
+      }
+    ]
+  }
+}

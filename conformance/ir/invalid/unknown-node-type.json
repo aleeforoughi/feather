@@ -1,11 +1,55 @@
 {
-  "description": "Node with unknown type.",
+  "description": "A misspelled node type in an order update (Stauts for Status).",
   "expect": [
-    {"code": "unknown-node-type", "path": "/nodes/0/type"}
+    {
+      "code": "unknown-node-type",
+      "path": "/nodes/1/type"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
-    "nodes": [{"type": "BadNodeType", "id": "n1"}]
+    "experience": "order_tracking",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "order_id",
+        "text": "Order #ORD-2026-001234 - Your package is on its way"
+      },
+      {
+        "type": "Stauts",
+        "id": "delivery_status",
+        "state": "working",
+        "label": "In transit for delivery"
+      },
+      {
+        "type": "Person",
+        "id": "driver",
+        "name": "Mohammed",
+        "role": "delivery driver",
+        "kind": "agent"
+      },
+      {
+        "type": "Location",
+        "id": "current_location",
+        "name": "Business Bay, Dubai",
+        "coordinates": {
+          "lat": 25.1967,
+          "lng": 55.2722
+        }
+      },
+      {
+        "type": "Date",
+        "id": "delivery_window",
+        "value": "2026-10-05",
+        "until": "2026-10-06",
+        "label": "Expected delivery"
+      },
+      {
+        "type": "Action",
+        "id": "track",
+        "intent": "view tracking",
+        "label": "See full timeline"
+      }
+    ]
   }
 }

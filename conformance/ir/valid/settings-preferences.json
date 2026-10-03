@@ -1,0 +1,13 @@
+{
+  "description": "User settings with multiple preference toggles.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "update_preferences",
+    "nodes": [
+      {"type": "Text", "id": "header", "text": "Customize your experience"},
+      {"type": "Preference", "id": "theme", "intent": "set theme", "key": "color_theme", "label": "Color theme", "value": "light", "options": ["light", "dark", "auto"]},
+      {"type": "Preference", "id": "density", "intent": "set density", "key": "ui_density", "label": "Interface density", "value": "comfortable", "options": ["compact", "comfortable", "spacious"]},
+      {"type": "Preference", "id": "notifications", "intent": "toggle notifications", "key": "push_enabled", "label": "Push notifications", "value": true}
+    ]
+  }
+}

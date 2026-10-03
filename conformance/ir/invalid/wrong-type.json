@@ -1,13 +1,42 @@
 {
-  "description": "Field with wrong data type.",
+  "description": "The license price arrives as a string.",
   "expect": [
-    {"code": "wrong-type", "path": "/nodes/0/amount"}
+    {
+      "code": "wrong-type",
+      "path": "/nodes/2/amount"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "purchase_approval",
     "nodes": [
-      {"type": "Price", "id": "n1", "amount": "not a number", "currency": "USD"}
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "You have a request to purchase software."
+      },
+      {
+        "type": "Person",
+        "id": "req",
+        "name": "Finance Manager",
+        "role": "approver"
+      },
+      {
+        "type": "Price",
+        "id": "cost",
+        "amount": "2500.00",
+        "currency": "USD",
+        "label": "Annual license"
+      },
+      {
+        "type": "Approval",
+        "id": "approve",
+        "intent": "review and decide",
+        "request": "Approve the purchase of professional software",
+        "requester": "req",
+        "scope": "Annual software license for the team",
+        "primary": true
+      }
     ]
   }
 }

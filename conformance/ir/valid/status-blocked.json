@@ -1,0 +1,12 @@
+{
+  "description": "A blocked status with explanation and action.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "payment_status",
+    "nodes": [
+      {"type": "Status", "id": "stat", "state": "blocked", "label": "Payment is blocked and requires verification"},
+      {"type": "Text", "id": "reason", "text": "For security reasons, we need to verify this transaction."},
+      {"type": "Action", "id": "verify", "intent": "verify identity", "label": "Start verification", "primary": true}
+    ]
+  }
+}

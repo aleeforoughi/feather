@@ -1,0 +1,16 @@
+{
+  "description": "System predicts user choice and shows confidence.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "predict_preference",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Based on your history, we think you'll like:"},
+      {"type": "Choice", "id": "category", "intent": "select category", "prompt": "What would you like to explore?", "options": [
+        {"id": "tech", "label": "Technology news"},
+        {"id": "sport", "label": "Sports updates"},
+        {"id": "music", "label": "Music releases"}
+      ]},
+      {"type": "PredictedChoice", "id": "pred", "intent": "predict tech", "of": "category", "option": "tech", "summary": "You've read 15 tech articles this week", "confidence": 0.78}
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "description": "An Arabic-speaking customer approves a cash-on-delivery order; every word is Arabic and the layout will run right to left.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "confirm_cod_order",
+    "locale": "ar-AE",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "greeting",
+        "text": "طلبك جاهز للتأكيد."
+      },
+      {
+        "type": "Price",
+        "id": "total",
+        "amount": 185.5,
+        "currency": "AED",
+        "label": "المبلغ عند الاستلام"
+      },
+      {
+        "type": "Date",
+        "id": "window",
+        "value": "2026-10-04T10:00:00+04:00",
+        "until": "2026-10-04T14:00:00+04:00",
+        "label": "موعد التوصيل"
+      },
+      {
+        "type": "Location",
+        "id": "address",
+        "name": "المنزل",
+        "address": "شارع الوصل، جميرا ١، دبي"
+      },
+      {
+        "type": "IrreversibleAction",
+        "id": "place_order",
+        "intent": "تأكيد الطلب",
+        "label": "أكّد الطلب",
+        "primary": true,
+        "consequence": {
+          "spend": {
+            "amount": 185.5,
+            "currency": "AED"
+          },
+          "statement": "سيصل المندوب ويطلب المبلغ نقدًا عند التسليم."
+        }
+      },
+      {
+        "type": "Alternative",
+        "id": "change_address",
+        "intent": "تغيير العنوان",
+        "input": "Location"
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "description": "An assistant booking a dinner table has every fact but one: how many people. It asks only for that.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "book_table_party_size",
+    "locale": "en",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "context",
+        "text": "Table at Zuma on Friday at 8 pm. One thing missing:"
+      },
+      {
+        "type": "Location",
+        "id": "restaurant",
+        "name": "Zuma Dubai",
+        "address": "Gate Village 06, DIFC, Dubai"
+      },
+      {
+        "type": "Date",
+        "id": "slot",
+        "value": "2026-10-09T20:00:00+04:00",
+        "label": "Friday dinner"
+      },
+      {
+        "type": "Input",
+        "id": "party_size",
+        "intent": "say how many people",
+        "prompt": "How many people?",
+        "kind": "number",
+        "required": true,
+        "min": 1,
+        "max": 12,
+        "primary": true,
+        "expandable": {
+          "why": "The restaurant holds tables by party size."
+        }
+      }
+    ]
+  }
+}

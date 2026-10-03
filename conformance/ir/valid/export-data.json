@@ -1,0 +1,12 @@
+{
+  "description": "Export data action with custom statement consequence.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "export_account_data",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Download all your account data in a single archive."},
+      {"type": "Warning", "id": "note", "text": "This export includes all your personal information, photos, and messages. Handle it carefully.", "severity": "caution"},
+      {"type": "IrreversibleAction", "id": "export", "intent": "download data", "consequence": {"statement": "Your data will be prepared and sent to your email within 24 hours. This is a point-in-time export."}, "primary": true}
+    ]
+  }
+}

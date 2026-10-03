@@ -1,13 +1,29 @@
 {
-  "description": "Irreversible action without consequence.",
+  "description": "The account deletion does not say what it deletes.",
   "expect": [
-    {"code": "irreversible-without-consequence", "path": "/nodes/0/consequence"}
+    {
+      "code": "irreversible-without-consequence",
+      "path": "/nodes/1/consequence"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "delete_account_confirm",
     "nodes": [
-      {"type": "IrreversibleAction", "id": "n1", "intent": "delete", "reversible": false}
+      {
+        "type": "Warning",
+        "id": "danger",
+        "text": "Deleting your account is permanent. All data will be permanently removed and cannot be recovered.",
+        "severity": "danger",
+        "importance": "critical",
+        "acknowledge": true
+      },
+      {
+        "type": "IrreversibleAction",
+        "id": "confirm_delete",
+        "intent": "delete account",
+        "primary": true
+      }
     ]
   }
 }

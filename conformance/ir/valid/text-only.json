@@ -2,9 +2,9 @@
   "description": "A one-line text-only experience with no decision.",
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "simple_message",
+    "experience": "payment_received",
     "nodes": [
-      {"type": "Text", "id": "msg", "text": "Your payment has been received."}
+      {"type": "Text", "id": "msg", "text": "Your payment has been received and will be processed within 24 hours."}
     ]
   }
 }

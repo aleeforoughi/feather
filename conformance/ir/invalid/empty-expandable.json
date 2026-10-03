@@ -1,13 +1,55 @@
 {
-  "description": "Expandable object with no content.",
+  "description": "The recommendation's \"Why?\" is empty.",
   "expect": [
-    {"code": "empty-expandable", "path": "/nodes/0/expandable"}
+    {
+      "code": "empty-expandable",
+      "path": "/nodes/0/expandable"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "approve_campaign",
     "nodes": [
-      {"type": "Action", "id": "n1", "intent": "action", "expandable": {}}
+      {
+        "type": "Recommendation",
+        "id": "rec",
+        "intent": "launch the recommended test",
+        "importance": "high",
+        "reversible": false,
+        "summary": "Recommended test: 7 days, purchase objective",
+        "expandable": {}
+      },
+      {
+        "type": "Price",
+        "id": "cap",
+        "amount": 1050,
+        "currency": "AED",
+        "label": "Maximum spend"
+      },
+      {
+        "type": "IrreversibleAction",
+        "id": "go",
+        "intent": "confirm spend",
+        "importance": "critical",
+        "reversible": false,
+        "consequence": {
+          "spend": {
+            "amount": 1050,
+            "currency": "AED"
+          }
+        }
+      },
+      {
+        "type": "Alternative",
+        "id": "less",
+        "intent": "spend less"
+      },
+      {
+        "type": "Alternative",
+        "id": "own",
+        "intent": "set my own budget",
+        "input": "Price"
+      }
     ]
   }
 }

@@ -1,0 +1,12 @@
+{
+  "description": "File processing with indeterminate progress (no value).",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "process_file",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "Processing your file..."},
+      {"type": "Progress", "id": "indeterminate", "label": "Analyzing data"},
+      {"type": "Text", "id": "note", "text": "This may take a few moments.", "importance": "low"}
+    ]
+  }
+}

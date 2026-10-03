@@ -1,13 +1,42 @@
 {
-  "description": "Invalid currency code.",
+  "description": "The price uses a symbol (US$) instead of an ISO 4217 code.",
   "expect": [
-    {"code": "invalid-currency", "path": "/nodes/0/currency"}
+    {
+      "code": "invalid-currency",
+      "path": "/nodes/2/currency"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "purchase_approval",
     "nodes": [
-      {"type": "Price", "id": "n1", "amount": 100, "currency": "INVALID"}
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "You have a request to purchase software."
+      },
+      {
+        "type": "Person",
+        "id": "req",
+        "name": "Finance Manager",
+        "role": "approver"
+      },
+      {
+        "type": "Price",
+        "id": "cost",
+        "amount": 2500,
+        "currency": "US$",
+        "label": "Annual license"
+      },
+      {
+        "type": "Approval",
+        "id": "approve",
+        "intent": "review and decide",
+        "request": "Approve the purchase of professional software",
+        "requester": "req",
+        "scope": "Annual software license for the team",
+        "primary": true
+      }
     ]
   }
 }

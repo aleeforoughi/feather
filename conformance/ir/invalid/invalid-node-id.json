@@ -1,0 +1,50 @@
+{
+  "description": "A node id starts with a digit.",
+  "expect": [
+    {
+      "code": "invalid-id",
+      "path": "/nodes/2/id"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "report_issue",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "Tell us what happened so we can help."
+      },
+      {
+        "type": "Input",
+        "id": "feedback",
+        "intent": "describe issue",
+        "prompt": "Describe the problem in detail",
+        "kind": "long-text",
+        "required": true,
+        "maxLength": 5000
+      },
+      {
+        "type": "Media",
+        "id": "2nd_screenshot",
+        "kind": "document",
+        "src": "https://example.com/uploads/issue.pdf",
+        "caption": "Attached error log for reference"
+      },
+      {
+        "type": "Warning",
+        "id": "warn",
+        "text": "Please remove any sensitive information from attachments.",
+        "severity": "caution",
+        "importance": "high"
+      },
+      {
+        "type": "Action",
+        "id": "submit",
+        "intent": "submit ticket",
+        "label": "Submit report",
+        "primary": true
+      }
+    ]
+  }
+}

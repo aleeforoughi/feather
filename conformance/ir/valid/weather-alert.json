@@ -1,0 +1,13 @@
+{
+  "description": "Weather alert with location and action.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "weather_warning",
+    "nodes": [
+      {"type": "Warning", "id": "alert", "text": "Severe heat warning in effect. Stay hydrated and avoid outdoor activity during peak hours.", "severity": "caution", "importance": "high"},
+      {"type": "Location", "id": "location", "name": "Dubai", "coordinates": {"lat": 25.2048, "lng": 55.2708}},
+      {"type": "Text", "id": "temp", "text": "Current temperature: 52°C (125°F)"},
+      {"type": "Action", "id": "dismiss", "intent": "dismiss", "label": "Dismiss"}
+    ]
+  }
+}

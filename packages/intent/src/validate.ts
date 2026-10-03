@@ -167,7 +167,8 @@ export function validate(input: unknown): ValidationResult {
   }
 
   // One primary act per experience (composer rule 1).
-  const primaries = [...byId.values()].filter(({ node }) => node.primary === true)
+  // Only nodes that can be primary count; a primary flag elsewhere is already reported as not-primary-capable.
+  const primaries = [...byId.values()].filter(({ node, spec }) => spec.primaryCapable && node.primary === true)
   for (const extra of primaries.slice(1)) {
     const first = primaries[0].node.id as string
     add("multiple-primary", pointer("nodes", extra.index, "primary"), `An experience has one primary act; "${first}" already is, so "${extra.node.id}" cannot also be.`, extra.node.id as string)
@@ -349,7 +350,7 @@ function checkNode(add: Add, node: Json, spec: NodeSpec, at: string, name: strin
     }
     case "Preference":
       if (Array.isArray(node.options) && isScalar(node.value) && !node.options.includes(node.value)) {
-        add("invalid-value", `${at}/value`, `${name}'s value ${JSON.stringify(node.value)} is not one of its options (${node.options.map((o) => JSON.stringify(o)).join(", ")}).`, id)
+        add("unknown-option", `${at}/value`, `${name}'s value ${JSON.stringify(node.value)} is not one of its options (${node.options.map((o) => JSON.stringify(o)).join(", ")}).`, id)
       }
       return
     case "IrreversibleAction":

@@ -1,0 +1,21 @@
+{
+  "description": "Flight choice with tradeoffs shown for alternatives.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "book_flight",
+    "nodes": [
+      {"type": "Text", "id": "trip", "text": "Flights from Dubai to New York on October 15"},
+      {"type": "Recommendation", "id": "recommended_flight", "intent": "recommend flight", "summary": "Emirates EK-001: Departs 2pm, arrives 6pm next day (direct)", "confidence": 0.88},
+      {"type": "Price", "id": "price_rec", "amount": 850, "currency": "USD", "label": "Recommended price"},
+      {"type": "Alternative", "id": "alt_early", "intent": "early departure", "for": "recommended_flight", "label": "Early morning (7am)"},
+      {"type": "Tradeoff", "id": "trade_early", "of": "alt_early", "summary": "Early flight gets you there faster but requires waking up early", "gains": ["Arrive same day", "Full day at destination"], "costs": ["Early wake up", "$50 more expensive"]},
+      {"type": "Alternative", "id": "alt_budget", "intent": "budget option", "for": "recommended_flight", "label": "Budget with connection"},
+      {"type": "Tradeoff", "id": "trade_budget", "of": "alt_budget", "summary": "Budget flights save money but take longer", "gains": ["$200 cheaper", "Better flight time"], "costs": ["One connection", "Arrive next morning"]},
+      {"type": "Choice", "id": "select_flight", "intent": "choose flight", "prompt": "Which flight do you prefer?", "options": [
+        {"id": "rec", "label": "Recommended - 2pm direct"},
+        {"id": "early", "label": "Early - 7am direct"},
+        {"id": "budget", "label": "Budget - 8pm with connection"}
+      ], "primary": true}
+    ]
+  }
+}

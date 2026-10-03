@@ -1,0 +1,33 @@
+{
+  "description": "The locale is a language name, not a BCP 47 tag.",
+  "expect": [
+    {
+      "code": "invalid-value",
+      "path": "/locale"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "bienvenue",
+    "locale": "French",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "greeting",
+        "text": "Bienvenue dans notre application!"
+      },
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "Nous sommes heureux de vous avoir avec nous."
+      },
+      {
+        "type": "Action",
+        "id": "start",
+        "intent": "commencer",
+        "label": "Commencer",
+        "primary": true
+      }
+    ]
+  }
+}

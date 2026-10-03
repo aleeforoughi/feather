@@ -1,13 +1,47 @@
 {
-  "description": "Choice with duplicate option ids.",
+  "description": "Two delivery options share an id.",
   "expect": [
-    {"code": "duplicate-option", "path": "/nodes/0/options/1/id"}
+    {
+      "code": "duplicate-option",
+      "path": "/nodes/1/options/2/id"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "pick_delivery_speed",
     "nodes": [
-      {"type": "Choice", "id": "n1", "intent": "choose", "prompt": "Pick one", "options": [{"id": "opt1", "label": "Option A"}, {"id": "opt1", "label": "Option B"}]}
+      {
+        "type": "Text",
+        "id": "ctx",
+        "text": "How quickly do you need your order?"
+      },
+      {
+        "type": "Choice",
+        "id": "speed",
+        "intent": "choose delivery speed",
+        "prompt": "Select your preferred delivery speed",
+        "options": [
+          {
+            "id": "std",
+            "label": "Standard (5-7 days)",
+            "description": "Free shipping"
+          },
+          {
+            "id": "fast",
+            "label": "Express (2-3 days)",
+            "description": "5% surcharge"
+          },
+          {
+            "id": "fast",
+            "label": "Next day",
+            "description": "Premium service"
+          }
+        ],
+        "selected": [
+          "std"
+        ],
+        "primary": true
+      }
     ]
   }
 }

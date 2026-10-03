@@ -1,0 +1,15 @@
+{
+  "description": "A special offer with expiration and decline option.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "special_offer",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "Special offer just for you!"},
+      {"type": "Text", "id": "offer_text", "text": "Get 30% off your next purchase. Valid until October 10."},
+      {"type": "Price", "id": "original", "amount": 100, "currency": "USD", "label": "Original price"},
+      {"type": "Price", "id": "discounted", "amount": 70, "currency": "USD", "label": "With 30% discount"},
+      {"type": "Action", "id": "accept", "intent": "accept offer", "label": "Use offer", "primary": true},
+      {"type": "Action", "id": "decline", "intent": "decline", "label": "Not interested"}
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "description": "Idle status waiting for user action.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "service_waiting",
+    "nodes": [
+      {"type": "Status", "id": "stat", "state": "idle", "label": "Service ready, waiting for your input"},
+      {"type": "Text", "id": "msg", "text": "Ready when you are. Click below to begin."},
+      {"type": "Action", "id": "start", "intent": "start service", "label": "Start", "primary": true}
+    ]
+  }
+}

@@ -1,13 +1,30 @@
 {
-  "description": "Empty consequence object.",
+  "description": "The account deletion states an empty consequence.",
   "expect": [
-    {"code": "empty-consequence", "path": "/nodes/0/consequence"}
+    {
+      "code": "empty-consequence",
+      "path": "/nodes/1/consequence"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "delete_account_confirm",
     "nodes": [
-      {"type": "IrreversibleAction", "id": "n1", "intent": "action", "consequence": {}}
+      {
+        "type": "Warning",
+        "id": "danger",
+        "text": "Deleting your account is permanent. All data will be permanently removed and cannot be recovered.",
+        "severity": "danger",
+        "importance": "critical",
+        "acknowledge": true
+      },
+      {
+        "type": "IrreversibleAction",
+        "id": "confirm_delete",
+        "intent": "delete account",
+        "consequence": {},
+        "primary": true
+      }
     ]
   }
 }

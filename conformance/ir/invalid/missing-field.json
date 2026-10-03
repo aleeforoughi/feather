@@ -1,0 +1,41 @@
+{
+  "description": "The approval does not say what it asks for.",
+  "expect": [
+    {
+      "code": "missing-field",
+      "path": "/nodes/3/request"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "purchase_approval",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "You have a request to purchase software."
+      },
+      {
+        "type": "Person",
+        "id": "req",
+        "name": "Finance Manager",
+        "role": "approver"
+      },
+      {
+        "type": "Price",
+        "id": "cost",
+        "amount": 2500,
+        "currency": "USD",
+        "label": "Annual license"
+      },
+      {
+        "type": "Approval",
+        "id": "approve",
+        "intent": "review and decide",
+        "requester": "req",
+        "scope": "Annual software license for the team",
+        "primary": true
+      }
+    ]
+  }
+}

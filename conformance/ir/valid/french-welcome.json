@@ -1,0 +1,13 @@
+{
+  "description": "Welcome message in French (fr locale).",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "bienvenue",
+    "locale": "fr",
+    "nodes": [
+      {"type": "Text", "id": "greeting", "text": "Bienvenue dans notre application!"},
+      {"type": "Text", "id": "intro", "text": "Nous sommes heureux de vous avoir avec nous."},
+      {"type": "Action", "id": "start", "intent": "commencer", "label": "Commencer", "primary": true}
+    ]
+  }
+}

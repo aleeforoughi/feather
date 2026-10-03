@@ -1,11 +1,11 @@
 {
-  "description": "Deleting an account with danger warning and delete consequence.",
+  "description": "Delete account with danger warning and delete consequence.",
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "delete_account",
+    "experience": "delete_account_confirm",
     "nodes": [
-      {"type": "Warning", "id": "warn", "text": "Deleting your account is permanent. All your data will be removed and cannot be recovered.", "severity": "danger", "importance": "critical", "acknowledge": true},
-      {"type": "IrreversibleAction", "id": "del", "intent": "delete account", "consequence": {"delete": {"what": "your account and all associated data"}}, "primary": true}
+      {"type": "Warning", "id": "danger", "text": "Deleting your account is permanent. All data will be permanently removed and cannot be recovered.", "severity": "danger", "importance": "critical", "acknowledge": true},
+      {"type": "IrreversibleAction", "id": "confirm_delete", "intent": "delete account", "consequence": {"delete": {"what": "your account, all data, and all backups"}}, "primary": true}
     ]
   }
 }

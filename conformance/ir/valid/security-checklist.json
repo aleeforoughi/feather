@@ -1,0 +1,14 @@
+{
+  "description": "Security checklist with multiple action items.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "security_setup",
+    "nodes": [
+      {"type": "Text", "id": "heading", "text": "Secure your account"},
+      {"type": "Text", "id": "completed_text", "text": "✓ Email verified"},
+      {"type": "Action", "id": "setup_2fa", "intent": "enable 2fa", "label": "Set up two-factor authentication", "importance": "high"},
+      {"type": "Action", "id": "review_sessions", "intent": "review sessions", "label": "Review active sessions"},
+      {"type": "Action", "id": "change_password", "intent": "change password", "label": "Change password"}
+    ]
+  }
+}

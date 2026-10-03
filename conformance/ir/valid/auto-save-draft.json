@@ -1,0 +1,15 @@
+{
+  "description": "System automatically saved draft with undo option (autopick with 'of').",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "draft_autosave",
+    "nodes": [
+      {"type": "Choice", "id": "versions", "intent": "select version", "prompt": "Which version do you want to restore?", "options": [
+        {"id": "v_draft", "label": "Current draft (auto-saved now)"},
+        {"id": "v_1h", "label": "Version from 1 hour ago"},
+        {"id": "v_1d", "label": "Version from yesterday"}
+      ]},
+      {"type": "Autopick", "id": "auto_save", "intent": "accept auto-save", "summary": "Draft auto-saved successfully", "of": "versions", "undoWithin": 120}
+    ]
+  }
+}

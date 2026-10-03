@@ -1,0 +1,15 @@
+{
+  "description": "A bonus feature recommendation with alternatives.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "premium_feature_offer",
+    "nodes": [
+      {"type": "Text", "id": "intro", "text": "Unlock premium features"},
+      {"type": "Recommendation", "id": "rec_premium", "intent": "try premium", "summary": "Premium membership includes advanced analytics", "confidence": 0.78},
+      {"type": "Price", "id": "monthly_price", "amount": 9.99, "currency": "USD", "label": "Per month"},
+      {"type": "Alternative", "id": "alt_annual", "intent": "annual plan", "for": "rec_premium", "label": "Pay annually and save 20%"},
+      {"type": "Alternative", "id": "alt_decline", "intent": "not now", "for": "rec_premium", "label": "Maybe later"},
+      {"type": "Action", "id": "subscribe", "intent": "subscribe", "label": "Get premium", "primary": true}
+    ]
+  }
+}

@@ -16,7 +16,7 @@ function fieldSchema(field: Field): Schema {
   const base: Schema = { description: field.doc }
   switch (field.kind) {
     case "string":
-      return { ...base, type: "string", minLength: 1, ...(field.maxLength ? { maxLength: field.maxLength } : {}) }
+      return { ...base, type: "string", pattern: "\\S", ...(field.maxLength ? { maxLength: field.maxLength } : {}) }
     case "ref":
       return { ...base, $ref: "#/$defs/id" }
     case "number":
@@ -34,7 +34,7 @@ function fieldSchema(field: Field): Schema {
     case "refs":
       return { ...base, type: "array", items: { $ref: "#/$defs/id" }, ...(field.minItems ? { minItems: field.minItems } : {}) }
     case "strings":
-      return { ...base, type: "array", items: { type: "string", minLength: 1 }, ...(field.minItems ? { minItems: field.minItems } : {}) }
+      return { ...base, type: "array", items: { type: "string", pattern: "\\S" }, ...(field.minItems ? { minItems: field.minItems } : {}) }
     case "scalars":
       return { ...base, type: "array", items: { type: ["string", "number", "boolean"] }, ...(field.minItems ? { minItems: field.minItems } : {}) }
     case "array":
@@ -64,7 +64,12 @@ function nodeSchema(spec: NodeSpec): Schema {
   return {
     description: spec.doc,
     ...object,
-    properties: { type: { const: spec.type }, ...(object.properties as Schema) },
+    properties: {
+      type: { const: spec.type },
+      ...(object.properties as Schema),
+      id: { description: commonFields.id.doc, $ref: "#/$defs/id" },
+      ...(spec.defaults?.reversible === false ? { reversible: { description: "Always false: this act cannot be undone.", const: false } } : {}),
+    },
     required: [...new Set(required)],
   }
 }

@@ -1,0 +1,15 @@
+{
+  "description": "Recommend a plan upgrade with non-reversible recommendation and consequence, plus alternatives.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "upgrade_recommendation",
+    "nodes": [
+      {"type": "Text", "id": "msg", "text": "You've outgrown your current plan. Here's what we recommend."},
+      {"type": "Recommendation", "id": "rec_pro", "intent": "upgrade to Professional", "summary": "Professional Plan: double your storage and unlock advanced features", "confidence": 0.92, "consequence": {"spend": {"amount": 99, "currency": "USD"}}, "reversible": false, "primary": true},
+      {"type": "Price", "id": "pro_price", "amount": 99, "currency": "USD", "label": "Professional - per month"},
+      {"type": "Alternative", "id": "alt_stay", "intent": "keep current plan", "for": "rec_pro", "label": "Stay on current plan"},
+      {"type": "Alternative", "id": "alt_enterprise", "intent": "view enterprise", "for": "rec_pro", "label": "See Enterprise option"},
+      {"type": "Warning", "id": "warn", "text": "Downgrading later may result in data loss. Upgrades take effect immediately.", "severity": "caution", "importance": "high"}
+    ]
+  }
+}

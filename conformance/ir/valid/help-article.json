@@ -1,0 +1,16 @@
+{
+  "description": "A help article with expandable details (detail only, no why).",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "help_password_reset",
+    "nodes": [
+      {"type": "Text", "id": "title", "text": "How to reset your password"},
+      {"type": "Text", "id": "summary", "text": "If you've forgotten your password, you can reset it using your email address."},
+      {"type": "Text", "id": "steps_intro", "text": "Follow these steps:", "importance": "low"},
+      {"type": "Text", "id": "step1", "text": "1. Click 'Forgot password' on the login page", "importance": "low"},
+      {"type": "Text", "id": "step2", "text": "2. Enter your email address and click 'Send reset link'", "importance": "low"},
+      {"type": "Text", "id": "step3", "text": "3. Check your email and click the reset link", "expandable": {"detail": "The reset link is valid for 24 hours. If you don't see the email, check your spam folder."}, "importance": "low"},
+      {"type": "Action", "id": "back", "intent": "go back", "label": "Back to login"}
+    ]
+  }
+}

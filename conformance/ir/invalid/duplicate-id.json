@@ -1,14 +1,113 @@
 {
-  "description": "Two nodes with the same id.",
+  "description": "Two prices in the plan comparison share an id, so a reply could reach the wrong one.",
   "expect": [
-    {"code": "duplicate-id", "path": "/nodes/1/id"}
+    {
+      "code": "duplicate-id",
+      "path": "/nodes/5/id"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "compare_plans",
     "nodes": [
-      {"type": "Text", "id": "same", "text": "first"},
-      {"type": "Text", "id": "same", "text": "second"}
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "Choose the right plan for your needs."
+      },
+      {
+        "type": "Recommendation",
+        "id": "plan_pro",
+        "intent": "select professional",
+        "summary": "Professional Plan: the best value for growing teams",
+        "confidence": 0.85
+      },
+      {
+        "type": "Alternative",
+        "id": "plan_starter",
+        "intent": "choose starter",
+        "for": "plan_pro",
+        "label": "Starter"
+      },
+      {
+        "type": "Alternative",
+        "id": "plan_enterprise",
+        "intent": "choose enterprise",
+        "for": "plan_pro",
+        "label": "Enterprise"
+      },
+      {
+        "type": "Price",
+        "id": "price_starter",
+        "amount": 29,
+        "currency": "USD",
+        "label": "Starter",
+        "period": "month"
+      },
+      {
+        "type": "Price",
+        "id": "price_starter",
+        "amount": 99,
+        "currency": "USD",
+        "label": "Professional",
+        "period": "month"
+      },
+      {
+        "type": "Price",
+        "id": "price_enterprise",
+        "amount": 299,
+        "currency": "USD",
+        "label": "Enterprise",
+        "period": "month"
+      },
+      {
+        "type": "Comparison",
+        "id": "comp",
+        "items": [
+          "plan_starter",
+          "plan_pro",
+          "plan_enterprise"
+        ],
+        "criteria": [
+          {
+            "label": "Users",
+            "values": {
+              "plan_starter": "up to 5",
+              "plan_pro": "up to 50",
+              "plan_enterprise": "unlimited"
+            }
+          },
+          {
+            "label": "Storage",
+            "values": {
+              "plan_starter": "10 GB",
+              "plan_pro": "500 GB",
+              "plan_enterprise": "unlimited"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Choice",
+        "id": "select",
+        "intent": "choose plan",
+        "prompt": "Which plan works for you?",
+        "options": [
+          {
+            "id": "starter",
+            "label": "Starter"
+          },
+          {
+            "id": "pro",
+            "label": "Professional"
+          },
+          {
+            "id": "enterprise",
+            "label": "Enterprise"
+          }
+        ],
+        "primary": true
+      }
     ]
   }
 }

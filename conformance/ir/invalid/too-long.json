@@ -1,13 +1,43 @@
 {
-  "description": "Text field exceeding max length.",
+  "description": "The signup button's label is a whole sentence.",
   "expect": [
-    {"code": "too-long", "path": "/nodes/0/intent"}
+    {
+      "code": "too-long",
+      "path": "/nodes/3/label"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "user_signup",
     "nodes": [
-      {"type": "Action", "id": "n1", "intent": "this is a very long intent that exceeds the maximum allowed length of one hundred twenty characters for the intent field on action nodes"}
+      {
+        "type": "Text",
+        "id": "welcome",
+        "text": "Create your account in two steps."
+      },
+      {
+        "type": "Input",
+        "id": "email",
+        "intent": "provide email",
+        "prompt": "What is your email address?",
+        "kind": "email",
+        "required": true
+      },
+      {
+        "type": "Input",
+        "id": "phone",
+        "intent": "provide phone",
+        "prompt": "Your phone number for verification",
+        "kind": "phone",
+        "required": true
+      },
+      {
+        "type": "Action",
+        "id": "create",
+        "intent": "create account",
+        "label": "Create my account now and start using every feature of the product today",
+        "primary": true
+      }
     ]
   }
 }

@@ -1,13 +1,37 @@
 {
-  "description": "Choice with fewer than two options.",
+  "description": "A choice with only one option is not a choice.",
   "expect": [
-    {"code": "too-few-items", "path": "/nodes/0/options"}
+    {
+      "code": "too-few-items",
+      "path": "/nodes/1/options"
+    }
   ],
   "ir": {
     "ir": "feather.ir/0",
-    "experience": "test",
+    "experience": "pick_delivery_speed",
     "nodes": [
-      {"type": "Choice", "id": "n1", "intent": "choose", "prompt": "Pick one", "options": [{"id": "opt1", "label": "Option 1"}]}
+      {
+        "type": "Text",
+        "id": "ctx",
+        "text": "How quickly do you need your order?"
+      },
+      {
+        "type": "Choice",
+        "id": "speed",
+        "intent": "choose delivery speed",
+        "prompt": "Select your preferred delivery speed",
+        "options": [
+          {
+            "id": "std",
+            "label": "Standard (5-7 days)",
+            "description": "Free shipping"
+          }
+        ],
+        "selected": [
+          "std"
+        ],
+        "primary": true
+      }
     ]
   }
 }

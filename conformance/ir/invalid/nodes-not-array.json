@@ -1,0 +1,35 @@
+{
+  "description": "The nodes arrive as an object keyed by id instead of an ordered list.",
+  "expect": [
+    {
+      "code": "wrong-type",
+      "path": "/nodes"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "export_account_data",
+    "nodes": {
+      "intro": {
+        "type": "Text",
+        "id": "intro",
+        "text": "Download all your account data in a single archive."
+      },
+      "note": {
+        "type": "Warning",
+        "id": "note",
+        "text": "This export includes all your personal information, photos, and messages. Handle it carefully.",
+        "severity": "caution"
+      },
+      "export": {
+        "type": "IrreversibleAction",
+        "id": "export",
+        "intent": "download data",
+        "consequence": {
+          "statement": "Your data will be prepared and sent to your email within 24 hours. This is a point-in-time export."
+        },
+        "primary": true
+      }
+    }
+  }
+}

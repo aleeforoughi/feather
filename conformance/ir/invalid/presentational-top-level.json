@@ -1,0 +1,61 @@
+{
+  "description": "The caller asks for a dark theme at the top of the experience; theming is the product's, not the caller's.",
+  "expect": [
+    {
+      "code": "presentational-field",
+      "path": "/theme"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "book_consultation",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "intro",
+        "text": "Schedule your consultation with Dr. Patel."
+      },
+      {
+        "type": "Person",
+        "id": "doctor",
+        "name": "Dr. Patel",
+        "role": "medical consultant",
+        "kind": "agent"
+      },
+      {
+        "type": "Date",
+        "id": "appointment_time",
+        "value": "2026-10-15T14:00:00+04:00",
+        "label": "Appointment time"
+      },
+      {
+        "type": "Location",
+        "id": "clinic",
+        "name": "Downtown Medical Center",
+        "address": "123 Health Ave, Dubai",
+        "coordinates": {
+          "lat": 25.2048,
+          "lng": 55.2708
+        }
+      },
+      {
+        "type": "Input",
+        "id": "duration",
+        "intent": "select duration",
+        "prompt": "How long do you need (minutes)?",
+        "kind": "number",
+        "min": 30,
+        "max": 120,
+        "value": 30
+      },
+      {
+        "type": "Action",
+        "id": "book",
+        "intent": "confirm booking",
+        "label": "Confirm appointment",
+        "primary": true
+      }
+    ],
+    "theme": "dark"
+  }
+}

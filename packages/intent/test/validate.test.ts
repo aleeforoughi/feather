@@ -48,6 +48,7 @@ describe("validate", () => {
     ["a bad id", (d) => void (d.nodes[1].id = "1cap"), only("invalid-id", "/nodes/1/id")],
     ["two primary acts", (d) => { d.nodes[0].primary = true; d.nodes[2].primary = true }, only("multiple-primary", "/nodes/2/primary")],
     ["a primary Alternative", (d) => void (d.nodes[3].primary = true), only("not-primary-capable", "/nodes/3/primary")],
+    ["a primary Alternative beside a primary act", (d) => { d.nodes[2].primary = true; d.nodes[3].primary = true }, only("not-primary-capable", "/nodes/3/primary")],
     ["an IrreversibleAction without consequence", (d) => void delete d.nodes[2].consequence, only("irreversible-without-consequence", "/nodes/2/consequence")],
     ["an empty consequence", (d) => void (d.nodes[2].consequence = {}), only("empty-consequence", "/nodes/2/consequence")],
     ["a reversible IrreversibleAction", (d) => void (d.nodes[2].reversible = true), only("irreversible-marked-reversible", "/nodes/2/reversible")],
@@ -93,7 +94,7 @@ describe("validate", () => {
     expect(codes(doc({ type: "Progress", id: "p", label: "Upload", value: 1.5 }))).toEqual(["out-of-range"])
     expect(codes(doc({ type: "Progress", id: "p", label: "Plan", steps: [{ id: "s", label: "A", state: "done" }, { id: "s", label: "B", state: "active" }] }))).toEqual(["duplicate-step"])
     expect(codes(doc({ type: "Tradeoff", id: "t", summary: "Hmm" }))).toEqual(["empty-tradeoff"])
-    expect(codes(doc({ type: "Preference", id: "p", intent: "units", key: "units", label: "Units", value: "feet", options: ["metric", "imperial"] }))).toEqual(["invalid-value"])
+    expect(codes(doc({ type: "Preference", id: "p", intent: "units", key: "units", label: "Units", value: "feet", options: ["metric", "imperial"] }))).toEqual(["unknown-option"])
     const a = { type: "Alternative", id: "a", intent: "plan a" }
     const b = { type: "Alternative", id: "b", intent: "plan b" }
     expect(codes(doc(a, b, { type: "Comparison", id: "cmp", items: ["a", "b"], criteria: [{ label: "Price", values: { a: 10 } }] }))).toEqual(["comparison-mismatch"])
