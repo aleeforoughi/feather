@@ -177,3 +177,29 @@ describe("replies (B10, B11, X7)", () => {
     expect(codes(e, { ...send("appr", "approve"), color: "red" })).toEqual(["unknown-field"])
   })
 })
+
+describe("composer review (L3)", () => {
+  it("reports an unreadable document instead of throwing", () => {
+    const circular: Record<string, unknown> = { ir: "feather.ir/0", nodes: [] }
+    circular.experience = circular
+    for (const input of [{ ir: "feather.ir/0", experience: 1n, nodes: [] }, circular, Object.defineProperty({ ir: "feather.ir/0", experience: "e" }, "nodes", { get: () => { throw new Error("boom") }, enumerable: true })]) {
+      expect(() => validate(input)).not.toThrow()
+      const r = validate(input)
+      expect(r.ok).toBe(false)
+    }
+    const r = validate(Object.defineProperty({ ir: "feather.ir/0", experience: "e" }, "nodes", { get: () => { throw new Error("boom") }, enumerable: true }))
+    expect(r.ok ? [] : r.issues.map((i) => i.code)).toEqual(["unreadable"])
+  })
+  it("treats an act that states a consequence as irreversible", () => {
+    const approval = { type: "Approval", id: "ok", intent: "grant access", request: "Share your data?", consequence: { consent: { to: "Acme", scope: "purchase history" } } }
+    expect(issues(doc(approval))).toEqual([])
+    expect(issues(doc({ ...approval, reversible: true }))).toEqual(["irreversible-marked-reversible /nodes/0/reversible"])
+  })
+  it("stays fast on a large experience", () => {
+    const nodes = Array.from({ length: 500 }, (_, i) => (i % 2 === 0 ? { type: "Choice", id: `c${i}`, intent: "pick", prompt: "?", options: [{ id: "a", label: "A" }, { id: "b", label: "B" }] } : { type: "PredictedChoice", id: `p${i}`, intent: "likely", of: `c${i - 1}`, option: "a" }))
+    validate(doc(...nodes))
+    const start = performance.now()
+    for (let i = 0; i < 10; i++) validate(doc(...nodes))
+    expect((performance.now() - start) / 10).toBeLessThan(20)
+  })
+})

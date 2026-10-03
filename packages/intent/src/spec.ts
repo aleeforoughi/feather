@@ -32,7 +32,7 @@ export interface NodeSpec {
   /** The acts its replies may carry, and whether each carries a value. */
   acts: Record<string, { value: "none" | "required" | "optional"; doc: string }>
   fields: Record<string, Field>
-  /** Default values the composer assumes when the caller leaves a field out. */
+  /** Default values the composer applies when the caller leaves a field out (its effective importance). */
   defaults?: { importance?: string; reversible?: boolean }
   /** The importance values this node accepts, when narrower than all four. */
   importance?: readonly string[]
@@ -78,7 +78,7 @@ export const commonFields: Record<string, Field> = {
   id: { kind: "string", doc: "Stable within the experience; replies and references use it.", required: true, maxLength: 64 },
   intent: { kind: "string", doc: "What the human is doing here, in a few words. Required on act nodes.", maxLength: 120 },
   importance: { kind: "enum", doc: "How much it matters. Default normal; critical is never hidden behind expansion.", values: ["low", "normal", "high", "critical"] },
-  reversible: { kind: "boolean", doc: "Whether the effect can be undone. Default true." },
+  reversible: { kind: "boolean", doc: "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone." },
   expandable: {
     kind: "object",
     doc: 'Detail on demand, behind "Why?". At least one entry.',
@@ -89,7 +89,7 @@ export const commonFields: Record<string, Field> = {
 
 export const primaryField: Field = {
   kind: "boolean",
-  doc: "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+  doc: "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
 }
 
 const none = {} as NodeSpec["acts"]

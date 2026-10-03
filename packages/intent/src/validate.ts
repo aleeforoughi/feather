@@ -45,6 +45,7 @@ export type IssueCode =
   | "empty-tradeoff"
   | "comparison-mismatch"
   | "too-many-issues"
+  | "unreadable"
 
 export interface Issue {
   code: IssueCode
@@ -75,14 +76,19 @@ const isObject = (v: unknown): v is Json => typeof v === "object" && v !== null 
 export const isScalar = (v: unknown) => typeof v === "string" || (typeof v === "number" && Number.isFinite(v)) || typeof v === "boolean"
 const has = (o: object, k: string) => Object.hasOwn(o, k)
 /** One JSON Pointer segment, escaped (RFC 6901). */
-export const seg = (p: string | number) => `/${String(p).replace(/~/g, "~0").replace(/\//g, "~1")}`
+export const seg = (p: string | number) => (typeof p === "number" || !/[~/]/.test(p) ? `/${p}` : `/${p.replace(/~/g, "~0").replace(/\//g, "~1")}`)
 const pointer = (...parts: Array<string | number>) => parts.map(seg).join("")
 const describe = (v: unknown) =>
   Array.isArray(v) ? "an array" : v === null ? "null" : typeof v === "object" ? "an object" : typeof v === "number" && !Number.isFinite(v) ? String(v) : `a ${typeof v}`
 /** Length in Unicode code points, not UTF-16 units. */
 export const chars = (s: string) => [...s].length
 const quote = (v: unknown) => {
-  const s = JSON.stringify(v) ?? String(v)
+  let s: string
+  try {
+    s = JSON.stringify(v) ?? String(v)
+  } catch {
+    s = describe(v)
+  }
   return s.length > 80 ? `${s.slice(0, 77)}…` : s
 }
 
@@ -101,7 +107,8 @@ export function validate(input: unknown): ValidationResult {
   try {
     run(input, add)
   } catch (err) {
-    if (!(err instanceof Overflow)) throw err
+    // A document that cannot even be read (a throwing getter, a value JSON cannot hold) is reported, never thrown.
+    if (!(err instanceof Overflow)) issues.push({ code: "unreadable", path: "", message: `The document could not be read as JSON data (${err instanceof Error ? err.message : String(err)}); send plain JSON.` })
   }
   return issues.length === 0 ? { ok: true, experience: input as Experience } : { ok: false, issues }
 }
@@ -171,8 +178,8 @@ function run(input: unknown, add: Add) {
       if (key === "type" || has(fields, key)) continue
       if (key === "primary") {
         // "primary": false says nothing, so it is allowed on any node.
-        if (node.primary !== false) add("not-primary-capable", pointer("nodes", index, key), `${name} cannot be the primary act; only Action, Choice, Input, Approval, Recommendation and IrreversibleAction can.`, id)
-      } else unknownField(add, pointer("nodes", index, key), key, name, ["type", ...Object.keys(fields)], id)
+        if (node.primary !== false) add("not-primary-capable", `${at}${seg(key)}`, `${name} cannot be the primary act; only Action, Choice, Input, Approval, Recommendation and IrreversibleAction can.`, id)
+      } else unknownField(add, `${at}${seg(key)}`, key, name, ["type", ...Object.keys(fields)], id)
     }
     if (spec.act && node.intent === undefined) add("missing-field", `${at}/intent`, `${name} is an act, so it needs an intent: what the person is doing, in a few words.`, id)
     if (spec.type === "IrreversibleAction" && node.consequence === undefined) {
@@ -180,7 +187,10 @@ function run(input: unknown, add: Add) {
     }
     for (const [key, field] of Object.entries(fields)) {
       if (spec.type === "IrreversibleAction" && key === "consequence" && node[key] === undefined) continue
-      checkField(add, has(node, key) ? node[key] : undefined, field, pointer("nodes", index, key), key, name, id)
+      checkField(add, has(node, key) ? node[key] : undefined, field, `${at}${seg(key)}`, key, name, id)
+    }
+    if (spec.type !== "IrreversibleAction" && node.consequence !== undefined && node.reversible === true) {
+      add("irreversible-marked-reversible", `${at}/reversible`, `${name} states a consequence, and an act with a consequence to state cannot be undone (principle 6); drop "reversible": true, or drop the consequence.`, id)
     }
     if (spec.importance && typeof node.importance === "string" && IMPORTANCE.includes(node.importance) && !spec.importance.includes(node.importance)) {
       add("invalid-value", `${at}/importance`, `${name} cannot be undone, so its importance is ${spec.importance.join(" or ")}, never ${node.importance}.`, id)
@@ -196,7 +206,12 @@ function run(input: unknown, add: Add) {
 
   // ── Across nodes ──────────────────────────────────────────────────────────────────────────────────────────────
   for (const entry of entries) checkReferences(add, entry, byId)
-  for (const entry of entries) checkNode(add, entry, entries, byId)
+  const predictions = new Map<string, Entry[]>()
+  for (const e of entries) {
+    if (e.spec.type === "PredictedChoice" && typeof e.node.of === "string") predictions.set(e.node.of, [...(predictions.get(e.node.of) ?? []), e])
+  }
+  const across: Across = { byId, predictions, recommendations: entries.filter((e) => e.spec.type === "Recommendation").length }
+  for (const entry of entries) checkNode(add, entry, across)
 
   // One primary act per experience (composer rule 1). Only nodes that can be primary count; a primary flag elsewhere
   // is already reported as not-primary-capable.
@@ -222,7 +237,15 @@ function run(input: unknown, add: Add) {
   }
 }
 
+const FIELDS = new Map<NodeSpec, Record<string, Field>>()
+/** Every field a node of this type may have. Computed once per type. */
 function fieldsOf(spec: NodeSpec): Record<string, Field> {
+  let fields = FIELDS.get(spec)
+  if (!fields) FIELDS.set(spec, (fields = allFields(spec)))
+  return fields
+}
+
+function allFields(spec: NodeSpec): Record<string, Field> {
   return Object.assign(Object.create(null) as Record<string, Field>, commonFields, spec.primaryCapable ? { primary: primaryField } : {}, spec.fields)
 }
 
@@ -350,7 +373,9 @@ function checkReferences(add: Add, { node, spec, at, name, id }: Entry, byId: Ma
 }
 
 /** Rules particular to one node type, and rules about where it stands among the others. */
-function checkNode(add: Add, { node, spec, at, name, id, index }: Entry, entries: Entry[], byId: Map<string, Entry>) {
+type Across = { byId: Map<string, Entry>; predictions: Map<string, Entry[]>; recommendations: number }
+
+function checkNode(add: Add, { node, spec, at, name, id, index }: Entry, { byId, predictions: predictionsOf, recommendations }: Across) {
   switch (spec.type) {
     case "Choice": {
       const ids = optionIds(node)
@@ -366,7 +391,7 @@ function checkNode(add: Add, { node, spec, at, name, id, index }: Entry, entries
       if (node.multiple !== true && selected.length > 1) add("too-many-selected", `${at}/selected`, `${name} allows one pick but marks ${selected.length} selected; set "multiple": true or select one.`, id)
       // Preselection is decided once (composer rule 3): one prediction per Choice, agreeing with what is selected.
       if (id === undefined) return
-      const predictions = entries.filter((e) => e.spec.type === "PredictedChoice" && e.node.of === id)
+      const predictions = predictionsOf.get(id) ?? []
       for (const extra of predictions.slice(1)) {
         add("conflicting-prediction", `${extra.at}/of`, `${name} already has a prediction (${predictions[0].name}); a Choice has at most one, or its preselection would be ambiguous.`, extra.id)
       }
@@ -415,7 +440,7 @@ function checkNode(add: Add, { node, spec, at, name, id, index }: Entry, entries
     case "Alternative": {
       const target = typeof node.for === "string" ? byId.get(node.for) : undefined
       if (target && target.index > index) add("out-of-order", `${at}/for`, `${name} comes before ${target.name}, the node it is an alternative to; the order is meaning, so put the alternative after it.`, id)
-      if (node.for === undefined && entries.filter((e) => e.spec.type === "Recommendation").length > 1) {
+      if (node.for === undefined && recommendations > 1) {
         add("ambiguous-alternative", `${at}/for`, `${name} must say which recommendation it is an alternative to ("for"), since the experience has several.`, id)
       }
       return

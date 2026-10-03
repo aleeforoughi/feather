@@ -32,8 +32,8 @@ export function decide<T>(trace: TraceEntry[], subject: string, candidates: Arra
   let winner = live[0]
   for (const c of live) if (PRIORITY[c.level] < PRIORITY[winner.level]) winner = c
   const overrode = live.filter((c) => c !== winner && !same(c.value, winner.value)).map(({ rule, value, because }) => ({ rule, value, because }))
-  trace.push({ rule: winner.rule, subject, value: winner.value, because: winner.because, ...(overrode.length ? { overrode } : {}) })
+  trace.push({ rule: winner.rule, level: winner.level, subject, value: winner.value, because: winner.because, ...(overrode.length ? { overrode } : {}) })
   return winner.value
 }
 
-const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
+const same = (a: unknown, b: unknown) => a === b || (a !== null && b !== null && typeof a === "object" && typeof b === "object" && JSON.stringify(a) === JSON.stringify(b))

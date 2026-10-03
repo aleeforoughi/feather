@@ -25,14 +25,14 @@ export interface NodeBase {
   intent?: string
   /** Default `normal`. */
   importance?: Importance
-  /** Whether the effect can be undone. Default `true`; an IrreversibleAction is always `false`. */
+  /** Whether the effect can be undone. Default `true`; an IrreversibleAction, or an act stating a consequence, cannot be. */
   reversible?: boolean
   expandable?: Expandable
 }
 
 /** Nodes that are the experience's main act may say so. At most one node per experience is primary. */
 export interface PrimaryCapable {
-  /** The main act: it gets the emphasis, never the default focus by itself. */
+  /** The main act: it gets the emphasis. Where focus starts is the composer's decision. */
   primary?: boolean
 }
 

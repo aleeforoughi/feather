@@ -16,7 +16,8 @@ function plan(experience: unknown, context: RenderContext = {}): LayoutPlan {
   if (!result.ok) throw new Error(JSON.stringify(result.issues))
   return result.plan
 }
-const all = (p: LayoutPlan): PlanNode[] => p.regions.flatMap((r) => r.nodes.flatMap((n) => [n, ...(n.items ?? []), ...(n.attached ?? []), ...(n.items ?? []).flatMap((i) => i.attached ?? [])]))
+const deep = (n: PlanNode): PlanNode[] => [n, ...[...(n.merged ?? []), ...(n.attached ?? []), ...(n.items ?? [])].flatMap(deep)]
+const all = (p: LayoutPlan): PlanNode[] => p.regions.flatMap((r) => r.nodes.flatMap(deep))
 const find = (p: LayoutPlan, id: string) => all(p).find((n) => n.id === id)!
 const decided = (p: LayoutPlan, subject: string) => p.trace.find((t) => t.subject === subject)!
 
@@ -24,6 +25,9 @@ const rec = { type: "Recommendation", id: "rec", intent: "launch the test", summ
 const spend = { type: "IrreversibleAction", id: "go", intent: "confirm spend", consequence: { spend: { amount: 1050, currency: "AED" } } }
 const alt = { type: "Alternative", id: "less", intent: "spend less", for: "rec" }
 const text = { type: "Text", id: "t", text: "Your order is on its way." }
+const person = { type: "Person", id: "maya", name: "Maya" }
+const approval = { type: "Approval", id: "ok", intent: "approve", request: "Approve the budget?", requester: "maya" }
+const predicted = { type: "PredictedChoice", id: "p", intent: "likely", of: "c", option: "m" }
 const choice = { type: "Choice", id: "c", intent: "pick a size", prompt: "Which size?", options: [{ id: "s", label: "Small" }, { id: "m", label: "Medium" }] }
 
 rule("one-primary", () => {
@@ -40,7 +44,9 @@ rule("one-primary", () => {
     expect(decided(plan(doc(rec, spend)), "plan.primary").because).toContain("none marked")
   })
   it("has none when there is no act", () => {
-    expect(plan(doc(text)).primary).toBeNull()
+    const p = plan(doc(text))
+    expect(p.primary).toBeNull()
+    expect(decided(p, "plan.primary").because).toBe("the experience has no act that can be primary")
   })
 })
 
@@ -60,10 +66,42 @@ rule("irreversible-explicit", () => {
     expect(find(plan(doc(own)), "rec").confirm).toBe("confirm")
     expect(find(plan(doc({ ...rec, reversible: false }, spend)), "rec").confirm).toBeUndefined()
   })
+  it("treats an act stating a consequence as irreversible: a consent Approval takes no focus and confirms", () => {
+    const consent = { ...approval, consequence: { consent: { to: "Acme", scope: "your calendar" } } }
+    const p = plan(doc(person, consent))
+    expect(p.focus).toBeNull()
+    expect(find(p, "ok").confirm).toBe("confirm")
+  })
+  it("confirms once: an act its IrreversibleAction commits gets no confirm of its own, named or implied", () => {
+    const own = { ...rec, reversible: false, consequence: { statement: "Starts the campaign." } }
+    for (const go of [{ ...spend, confirms: "rec" }, spend]) {
+      const p = plan(doc(own, go))
+      expect(find(p, "rec").confirm).toBeUndefined()
+      expect(find(p, "go").confirm).toBe("confirm")
+    }
+  })
+  it("gives a spoken or typed keyword in the plan's locale, falling back to English", () => {
+    const voice = { capability: { output: { visual: "unavailable" as const } } }
+    expect(find(plan(doc(spend), voice), "go").keyword).toBe("confirm")
+    expect(find(plan({ ...doc(spend), locale: "fr-FR" }, voice), "go").keyword).toBe("confirmer")
+    expect(find(plan(doc(spend), { ...voice, locale: "ar" }), "go").keyword).toBe("تأكيد")
+    const ja = plan(doc(spend), { device: { surface: "terminal" }, locale: "ja" })
+    expect(find(ja, "go").keyword).toBe("confirm")
+    expect(decided(ja, "plan.keyword").rule).toBe("defaults")
+    expect(find(plan(doc(spend)), "go").keyword).toBeUndefined()
+  })
   it("never preselects an irreversible choice", () => {
     const p = plan(doc({ ...choice, reversible: false, selected: ["m"] }, { ...spend, confirms: "c" }))
     expect(find(p, "c").preselected).toBeUndefined()
     expect(decided(p, "node c.preselected").rule).toBe("irreversible-explicit")
+  })
+  it("shows an irreversible choice's prediction as a note, never merged and preselected", () => {
+    const p = plan(doc({ ...choice, reversible: false }, predicted, { ...spend, confirms: "c" }))
+    const c = find(p, "c")
+    expect(c.organism).toBe("Choice")
+    expect(c.preselected).toBeUndefined()
+    expect(c.merged).toBeUndefined()
+    expect(c.attached).toMatchObject([{ id: "p", organism: "PredictionNote" }])
   })
 })
 
@@ -72,11 +110,19 @@ rule("recommendation-first", () => {
     const p = plan(doc(rec, alt, { ...alt, id: "own", intent: "set my own budget", input: "Price" }))
     expect(p.regions[0].nodes.map((n) => n.id)).toEqual(["rec"])
     expect(p.regions[1].nodes).toHaveLength(1)
-    expect(p.regions[1].nodes[0]).toMatchObject({ id: "~alternatives", organism: "AlternativeList" })
+    expect(p.regions[1].nodes[0]).toMatchObject({ id: "~alternatives:rec", organism: "AlternativeList" })
     expect(p.regions[1].nodes[0].items!.map((n) => n.id)).toEqual(["less", "own"])
   })
+  it("keeps one list per recommendation", () => {
+    const rec2 = { ...rec, id: "rec2", intent: "pause instead" }
+    const p = plan(doc(rec, { ...alt, id: "a1" }, rec2, { ...alt, id: "a2", for: "rec2" }, { ...alt, id: "a3" }))
+    expect(p.regions[1].nodes.map((g) => [g.id, g.items!.map((i) => i.id)])).toEqual([
+      ["~alternatives:rec", ["a1", "a3"]],
+      ["~alternatives:rec2", ["a2"]],
+    ])
+  })
   it("preselects the predicted option, or the caller's selection", () => {
-    expect(find(plan(doc(choice, { type: "PredictedChoice", id: "p", intent: "likely", of: "c", option: "m" })), "c").preselected).toBe("m")
+    expect(find(plan(doc(choice, predicted)), "c").preselected).toBe("m")
     expect(find(plan(doc({ ...choice, selected: ["s"] })), "c").preselected).toBe("s")
     expect(find(plan(doc(choice)), "c").preselected).toBeUndefined()
   })
@@ -93,6 +139,22 @@ rule("critical-never-hidden", () => {
     const t = decided(p, "node rec.expanded")
     expect(t.rule).toBe("critical-never-hidden")
     expect(t.overrode?.map((o) => o.rule)).toContain("explanation-depth")
+  })
+  it("applies the IR's defaults: an IrreversibleAction is critical unless it says high", () => {
+    expect(find(plan(doc(rec, spend)), "go").emphasis).toBe("critical")
+    expect(find(plan(doc(rec, { ...spend, importance: "high" })), "go").emphasis).toBe("primary")
+  })
+})
+
+rule("importance", () => {
+  it("makes high importance stand out and low importance quiet, with the IR's defaults", () => {
+    expect(find(plan(doc(text, { ...text, id: "h", importance: "high" })), "h").emphasis).toBe("high")
+    expect(find(plan(doc(text, { ...text, id: "l", importance: "low" })), "l").emphasis).toBe("quiet")
+    expect(find(plan(doc({ type: "Warning", id: "w", text: "Prices rise tomorrow." })), "w").emphasis).toBe("high")
+  })
+  it("lets a list of alternatives stand out as much as its strongest member", () => {
+    expect(plan(doc(rec, { ...alt, importance: "low" })).regions[1].nodes[0].emphasis).toBe("quiet")
+    expect(plan(doc(rec, { ...alt, importance: "low" }, { ...alt, id: "x", importance: "critical" })).regions[1].nodes[0].emphasis).toBe("critical")
   })
 })
 
@@ -112,10 +174,12 @@ rule("density-and-targets", () => {
     expect(plan(doc(text), { device: { surface: "phone" } }).minTarget).toBe(44)
     expect(plan(doc(text), { device: { surface: "desktop" } }).minTarget).toBe(24)
   })
-  it("ranks a learned density below an explicit one would rank", () => {
-    const p = plan(doc(text), { persona: { density: "compact", source: "learned" }, brand: { density: "spacious" } })
+  it("ranks a learned preference below an explicit setting, field by field", () => {
+    const p = plan(doc(rec), { persona: { density: "compact", explanation: "detailed", learned: ["density"] }, brand: { density: "spacious" } })
     expect(p.density).toBe("compact")
-    expect(decided(p, "plan.density").because).toContain("person")
+    expect(decided(p, "plan.density").level).toBe("learned")
+    expect(decided(p, "node rec.expanded").level).toBe("user-setting")
+    expect(decided(plan(doc(text), { persona: { density: "compact" } }), "plan.density").level).toBe("user-setting")
   })
 })
 
@@ -132,6 +196,17 @@ rule("output-routing", () => {
   })
   it("puts a need above a preference: no visual output beats a preference for switch", () => {
     expect(plan(doc(text), { capability: { output: { visual: "unavailable" } }, persona: { inputMode: "switch" } }).manifestation).toBe("voice")
+  })
+  it("never takes a body the output cannot carry", () => {
+    expect(plan(doc(text), { persona: { inputMode: "voice" } }).manifestation).toBe("web")
+    expect(plan(doc(text), { device: { surface: "speaker" }, capability: { input: { switch: true } } }).manifestation).toBe("voice")
+    expect(plan(doc(text), { device: { surface: "terminal" }, capability: { input: { switch: true } } }).manifestation).toBe("text")
+    expect(plan(doc(text), { device: { surface: "speaker" }, capability: { output: { audio: "unavailable" } } }).manifestation).toBe("text")
+  })
+  it("renders the text equivalent of audio and video when there is no audio output", () => {
+    const clip = { type: "Media", id: "m", kind: "audio", src: "https://example.com/a.mp3", transcript: "Hello." }
+    expect(find(plan(doc(clip), { capability: { output: { audio: "unavailable" } } }), "m").textEquivalent).toBe(true)
+    expect(find(plan(doc(clip)), "m").textEquivalent).toBeUndefined()
   })
   it("makes every cue text when there is no audio output", () => {
     expect(plan(doc(text), { capability: { output: { audio: "unavailable" } } }).cues).toBe("text-only")
@@ -154,7 +229,7 @@ rule("reduced-motion", () => {
   it("reduces motion when the OS asks, over the brand and over a request for full motion", () => {
     const p = plan(doc(text), { device: { reducedMotion: true }, brand: { motion: "snappy" }, persona: { motion: "full" } })
     expect(p.motion).toBe("reduced")
-    expect(decided(p, "plan.motion").overrode?.map((o) => o.because)).toEqual(["the person asked for full motion", "the brand's motion (snappy)", "nothing asks to reduce motion"])
+    expect(decided(p, "plan.motion").overrode?.map((o) => o.because)).toEqual(["the person asked for full motion", "nothing asks to reduce motion"])
   })
   it("reduces motion when the person asks", () => {
     expect(plan(doc(text), { persona: { motion: "reduced" } }).motion).toBe("reduced")
@@ -171,6 +246,13 @@ rule("text-without-decision", () => {
     expect(plan(doc({ ...text, text: "x".repeat(121) })).chrome).toBe("card")
     expect(plan(doc({ ...text, text: "two\nlines" })).chrome).toBe("card")
   })
+  it("counts one node of Text, Confirmation or Status, with no detail, in code points", () => {
+    expect(plan(doc({ type: "Status", id: "s", state: "done", label: "Sent" })).chrome).toBe("none")
+    expect(plan(doc(text, { ...text, id: "t2" })).chrome).toBe("card")
+    expect(plan(doc({ ...text, expandable: { why: "Because." } })).chrome).toBe("card")
+    expect(plan(doc({ ...text, text: "😀".repeat(100) })).chrome).toBe("none")
+    expect(plan(doc({ type: "Price", id: "pr", amount: 5, currency: "USD" })).chrome).toBe("card")
+  })
 })
 
 rule("contrast", () => {
@@ -181,17 +263,29 @@ rule("contrast", () => {
 })
 
 rule("structure", () => {
-  it("merges a prediction into its Choice", () => {
-    const p = plan(doc(choice, { type: "PredictedChoice", id: "p", intent: "likely", of: "c", option: "m" }))
+  it("merges a prediction into its Choice, composed like any node", () => {
+    const p = plan(doc(choice, { ...predicted, importance: "low" }))
     expect(p.regions[0].nodes.map((n) => n.id)).toEqual(["c"])
-    expect(find(p, "c")).toMatchObject({ organism: "PredictedChoice", merged: [{ id: "p" }] })
+    expect(find(p, "c")).toMatchObject({ organism: "PredictedChoice", merged: [{ id: "p", organism: "PredictedChoice", emphasis: "quiet" }] })
   })
   it("attaches a tradeoff to its option and an approval's requester to the approval", () => {
     const p = plan(doc(rec, alt, { type: "Tradeoff", id: "tr", of: "less", gains: ["Cheaper"], costs: ["Slower results"] }))
     expect(p.regions[1].nodes[0].items![0].attached!.map((n) => n.id)).toEqual(["tr"])
-    const a = plan(doc({ type: "Person", id: "maya", name: "Maya" }, { type: "Approval", id: "ok", intent: "approve", request: "Approve the budget?", requester: "maya" }))
+    const a = plan(doc(person, approval))
     expect(a.regions[0].nodes.map((n) => n.id)).toEqual(["ok"])
     expect(find(a, "ok").attached!.map((n) => n.id)).toEqual(["maya"])
+  })
+  it("attaches the requester to every approval it asks for, and lists it once in the order", () => {
+    const p = plan(doc(person, approval, { ...approval, id: "ok2", request: "Approve the dates?" }))
+    expect(p.regions[0].nodes.map((n) => [n.id, n.attached!.map((a) => a.id)])).toEqual([
+      ["ok", ["maya"]],
+      ["ok2", ["maya"]],
+    ])
+    expect(p.order).toEqual(["ok", "maya", "ok2"])
+  })
+  it("orders every node once: main, then secondary, each followed by what it holds", () => {
+    const p = plan(doc(text, rec, alt, { type: "Tradeoff", id: "tr", of: "less", gains: ["Cheaper"] }, { type: "ExploreMore", id: "more", intent: "learn more" }, choice, predicted))
+    expect(p.order).toEqual(["t", "rec", "c", "p", "less", "tr", "more"])
   })
   it("keeps the IR's order in the main region", () => {
     const p = plan(doc(text, { type: "Price", id: "price", amount: 5, currency: "USD" }, choice))
@@ -212,6 +306,40 @@ describe("compose", () => {
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.issues.map((i) => i.code)).toEqual(["irreversible-without-consequence"])
     expect(() => compose(null)).not.toThrow()
+  })
+  it("never throws on input it cannot read", () => {
+    const circular: Record<string, unknown> = { ...doc(text) }
+    circular.self = circular
+    const getter = { ...doc(text) }
+    Object.defineProperty(getter, "nodes", { enumerable: true, get: () => { throw new Error("no") } })
+    for (const input of [{ ...doc(text), big: 1n }, circular, getter]) {
+      expect(() => compose(input)).not.toThrow()
+      expect(compose(input).ok).toBe(false)
+    }
+  })
+  it("drops context it cannot trust, says so in the trace, and composes anyway", () => {
+    const bad = { persona: { density: "huge", learned: ["density", "colour"] }, device: { surface: 7, width: -1 }, capability: "low", locale: "not a locale!" }
+    for (const context of [null, 5, "phone", bad]) {
+      const r = compose(doc(text), context as unknown as RenderContext)
+      expect(r.ok).toBe(true)
+    }
+    const p = plan(doc(text), bad as unknown as RenderContext)
+    expect(p.density).toBe("comfortable")
+    expect(p.locale).toBe("en")
+    expect(p.trace.filter((t) => t.subject.startsWith("context.")).map((t) => t.subject)).toEqual([
+      "context.persona.density",
+      "context.persona.learned",
+      "context.capability",
+      "context.device.surface",
+      "context.device.width",
+      "context.locale",
+    ])
+  })
+  it("keeps the plan apart from the caller's document", () => {
+    const ir = doc({ ...text })
+    const p = plan(ir)
+    ;(ir.nodes[0] as { text: string }).text = "changed"
+    expect((p.regions[0].nodes[0].node as { text: string }).text).toBe("Your order is on its way.")
   })
   it("uses the context's locale, else the experience's, else en", () => {
     expect(plan({ ...doc(text), locale: "ar-AE" }).locale).toBe("ar-AE")

@@ -10,8 +10,10 @@ starts, and which body (manifestation) the experience takes. A manifestation (we
 plan; it never re-decides.
 
 The composer is pure and deterministic (principle 9). The same IR and context always give the same plan. It uses
-no clock, no randomness and no model call, and it composes an experience in well under a millisecond. It
-validates the IR first and refuses an invalid one, returning the validator's issues.
+no clock, no randomness and no model call. A typical experience composes in well under a millisecond, and one ten
+times the largest fixture in under 5 ms. It validates the IR first and refuses an invalid one, returning the
+validator's issues. It never throws: an experience it cannot read (a circular object, a BigInt, a throwing getter)
+comes back as an `unreadable` issue.
 
 ## Context
 
@@ -20,11 +22,15 @@ validates the IR first and refuses an invalid one, returning the validator's iss
 
 | Part | Fields |
 |---|---|
-| `persona` | `density`, `explanation` (brief, standard, detailed), `motion` (full, reduced), `inputMode`, `source` (explicit or learned) |
+| `persona` | `density`, `explanation` (brief, standard, detailed), `motion` (full, reduced), `inputMode`, `learned` (which of those fields the host learned rather than the person set) |
 | `capability` | `input` (pointer, touch, keyboard, voice, switch), `output` (visual, audio: available or unavailable), `vision` (typical, low), `precision` (typical, low) |
 | `device` | `surface` (phone, tablet, desktop, watch, speaker, terminal), `width`, `reducedMotion`, `colorScheme` |
 | `brand` | the brand's `density` and `motion` axes |
-| `locale` | for formatting; defaults to the experience's locale, then `en` |
+| `locale` | a BCP 47 tag, for formatting and the confirm keyword; defaults to the experience's locale, then `en` |
+
+The context comes from the host, so the composer checks it. A field outside its type (`density: "huge"`, a
+negative width, a `locale` that is not a language tag, a context that is not an object) is dropped, and the trace
+records it under `defaults` with the subject `context.<field>`. Unknown fields are ignored.
 
 `REFERENCE_CONTEXTS` names four contexts for tests, the playground and documentation:
 
@@ -55,28 +61,44 @@ the winning rule, the value, why, and what it overrode.
   "overrode": [{ "rule": "explanation-depth", "value": false, "because": "the person wants brief explanations" }] }
 ```
 
-A preference the host marks `source: "learned"` ranks below an explicit setting. One deliberate exception: a request
-to **reduce** motion counts as an accessibility need whoever makes it, so `motion: "full"` never overrides it.
+Each trace entry also carries the `level` it won at. A persona field listed in `learned` decides at the `learned`
+level, below an explicit setting; the others decide as user settings. This is decided field by field, so a learned
+density does not weaken an explicit explanation depth. One deliberate exception: a request to **reduce** motion
+counts as an accessibility need whoever makes it, so `motion: "full"` never overrides it.
+
+**What counts as irreversible.** An act is irreversible when it is an IrreversibleAction, is marked
+`reversible: false`, or states a `consequence`: an effect worth stating cannot be undone, and the validator refuses
+`reversible: true` beside a consequence. Importance includes the IR's defaults: an IrreversibleAction is `critical`
+and a Warning `high` unless they say otherwise.
 
 ## The rules
 
 | Rule | Decides |
 |---|---|
 | `one-primary` (7.1) | `plan.primary`: the node the caller marks, or else the first IrreversibleAction, Approval, Recommendation, Choice, Input or Action. Its emphasis is `primary`. |
-| `irreversible-explicit` (7.2) | An irreversible act never gets `plan.focus`. An act that commits by itself (an IrreversibleAction, or an irreversible act with its own consequence) gets `confirm`: `confirm` on screen, `spoken-keyword` by voice, `typed-keyword` in text. An irreversible Choice is never preselected. |
-| `recommendation-first` (7.3) | Alternatives follow in the `secondary` region as one AlternativeList. A Choice preselects its predicted option, or the caller's selection. Focus starts on a reversible primary act. |
-| `critical-never-hidden` (7.4) | A critical node has emphasis `critical`, and its detail shows open (`expanded: true`), whatever the persona. |
+| `irreversible-explicit` (7.2) | An irreversible act never gets `plan.focus`. Whatever commits the effect gets `confirm`, once: an IrreversibleAction, or an irreversible act that no IrreversibleAction confirms (by its `confirms`, or implied when there is only one). The mode is `confirm` on screen, `spoken-keyword` by voice and `typed-keyword` in text, and the keyword modes carry `keyword` in the plan's language (English when Feather has none for it). An irreversible Choice is never preselected, and its prediction shows beside it as a `PredictionNote`. |
+| `recommendation-first` (7.3) | Alternatives follow in the `secondary` region, one AlternativeList per node they are alternatives to (`~alternatives:<for>`, or `~alternatives` when they name none). A reversible Choice preselects its predicted option, or the caller's selection. Focus starts on a reversible primary act. |
+| `critical-never-hidden` (7.4) | A critical node (with the IR's defaults) has emphasis `critical`, and its detail shows open (`expanded: true`), whatever the persona. |
 | `density-and-targets` (7.5) | `plan.density` comes from the person, then the brand, then `comfortable`. Low precision gives `spacious` density and 44 px targets. Touch surfaces get 44 px targets; others get the 24 px minimum (`plan.minTarget`). |
-| `output-routing` (7.6) | `plan.manifestation`: no visual output gives `voice`, or `text` when there is no audio either. Switch access gives `switch`, a speaker gives `voice`, a terminal gives `text`, and anything else gets `web`. No audio output makes `plan.cues` `text-only`. |
+| `output-routing` (7.6) | `plan.manifestation` follows output first: no visual output or a speaker gives `voice` (`text` when there is no audio either), and a terminal gives `text`. Switch access, needed or preferred, gives `switch` only where there is a screen. Anything else gets `web`. An input preference never removes a screen, so `inputMode: "voice"` keeps `web`. No audio output makes `plan.cues` `text-only`, and an audio or video Media gets `textEquivalent: true`. |
 | `explanation-depth` (7.7) | `expanded` on nodes with detail: brief closes it, detailed opens it. |
 | `reduced-motion` (7.8) | `plan.motion` is `reduced` when the OS or the person asks, over any brand motion. |
-| `text-without-decision` (7.9) | `plan.chrome` is `none` (plain text, no card) for one line of text with no decision. |
+| `text-without-decision` (7.9) | `plan.chrome` is `none` (plain text, no card) for a single Text, Confirmation or Status with no expandable detail, at most 120 code points and one line. |
 | `contrast` (7.10) | `plan.contrast` is `AAA` where vision is low, otherwise `AA`. |
-| `structure` | A PredictedChoice merges into its Choice (organism `PredictedChoice`). A Tradeoff attaches to the option it describes, and an Approval's requester to the approval. |
+| `importance` | High importance gives emphasis `high`, low gives `quiet`. A group of alternatives stands out as much as its strongest member. |
+| `structure` | A PredictedChoice merges into its reversible Choice (organism `PredictedChoice`), composed as a plan node. A Tradeoff attaches to the option it describes, and the requester attaches to every Approval it asks for. |
 | `defaults` | What the composer assumes when no rule applies, stated in the trace. |
 
 Every rule has tests in `packages/liquid/test/rules.test.ts`. Every valid conformance fixture, composed in every
 reference context, is snapshot in `packages/liquid/test/plans/`, so a rule change shows up as a diff.
+`packages/liquid/test/invariants.test.ts` checks what must hold whatever the rules decide, for every fixture in the
+reference contexts and 60 generated ones:
+
+- every IR node appears once in `order`;
+- focus never lands on an irreversible act;
+- critical detail is always open;
+- every IrreversibleAction confirms in its body's own way;
+- no plan takes a body its output cannot carry.
 
 ## The plan
 
@@ -94,22 +116,25 @@ interface LayoutPlan {
   cues: "audio-and-text" | "text-only"
   primary: string | null
   focus: string | null
+  order: string[]                 // every IR node id once: reading, speaking and scanning order
   regions: [{ id: "main"; nodes: PlanNode[] }, { id: "secondary"; nodes: PlanNode[] }]
-  trace: TraceEntry[]
+  trace: TraceEntry[]             // { rule, level, subject, value, because, overrode? }
 }
 
 interface PlanNode {
   id: string                      // the IR id; a group's id starts with "~"
   type: NodeType | "AlternativeGroup"
   organism: Organism              // what renders it
-  emphasis: "critical" | "primary" | "default" | "quiet"
+  emphasis: "critical" | "primary" | "high" | "default" | "quiet"
   expanded?: boolean              // on nodes with expandable
-  confirm?: "confirm" | "spoken-keyword" | "typed-keyword"   // on acts that commit
+  confirm?: "confirm" | "spoken-keyword" | "typed-keyword"   // on whatever commits an irreversible effect
+  keyword?: string                // the word to say or type, with the keyword modes
+  textEquivalent?: true           // audio or video with no audio output: render its text equivalent
   preselected?: string            // on a Choice
-  attached?: PlanNode[]           // a Tradeoff on its option, the requester on an Approval
+  attached?: PlanNode[]           // a Tradeoff on its option, the requester on an Approval, a PredictionNote
   items?: PlanNode[]              // the members of a group
   node?: IRNode                   // the IR node it renders
-  merged?: IRNode[]               // the PredictedChoice of a Choice
+  merged?: PlanNode[]             // the PredictedChoice of a reversible Choice
 }
 ```
 
@@ -127,9 +152,13 @@ The web manifestation renders a plan with Feather's organisms and atoms. It must
   - `motion` `reduced` makes every organism move as if the OS asked for reduced motion.
   - `contrast` is exposed as `data-contrast`, a hint until themes can promise AAA (L5).
   - `expanded` opens or closes "Why?" at first render.
-  - `confirm` chooses the IrreversibleAction mode.
+  - `confirm` chooses the confirm mode of whatever commits. An Approval or Recommendation with `confirm` arms
+    first, like an IrreversibleAction. An act with no `confirm` never commits by itself.
+  - `textEquivalent` renders the Media's transcript in place of the player.
+  - A `PredictionNote` shows the prediction beside the Choice as text, and never preselects.
   - `preselected` preselects the option.
-  - `focus` moves focus to that node's first control once, on mount, and never otherwise.
+  - `focus` moves focus to that node's first control once, on mount, and never otherwise. Organisms themselves
+    never move focus on render.
 - **Turn every act into a reply:** an organism's `onAct(act, value?)` becomes `{ experience, node, act, value }`.
   It is checked with `validateReply` before `onReply` receives it, and a reply that fails is never emitted.
 - **For `voice` and `text` plans, which arrive at L4,** render a plain, accessible summary of the plan: what is

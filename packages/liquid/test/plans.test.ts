@@ -16,7 +16,7 @@ function decisions(plan: LayoutPlan) {
     const { merged, items, attached, ...rest } = n
     const kept: Record<string, unknown> = { ...rest }
     delete kept.node
-    return { ...kept, ...(merged ? { merged: merged.map((m) => m.id) } : {}), ...(items ? { items: items.map(strip) } : {}), ...(attached ? { attached: attached.map(strip) } : {}) }
+    return { ...kept, ...(merged ? { merged: merged.map(strip) } : {}), ...(items ? { items: items.map(strip) } : {}), ...(attached ? { attached: attached.map(strip) } : {}) }
   }
   return { ...plan, regions: plan.regions.map((r) => ({ id: r.id, nodes: r.nodes.map(strip) })) }
 }

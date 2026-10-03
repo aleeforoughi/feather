@@ -11,9 +11,9 @@ How to use the IR, and what the validator checks, is in [README.md](README.md).
 | `id` | yes | string | Stable within the experience; replies and references use it. |
 | `intent` |  | string | What the human is doing here, in a few words. Required on act nodes. |
 | `importance` |  | `low` \| `normal` \| `high` \| `critical` | How much it matters. Default normal; critical is never hidden behind expansion. |
-| `reversible` |  | boolean | Whether the effect can be undone. Default true. |
+| `reversible` |  | boolean | Whether the effect can be undone. Default true; an act that states a consequence cannot be undone. |
 | `expandable` |  | { why?, detail? } | Detail on demand, behind "Why?". At least one entry. |
-| `primary` |  | boolean | This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience. |
+| `primary` |  | boolean | This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience. |
 
 `intent` is required on act nodes. `primary` exists only on Action, Choice, Input, Approval, Recommendation and IrreversibleAction.
 

@@ -147,7 +147,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -211,7 +211,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -235,7 +235,7 @@
           "additionalProperties": false
         },
         "primary": {
-          "description": "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+          "description": "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
           "type": "boolean"
         },
         "label": {
@@ -279,7 +279,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -303,7 +303,7 @@
           "additionalProperties": false
         },
         "primary": {
-          "description": "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+          "description": "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
           "type": "boolean"
         },
         "prompt": {
@@ -393,7 +393,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -417,7 +417,7 @@
           "additionalProperties": false
         },
         "primary": {
-          "description": "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+          "description": "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
           "type": "boolean"
         },
         "prompt": {
@@ -509,7 +509,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -594,7 +594,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -671,7 +671,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -743,7 +743,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -836,7 +836,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -912,7 +912,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1016,7 +1016,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1114,7 +1114,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1182,7 +1182,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1257,7 +1257,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1281,7 +1281,7 @@
           "additionalProperties": false
         },
         "primary": {
-          "description": "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+          "description": "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
           "type": "boolean"
         },
         "request": {
@@ -1447,7 +1447,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1471,7 +1471,7 @@
           "additionalProperties": false
         },
         "primary": {
-          "description": "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+          "description": "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
           "type": "boolean"
         },
         "summary": {
@@ -1633,7 +1633,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1715,7 +1715,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1793,7 +1793,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1878,7 +1878,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -1952,7 +1952,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -2028,7 +2028,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -2121,7 +2121,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {
@@ -2243,7 +2243,7 @@
           "additionalProperties": false
         },
         "primary": {
-          "description": "This node is the experience's main act: it gets the emphasis. It never takes the default focus by itself, and an IrreversibleAction never does. At most one per experience.",
+          "description": "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
           "type": "boolean"
         },
         "label": {
@@ -2403,7 +2403,7 @@
           ]
         },
         "reversible": {
-          "description": "Whether the effect can be undone. Default true.",
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
           "type": "boolean"
         },
         "expandable": {

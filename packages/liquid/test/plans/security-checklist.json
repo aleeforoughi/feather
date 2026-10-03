@@ -12,6 +12,13 @@
     "cues": "audio-and-text",
     "primary": "setup_2fa",
     "focus": "setup_2fa",
+    "order": [
+      "heading",
+      "completed_text",
+      "setup_2fa",
+      "review_sessions",
+      "change_password"
+    ],
     "regions": [
       {
         "id": "main",
@@ -56,30 +63,35 @@
     "trace": [
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.manifestation",
         "value": "web",
-        "because": "nothing asks for another body"
+        "because": "a screen is available and nothing asks for another body"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.cues",
         "value": "audio-and-text",
         "because": "audio output is available or unstated"
       },
       {
         "rule": "contrast",
+        "level": "default",
         "subject": "plan.contrast",
         "value": "AA",
         "because": "WCAG 2.2 AA in every theme"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.density",
         "value": "comfortable",
         "because": "no density asked for"
       },
       {
         "rule": "density-and-targets",
+        "level": "task",
         "subject": "plan.minTarget",
         "value": 44,
         "because": "a phone is used by touch",
@@ -93,12 +105,14 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.motion",
         "value": "full",
         "because": "nothing asks to reduce motion"
       },
       {
         "rule": "one-primary",
+        "level": "default",
         "subject": "plan.primary",
         "value": "setup_2fa",
         "because": "none marked: Action \"setup_2fa\" is the act that most needs the person",
@@ -106,12 +120,13 @@
           {
             "rule": "one-primary",
             "value": null,
-            "because": "the experience has no act"
+            "because": "the experience has no act that can be primary"
           }
         ]
       },
       {
         "rule": "recommendation-first",
+        "level": "task",
         "subject": "plan.focus",
         "value": "setup_2fa",
         "because": "focus starts on the primary act \"setup_2fa\"",
@@ -125,28 +140,37 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.chrome",
         "value": "card",
-        "because": "the experience has a decision or more than a line"
+        "because": "the experience has a decision, more than one node, or more than a line"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node heading.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node completed_text.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "one-primary",
+        "level": "task",
         "subject": "node setup_2fa.emphasis",
         "value": "primary",
         "because": "the primary act",
         "overrode": [
+          {
+            "rule": "importance",
+            "value": "high",
+            "because": "high importance"
+          },
           {
             "rule": "defaults",
             "value": "default",
@@ -156,12 +180,14 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node review_sessions.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"
@@ -181,6 +207,13 @@
     "cues": "audio-and-text",
     "primary": "setup_2fa",
     "focus": "setup_2fa",
+    "order": [
+      "heading",
+      "completed_text",
+      "setup_2fa",
+      "review_sessions",
+      "change_password"
+    ],
     "regions": [
       {
         "id": "main",
@@ -225,24 +258,28 @@
     "trace": [
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.manifestation",
         "value": "web",
-        "because": "nothing asks for another body"
+        "because": "a screen is available and nothing asks for another body"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.cues",
         "value": "audio-and-text",
         "because": "audio output is available or unstated"
       },
       {
         "rule": "contrast",
+        "level": "default",
         "subject": "plan.contrast",
         "value": "AA",
         "because": "WCAG 2.2 AA in every theme"
       },
       {
         "rule": "density-and-targets",
+        "level": "user-setting",
         "subject": "plan.density",
         "value": "compact",
         "because": "the person's density (compact)",
@@ -256,18 +293,21 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.minTarget",
         "value": 24,
         "because": "WCAG 2.2 AA minimum target"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.motion",
         "value": "full",
         "because": "nothing asks to reduce motion"
       },
       {
         "rule": "one-primary",
+        "level": "default",
         "subject": "plan.primary",
         "value": "setup_2fa",
         "because": "none marked: Action \"setup_2fa\" is the act that most needs the person",
@@ -275,12 +315,13 @@
           {
             "rule": "one-primary",
             "value": null,
-            "because": "the experience has no act"
+            "because": "the experience has no act that can be primary"
           }
         ]
       },
       {
         "rule": "recommendation-first",
+        "level": "task",
         "subject": "plan.focus",
         "value": "setup_2fa",
         "because": "focus starts on the primary act \"setup_2fa\"",
@@ -294,28 +335,37 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.chrome",
         "value": "card",
-        "because": "the experience has a decision or more than a line"
+        "because": "the experience has a decision, more than one node, or more than a line"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node heading.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node completed_text.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "one-primary",
+        "level": "task",
         "subject": "node setup_2fa.emphasis",
         "value": "primary",
         "because": "the primary act",
         "overrode": [
+          {
+            "rule": "importance",
+            "value": "high",
+            "because": "high importance"
+          },
           {
             "rule": "defaults",
             "value": "default",
@@ -325,12 +375,14 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node review_sessions.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"
@@ -350,6 +402,13 @@
     "cues": "audio-and-text",
     "primary": "setup_2fa",
     "focus": "setup_2fa",
+    "order": [
+      "heading",
+      "completed_text",
+      "setup_2fa",
+      "review_sessions",
+      "change_password"
+    ],
     "regions": [
       {
         "id": "main",
@@ -394,18 +453,21 @@
     "trace": [
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.manifestation",
         "value": "web",
-        "because": "nothing asks for another body"
+        "because": "a screen is available and nothing asks for another body"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.cues",
         "value": "audio-and-text",
         "because": "audio output is available or unstated"
       },
       {
         "rule": "contrast",
+        "level": "accessibility",
         "subject": "plan.contrast",
         "value": "AAA",
         "because": "low vision: WCAG AAA contrast",
@@ -419,6 +481,7 @@
       },
       {
         "rule": "density-and-targets",
+        "level": "accessibility",
         "subject": "plan.density",
         "value": "spacious",
         "because": "low motor precision: room between targets",
@@ -432,6 +495,7 @@
       },
       {
         "rule": "density-and-targets",
+        "level": "accessibility",
         "subject": "plan.minTarget",
         "value": 44,
         "because": "low motor precision: targets of at least 44 px",
@@ -445,6 +509,7 @@
       },
       {
         "rule": "reduced-motion",
+        "level": "accessibility",
         "subject": "plan.motion",
         "value": "reduced",
         "because": "the operating system asks for reduced motion",
@@ -458,6 +523,7 @@
       },
       {
         "rule": "one-primary",
+        "level": "default",
         "subject": "plan.primary",
         "value": "setup_2fa",
         "because": "none marked: Action \"setup_2fa\" is the act that most needs the person",
@@ -465,12 +531,13 @@
           {
             "rule": "one-primary",
             "value": null,
-            "because": "the experience has no act"
+            "because": "the experience has no act that can be primary"
           }
         ]
       },
       {
         "rule": "recommendation-first",
+        "level": "task",
         "subject": "plan.focus",
         "value": "setup_2fa",
         "because": "focus starts on the primary act \"setup_2fa\"",
@@ -484,28 +551,37 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.chrome",
         "value": "card",
-        "because": "the experience has a decision or more than a line"
+        "because": "the experience has a decision, more than one node, or more than a line"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node heading.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node completed_text.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "one-primary",
+        "level": "task",
         "subject": "node setup_2fa.emphasis",
         "value": "primary",
         "because": "the primary act",
         "overrode": [
+          {
+            "rule": "importance",
+            "value": "high",
+            "because": "high importance"
+          },
           {
             "rule": "defaults",
             "value": "default",
@@ -515,12 +591,14 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node review_sessions.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"
@@ -540,6 +618,13 @@
     "cues": "audio-and-text",
     "primary": "setup_2fa",
     "focus": null,
+    "order": [
+      "heading",
+      "completed_text",
+      "setup_2fa",
+      "review_sessions",
+      "change_password"
+    ],
     "regions": [
       {
         "id": "main",
@@ -584,6 +669,7 @@
     "trace": [
       {
         "rule": "output-routing",
+        "level": "accessibility",
         "subject": "plan.manifestation",
         "value": "voice",
         "because": "no visual output: the experience is spoken",
@@ -591,42 +677,48 @@
           {
             "rule": "defaults",
             "value": "web",
-            "because": "nothing asks for another body"
+            "because": "a screen is available and nothing asks for another body"
           }
         ]
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.cues",
         "value": "audio-and-text",
         "because": "audio output is available or unstated"
       },
       {
         "rule": "contrast",
+        "level": "default",
         "subject": "plan.contrast",
         "value": "AA",
         "because": "WCAG 2.2 AA in every theme"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.density",
         "value": "comfortable",
         "because": "no density asked for"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.minTarget",
         "value": 24,
         "because": "WCAG 2.2 AA minimum target"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.motion",
         "value": "full",
         "because": "nothing asks to reduce motion"
       },
       {
         "rule": "one-primary",
+        "level": "default",
         "subject": "plan.primary",
         "value": "setup_2fa",
         "because": "none marked: Action \"setup_2fa\" is the act that most needs the person",
@@ -634,12 +726,13 @@
           {
             "rule": "one-primary",
             "value": null,
-            "because": "the experience has no act"
+            "because": "the experience has no act that can be primary"
           }
         ]
       },
       {
         "rule": "output-routing",
+        "level": "task",
         "subject": "plan.focus",
         "value": null,
         "because": "a voice manifestation has no focus",
@@ -653,28 +746,37 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "plan.chrome",
         "value": "card",
-        "because": "the experience has a decision or more than a line"
+        "because": "the experience has a decision, more than one node, or more than a line"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node heading.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node completed_text.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "one-primary",
+        "level": "task",
         "subject": "node setup_2fa.emphasis",
         "value": "primary",
         "because": "the primary act",
         "overrode": [
+          {
+            "rule": "importance",
+            "value": "high",
+            "because": "high importance"
+          },
           {
             "rule": "defaults",
             "value": "default",
@@ -684,12 +786,14 @@
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node review_sessions.emphasis",
         "value": "default",
         "because": "normal importance"
       },
       {
         "rule": "defaults",
+        "level": "default",
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"

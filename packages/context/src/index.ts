@@ -16,8 +16,9 @@ export interface PersonaSlice {
   motion?: "full" | "reduced"
   /** How the person prefers to act. */
   inputMode?: "pointer" | "touch" | "keyboard" | "voice" | "switch"
-  /** Where these preferences come from: "explicit" settings outrank "learned" ones (principle 8). Default explicit. */
-  source?: "explicit" | "learned"
+  /** The fields above the host learned rather than the person set. Explicit settings outrank learned ones
+   * (principle 8); a field not listed here is explicit. */
+  learned?: Array<"density" | "explanation" | "motion" | "inputMode">
 }
 
 /** What the person can perceive and do, right now. Interaction needs, never diagnoses. */

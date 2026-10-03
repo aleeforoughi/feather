@@ -51,7 +51,8 @@ This page is the contract every organism follows. Stories, tests and review chec
 
   Format money with `Intl.NumberFormat` in the organism's `locale` (default: the document's `lang`, else
   `en`).
-- Irreversible acts never take the default focus and never auto-submit.
+- Irreversible acts never take the default focus and never auto-submit. Where focus starts is the composer's
+  decision (`plan.focus`), applied once on mount by the manifestation; an organism never moves focus on render.
 - **An irreversible act happens once.** After `confirm` (or an Approval's `approve` or `reject`), the organism
   enters a `done` state (`data-variant="done"`): it shows the outcome ("Confirmed: spends AED 1,050"), and offers
   no control that could act again. The caller collapses the experience. Focus moves to the outcome text
@@ -130,7 +131,7 @@ in both reference themes in Storybook, the axe suite and the visual suite.
 
 - Props: `intent`, `request`, `requester?` (`{ name, role?, kind? }`, shown with `RoleChip`), `scope?`,
   `consequence?`, `reversible?`, `importance?`, `expandable?`, `onAct(act: "approve" | "reject", reason?)`.
-- Approve performs `approve`. When `reversible` is false and it has a consequence, approve follows the
+- Approve performs `approve`. When it has a consequence (which makes it irreversible), approve follows the
   IrreversibleAction confirm pattern, arming first.
 - Reject opens an optional reason field (Textarea with a label) with "Send rejection" and "Back". Sending calls
   `onAct("reject", reason || undefined)`. Escape backs out.

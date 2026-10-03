@@ -2,6 +2,7 @@
 // diffed, snapshot-tested and sent across a process boundary.
 import type { Density } from "@aleeforoughi/feather-context"
 import type { IRNode, NodeType } from "@aleeforoughi/feather-intent"
+import type { Level } from "./priority.ts"
 
 export const PLAN_VERSION = "feather.plan/0"
 
@@ -34,9 +35,11 @@ export type Organism =
   | "Comparison"
   | "IrreversibleAction"
   | "ExploreMore"
+  /** A PredictedChoice shown as a note beside an irreversible Choice, which is never preselected. */
+  | "PredictionNote"
 
 /** How strongly a node stands out. */
-export type Emphasis = "critical" | "primary" | "default" | "quiet"
+export type Emphasis = "critical" | "primary" | "high" | "default" | "quiet"
 
 /** How an irreversible act is confirmed, per manifestation: two deliberate presses, a spoken or a typed keyword. */
 export type ConfirmMode = "confirm" | "spoken-keyword" | "typed-keyword"
@@ -49,18 +52,23 @@ export interface PlanNode {
   emphasis: Emphasis
   /** Whether its expandable detail shows open. Only on nodes that have expandable. */
   expanded?: boolean
-  /** How the act is confirmed. Only on irreversible acts. */
+  /** How the act is confirmed. Only on acts that commit by themselves; an act committed by an IrreversibleAction
+   * that confirms it has none (that IrreversibleAction does). */
   confirm?: ConfirmMode
+  /** The word to say or type for spoken-keyword and typed-keyword, in the plan's locale. */
+  keyword?: string
+  /** Render the text equivalent in place of the medium: an audio or video Media when there is no audio output. */
+  textEquivalent?: true
   /** The option preselected in a Choice. */
   preselected?: string
   /** Nodes rendered as part of this one: a Tradeoff on its option, the Person who requests an Approval. */
   attached?: PlanNode[]
   /** A group's members, in order. */
   items?: PlanNode[]
-  /** The IR node it renders (absent on groups). Merged nodes keep theirs in `merged`. */
+  /** The IR node it renders (absent on groups). */
   node?: IRNode
-  /** IR nodes folded into this one: the PredictedChoice of a Choice. */
-  merged?: IRNode[]
+  /** Nodes folded into this one, composed like any other: the PredictedChoice of a reversible Choice. */
+  merged?: PlanNode[]
 }
 
 export interface Region {
@@ -72,6 +80,8 @@ export interface Region {
 /** Why a value was chosen, and what it overrode (principle 8 order). */
 export interface TraceEntry {
   rule: RuleId
+  /** The principle 8 level the winning rule acted at. */
+  level: Level
   /** What was decided: "plan.density", "node go.confirm", "structure". */
   subject: string
   value: unknown
@@ -90,6 +100,7 @@ export type RuleId =
   | "reduced-motion"
   | "text-without-decision"
   | "contrast"
+  | "importance"
   | "structure"
   | "defaults"
 
@@ -112,6 +123,9 @@ export interface LayoutPlan {
   primary: string | null
   /** Where focus starts; never an irreversible act (composer rule 2). Null: focus stays where it is. */
   focus: string | null
+  /** Every IR node id once, in reading, speaking and scanning order: main then secondary, each node followed by
+   * what is merged into it, attached to it, or grouped in it. */
+  order: string[]
   regions: Region[]
   trace: TraceEntry[]
 }

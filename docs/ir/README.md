@@ -69,8 +69,9 @@ whatever was misunderstood. The [node reference](nodes.md) lists the allowed kin
 **Dates** are ISO 8601. A date-time with `Z` or an offset names an instant; one without names a wall-clock
 time. Feather never compares the two kinds, because the answer would depend on where it runs.
 
-**`primary`** marks the main act. It gets the emphasis but never takes the default focus by itself, and an
-IrreversibleAction never takes the default focus at all (composer rule 2).
+**`primary`** marks the main act and gets the emphasis. Where focus starts is the composer's decision
+(`docs/composer.md`). Focus can start on a reversible primary act, but never on an irreversible one (composer rule
+2).
 
 ## Acts and replies
 
@@ -112,7 +113,8 @@ The validator checks structure, and these rules across nodes:
    nothing.
 2. **Irreversible means explicit.** An `IrreversibleAction` must state its `consequence` (`spend`, `publish`,
    `send`, `consent`, `delete` or a `statement`), so Feather can show it verbatim and ask for a deliberate act.
-   Its importance is `high` or `critical`. Any other act marked `reversible: false` either states a consequence
+   Its importance is `high` or `critical`. An act that states a consequence is irreversible by definition, so
+   `reversible: true` next to a consequence is an error. Any other act marked `reversible: false` either states a consequence
    of its own (Approval and Recommendation take one) or is confirmed by an IrreversibleAction. The
    IrreversibleAction names that act in `confirms`; when the experience has exactly one IrreversibleAction, it
    confirms implicitly.
@@ -176,6 +178,7 @@ says what to change. `validate()` never throws, and reports at most 100 issues; 
 | `too-few-items`, `duplicate-item`, `empty-experience`, `empty-expandable`, `empty-consequence`, `empty-tradeoff` | Not enough content to mean anything, or the same thing twice. |
 | `multiple-primary`, `not-primary-capable` | Rule 1. |
 | `irreversible-without-consequence`, `irreversible-marked-reversible`, `unneeded-confirmation` | Rule 2. |
+| `unreadable` | The document could not be read as JSON data at all (a value JSON cannot hold, a circular reference). |
 | `missing-text-equivalent` | Rule 3. |
 | `dangling-reference`, `self-reference`, `wrong-reference-type`, `out-of-order`, `ambiguous-alternative` | Rule 4. |
 | `conflicting-prediction` | Rule 5. |
