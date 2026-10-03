@@ -48,12 +48,24 @@ importers:
       '@aleeforoughi/feather-context':
         specifier: workspace:*
         version: link:../../packages/context
+      '@aleeforoughi/feather-dialog':
+        specifier: workspace:*
+        version: link:../../packages/dialog
       '@aleeforoughi/feather-intent':
         specifier: workspace:*
         version: link:../../packages/intent
       '@aleeforoughi/feather-liquid':
         specifier: workspace:*
         version: link:../../packages/liquid
+      '@aleeforoughi/feather-manifest-switch':
+        specifier: workspace:*
+        version: link:../../packages/manifest-switch
+      '@aleeforoughi/feather-manifest-text':
+        specifier: workspace:*
+        version: link:../../packages/manifest-text
+      '@aleeforoughi/feather-manifest-voice':
+        specifier: workspace:*
+        version: link:../../packages/manifest-voice
       '@aleeforoughi/feather-manifest-web':
         specifier: workspace:*
         version: link:../../packages/manifest-web

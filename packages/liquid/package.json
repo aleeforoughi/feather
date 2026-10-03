@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-liquid",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "The liquid composer: compose(experience, context) turns an Experience IR and who it is for into a layout plan, by named rules, with a trace of every decision. Pure and deterministic.",
   "license": "UNLICENSED",
   "type": "module",

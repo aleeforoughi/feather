@@ -1,7 +1,7 @@
 {
   "name": "@feather-apps/playground",
   "private": true,
-  "version": "1.10.0",
+  "version": "1.11.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,8 +12,12 @@
   },
   "dependencies": {
     "@aleeforoughi/feather-context": "workspace:*",
+    "@aleeforoughi/feather-dialog": "workspace:*",
     "@aleeforoughi/feather-intent": "workspace:*",
     "@aleeforoughi/feather-liquid": "workspace:*",
+    "@aleeforoughi/feather-manifest-switch": "workspace:*",
+    "@aleeforoughi/feather-manifest-text": "workspace:*",
+    "@aleeforoughi/feather-manifest-voice": "workspace:*",
     "@aleeforoughi/feather-manifest-web": "workspace:*",
     "@aleeforoughi/feather-react": "workspace:*",
     "@aleeforoughi/feather-tokens": "workspace:*",

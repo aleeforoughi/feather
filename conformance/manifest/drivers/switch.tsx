@@ -35,6 +35,8 @@ export async function driveSwitch(fx: Fixture, s: Scenario): Promise<Result> {
   const user = userEvent.setup()
   const replies: ReplyEvent[] = []
   const { container, unmount } = render(<SwitchExperience plan={plan} experience={fx.ir} scan="step" onReply={(r) => void replies.push(r)} />)
+  // A switch user starts by focusing the scanner: keys are heard only inside the experience (manifestations.md §4).
+  container.querySelector<HTMLElement>("[data-slot=switch-scanner]")?.focus()
   try {
     const run = async (step: Step) => {
       const find = () => step.find(hostOf(container, s.node))

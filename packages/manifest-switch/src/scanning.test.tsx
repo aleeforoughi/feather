@@ -10,7 +10,10 @@ import { FIXTURES, failOnConsole, fixture } from "./test/fixtures"
 
 const switchContext: RenderContext = { capability: { input: { switch: true } } }
 
-const press = (key: string) => fireEvent.keyDown(document.activeElement ?? document.body, { key })
+const press = (key: string) => {
+  if (!document.activeElement || document.activeElement === document.body) (document.querySelector("[data-slot=switch-scanner]") as HTMLElement | null)?.focus()
+  fireEvent.keyDown(document.activeElement ?? document.body, { key })
+}
 const focused = () => (document.activeElement as HTMLElement | null)?.textContent ?? ""
 /** Presses "next" until the focused control satisfies `pred`; fails after a full lap. */
 function nextUntil(pred: (el: HTMLElement) => boolean) {
@@ -314,5 +317,47 @@ describe("popups", () => {
     await vi.waitFor(() => expect(screen.queryAllByRole("menuitem")).toHaveLength(0))
     press("Tab")
     expect(document.activeElement?.closest("[data-slot=switch-scanner]")).not.toBeNull()
+  })
+})
+
+describe("where keys are heard", () => {
+  failOnConsole()
+
+  it("experience mode (default) leaves keys outside the scanner alone, and never takes Shift+Tab", () => {
+    render(
+      <div>
+        <button data-testid="outside">Outside</button>
+        <FeatherSwitchExperience experience={fixture("ad-campaign-launch")} context={switchContext} scan="step" onReply={vi.fn()} />
+      </div>,
+    )
+    const outside = screen.getByTestId("outside")
+    outside.focus()
+    for (const key of ["Tab", "Enter", " "]) expect(fireEvent.keyDown(outside, { key })).toBe(true)
+    expect(document.querySelector("[data-scanned]")).toBeNull()
+    expect(document.activeElement).toBe(outside)
+
+    const root = document.querySelector("[data-slot=switch-scanner]") as HTMLElement
+    expect(root.tabIndex).toBe(0)
+    expect(root.getAttribute("aria-label")).toMatch(/Switch scanning/)
+    root.focus()
+    expect(fireEvent.keyDown(root, { key: "Tab", shiftKey: true })).toBe(true)
+    expect(document.querySelector("[data-scanned]")).toBeNull()
+    expect(fireEvent.keyDown(root, { key: "Tab" })).toBe(false)
+    expect(document.querySelector("[data-scanned]")).not.toBeNull()
+  })
+
+  it("document mode hears keys anywhere, but still not Shift+Tab", () => {
+    render(
+      <div>
+        <button data-testid="outside">Outside</button>
+        <FeatherSwitchExperience experience={fixture("ad-campaign-launch")} context={switchContext} scan="step" listen="document" onReply={vi.fn()} />
+      </div>,
+    )
+    const outside = screen.getByTestId("outside")
+    outside.focus()
+    expect(fireEvent.keyDown(outside, { key: "Tab", shiftKey: true })).toBe(true)
+    expect(document.querySelector("[data-scanned]")).toBeNull()
+    expect(fireEvent.keyDown(outside, { key: "Tab" })).toBe(false)
+    expect(document.querySelector("[data-scanned]")).not.toBeNull()
   })
 })

@@ -1,9 +1,10 @@
 import * as React from "react"
 import type { ReplyEvent } from "@aleeforoughi/feather-intent"
-import { REFERENCE_CONTEXTS, type LayoutPlan } from "@aleeforoughi/feather-liquid"
-import { FeatherExperience, PlanView } from "@aleeforoughi/feather-manifest-web"
+import { compose, type LayoutPlan } from "@aleeforoughi/feather-liquid"
 import { Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, Textarea } from "@aleeforoughi/feather-react"
+import { Body } from "./bodies"
 import { composeText, RUNS, type Problem } from "./compose"
+import { FOUR_CONTEXTS, PRESET_CONTEXTS } from "./contexts"
 import { ContextControls, DEFAULT_CONTROLS, toContext, type Controls } from "./controls"
 import { applyTheme, THEME_NAMES, type ThemeName } from "./theme"
 
@@ -72,12 +73,25 @@ function Trace({ plan }: { plan: LayoutPlan }) {
   )
 }
 
+/** The last reply, and which body sent it. The text stays the bare reply event; the body is beside it. */
+function LastReply({ reply }: { reply: { text: string; body: string } | null }) {
+  return (
+    <div>
+      <p className="text-sm font-medium">
+        Last reply <span data-testid="last-reply-body" className="font-normal text-muted-foreground">{reply ? `(sent by the ${reply.body} body)` : ""}</span>
+      </p>
+      <pre data-testid="last-reply" data-body={reply?.body} className="mt-1 min-h-8 overflow-x-auto rounded-lg bg-muted p-2 font-mono text-xs">{reply?.text || "none yet"}</pre>
+    </div>
+  )
+}
+
 export default function App() {
   const [fixture, setFixture] = React.useState(FIXTURES.find((f) => f.name === "ad-campaign-launch")?.name ?? FIXTURES[0]!.name)
   const [text, setText] = React.useState(() => FIXTURES.find((f) => f.name === fixture)!.text)
   const [controls, setControls] = React.useState<Controls>(DEFAULT_CONTROLS)
   const [theme, setTheme] = React.useState<ThemeName>("paper-sharp")
-  const [reply, setReply] = React.useState<string>("")
+  const [reply, setReply] = React.useState<{ text: string; body: string } | null>(null)
+  const [preset, setPreset] = React.useState("custom")
 
   React.useLayoutEffect(() => applyTheme(theme), [theme])
 
@@ -87,10 +101,25 @@ export default function App() {
   const pick = (name: string) => {
     setFixture(name)
     setText(FIXTURES.find((f) => f.name === name)!.text)
-    setReply("")
+    setReply(null)
   }
-  const onReply = React.useCallback((r: ReplyEvent) => setReply(JSON.stringify(r)), [])
-  const noop = React.useCallback(() => {}, [])
+  const onReply = React.useCallback((r: ReplyEvent, body: string) => setReply({ text: JSON.stringify(r), body }), [])
+  // What the Rendered tab shows: the controls' context, or one of the named ones.
+  const rendered = React.useMemo((): { plan: LayoutPlan } | null => {
+    if (!composed.ok) return null
+    const named = PRESET_CONTEXTS.find((c) => c.id === preset)
+    if (!named) return { plan: composed.plan }
+    const result = compose(composed.experience, named.context)
+    return result.ok ? { plan: result.plan } : null
+  }, [composed, preset])
+  // One plan for each of the four contexts, each rendered by the body its own plan names.
+  const four = React.useMemo(() => {
+    if (!composed.ok) return []
+    return FOUR_CONTEXTS.map((c) => {
+      const result = compose(composed.experience, c.context)
+      return { ...c, plan: result.ok ? result.plan : null }
+    })
+  }, [composed])
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -135,30 +164,44 @@ export default function App() {
               <TabsTrigger value="trace">Trace</TabsTrigger>
             </TabsList>
             <TabsContent value="rendered" className="flex flex-col gap-3 pt-3">
-              {composed.ok ? (
-                // Focus is not moved here: the view is remounted as the JSON becomes valid again, and typing must not be interrupted.
-                <PlanView plan={composed.plan} experience={composed.experience} onReply={onReply} autoFocus={false} />
+              {composed.ok && rendered ? (
+                <>
+                  <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex min-w-48 flex-col gap-1">
+                      <Label htmlFor="rendered-context">Context</Label>
+                      <select id="rendered-context" className={SELECT} value={preset} onChange={(e) => setPreset(e.target.value)}>
+                        <option value="custom">The controls on the left</option>
+                        {PRESET_CONTEXTS.map((c) => (
+                          <option key={c.id} value={c.id}>{c.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <p data-testid="rendered-body" className="pb-1 text-sm text-muted-foreground">Body: <span className="font-medium text-foreground">{rendered.plan.manifestation}</span></p>
+                  </div>
+                  {/* Focus is not moved here: the view is remounted as the JSON becomes valid again, and typing must not be interrupted. */}
+                  <Body key={rendered.plan.manifestation} plan={rendered.plan} experience={composed.experience} onReply={onReply} />
+                </>
               ) : (
                 <p className="text-sm text-muted-foreground">Nothing to render until the IR is valid.</p>
               )}
-              <div>
-                <p className="text-sm font-medium">Last reply</p>
-                <pre data-testid="last-reply" className="mt-1 min-h-8 overflow-x-auto rounded-lg bg-muted p-2 font-mono text-xs">{reply || "none yet"}</pre>
-              </div>
+              <LastReply reply={reply} />
             </TabsContent>
-            <TabsContent value="contexts" className="pt-3">
+            <TabsContent value="contexts" className="flex flex-col gap-3 pt-3">
               {composed.ok ? (
                 <div className="grid gap-4 xl:grid-cols-2">
-                  {Object.entries(REFERENCE_CONTEXTS).map(([name, { title, context: ctx }]) => (
-                    <section key={name} data-testid="context-panel" aria-labelledby={`ctx-${name}`} className="flex min-w-0 flex-col gap-2">
-                      <h3 id={`ctx-${name}`} data-testid="context-title" className="text-sm font-semibold">{title}</h3>
-                      <FeatherExperience experience={composed.experience} context={ctx} onReply={noop} autoFocus={false} />
+                  {four.map(({ id, title, plan }) => (
+                    <section key={id} data-testid="context-panel" data-body={plan?.manifestation} aria-labelledby={`ctx-${id}`} className="flex min-w-0 flex-col gap-2">
+                      <h3 id={`ctx-${id}`} className="text-sm font-semibold">
+                        <span data-testid="context-title">{title}</span> <span data-testid="context-body" className="font-normal text-muted-foreground">({plan?.manifestation ?? "no plan"})</span>
+                      </h3>
+                      {plan && <Body plan={plan} experience={composed.experience} onReply={onReply} />}
                     </section>
                   ))}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">Nothing to render until the IR is valid.</p>
               )}
+              <LastReply reply={reply} />
             </TabsContent>
             <TabsContent value="plan" className="pt-3">
               {composed.ok ? <pre data-testid="plan-json" className="overflow-x-auto rounded-lg bg-muted p-3 font-mono text-xs">{JSON.stringify(composed.plan, null, 2)}</pre> : <p className="text-sm text-muted-foreground">No plan until the IR is valid.</p>}

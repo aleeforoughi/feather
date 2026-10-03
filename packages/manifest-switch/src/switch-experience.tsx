@@ -54,6 +54,13 @@ export interface SwitchExperienceProps {
   /** Resting the pointer on a target this long selects it. Never a committing control. Unset: no dwell. */
   dwellMs?: number
   keys?: SwitchKeys
+  /**
+   * Where the switch keys are heard. "experience" (default): only when the event target is inside the scanner (or inside
+   * a popup it owns), so the rest of the page keeps Tab, Space and Enter; the scanner itself is focusable, so a switch
+   * user can start there. "document": anywhere on the page, for a page that is nothing but the experience. Shift+Tab is
+   * never captured, in either mode.
+   */
+  listen?: "experience" | "document"
   /** Timers, injectable for tests. */
   clock?: ScanClock
   className?: string
@@ -73,16 +80,16 @@ function removeDescribedBy(el: HTMLElement, id: string) {
   else el.removeAttribute("aria-describedby")
 }
 
-export function SwitchExperience({ plan, onReply, experience, onRejectedReply, scan = "auto", scanMs = 1500, dwellMs, keys, clock = windowClock, className }: SwitchExperienceProps) {
+export function SwitchExperience({ plan, onReply, experience, onRejectedReply, scan = "auto", scanMs = 1500, dwellMs, keys, listen = "experience", clock = windowClock, className }: SwitchExperienceProps) {
   const root = React.useRef<HTMLDivElement>(null)
   const hintId = React.useId()
   const [state, setState] = React.useState<ScanState>("idle")
   const reduced = plan.motion === "reduced"
 
   // Everything the listeners read, kept in a ref so the listeners are attached once per configuration.
-  const live = React.useRef({ scan, scanMs, dwellMs, keys: keys ?? DEFAULT_KEYS[scan], clock })
+  const live = React.useRef({ scan, scanMs, dwellMs, keys: keys ?? DEFAULT_KEYS[scan], clock, listen })
   React.useLayoutEffect(() => {
-    live.current = { scan, scanMs, dwellMs, keys: keys ?? DEFAULT_KEYS[scan], clock }
+    live.current = { scan, scanMs, dwellMs, keys: keys ?? DEFAULT_KEYS[scan], clock, listen }
   })
 
   React.useEffect(() => {
@@ -168,6 +175,12 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
+      if (e.key === "Tab" && e.shiftKey) return
+      if (live.current.listen === "experience") {
+        const scope = scopeOf(host)
+        const from = e.target instanceof Node ? e.target : null
+        if (!from || !(host.contains(from) || (scope !== host && scope.contains(from)))) return
+      }
       const k = live.current.keys
       const active = doc.activeElement
       const inField = active instanceof HTMLElement && host.contains(active) && isTextEntry(active)
@@ -299,7 +312,7 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
     "[&_[data-scanned=true]]:outline-[3px] [&_[data-scanned=true]]:outline-offset-[3px] [&_[data-scanned=true]]:outline-solid [&_[data-scanned=true]]:outline-ring"
   const motion = reduced ? "[&_[data-scanned]]:transition-none" : "[&_[data-scanned]]:transition-[outline-offset] [&_[data-scanned]]:duration-150"
   return (
-    <div ref={root} data-slot="switch-scanner" data-variant={state} data-scan={scan} data-motion={plan.motion} className={[ring, motion, className ?? ""].filter(Boolean).join(" ")}>
+    <div ref={root} role="group" tabIndex={0} aria-label="Switch scanning: press Space or Enter to start" data-slot="switch-scanner" data-variant={state} data-scan={scan} data-motion={plan.motion} className={[ring, motion, className ?? ""].filter(Boolean).join(" ")}>
       <span id={hintId} data-slot="switch-scan-hint" className="sr-only">
         {HINT_TEXT}
       </span>

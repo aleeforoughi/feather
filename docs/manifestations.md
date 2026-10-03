@@ -194,6 +194,11 @@ Switch access on the web, built on `manifest-web` (`PlanView`).
   - **auto (one switch):** the highlight advances every `scanMs`. Space or Enter selects (clicks) it.
   - **step (two switches):** Tab or Space moves to the next target, and Enter selects.
   - The keys are configurable. Scanning pauses while a text field has focus, and typing goes to it.
+  - **`listen`** (`"experience"` by default, or `"document"`) says where the keys are heard. By default only a key
+    pressed inside the scanner, or inside a popup it owns, is taken; the rest of the page keeps Tab, Space and Enter.
+    The scanner itself is focusable (`tabIndex=0`, named "Switch scanning: press Space or Enter to start"), so a
+    switch user starts there. `"document"` hears keys anywhere, for a page that is nothing but the experience.
+    Shift+Tab is never captured.
 - **Leaving a text field.** In a text field, Escape belongs to the scanner. It is caught before the organism sees
   it, never backs out of a form, and never clears what was typed. Scanning resumes on the next target after the
   field. In step mode, a "next" key that is not a printable character (Tab) does the same. Backing out of a form is

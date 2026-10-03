@@ -1,18 +1,129 @@
-import { expect, test } from "@playwright/test"
+import { expect, test, type Page } from "@playwright/test"
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/")
   await page.getByLabel("Fixture").selectOption("ad-campaign-launch")
 })
 
-test("the ad campaign fixture shows four titled contexts", async ({ page }) => {
+const SPEND = '{"experience":"approve_campaign","node":"go","act":"confirm"}'
+const body = (page: Page, name: string) => page.locator(`[data-testid="context-panel"][data-body="${name}"]`)
+
+async function fourContexts(page: Page) {
   await page.getByRole("tab", { name: "Four contexts" }).click()
-  const titles = page.getByTestId("context-title")
-  await expect(titles).toHaveCount(4)
-  await expect(titles).toHaveText(["Phone, defaults", "Desktop, wants the reasoning", "Low vision, low motor precision, reduced motion", "No screen: voice only"])
-  // The voice context shows the summary, with the consequence.
-  const voice = page.getByTestId("context-panel").nth(3)
-  await expect(voice.locator('[data-slot="experience-summary"]')).toContainText("Spends AED 1,050")
+}
+
+test("the ad campaign fixture shows four titled contexts, each in its own body", async ({ page }) => {
+  await fourContexts(page)
+  await expect(page.getByTestId("context-title")).toHaveText(["Phone, defaults", "Switch access: two switches", "No screen: voice only", "Terminal"])
+  await expect(page.getByTestId("context-body")).toHaveText(["(web)", "(switch)", "(voice)", "(text)"])
+  await expect(body(page, "web").locator('[data-slot="plan-view"], [data-feather-node]').first()).toBeVisible()
+  await expect(body(page, "switch").getByTestId("switch-hint")).toHaveText("Tab: next · Enter: select")
+  await expect(body(page, "switch").locator('[data-slot="switch-scanner"]')).toBeVisible()
+  // Voice shows what Feather says, with the consequence, and text shows the turn.
+  await expect(body(page, "voice").getByRole("log", { name: "Transcript" })).toContainText("Feather says: Spends AED 1,050")
+  await expect(body(page, "text").getByRole("log", { name: "Conversation" })).toContainText("Spends AED 1,050")
+})
+
+test("text: the number arms the spend, only the keyword commits", async ({ page }) => {
+  await fourContexts(page)
+  const text = body(page, "text")
+  const input = text.getByLabel("Type a reply")
+  const log = text.getByRole("log")
+  const reply = page.getByTestId("last-reply")
+  await input.fill("1")
+  await input.press("Enter")
+  await expect(log).toContainText('Type "confirm" to go ahead')
+  await expect(reply).toHaveText("none yet")
+  for (const wrong of ["1", "yes"]) {
+    await input.fill(wrong)
+    await input.press("Enter")
+    await expect(log).toContainText("Nothing was done.")
+    await expect(reply).toHaveText("none yet")
+  }
+  await input.fill("confirm")
+  await input.press("Enter")
+  await expect(reply).toHaveText(SPEND)
+  await expect(reply).toHaveAttribute("data-body", "text")
+  await expect(page.getByTestId("last-reply-body")).toContainText("text")
+  await expect(log).toContainText("reply sent: " + SPEND)
+})
+
+test("voice: 'option one' arms the spend, only the keyword commits", async ({ page }) => {
+  await fourContexts(page)
+  const voice = body(page, "voice")
+  const input = voice.getByLabel("Say (as transcribed)")
+  const log = voice.getByRole("log")
+  const reply = page.getByTestId("last-reply")
+  await input.fill("option one")
+  await input.press("Enter")
+  await expect(log).toContainText("You said: option one")
+  await expect(log.getByText("Feather says:").last()).toBeVisible()
+  await expect(log).toContainText("confirm")
+  await expect(reply).toHaveText("none yet")
+  await input.fill("yes")
+  await input.press("Enter")
+  await expect(reply).toHaveText("none yet")
+  await input.fill("confirm")
+  await input.press("Enter")
+  await expect(reply).toHaveText(SPEND)
+  await expect(reply).toHaveAttribute("data-body", "voice")
+})
+
+test("voice: nothing is spoken on load or while the toggle is off", async ({ page }) => {
+  await page.addInitScript(() => {
+    ;(window as unknown as { spoken: string[] }).spoken = []
+    const synth = window.speechSynthesis
+    if (synth) synth.speak = (u) => void (window as unknown as { spoken: string[] }).spoken.push(u.text)
+  })
+  await page.reload()
+  await page.getByLabel("Fixture").selectOption("ad-campaign-launch")
+  await fourContexts(page)
+  const voice = body(page, "voice")
+  await expect(voice.getByRole("checkbox", { name: "Speak aloud" })).toHaveAttribute("aria-checked", "false")
+  await voice.getByLabel("Say (as transcribed)").fill("help")
+  await voice.getByLabel("Say (as transcribed)").press("Enter")
+  await expect(voice.getByRole("log")).toContainText("You said: help")
+  expect(await page.evaluate(() => (window as unknown as { spoken: string[] }).spoken)).toEqual([])
+})
+
+test("switch: Tab and Enter arm the spend, then confirm it", async ({ page }) => {
+  await fourContexts(page)
+  const scanner = body(page, "switch").locator('[data-slot="switch-scanner"]')
+  const armer = scanner.getByRole("button", { name: /^Confirm spend…/ })
+  // Native Tab reaches the panel; inside it Tab is the scanner's "next".
+  await page.getByTestId("switch-hint").locator("..").focus()
+  await page.keyboard.press("Tab")
+  for (let i = 0; i < 12 && !(await armer.evaluate((el) => el === document.activeElement)); i++) await page.keyboard.press("Tab")
+  await expect(armer).toBeFocused()
+  await expect(armer).toHaveAttribute("data-scanned", "true")
+  await page.keyboard.press("Enter")
+  const yes = scanner.getByRole("button", { name: "Yes, confirm spend" })
+  await expect(yes).toBeFocused()
+  await expect(page.getByTestId("last-reply")).toHaveText("none yet")
+  await page.keyboard.press("Enter")
+  await expect(page.getByTestId("last-reply")).toHaveText(SPEND)
+  await expect(page.getByTestId("last-reply")).toHaveAttribute("data-body", "switch")
+})
+
+test("the rest of the page stays usable by keyboard beside the switch panel", async ({ page }) => {
+  await fourContexts(page)
+  // Enter on a control outside the panel still does its own thing (the scanner does not swallow it).
+  await page.getByRole("tab", { name: "Plan" }).focus()
+  await page.keyboard.press("Enter")
+  await expect(page.getByTestId("plan-json")).toBeVisible()
+})
+
+test("the Rendered tab renders any context through its own body", async ({ page }) => {
+  const choose = page.getByLabel("Context", { exact: true })
+  await expect(page.getByTestId("rendered-body")).toContainText("web")
+  for (const [context, name] of [["terminal", "text"], ["screenless", "voice"], ["switch", "switch"], ["desktop", "web"], ["low-vision", "web"]] as const) {
+    await choose.selectOption(context)
+    await expect(page.getByTestId("rendered-body")).toContainText(name)
+  }
+  await choose.selectOption("terminal")
+  await page.getByLabel("Type a reply").fill("1")
+  await page.getByLabel("Type a reply").press("Enter")
+  await expect(page.getByRole("log")).toContainText('Type "confirm"')
 })
 
 test("composing takes under 5 ms", async ({ page }) => {
