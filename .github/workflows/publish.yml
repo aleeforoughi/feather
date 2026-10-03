@@ -26,6 +26,9 @@ jobs:
       - name: Tag matches the version
         run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
       - run: pnpm lint && pnpm build && pnpm typecheck && pnpm test && pnpm hygiene
-      - run: pnpm -r --filter "./packages/**" publish --no-git-checks --access restricted
+      - name: Publish
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+          pnpm -r --filter "./packages/**" publish --no-git-checks --access restricted
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
