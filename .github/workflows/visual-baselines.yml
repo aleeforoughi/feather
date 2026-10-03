@@ -65,7 +65,10 @@ jobs:
       - name: Record
         run: |
           if [ "$REFERENCE" = "missing" ]; then
-            pnpm --filter @feather-apps/storybook exec playwright test --update-snapshots=missing
+            # Playwright fails the tests whose snapshot it just wrote, so write them, then prove the full suite
+            # passes: every existing baseline still matches, and every new story now has one.
+            pnpm --filter @feather-apps/storybook exec playwright test --update-snapshots=missing || true
+            pnpm --filter @feather-apps/storybook exec playwright test
           else
             rm -rf apps/storybook/visual/__screenshots__
             pnpm --filter @feather-apps/storybook exec playwright test --update-snapshots
