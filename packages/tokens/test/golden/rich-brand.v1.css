@@ -57,6 +57,7 @@
   --radius-xs: 0.25rem;
   --radius-control: 0.5rem;
   --radius-card: 0.75rem;
+  --radius-step: 0.25rem;
   --radius-dialog: 1rem;
   --radius: var(--radius-card);
   --sidebar: #ffffff;

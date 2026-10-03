@@ -32,6 +32,8 @@ export interface Consts {
 export interface StaticOpts {
   density: string
   expectedHeight: number
+  /** One step of the radius hierarchy (0 in the sharp shape). */
+  radiusStep: number
   /** The control height of each density: an element inside a nearer [data-density] (a plan's own) follows it. */
   densityHeights: Record<string, number>
   radii: number[]
@@ -241,6 +243,14 @@ export function install(c: Consts): void {
     b: number
   }
   const boxOfRect = (r: DOMRect): Box => ({ l: r.left, t: r.top, r: r.right, b: r.bottom })
+  /** A visible surface: something with a border, a background or a shadow, whose corner a person can see. */
+  function isSurface(el: Element): boolean {
+    const s = cs(el)
+    const border = [s.borderTopWidth, s.borderRightWidth, s.borderBottomWidth, s.borderLeftWidth].some((w) => px(w) > 0)
+    const bg = s.backgroundColor !== "transparent" && !/rgba?\([^)]*,\s*0\)$/.test(s.backgroundColor) && s.backgroundColor !== "rgba(0, 0, 0, 0)"
+    return border || bg || (s.boxShadow !== "none" && s.boxShadow !== "")
+  }
+
   function padBox(el: Element): Box {
     const r = rect(el)
     const s = cs(el)
@@ -508,17 +518,23 @@ export function install(c: Consts): void {
         const ks = corners(el)
         const bad = ks.filter((k) => !(isFull(k) || near(k.px, 0) && k.pct === null || (k.pct === null && inList(k.px, o.radii))))
         if (bad.length) out.push(make("radius.tier", "border-radius", el, `${o.radii.join(" | ")}px or full`, ks.map(fmtCorner).join(" ")))
+        // Radius hierarchy (section 7): a curve inside a curve is tighter. A flush child (touching its rounded parent on
+        // two sides, like a clipped image) may match the parent's corner; any other rounded surface inside a rounded
+        // surface is at least one step smaller. Full radius (pills, dots) is a shape, not a level, and is exempt.
         const own = maxRadius(el)
-        if (own > 0) {
-          let anc = el.parentElement
-          for (let i = 0; i < 3 && anc && anc !== document.body; i++, anc = anc.parentElement) {
+        if (own > 0 && own < 1e9 && isSurface(el)) {
+          for (let anc = el.parentElement; anc && anc !== document.body; anc = anc.parentElement) {
             const pr = maxRadius(anc)
-            if (pr <= 0) continue
+            if (pr <= 0 || !isSurface(anc)) continue
+            if (pr >= 1e9) break
             const pb = padBox(anc)
             const r = rect(el)
             const touching = [near(r.left, pb.l, 0.5), near(r.right, pb.r, 0.5), near(r.top, pb.t, 0.5), near(r.bottom, pb.b, 0.5)].filter(Boolean).length
-            if (touching >= 2 && own > pr + 0.01)
-              out.push(make("radius.nesting", "border-radius", el, `<= parent ${pr >= 1e9 ? "full" : f2(pr) + "px"} (${slotOf(anc)})`, own >= 1e9 ? "full" : `${f2(own)}px`))
+            if (touching >= 2) {
+              if (own > pr + 0.01) out.push(make("radius.nesting", "border-radius", el, `<= parent ${f2(pr)}px (flush in ${slotOf(anc)})`, `${f2(own)}px`))
+            } else if (pr < own + o.radiusStep - 0.01) {
+              out.push(make("radius.nesting", "border-radius", el, `parent >= ${f2(own + o.radiusStep)}px (one step above ${f2(own)}px)`, `parent ${slotOf(anc)} is ${f2(pr)}px`))
+            }
             break
           }
         }

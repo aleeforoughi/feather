@@ -99,8 +99,6 @@
 @theme static {
     --radius-xs: 0.25rem;
     --radius-control: 0.5rem;
-    --radius-card: 0.75rem;
-    --radius-dialog: 1rem;
     /* Shadows reference the elevation variables, so a brand's elevation axis reaches every utility (Tailwind inlines a
        literal shadow value, which a brand's override could never change). */
     --shadow-1: var(--elevation-1);
@@ -473,6 +471,39 @@
 @utility press {
   scale: 0.985;
 }
+/* Radius hierarchy (docs/visual-system.md section 7). The control (button) radius is the base. A surface's radius is
+   its tier plus one --radius-step for each level of rounded surface nested inside it, computed from its content with
+   :has(), so curves inside curves are always tighter and no component needs to know where it sits. --surface-extra
+   does not inherit, so a card's own nesting never leaks into the cards inside it. */
+:root {
+  --radius-card: 0.75rem;
+  --radius-dialog: 1rem;
+  --radius-step: 0.25rem;
+}
+@property --surface-extra {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@utility rounded-card {
+  border-radius: calc(var(--radius-card) + var(--radius-step) * var(--surface-extra));
+}
+@utility rounded-dialog {
+  border-radius: calc(var(--radius-dialog) + var(--radius-step) * var(--surface-extra));
+}
+.rounded-card:has(.rounded-card) {
+  --surface-extra: 1;
+}
+.rounded-card:has(.rounded-card .rounded-card) {
+  --surface-extra: 2;
+}
+.rounded-dialog:has(.rounded-card .rounded-card) {
+  --surface-extra: 1;
+}
+.rounded-dialog:has(.rounded-card .rounded-card .rounded-card) {
+  --surface-extra: 2;
+}
+
 /* Hit area (section 3): an invisible extension of at least 44 x 44px, centered on the element, so a smaller visual (a
    tight 36px control, a 16px checkbox) still reaches the target. Never clip it with overflow. */
 @utility hit-area {

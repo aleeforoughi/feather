@@ -64,13 +64,16 @@ export const BORDER_WIDTHS = [0, 1]
 export const FOCUS = { width: 2, offset: 2 }
 export const CURVE = "cubic-bezier(0.4, 0, 0.2, 1)"
 
-/** Radius tier sets by brand shape (section 7). 0 is always allowed; "full" is always allowed (9999px or 50%). */
+/** Radius values by brand shape (section 7): xs, the control base, and the card and dialog tiers plus one step per
+ * level of rounded surface nested inside them (up to two). 0 and "full" are always allowed. */
 export const RADIUS_TIERS: Record<string, number[]> = {
   sharp: [0],
-  soft: [0, 4, 8, 12],
-  rounded: [0, 4, 8, 12, 16],
-  pill: [0, 4, 16],
+  soft: [0, 4, 8, 12, 16, 20],
+  rounded: [0, 4, 8, 12, 16, 20, 24],
+  pill: [0, 4, 16, 20, 24, 28],
 }
+/** The radius step per brand shape: a surface is at least one step larger than a rounded surface inside it. */
+export const RADIUS_STEP: Record<string, number> = { sharp: 0, soft: 4, rounded: 4, pill: 4 }
 
 /** The six durations per brand motion axis, in ms (section 10). */
 export const DURATIONS: Record<string, number[]> = {
@@ -83,6 +86,8 @@ export interface ThemeSpec {
   shape: string
   motion: string
   radii: number[]
+  /** One step of the radius hierarchy: a surface is at least this much larger than a surface it holds. */
+  step: number
   durations: number[]
 }
 
@@ -132,7 +137,12 @@ export async function fromEngine(): Promise<Expected> {
     for (const [shape, v] of Object.entries(tiers)) {
       const xs = numbers(v)?.filter((n) => n < 9999)
       if (xs) {
-        out.radiusTiers[shape] = [...new Set([0, ...xs])].sort((a, b) => a - b)
+        // The engine's tiers are { xs, control, card, dialog, step }: card and dialog grow by one step per nesting level.
+        const t = v as Record<string, string>
+        const step = numbers({ s: t.step })?.[0]
+        const grown = step !== undefined && t.card && t.dialog ? [0, 1, 2].flatMap((k) => [...(numbers({ a: t.card }) ?? []), ...(numbers({ b: t.dialog }) ?? [])].map((r) => r + k * step)) : []
+        const base = (numbers({ x: t.xs, c: t.control }) ?? []).filter((n) => n < 9999)
+        out.radiusTiers[shape] = [...new Set([0, ...(t.step !== undefined ? [...base, ...grown] : xs)])].sort((a, b) => a - b)
         used = true
       } else out.notes.push(`RADIUS_TIERS.${shape} not parseable; spec values kept`)
     }
@@ -176,7 +186,7 @@ export function loadThemes(expected: Expected): ThemeSpec[] {
       const json = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")) as { name: string; tokens: { shape?: string; motion?: string } }
       const shape = json.tokens.shape ?? "rounded"
       const motion = json.tokens.motion ?? "calm"
-      return { name: json.name, shape, motion, radii: expected.radiusTiers[shape] ?? RADIUS_TIERS.rounded, durations: expected.durations[motion] ?? DURATIONS.calm }
+      return { name: json.name, shape, motion, radii: expected.radiusTiers[shape] ?? RADIUS_TIERS.rounded, step: RADIUS_STEP[shape] ?? 4, durations: expected.durations[motion] ?? DURATIONS.calm }
     })
 }
 

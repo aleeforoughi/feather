@@ -6,8 +6,9 @@ import { DURATIONS, RADIUS_TIERS } from "./expected"
 import type { Density, ThemeSpec } from "./expected"
 import { runAudit } from "./run"
 
-const sharp: ThemeSpec = { name: "paper-sharp", shape: "sharp", motion: "calm", radii: RADIUS_TIERS.sharp, durations: DURATIONS.calm }
-const pill: ThemeSpec = { name: "void-pill", shape: "pill", motion: "snappy", radii: RADIUS_TIERS.pill, durations: DURATIONS.snappy }
+const sharp: ThemeSpec = { name: "paper-sharp", shape: "sharp", motion: "calm", radii: RADIUS_TIERS.sharp, step: 0, durations: DURATIONS.calm }
+const pill: ThemeSpec = { name: "void-pill", shape: "pill", motion: "snappy", radii: RADIUS_TIERS.pill, step: 4, durations: DURATIONS.snappy }
+const rounded: ThemeSpec = { name: "feather", shape: "rounded", motion: "calm", radii: RADIUS_TIERS.rounded, step: 4, durations: DURATIONS.calm }
 
 const CSS = `
 *,*::before,*::after{box-sizing:border-box}
@@ -52,6 +53,8 @@ interface Case {
 }
 
 const violating: Case[] = [
+  { name: "radius.nesting: a 12px card inside a 12px card (no step between the curves)", body: '<div class="row"><div style="border:1px solid #767676;border-radius:12px;padding:24px;width:240px"><div style="border:1px solid #767676;border-radius:12px;padding:24px">Inner</div></div></div>', theme: rounded, only: ["radius.nesting"], fires: ["radius.nesting"] },
+  { name: "radius.nesting: an 8px item inset in a 8px list", body: '<div class="row"><div style="border:1px solid #767676;border-radius:8px;padding:4px;width:200px"><div style="background:#eee;border-radius:8px;height:36px"></div></div></div>', theme: rounded, only: ["radius.nesting"], fires: ["radius.nesting"] },
   { name: "targets.size: a small control next to (not behind) a modal is still a target", body: '<div class="row"><span class="cb nofx" role="checkbox" tabindex="0" aria-checked="false"></span></div><div role="dialog" aria-modal="false" style="position:absolute;left:200px;top:0;width:100px;height:40px">Panel</div>', css: ".nofx::after{content:none}", fires: ["targets.size"] },
   { name: "controls.height: a wrapped label below the control height", body: '<div class="row"><button class="btn" data-slot="button" style="height:40px;width:90px;white-space:normal;line-height:16px;font-size:14px">Launch the recommended test</button></div>', only: ["controls.height", "targets.size"], fires: ["controls.height"] },
   { name: "controls.height: a nearer data-density still decides", body: '<div class="row" data-density="tight"><button class="btn" data-slot="button">Save</button></div>', fires: ["controls.height"] },
@@ -96,6 +99,9 @@ const violating: Case[] = [
 ]
 
 const clean: Case[] = [
+  { name: "clean: a 12px card holding an 8px control, inside a 16px card", body: '<div class="row"><div style="border:1px solid #767676;border-radius:16px;padding:24px;width:280px"><div style="border:1px solid #767676;border-radius:12px;padding:24px"><div style="background:#eee;border-radius:8px;height:44px"></div></div></div></div>', theme: rounded },
+  { name: "clean: an 8px item inset 4px in a 12px list is concentric", body: '<div class="row"><div style="border:1px solid #767676;border-radius:12px;padding:4px;width:200px"><div style="background:#eee;border-radius:8px;height:36px"></div></div></div>', theme: rounded },
+  { name: "clean: a flush child matches its parent's corner", body: '<div class="row"><div style="border:1px solid #767676;border-radius:12px;overflow:hidden;width:200px"><div style="background:#eee;border-radius:12px;height:80px"></div></div></div>', theme: rounded },
   { name: "clean: a fixed-position element in a scrolled story is not a hover shift", body: '<div class="row"><button class="btn" data-slot="button">Save</button></div><div style="height:1400px"></div><input type="radio" aria-hidden="true" tabindex="-1" style="position:fixed;top:0;left:0;width:20px;height:20px;opacity:0;pointer-events:none"><div class="row"><button class="btn" data-slot="button">Lower</button></div>' },
   { name: "clean: a small control behind an open modal dialog is not a target", body: '<div class="row"><span class="cb nofx" role="checkbox" tabindex="-1" aria-checked="false"></span></div><div role="dialog" aria-modal="true" style="position:absolute;inset:40px;background:#fff"><p>Dialog</p></div>', css: ".nofx::after{content:none}" },
   { name: "clean: a box inside a hidden ancestor never counts as a hover shift", body: '<div class="row"><button class="btn" data-slot="button">Save</button></div><div style="height:1400px"></div><div style="display:none"><div class="sb-loader" style="height:20px"></div></div>' },

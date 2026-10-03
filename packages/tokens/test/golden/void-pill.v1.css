@@ -57,7 +57,8 @@
   --radius-xs: 0.25rem;
   --radius-control: 9999px;
   --radius-card: 1rem;
-  --radius-dialog: 1rem;
+  --radius-step: 0.25rem;
+  --radius-dialog: 1.25rem;
   --radius: var(--radius-card);
   --sidebar: #141614;
   --sidebar-foreground: var(--text-primary);

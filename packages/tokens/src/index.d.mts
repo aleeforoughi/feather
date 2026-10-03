@@ -54,8 +54,9 @@ export type RadiusTier = "xs" | "control" | "card" | "dialog"
 export type SemanticDensity = "tight" | "default" | "spacious"
 
 export const HEADING_WEIGHTS: readonly [400, 500, 600, 700]
-export const RADIUS_TIERS: Record<"sharp" | "soft" | "rounded" | "pill", Record<RadiusTier, string>>
-export const RADIUS_PRIMITIVES: Record<"0" | "4" | "8" | "12" | "16" | "full", string>
+/** Per shape: each radius tier, plus `step`, the radius one enclosing level adds (section 7). */
+export const RADIUS_TIERS: Record<"sharp" | "soft" | "rounded" | "pill", Record<RadiusTier | "step", string>>
+export const RADIUS_PRIMITIVES: Record<"0" | "4" | "8" | "12" | "16" | "20" | "24" | "full", string>
 /** The card radius of each shape. */
 export const SHAPES: { sharp: string; soft: string; rounded: string; pill: string }
 /** Brand density axis value → semantic density. */

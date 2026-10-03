@@ -167,10 +167,10 @@ describe("the brand axes", () => {
 
   it("lists the exact tier values of section 7", () => {
     expect(RADIUS_TIERS).toEqual({
-      sharp: { xs: "0px", control: "0px", card: "0px", dialog: "0px" },
-      soft: { xs: "0.25rem", control: "0.25rem", card: "0.5rem", dialog: "0.75rem" },
-      rounded: { xs: "0.25rem", control: "0.5rem", card: "0.75rem", dialog: "1rem" },
-      pill: { xs: "0.25rem", control: "9999px", card: "1rem", dialog: "1rem" },
+      sharp: { xs: "0px", control: "0px", card: "0px", dialog: "0px", step: "0px" },
+      soft: { xs: "0.25rem", control: "0.25rem", card: "0.5rem", dialog: "0.75rem", step: "0.25rem" },
+      rounded: { xs: "0.25rem", control: "0.5rem", card: "0.75rem", dialog: "1rem", step: "0.25rem" },
+      pill: { xs: "0.25rem", control: "9999px", card: "1rem", dialog: "1.25rem", step: "0.25rem" },
     })
   })
 
@@ -262,23 +262,24 @@ describe("the brand axes", () => {
 const paperBuilt = () => build(paper())
 
 describe("radius nesting", () => {
-  it.each(Object.entries(RADIUS_TIERS))("%s: xs <= card <= dialog, and a nested xs fits inside a card", (_shape, tiers) => {
-    const [xs, control, card, dialog] = [tiers.xs, tiers.control, tiers.card, tiers.dialog].map(px)
-    expect(xs).toBeLessThanOrEqual(card)
-    expect(card).toBeLessThanOrEqual(dialog)
+  it.each(Object.entries(RADIUS_TIERS))("%s: the control is the base, and each enclosing level is one step larger", (shape, tiers) => {
+    const [xs, control, card, dialog, step] = [tiers.xs, tiers.control, tiers.card, tiers.dialog, tiers.step].map(px)
     expect(xs).toBeLessThanOrEqual(control)
-    // A flush child's radius is at most its parent's minus the gap between them (4px), never more than the parent's.
-    expect(xs).toBeLessThanOrEqual(Math.max(0, card - 4))
-    expect(Math.min(card, dialog)).toBeLessThanOrEqual(dialog)
+    // A card holding controls is one step above them (pill controls are full by meaning, so its cards start at 16).
+    if (shape !== "pill") expect(card).toBe(control + step)
+    // A dialog is one step above a card, so it holds one with a tighter curve.
+    expect(dialog).toBe(card + step)
+    // A step is 4px (none in the sharp shape): an item inset 4px in a list is exactly concentric with it.
+    expect(step).toBe(shape === "sharp" ? 0 : 4)
     // Full radius belongs to the control tier of the pill shape alone.
-    for (const [tier, value] of Object.entries(tiers)) expect(px(value) < 9999 || (tier === "control" && _shape === "pill")).toBe(true)
+    for (const [tier, value] of Object.entries(tiers)) expect(px(value) < 9999 || (tier === "control" && shape === "pill")).toBe(true)
   })
 
   it("accepts a component radius that is a tier or a primitive, and nothing else", () => {
     const radius = (value: unknown) => buildTheme({ ...paper(), components: { button: { radius: value } } })
     for (const ok of ["xs", "control", "card", "dialog", "0", "4", "8", "12", "16", "full", 8]) expect(radius(ok).ok, String(ok)).toBe(true)
-    for (const bad of ["pill", "soft", "6px", "10", "0.5rem", "lg"]) expect(radius(bad).ok, String(bad)).toBe(false)
-    expect(Object.keys(RADIUS_PRIMITIVES)).toEqual(["0", "4", "8", "12", "16", "full"])
+    for (const bad of ["pill", "soft", "step", "6px", "10", "0.5rem", "lg"]) expect(radius(bad).ok, String(bad)).toBe(false)
+    expect(Object.keys(RADIUS_PRIMITIVES)).toEqual(["0", "4", "8", "12", "16", "20", "24", "full"])
   })
 })
 

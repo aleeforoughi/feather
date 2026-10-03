@@ -18,6 +18,12 @@
   drift. A product that applies no brand gets exactly this theme.
 - **Geist Mono** joins the foundation font set. A mono family now falls back to `monospace` for display as well
   as body.
+- **Corner radius is a hierarchy** (docs/visual-system.md §7). The button radius is the base and the minimum;
+  every enclosing level adds one 4px step, so curves inside curves are always tighter (control 8 → card 12 → card
+  holding a card 16 → dialog 20). `rounded-card` and `rounded-dialog` compute this from their content with
+  `:has()`, so every component follows it without knowing where it sits. A list that insets its items by 4px is
+  exactly concentric with them. The `pill` shape's cards and dialogs are now 16 and 20, and the rendered audit
+  checks the hierarchy (`radius.nesting`).
 - **Table:** a table wider than its container becomes a focusable, named region while it scrolls, so a keyboard
   user can reach it. Mono text made the comparison table scroll and exposed this.
 - **Gates.** Storybook opens in feather. Accessibility runs in all four reference themes, and visual regression

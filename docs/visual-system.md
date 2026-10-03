@@ -73,7 +73,7 @@ group, 48 a section, and 64 or more a major section.
 - The weights are 400, 500, 600 and 700. `typography.headingWeight` is limited to these four (it previously
   allowed 100 to 900).
 
-**Radius.** The values are 0, 4, 8, 12, 16 and full. A brand's shape picks a tier set (§7).
+**Radius.** The values are 0, 4, 8, 12, 16, 20, 24 and full. They form a hierarchy built up from the control radius (§7).
 
 **Border.** Width is 1px. Focus is 2px. Nothing else exists.
 
@@ -225,25 +225,41 @@ The surface tokens are:
 `--scrim` dims the page behind a dialog or sheet (`bg-scrim`). A component never invents its own gray. **Depth order:** surface tone first, then a border, then overlap, and
 only then a shadow.
 
-## 7. Radius and shape
+## 7. Radius and shape: a hierarchy
 
-A brand's `shape` picks a tier set. Every set obeys nesting:
+Corner radius is a hierarchy, built from the bottom up. **The control (button) radius is the base and the
+minimum**: every button, input, select and toggle has it, wherever it sits. **Each enclosing level adds one step**
+(4px), so a curve inside a curve is always tighter, and the curves read as one family:
 
-| shape | xs (nested) | control / chip | card / popover | dialog / sheet |
-|---|---|---|---|---|
-| `sharp` | 0 | 0 | 0 | 0 |
-| `soft` | 4 | 4 | 8 | 12 |
-| `rounded` (new default) | 4 | 8 | 12 | 16 |
-| `pill` | 4 | full | 16 | 16 |
+```text
+control 8  →  card holding controls 12  →  card holding a card 16  →  dialog holding that 20
+```
 
-- The tokens are `--radius-xs`, `--radius-control`, `--radius-card` and `--radius-dialog`, plus `rounded-full`.
-- **Nesting.** A surface flush inside another (a thumbnail in a card, a list inside a popover) has an inner
-  radius of at most the outer radius minus the gap between them, and never more than the outer. A control
-  separated from its container by padding counts as its own object.
-- **Full radius** is only for pill-semantic parts: avatars, status dots, pill badges, switch tracks and thumbs,
-  and controls in the `pill` shape. It is never a decorative default.
-- `rounded-sm`, `rounded-md`, `rounded-lg` and `rounded-xl` disappear from components, replaced by the semantic
-  tiers.
+| shape | xs | control (base) | step | card | dialog |
+|---|---|---|---|---|---|
+| `sharp` | 0 | 0 | 0 | 0 | 0 |
+| `soft` | 4 | 4 | 4 | 8 | 12 |
+| `rounded` (default) | 4 | 8 | 4 | 12 | 16 |
+| `pill` | 4 | full | 4 | 16 | 20 |
+
+The card and dialog values above are for a surface with nothing rounded inside it. Every level of rounded surface
+nested inside adds one step: a card that holds a card is 16 in `rounded`, and a dialog holding that card is 20.
+The radius scale is therefore 0, 4, 8, 12, 16, 20, 24 and full.
+
+- **It is automatic.** `rounded-card` and `rounded-dialog` compute their radius from their content (`:has()`),
+  so no component needs to know where it is placed. The extra steps live in `--surface-extra`, a property that
+  does not inherit, so a container's nesting never leaks into the surfaces inside it. The tokens are
+  `--radius-xs`, `--radius-control`, `--radius-card`, `--radius-dialog` and `--radius-step`.
+- **Concentric by construction.** A list, menu or segmented control that insets its items by one step (4px,
+  `p-1`) is exactly concentric with them: 8px items in a 12px container.
+- **Flush children match.** A child flush with its container on two sides (a clipped image, a header band) takes
+  the container's corner, never a larger one.
+- **The audit checks it** (`radius.nesting`). A rounded surface inside a rounded surface must be at least one step
+  smaller, unless it is flush.
+- **Full radius** is a shape, not a level. Avatars, status dots, pill badges, switch tracks and thumbs, and the
+  `pill` shape's controls use it, and it is never a decorative default.
+- `rounded-sm`, `rounded-md`, `rounded-lg` and `rounded-xl` never appear in components; the semantic tiers replace
+  them.
 
 ## 8. Borders, focus and elevation
 

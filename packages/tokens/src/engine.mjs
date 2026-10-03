@@ -53,14 +53,18 @@ export const fontImports = (name) => [`@aleeforoughi/feather-tokens/fonts/${font
  * Radius tiers per brand shape (docs/visual-system.md section 7). Every set obeys nesting: xs <= control <= card <=
  * dialog, with "full" (a pill) only as a control radius. A brand's shape picks one set and can never produce another.
  */
+/** Radius hierarchy per shape (section 7). The control (button) radius is the base; each enclosing level adds one
+ * `step`: a card holding controls is control + step, a card holding a card one step more, and a dialog sits at least
+ * a step above what it holds. Curves inside curves are therefore always tighter, and an item inset by one step in a
+ * list is exactly concentric. `card` and `dialog` are the values with nothing rounded nested inside. */
 export const RADIUS_TIERS = {
-  sharp: { xs: "0px", control: "0px", card: "0px", dialog: "0px" },
-  soft: { xs: "0.25rem", control: "0.25rem", card: "0.5rem", dialog: "0.75rem" },
-  rounded: { xs: "0.25rem", control: "0.5rem", card: "0.75rem", dialog: "1rem" },
-  pill: { xs: "0.25rem", control: "9999px", card: "1rem", dialog: "1rem" },
+  sharp: { xs: "0px", control: "0px", card: "0px", dialog: "0px", step: "0px" },
+  soft: { xs: "0.25rem", control: "0.25rem", card: "0.5rem", dialog: "0.75rem", step: "0.25rem" },
+  rounded: { xs: "0.25rem", control: "0.5rem", card: "0.75rem", dialog: "1rem", step: "0.25rem" },
+  pill: { xs: "0.25rem", control: "9999px", card: "1rem", dialog: "1.25rem", step: "0.25rem" },
 }
 /** The radius primitives (section 2): 0, 4, 8, 12, 16 and full. */
-export const RADIUS_PRIMITIVES = { 0: "0px", 4: "0.25rem", 8: "0.5rem", 12: "0.75rem", 16: "1rem", full: "9999px" }
+export const RADIUS_PRIMITIVES = { 0: "0px", 4: "0.25rem", 8: "0.5rem", 12: "0.75rem", 16: "1rem", 20: "1.25rem", 24: "1.5rem", full: "9999px" }
 /** The card radius of each shape (the radius a surface gets): what `--radius` aliases. */
 export const SHAPES = Object.fromEntries(Object.entries(RADIUS_TIERS).map(([shape, tiers]) => [shape, tiers.card]))
 
@@ -210,7 +214,7 @@ function onColor(fill, text, background) {
  */
 const COMPONENT_PROPS = {
   // A radius tier (xs, control, card, dialog) or one of the radius primitives (0, 4, 8, 12, 16, full): never a free value.
-  radius: (v) => (v in RADIUS_TIERS.rounded ? `border-radius: var(--radius-${v})` : String(v) in RADIUS_PRIMITIVES ? `border-radius: ${RADIUS_PRIMITIVES[v]}` : null),
+  radius: (v) => (["xs", "control", "card", "dialog"].includes(v) ? `border-radius: var(--radius-${v})` : String(v) in RADIUS_PRIMITIVES ? `border-radius: ${RADIUS_PRIMITIVES[v]}` : null),
   // Borders are 1px or none (docs/visual-system.md section 8).
   borderWidth: (v) => (v === "0px" || v === "1px" ? `border-width: ${v}` : null),
   shadow: (v) => (v === "none" ? "box-shadow: none" : [1, 2, 3].includes(Number(v)) ? `box-shadow: var(--elevation-${v})` : v in SHADOW_ALIASES ? `box-shadow: var(--elevation-${SHADOW_ALIASES[v]})` : null),
@@ -405,6 +409,7 @@ export function buildTheme(input) {
     "--radius-xs": tiers.xs,
     "--radius-control": tiers.control,
     "--radius-card": tiers.card,
+    "--radius-step": tiers.step,
     "--radius-dialog": tiers.dialog,
     "--radius": "var(--radius-card)",
     "--sidebar": surface,
