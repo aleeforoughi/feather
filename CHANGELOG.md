@@ -1,5 +1,25 @@
 # Feather — changelog
 
+## 1.8.0 — 2026-10-03
+
+**The Experience IR, `feather.ir/0` (milestone L1).** The public contract: what a caller asks Feather to render,
+as meaning. New package `@aleeforoughi/feather-intent`, with no dependencies.
+
+- 24 node types (14 content, 10 decision), the common fields (`id`, `intent`, `importance`, `reversible`,
+  `expandable`), references between nodes, and the acts each node takes in its replies
+  (`{ experience, node, act, value? }`).
+- One table (`src/spec.ts`) drives the validator, the JSON Schema (`schema/feather.ir-0.json`) and the node
+  reference (`docs/ir/nodes.md`); a test fails if the generated files drift. TypeScript types in `src/types.ts`.
+- `validate()` reports every problem at once, each with a stable code, a JSON Pointer and a sentence saying what
+  to change. Beyond structure it checks one primary act per experience, that irreversible acts state their
+  consequence (principle 6), that every medium has a text equivalent, that references resolve, and it rejects
+  presentational fields (principle 1) and unknown ones, suggesting the name a typo meant. `validateReply()`
+  checks a reply against its experience. `feather-ir validate <file>` runs it from a shell.
+- Conformance fixtures in `conformance/ir`: realistic valid experiences covering every node type, and invalid ones
+  that each list exactly the issues the validator must report.
+- Docs: `docs/ir/README.md` (how the IR works, the rules, the codes, versioning).
+- `docs/PLAN.md`: the `qooe-core` switch is set aside; Feather builds on the 1.7.0 handoff alone.
+
 ## 1.7.0 — 2026-10-03
 
 **Feather becomes independent (milestone L0).** The 1.7.0 components, unchanged, move out of qooe-core into

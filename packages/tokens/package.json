@@ -1,22 +1,42 @@
 {
   "name": "@aleeforoughi/feather-tokens",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Feather tokens: the feather-tokens/2 schema, the theme engine, the foundation CSS and the reference themes.",
   "license": "UNLICENSED",
   "type": "module",
-  "repository": { "type": "git", "url": "git+https://github.com/aleeforoughi/feather.git", "directory": "packages/tokens" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleeforoughi/feather.git",
+    "directory": "packages/tokens"
+  },
   "exports": {
-    ".": { "types": "./src/index.d.mts", "default": "./src/index.mjs" },
+    ".": {
+      "types": "./src/index.d.mts",
+      "default": "./src/index.mjs"
+    },
     "./foundation.css": "./css/foundation.css",
     "./fonts/*": "./fonts/*",
     "./themes/*": "./themes/*",
     "./schema/*": "./schema/*",
     "./package.json": "./package.json"
   },
-  "bin": { "feather-brand": "./bin/feather-brand.mjs" },
-  "files": ["src", "bin", "css", "fonts", "themes", "schema"],
-  "sideEffects": ["*.css"],
-  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "bin": {
+    "feather-brand": "./bin/feather-brand.mjs"
+  },
+  "files": [
+    "src",
+    "bin",
+    "css",
+    "fonts",
+    "themes",
+    "schema"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"

@@ -12,7 +12,7 @@
 //   themes     every reference theme compiles and reads (WCAG AA text, contrasting primary text)
 //   release    fonts are installed, every package / manifest / changelog agrees on the version
 //   packaging  published source has no "@/" alias imports, the package entry exports every component,
-//              every stylesheet import is a dependency of its package
+//              every stylesheet import is a dependency of its package, the IR package has no dependencies
 //
 // Deterministic: no network, no dependencies. Exit 1 with every problem listed.
 import fs from "node:fs"
@@ -25,7 +25,7 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/documents"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/documents"]
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 
@@ -157,6 +157,14 @@ export function hygiene(root = ".") {
     for (const m of body.matchAll(/from\s+"([^".][^"]*)"/g)) {
       const dep = m[1].startsWith("@") ? m[1].split("/").slice(0, 2).join("/") : m[1].split("/")[0]
       if (!runtimeDeps(reactPkg)[dep]) problems.push(`${path.relative(root, file)} imports ${m[1]} but ${dep} is not a dependency of ${reactPkg.name}`)
+    }
+  }
+  // The IR package stands alone (docs/PLAN.md section 5): no dependencies, only its own modules.
+  const intentPkg = json("packages/intent/package.json")
+  if (Object.keys(intentPkg.dependencies ?? {}).length) problems.push(`${intentPkg.name} must have no dependencies; it has ${Object.keys(intentPkg.dependencies).join(", ")}`)
+  for (const file of walk(at("packages/intent/src")).filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))) {
+    for (const m of read(file).matchAll(/from\s+"([^"]+)"/g)) {
+      if (!m[1].startsWith("./")) problems.push(`${path.relative(root, file)} imports ${m[1]}; the IR package imports only its own modules`)
     }
   }
   const entry = read(at(`${REACT}/src/index.ts`))

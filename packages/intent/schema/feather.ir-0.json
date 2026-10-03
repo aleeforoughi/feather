@@ -1,0 +1,2392 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aleeforoughi/feather/schema/feather.ir-0.json",
+  "title": "Feather Experience IR (feather.ir/0)",
+  "description": "One experience: the next necessary interaction, as meaning. Generated from packages/intent/src/spec.ts. This schema checks structure; rules across nodes (one primary act, irreversible acts state their consequence, references resolve) are checked by validate() in @aleeforoughi/feather-intent.",
+  "type": "object",
+  "required": [
+    "ir",
+    "experience",
+    "nodes"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ir": {
+      "const": "feather.ir/0"
+    },
+    "experience": {
+      "description": "Names the experience; replies carry it back.",
+      "$ref": "#/$defs/id"
+    },
+    "locale": {
+      "description": "BCP 47 language of the words in it.",
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$"
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})?)?$"
+    },
+    "node": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Text"
+        },
+        {
+          "$ref": "#/$defs/Action"
+        },
+        {
+          "$ref": "#/$defs/Choice"
+        },
+        {
+          "$ref": "#/$defs/Input"
+        },
+        {
+          "$ref": "#/$defs/Price"
+        },
+        {
+          "$ref": "#/$defs/Person"
+        },
+        {
+          "$ref": "#/$defs/Date"
+        },
+        {
+          "$ref": "#/$defs/Location"
+        },
+        {
+          "$ref": "#/$defs/Status"
+        },
+        {
+          "$ref": "#/$defs/Progress"
+        },
+        {
+          "$ref": "#/$defs/Media"
+        },
+        {
+          "$ref": "#/$defs/Confirmation"
+        },
+        {
+          "$ref": "#/$defs/Warning"
+        },
+        {
+          "$ref": "#/$defs/Approval"
+        },
+        {
+          "$ref": "#/$defs/Recommendation"
+        },
+        {
+          "$ref": "#/$defs/PredictedChoice"
+        },
+        {
+          "$ref": "#/$defs/Alternative"
+        },
+        {
+          "$ref": "#/$defs/Tradeoff"
+        },
+        {
+          "$ref": "#/$defs/Autopick"
+        },
+        {
+          "$ref": "#/$defs/Correction"
+        },
+        {
+          "$ref": "#/$defs/Preference"
+        },
+        {
+          "$ref": "#/$defs/Comparison"
+        },
+        {
+          "$ref": "#/$defs/IrreversibleAction"
+        },
+        {
+          "$ref": "#/$defs/ExploreMore"
+        }
+      ]
+    },
+    "Text": {
+      "description": "Plain words. One line with no decision renders as text, never a card.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Text"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "text": {
+          "description": "The words.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "Action": {
+      "description": "Something the person can do.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Action"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "primary": {
+          "description": "This node is the experience's main act. At most one per experience.",
+          "type": "boolean"
+        },
+        "label": {
+          "description": "The words for the act; defaults to the intent.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Choice": {
+      "description": "Pick one, or several, of a known set.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Choice"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "primary": {
+          "description": "This node is the experience's main act. At most one per experience.",
+          "type": "boolean"
+        },
+        "prompt": {
+          "description": "The question.",
+          "type": "string",
+          "minLength": 1
+        },
+        "options": {
+          "description": "The options, at least two, ids unique.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Unique among the options.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "label": {
+                "description": "The words for it.",
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "description": "One line more.",
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2
+        },
+        "multiple": {
+          "description": "Several may be picked. Default false.",
+          "type": "boolean"
+        },
+        "selected": {
+          "description": "Option ids already picked.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "prompt",
+        "options",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Input": {
+      "description": "A fact the caller does not have yet, asked of the person.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Input"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "primary": {
+          "description": "This node is the experience's main act. At most one per experience.",
+          "type": "boolean"
+        },
+        "prompt": {
+          "description": "The question.",
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "description": "What kind of value.",
+          "enum": [
+            "text",
+            "long-text",
+            "number",
+            "email",
+            "phone",
+            "url",
+            "date",
+            "money"
+          ]
+        },
+        "required": {
+          "description": "An answer is needed to continue.",
+          "type": "boolean"
+        },
+        "value": {
+          "description": "The current value, if any.",
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        "min": {
+          "description": "For number and money: the smallest accepted.",
+          "type": "number"
+        },
+        "max": {
+          "description": "For number and money: the largest accepted.",
+          "type": "number"
+        },
+        "maxLength": {
+          "description": "For text kinds: the longest accepted.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "currency": {
+          "description": "For money: the currency.",
+          "$ref": "#/$defs/currency"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "prompt",
+        "kind",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Price": {
+      "description": "An amount of money.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Price"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "amount": {
+          "description": "In the currency's major unit.",
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "description": "ISO 4217 code.",
+          "$ref": "#/$defs/currency"
+        },
+        "label": {
+          "description": "What the amount is.",
+          "type": "string",
+          "minLength": 1
+        },
+        "period": {
+          "description": "How often it is charged. Default once.",
+          "enum": [
+            "once",
+            "hour",
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "amount",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "Person": {
+      "description": "A person or an agent.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Person"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "name": {
+          "description": "Their name.",
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "description": "What they do here.",
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "description": "Default human.",
+          "enum": [
+            "human",
+            "agent"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "Date": {
+      "description": "A date, a date and time, or a range (ISO 8601).",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Date"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "value": {
+          "description": "ISO 8601 date or date-time.",
+          "$ref": "#/$defs/date"
+        },
+        "until": {
+          "description": "The end of a range.",
+          "$ref": "#/$defs/date"
+        },
+        "label": {
+          "description": "What the date is.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "Location": {
+      "description": "A place.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Location"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "name": {
+          "description": "Its name.",
+          "type": "string",
+          "minLength": 1
+        },
+        "address": {
+          "description": "Postal address.",
+          "type": "string",
+          "minLength": 1
+        },
+        "coordinates": {
+          "description": "Latitude and longitude.",
+          "type": "object",
+          "properties": {
+            "lat": {
+              "description": "Latitude.",
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "lng": {
+              "description": "Longitude.",
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            }
+          },
+          "required": [
+            "lat",
+            "lng"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "Status": {
+      "description": "The state of something ongoing.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Status"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "state": {
+          "description": "Where it stands.",
+          "enum": [
+            "idle",
+            "working",
+            "waiting",
+            "done",
+            "failed",
+            "blocked"
+          ]
+        },
+        "label": {
+          "description": "What is in that state.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "state",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "Progress": {
+      "description": "How far along something is. No value means indeterminate.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Progress"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "label": {
+          "description": "What is progressing.",
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "description": "0 to 1.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "steps": {
+          "description": "The plan, step by step.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Unique among the steps.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "label": {
+                "description": "The step.",
+                "type": "string",
+                "minLength": 1
+              },
+              "state": {
+                "description": "Where it stands.",
+                "enum": [
+                  "pending",
+                  "active",
+                  "done",
+                  "blocked"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "state"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "Media": {
+      "description": "An image, video, audio or document. Every medium carries its text equivalent.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Media"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "kind": {
+          "description": "What it is.",
+          "enum": [
+            "image",
+            "video",
+            "audio",
+            "document"
+          ]
+        },
+        "src": {
+          "description": "Where it is (URL).",
+          "type": "string",
+          "minLength": 1
+        },
+        "alt": {
+          "description": "Required for image and video: what it shows.",
+          "type": "string",
+          "minLength": 1
+        },
+        "transcript": {
+          "description": "Required for audio; for video, this or captions.",
+          "type": "string",
+          "minLength": 1
+        },
+        "captions": {
+          "description": "URL of a caption track (WebVTT), for video.",
+          "type": "string",
+          "minLength": 1
+        },
+        "caption": {
+          "description": "A visible caption.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "kind",
+        "src"
+      ],
+      "additionalProperties": false
+    },
+    "Confirmation": {
+      "description": "Something the person did took effect.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Confirmation"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "text": {
+          "description": "What happened.",
+          "type": "string",
+          "minLength": 1
+        },
+        "of": {
+          "description": "The node whose act this confirms.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "Warning": {
+      "description": "A risk the person should know about.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Warning"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "text": {
+          "description": "The risk.",
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "description": "Default caution.",
+          "enum": [
+            "caution",
+            "danger"
+          ]
+        },
+        "acknowledge": {
+          "description": "The person must acknowledge it.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "Approval": {
+      "description": "A request for the person's authority: approve or reject.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Approval"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "primary": {
+          "description": "This node is the experience's main act. At most one per experience.",
+          "type": "boolean"
+        },
+        "request": {
+          "description": "What is being asked.",
+          "type": "string",
+          "minLength": 1
+        },
+        "requester": {
+          "description": "The Person node asking.",
+          "$ref": "#/$defs/id"
+        },
+        "scope": {
+          "description": "What the approval covers.",
+          "type": "string",
+          "minLength": 1
+        },
+        "consequence": {
+          "description": "What the act does, stated so it can be shown verbatim. At least one entry.",
+          "type": "object",
+          "properties": {
+            "spend": {
+              "description": "Money that will be spent.",
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "description": "In the currency's major unit.",
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "description": "ISO 4217 code.",
+                  "$ref": "#/$defs/currency"
+                }
+              },
+              "required": [
+                "amount",
+                "currency"
+              ],
+              "additionalProperties": false
+            },
+            "publish": {
+              "description": "Something that will be made public.",
+              "type": "object",
+              "properties": {
+                "audience": {
+                  "description": "Who will see it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "audience"
+              ],
+              "additionalProperties": false
+            },
+            "send": {
+              "description": "Something that will be sent.",
+              "type": "object",
+              "properties": {
+                "to": {
+                  "description": "The recipient.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "channel": {
+                  "description": "How: email, SMS…",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "to"
+              ],
+              "additionalProperties": false
+            },
+            "consent": {
+              "description": "Permission the person grants.",
+              "type": "object",
+              "properties": {
+                "to": {
+                  "description": "Who receives it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "description": "What it covers.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "to",
+                "scope"
+              ],
+              "additionalProperties": false
+            },
+            "delete": {
+              "description": "Something that will be deleted.",
+              "type": "object",
+              "properties": {
+                "what": {
+                  "description": "What.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "what"
+              ],
+              "additionalProperties": false
+            },
+            "statement": {
+              "description": "The consequence in the caller's own words.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "request",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Recommendation": {
+      "description": "What the caller recommends. It comes first; alternatives follow.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Recommendation"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "primary": {
+          "description": "This node is the experience's main act. At most one per experience.",
+          "type": "boolean"
+        },
+        "summary": {
+          "description": "The recommendation, in one line.",
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "description": "0 to 1.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "consequence": {
+          "description": "What the act does, stated so it can be shown verbatim. At least one entry.",
+          "type": "object",
+          "properties": {
+            "spend": {
+              "description": "Money that will be spent.",
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "description": "In the currency's major unit.",
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "description": "ISO 4217 code.",
+                  "$ref": "#/$defs/currency"
+                }
+              },
+              "required": [
+                "amount",
+                "currency"
+              ],
+              "additionalProperties": false
+            },
+            "publish": {
+              "description": "Something that will be made public.",
+              "type": "object",
+              "properties": {
+                "audience": {
+                  "description": "Who will see it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "audience"
+              ],
+              "additionalProperties": false
+            },
+            "send": {
+              "description": "Something that will be sent.",
+              "type": "object",
+              "properties": {
+                "to": {
+                  "description": "The recipient.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "channel": {
+                  "description": "How: email, SMS…",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "to"
+              ],
+              "additionalProperties": false
+            },
+            "consent": {
+              "description": "Permission the person grants.",
+              "type": "object",
+              "properties": {
+                "to": {
+                  "description": "Who receives it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "description": "What it covers.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "to",
+                "scope"
+              ],
+              "additionalProperties": false
+            },
+            "delete": {
+              "description": "Something that will be deleted.",
+              "type": "object",
+              "properties": {
+                "what": {
+                  "description": "What.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "what"
+              ],
+              "additionalProperties": false
+            },
+            "statement": {
+              "description": "The consequence in the caller's own words.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "summary",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "PredictedChoice": {
+      "description": "The option the caller expects the person to pick in a Choice.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "PredictedChoice"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "of": {
+          "description": "The Choice node.",
+          "$ref": "#/$defs/id"
+        },
+        "option": {
+          "description": "The predicted option's id in that Choice.",
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "description": "Why, in one line.",
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "description": "0 to 1.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "of",
+        "option",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Alternative": {
+      "description": "Another way to go than the recommendation.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Alternative"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "label": {
+          "description": "The words for it; defaults to the intent.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "for": {
+          "description": "The node this is an alternative to.",
+          "$ref": "#/$defs/id"
+        },
+        "input": {
+          "description": "The person supplies a value of this kind when choosing it.",
+          "enum": [
+            "Price",
+            "Date",
+            "Text",
+            "Location",
+            "Person"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Tradeoff": {
+      "description": "What one option gains and costs. At least one gain or cost.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Tradeoff"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "of": {
+          "description": "The node the tradeoff describes.",
+          "$ref": "#/$defs/id"
+        },
+        "summary": {
+          "description": "The tradeoff, in one line.",
+          "type": "string",
+          "minLength": 1
+        },
+        "gains": {
+          "description": "What it gains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "costs": {
+          "description": "What it costs.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "Autopick": {
+      "description": "A decision already made for the person, which they may keep or undo.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Autopick"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "summary": {
+          "description": "What was decided, in one line.",
+          "type": "string",
+          "minLength": 1
+        },
+        "of": {
+          "description": "The node decided on.",
+          "$ref": "#/$defs/id"
+        },
+        "undoWithin": {
+          "description": "Seconds the person has to undo.",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "summary",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Correction": {
+      "description": "The person corrects something that was understood wrong.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Correction"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "target": {
+          "description": "The node being corrected.",
+          "$ref": "#/$defs/id"
+        },
+        "prompt": {
+          "description": "The question.",
+          "type": "string",
+          "minLength": 1
+        },
+        "original": {
+          "description": "What was understood, in words.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "target",
+        "prompt",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Preference": {
+      "description": "A setting the person may change. Feather stores nothing; the reply goes back to the caller.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Preference"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "key": {
+          "description": "The caller's name for the setting.",
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "description": "The words for it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "description": "The current value.",
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        "options": {
+          "description": "The values allowed, when a fixed set.",
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          },
+          "minItems": 2
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "key",
+        "label",
+        "value",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "Comparison": {
+      "description": "Several nodes side by side on the same criteria.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Comparison"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "items": {
+          "description": "The compared node ids, at least two.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 2
+        },
+        "criteria": {
+          "description": "What they are compared on; each gives a value for every item.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "description": "The criterion.",
+                "type": "string",
+                "minLength": 1
+              },
+              "values": {
+                "description": "One value per compared node id.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "label",
+              "values"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "items",
+        "criteria"
+      ],
+      "additionalProperties": false
+    },
+    "IrreversibleAction": {
+      "description": "An act that cannot be undone: spending, publishing, sending, consent. Always explicit, never the default focus.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "IrreversibleAction"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "primary": {
+          "description": "This node is the experience's main act. At most one per experience.",
+          "type": "boolean"
+        },
+        "label": {
+          "description": "The words for the act; defaults to the intent.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "consequence": {
+          "description": "What the act does, stated so it can be shown verbatim. At least one entry.",
+          "type": "object",
+          "properties": {
+            "spend": {
+              "description": "Money that will be spent.",
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "description": "In the currency's major unit.",
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "description": "ISO 4217 code.",
+                  "$ref": "#/$defs/currency"
+                }
+              },
+              "required": [
+                "amount",
+                "currency"
+              ],
+              "additionalProperties": false
+            },
+            "publish": {
+              "description": "Something that will be made public.",
+              "type": "object",
+              "properties": {
+                "audience": {
+                  "description": "Who will see it.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "audience"
+              ],
+              "additionalProperties": false
+            },
+            "send": {
+              "description": "Something that will be sent.",
+              "type": "object",
+              "properties": {
+                "to": {
+                  "description": "The recipient.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "channel": {
+                  "description": "How: email, SMS…",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "to"
+              ],
+              "additionalProperties": false
+            },
+            "consent": {
+              "description": "Permission the person grants.",
+              "type": "object",
+              "properties": {
+                "to": {
+                  "description": "Who receives it.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "description": "What it covers.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "to",
+                "scope"
+              ],
+              "additionalProperties": false
+            },
+            "delete": {
+              "description": "Something that will be deleted.",
+              "type": "object",
+              "properties": {
+                "what": {
+                  "description": "What.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "what"
+              ],
+              "additionalProperties": false
+            },
+            "statement": {
+              "description": "The consequence in the caller's own words.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "consequence",
+        "intent"
+      ],
+      "additionalProperties": false
+    },
+    "ExploreMore": {
+      "description": "More is available on request; the caller sends it when the person asks.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "ExploreMore"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "minLength": 1
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "label": {
+          "description": "The words for it; defaults to the intent.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "topics": {
+          "description": "What more is available.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "intent"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -7,16 +7,44 @@ Feather is becoming the first *liquid* design system: callers will describe what
 and Feather composes the interface for the person, their abilities and their device at runtime. The plan, its
 principles and its milestones are in [`docs/PLAN.md`](docs/PLAN.md).
 
-Today (milestone L0) Feather is the static foundation that work builds on: 35 themeable React components, a
-token-driven theme engine and the gates that keep them clean, released as packages.
+Feather today has two halves:
+
+- The static foundation (milestone L0): 35 themeable React components, a token-driven theme engine and the gates
+  that keep them clean.
+- The contract the liquid system is built on (L1): the [Experience IR](docs/ir/README.md), with its validator and
+  conformance fixtures.
 
 | Package | What it is |
 |---|---|
 | [`@aleeforoughi/feather-tokens`](packages/tokens) | Token schema `feather-tokens/2`, the theme engine and `feather-brand` CLI, the foundation CSS, the reference themes and fonts. |
+| [`@aleeforoughi/feather-intent`](packages/intent) | The Experience IR `feather.ir/0`: TypeScript types, JSON Schema, `validate()`, `validateReply()` and the `feather-ir` CLI. No dependencies. |
 | [`@aleeforoughi/feather-react`](packages/react) | 28 atoms and 7 molecules on Base UI and Tailwind CSS v4, styled only through tokens. |
 | [`@aleeforoughi/feather-documents`](packages/documents) | Token-themed HTML/CSS document templates and the render and verify kit (not published yet). |
 | [`apps/storybook`](apps/storybook) | Every component and story, switchable between the reference themes; home of the a11y and visual suites. |
 | [`apps/showcase`](apps/showcase) | The component sheet, built against the packages exactly as a product would. |
+
+## Ask Feather for an experience
+
+Callers describe the interaction as meaning, in `feather.ir/0`, and validate it before sending:
+
+```ts
+import { validate, formatIssues } from "@aleeforoughi/feather-intent"
+
+const result = validate({
+  ir: "feather.ir/0",
+  experience: "approve_campaign",
+  nodes: [
+    { type: "Recommendation", id: "rec", intent: "launch the recommended test", summary: "7 days, purchase objective" },
+    { type: "IrreversibleAction", id: "go", intent: "confirm spend", consequence: { spend: { amount: 1050, currency: "AED" } } },
+    { type: "Alternative", id: "less", intent: "spend less" },
+  ],
+})
+if (!result.ok) console.error(formatIssues(result.issues))
+```
+
+How the IR works, and every rule and error code, is in [`docs/ir/README.md`](docs/ir/README.md); every node
+type is in [`docs/ir/nodes.md`](docs/ir/nodes.md). The composer that turns an experience into an interface is
+milestone L3.
 
 ## Use Feather in a product
 

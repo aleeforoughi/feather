@@ -249,7 +249,8 @@ review, and every delegated task names its files and its exit test.
    They can be renamed once, at L7, when the IR freezes.
 3. `feather-tokens/2` keeps the `qooe-tokens/1` semantic role names; only the schema id changes, and
    `qooe-tokens/1` migrates on read.
-4. `qooe-core` switches to the packages at L0.
+4. `qooe-core` switches to the packages at L0. *Set aside on 2026-10-03: Feather builds on the 1.7.0 handoff
+   alone, and the `qooe-core` build check is no longer part of the L0 exit.*
 5. Proprietary (all rights reserved) for now.
 
 The original questions:
