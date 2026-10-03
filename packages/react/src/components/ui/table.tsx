@@ -2,9 +2,27 @@ import * as React from "react"
 import { cn } from "../../lib/cn"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
+  const container = React.useRef<HTMLDivElement>(null)
+  // A table wider than its container scrolls; a keyboard user must be able to reach and scroll it, so the container
+  // becomes a focusable, named region only while it overflows (no extra tab stop for a table that fits).
+  const [scrolls, setScrolls] = React.useState(false)
+  React.useLayoutEffect(() => {
+    const el = container.current
+    if (!el) return
+    const check = () => setScrolls(el.scrollWidth > el.clientWidth + 1)
+    check()
+    if (typeof ResizeObserver === "undefined") return
+    const observer = new ResizeObserver(check)
+    observer.observe(el)
+    if (el.firstElementChild) observer.observe(el.firstElementChild)
+    return () => observer.disconnect()
+  }, [])
   return (
     <div
+      ref={container}
       data-slot="table-container"
+      data-variant={scrolls ? "scrolls" : "fits"}
+      {...(scrolls ? { tabIndex: 0, role: "region", "aria-label": "Table, scrolls sideways" } : {})}
       className="relative w-full overflow-x-auto"
     >
       <table

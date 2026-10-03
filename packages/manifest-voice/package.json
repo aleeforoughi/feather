@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-manifest-voice",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "The voice manifestation: prompts, confirmations and readback for any speech engine, over the dialog engine. Replies are the same events every body sends.",
   "license": "UNLICENSED",
   "type": "module",

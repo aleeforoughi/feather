@@ -96,6 +96,10 @@ value in the plan comes with the rule that chose it and what it overrode. The ru
    npm install @aleeforoughi/feather-react @aleeforoughi/feather-tokens
    ```
 
+   With no brand, Feather renders its default theme, **feather**: black and white, with color only where it
+   carries meaning (status, errors). Everything is set in JetBrains Mono, headings and text alike, and `.dark` switches to
+   **feather-dark**. Steps 3 and 4 are for a product that has its own brand.
+
 3. Write the brand into `brand/tokens.json` (`feather-tokens/2`; a QOOE `qooe-tokens/1` file works as it is) and
    generate the theme:
 
@@ -147,8 +151,8 @@ pnpm build                 # build the packages
 pnpm lint && pnpm typecheck && pnpm test
 pnpm hygiene               # the release gate
 pnpm manifest              # rebuild Storybook and regenerate packages/react/foundation.json
-pnpm test:a11y             # axe on every story (FEATHER_THEME=paper-sharp|void-pill)
-pnpm test:visual           # every story in both themes against visual/__screenshots__
+pnpm test:a11y             # axe on every story (FEATHER_THEME=feather|feather-dark|paper-sharp|void-pill)
+pnpm test:visual           # every story in all four reference themes against visual/__screenshots__
 pnpm --filter @feather-apps/playground dev   # the playground
 node packages/manifest-text/dist/cli.js conformance/ir/valid/ad-campaign-launch.json   # an experience in the terminal
 pnpm test:playground       # build the playground and run its end-to-end tests (CHROMIUM_PATH to reuse a browser)

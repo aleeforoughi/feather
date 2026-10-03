@@ -23,6 +23,7 @@ export const FONTS = {
   Nunito: "@fontsource-variable/nunito",
   "Playfair Display": "@fontsource-variable/playfair-display",
   "JetBrains Mono": "@fontsource-variable/jetbrains-mono",
+  "Geist Mono": "@fontsource-variable/geist-mono",
   Figtree: "@fontsource-variable/figtree",
   Poppins: "@fontsource/poppins",
 }
@@ -34,6 +35,9 @@ export const STATIC_FONT_WEIGHTS = { Poppins: [400, 500, 600, 700, 800] }
 export const fontFamilyName = (name) => (STATIC_FONT_WEIGHTS[name] ? name : `${name} Variable`)
 
 /** The URL-safe file name of a font family: "Plus Jakarta Sans" → "plus-jakarta-sans". */
+/** The generic family a font falls back to: monospace for the mono families, sans-serif otherwise. */
+const fallback = (name) => (/\bMono\b/.test(name) ? "monospace" : "sans-serif")
+
 export const fontSlug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 
 /** The Fontsource stylesheets a font needs. */
@@ -411,8 +415,8 @@ export function buildTheme(input) {
     "--sidebar-accent-foreground": "var(--text-primary)",
     "--sidebar-border": mix(text, surface, 16),
     "--sidebar-ring": primary,
-    "--brand-font-body": `"${fontFamilyName(body)}", ${body === "JetBrains Mono" ? "monospace" : "sans-serif"}`,
-    "--brand-font-display": `"${fontFamilyName(display)}", sans-serif`,
+    "--brand-font-body": `"${fontFamilyName(body)}", ${fallback(body)}`,
+    "--brand-font-display": `"${fontFamilyName(display)}", ${fallback(display)}`,
     // The unit is fixed; density sets sizes and gaps through its own variables.
     "--spacing": "0.25rem",
     ...DENSITIES[semanticDensity],

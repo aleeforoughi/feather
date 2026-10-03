@@ -6,6 +6,8 @@ import "@aleeforoughi/feather-tokens/fonts/sora.css"
 import "@aleeforoughi/feather-tokens/fonts/inter.css"
 import "@aleeforoughi/feather-tokens/fonts/fraunces.css"
 import "@aleeforoughi/feather-tokens/fonts/dm-sans.css"
+import "@aleeforoughi/feather-tokens/fonts/geist.css"
+import "@aleeforoughi/feather-tokens/fonts/jetbrains-mono.css"
 import { FeatherProvider } from "@aleeforoughi/feather-react"
 import App from "./App"
 

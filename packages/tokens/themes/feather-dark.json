@@ -1,0 +1,25 @@
+{
+  "name": "feather-dark",
+  "dark": true,
+  "tokens": {
+    "schema": "feather-tokens/2",
+    "colors": {
+      "background": "#0C0C0E",
+      "surface": "#16161A",
+      "text": "#EDEDEF",
+      "primary": "#EDEDEF",
+      "primaryText": "#16161A",
+      "destructive": "#FF6B62"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "JetBrains Mono",
+        "body": "JetBrains Mono"
+      }
+    },
+    "shape": "rounded",
+    "density": "comfortable",
+    "elevation": "soft",
+    "motion": "calm"
+  }
+}

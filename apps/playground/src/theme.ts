@@ -3,12 +3,15 @@
 import { buildTheme, type BrandTokens } from "@aleeforoughi/feather-tokens"
 import voidPill from "@aleeforoughi/feather-tokens/themes/void-pill.json"
 import paperSharp from "@aleeforoughi/feather-tokens/themes/paper-sharp.json"
+import feather from "@aleeforoughi/feather-tokens/themes/feather.json"
+import featherDark from "@aleeforoughi/feather-tokens/themes/feather-dark.json"
 
-export const THEME_NAMES = ["paper-sharp", "void-pill", "neutral"] as const
+export const THEME_NAMES = ["feather", "feather-dark", "paper-sharp", "void-pill"] as const
 export type ThemeName = (typeof THEME_NAMES)[number]
 
 const THEMES: Record<ThemeName, { dark: boolean; tokens: BrandTokens } | null> = {
-  neutral: null,
+  feather: feather as { dark: boolean; tokens: BrandTokens },
+  "feather-dark": featherDark as { dark: boolean; tokens: BrandTokens },
   "void-pill": voidPill as { dark: boolean; tokens: BrandTokens },
   "paper-sharp": paperSharp as { dark: boolean; tokens: BrandTokens },
 }

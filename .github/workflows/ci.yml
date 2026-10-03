@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        theme: [paper-sharp, void-pill]
+        theme: [feather, feather-dark, paper-sharp, void-pill]
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4

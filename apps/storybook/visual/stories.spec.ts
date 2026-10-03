@@ -11,7 +11,7 @@ const stories = Object.values(index.entries)
   .filter((entry) => entry.type === "story")
   .map((entry) => entry.id)
   .sort()
-const THEMES = ["paper-sharp", "void-pill"]
+const THEMES = ["feather", "feather-dark", "paper-sharp", "void-pill"]
 
 for (const theme of THEMES) {
   test.describe(theme, () => {

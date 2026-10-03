@@ -89,7 +89,7 @@ export default function App() {
   const [fixture, setFixture] = React.useState(FIXTURES.find((f) => f.name === "ad-campaign-launch")?.name ?? FIXTURES[0]!.name)
   const [text, setText] = React.useState(() => FIXTURES.find((f) => f.name === fixture)!.text)
   const [controls, setControls] = React.useState<Controls>(DEFAULT_CONTROLS)
-  const [theme, setTheme] = React.useState<ThemeName>("paper-sharp")
+  const [theme, setTheme] = React.useState<ThemeName>("feather")
   const [reply, setReply] = React.useState<{ text: string; body: string } | null>(null)
   const [preset, setPreset] = React.useState("custom")
 

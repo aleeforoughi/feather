@@ -1,5 +1,28 @@
 # Feather — changelog
 
+## 1.13.0 — 2026-10-03
+
+**A default theme: feather.** What Feather looks like with no brand.
+
+- `themes/feather.json` (light) and `themes/feather-dark.json` (dark):
+  - Black and white. The primary is ink, near-black in light and near-white in dark, and there is no accent.
+    Color appears only where it carries meaning: success, warning, info, errors and the destructive act.
+  - Warm-neutral greys: a #F7F7F5 page under white surfaces, and #0C0C0E under #16161A in dark.
+  - JetBrains Mono throughout, for headings and text alike.
+  - The system defaults on every other axis: rounded 8/12/16, comfortable density (44px controls), soft
+    elevation, calm motion.
+  - Every emphasis color meets its contrast floor. The destructive red is the theme's own (#B42318 light, #FF6B62
+    dark), so error text passes AA on the page and on its tint, with no accessibility debt.
+- **The fallback is the theme.** foundation.css's `:root` and `.dark` blocks are generated from the two files by
+  `scripts/default-theme.mjs` (`pnpm --filter @aleeforoughi/feather-tokens theme:default`), and a test fails on
+  drift. A product that applies no brand gets exactly this theme.
+- **Geist Mono** joins the foundation font set. A mono family now falls back to `monospace` for display as well
+  as body.
+- **Table:** a table wider than its container becomes a focusable, named region while it scrolls, so a keyboard
+  user can reach it. Mono text made the comparison table scroll and exposed this.
+- **Gates.** Storybook opens in feather. Accessibility runs in all four reference themes, and visual regression
+  and the rendered audit cover them too.
+
 ## 1.12.0 — 2026-10-03
 
 **Visual hygiene (milestone V1).** Every pixel, gap, radius, type size, border, shadow, duration and curve now

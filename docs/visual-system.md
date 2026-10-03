@@ -15,6 +15,14 @@ BRAND THEMES   a brand picks values *inside* the system: colors, fonts, shape, d
 PRINCIPLES     the review layer: hierarchy, balance, rhythm, optical balance… (§13)
 ```
 
+**The default theme.** With no brand, Feather is `themes/feather.json`, with `themes/feather-dark.json` under
+`.dark`. The rules for it:
+- The primary is ink (black in light, near-white in dark).
+- There is no accent; color appears only where it means something (status, errors, the destructive act).
+- JetBrains Mono for headings and text, and every other axis at the system default.
+- The fallback blocks in foundation.css are generated from those two files (`pnpm --filter
+  @aleeforoughi/feather-tokens theme:default`), and a test fails if they drift.
+
 Decided with the owner (docs/PLAN.md section 12, decision 7):
 - The rules are the frame that brand themes live inside. A brand axis selects among compliant value sets and
   can never produce a non-compliant one.
