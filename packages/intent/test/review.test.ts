@@ -202,4 +202,11 @@ describe("composer review (L3)", () => {
     for (let i = 0; i < 10; i++) validate(doc(...nodes))
     expect((performance.now() - start) / 10).toBeLessThan(20)
   })
+  it("lets an IrreversibleAction confirm an act made irreversible by its consequence", () => {
+    const r = validate({ ir: "feather.ir/0", experience: "e", nodes: [
+      { type: "Approval", id: "ok", intent: "approve", request: "Share your calendar?", consequence: { consent: { to: "Acme", scope: "your calendar" } } },
+      { type: "IrreversibleAction", id: "go", intent: "confirm sharing", consequence: { consent: { to: "Acme", scope: "your calendar" } }, confirms: "ok" },
+    ] })
+    expect(r.ok).toBe(true)
+  })
 })

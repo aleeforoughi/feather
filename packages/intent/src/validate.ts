@@ -477,8 +477,8 @@ function checkNode(add: Add, { node, spec, at, name, id, index }: Entry, { byId,
       if (node.reversible === true) add("irreversible-marked-reversible", `${at}/reversible`, `${name} is irreversible by definition; drop "reversible": true, or use an Action if it can be undone.`, id)
       if (typeof node.confirms === "string") {
         const target = byId.get(node.confirms)
-        if (target && target.spec.type !== "IrreversibleAction" && target.node.reversible !== false) {
-          add("unneeded-confirmation", `${at}/confirms`, `${name} confirms ${target.name}, which can be undone; only an act marked "reversible": false needs confirming.`, id)
+        if (target && target.spec.type !== "IrreversibleAction" && target.node.reversible !== false && target.node.consequence === undefined) {
+          add("unneeded-confirmation", `${at}/confirms`, `${name} confirms ${target.name}, which can be undone; only an act marked "reversible": false, or stating a consequence, needs confirming.`, id)
         }
       }
       return

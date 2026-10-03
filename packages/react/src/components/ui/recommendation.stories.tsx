@@ -74,3 +74,31 @@ export const Keyboard: Story = {
     await expect(canvas.getByRole("button", { name: "Why?" })).toHaveAttribute("aria-expanded", "false")
   },
 }
+
+/** A consequence that this Recommendation commits by itself: accepting arms first, then a second press commits. */
+export const WithConsequenceArms: Story = {
+  name: "With consequence (arms)",
+  args: { intent: "book the venue", summary: "Book the Marina hall for the launch.", reversible: false, consequence: { spend: { amount: 1050, currency: "AED" } }, confidence: 0.81 },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const root = canvasElement.querySelector('[data-slot="recommendation"]')!
+    await userEvent.tab()
+    const accept = canvas.getByRole("button", { name: "Accept recommendation: Book the venue" })
+    await expect(accept).toHaveFocus()
+    await expect(accept).toHaveAccessibleDescription("Spends AED 1,050")
+    await userEvent.keyboard("{Enter}")
+    await expect(args.onAct).not.toHaveBeenCalled()
+    await expect(root).toHaveAttribute("data-variant", "armed")
+    const confirm = canvas.getByRole("button", { name: "Yes, book the venue" })
+    await expect(confirm).toHaveFocus()
+    await expect(canvas.getByRole("status")).toHaveTextContent("Armed: press again to book the venue")
+    await userEvent.keyboard("{Enter}")
+    await expect(args.onAct).toHaveBeenCalledTimes(1)
+    await expect(args.onAct).toHaveBeenCalledWith("accept")
+    await expect(root).toHaveAttribute("data-variant", "done")
+    await expect(root.querySelectorAll("button")).toHaveLength(0)
+    const outcome = canvasElement.querySelector('[data-slot="recommendation-outcome"]')!
+    await expect(outcome).toHaveTextContent("Confirmed: spends AED 1,050")
+    await expect(document.activeElement).toBe(outcome)
+  },
+}

@@ -67,6 +67,30 @@ jobs:
         env:
           FEATHER_THEME: ${{ matrix.theme }}
 
+  playground:
+    name: Playground (one IR in four contexts, compose under 5 ms)
+    needs: check
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test:playground
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playground-report
+          path: |
+            apps/playground/playwright-report
+            apps/playground/test-results
+          retention-days: 7
+
   visual:
     name: Visual regression
     needs: check

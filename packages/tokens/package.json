@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-tokens",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Feather tokens: the feather-tokens/2 schema, the theme engine, the foundation CSS and the reference themes.",
   "license": "UNLICENSED",
   "type": "module",

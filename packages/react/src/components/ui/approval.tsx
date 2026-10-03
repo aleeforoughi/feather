@@ -35,26 +35,33 @@ type Mode = "idle" | "armed" | "rejecting" | "done"
 
 /**
  * A request for the person's authority (IR node Approval), built on AttentionCard. Approve performs `approve`;
- * when the act is irreversible and has a consequence, approve arms first (confirm pattern). Reject opens an
- * optional reason field.
+ * when it states a consequence (which makes it irreversible), approve arms first (confirm pattern) unless `arm` says
+ * otherwise. Reject opens an optional reason field.
  */
-function Approval({ intent, request, requester, scope, consequence, reversible, importance = "normal", expandable, locale = "en", onAct, className }: {
+function Approval({ intent, request, requester, scope, consequence, arm, importance = "normal", expandable, locale = "en", defaultExpanded = false, onAct, className }: {
   intent: string
   request: string
   requester?: { name: string; role?: string; kind?: string }
   scope?: string
   consequence?: Consequence
+  /**
+   * Whether approving arms first (two deliberate acts). Default: when it states a consequence. A layout plan passes
+   * its `confirm`; an Approval that an IrreversibleAction commits does not arm.
+   */
+  arm?: boolean
   reversible?: boolean
   importance?: "low" | "normal" | "high" | "critical"
   expandable?: Expandable
   locale?: string
+  /** Whether "Why?" starts open (a layout plan's `expanded`). Deciding closes it. */
+  defaultExpanded?: boolean
   onAct: (act: "approve" | "reject", reason?: string) => void
   className?: string
 }) {
   const id = React.useId()
   const [mode, setMode] = React.useState<Mode>("idle")
   const [reason, setReason] = React.useState("")
-  const [whyOpen, setWhyOpen] = React.useState(false)
+  const [whyOpen, setWhyOpen] = React.useState(defaultExpanded)
   const [status, setStatus] = React.useState("")
   const [outcome, setOutcome] = React.useState("")
   const decided = React.useRef(false)
@@ -64,7 +71,10 @@ function Approval({ intent, request, requester, scope, consequence, reversible, 
   const confirmRef = React.useRef<HTMLButtonElement>(null)
   const reasonRef = React.useRef<HTMLTextAreaElement>(null)
   const focusOn = React.useRef<"approve" | "reject" | "confirm" | "reason" | "outcome" | null>(null)
-  const needsConfirm = reversible === false && consequence !== undefined
+  // An act that states a consequence is irreversible by definition, so it arms first whatever `reversible` says,
+  // unless the caller says another control commits the effect (`arm={false}`).
+  const irreversible = consequence !== undefined
+  const needsConfirm = arm ?? irreversible
   const consequenceId = `${id}-consequence`
   const describedBy = consequence ? consequenceId : undefined
 
@@ -131,7 +141,7 @@ function Approval({ intent, request, requester, scope, consequence, reversible, 
           {scope}
         </p>
       )}
-      {needsConfirm && (
+      {irreversible && (
         <p data-slot="approval-warning" className="flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase">
           <TriangleAlertIcon aria-hidden className="size-4 shrink-0 text-destructive" />
           Cannot be undone

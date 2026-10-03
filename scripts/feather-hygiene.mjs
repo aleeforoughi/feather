@@ -25,7 +25,7 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/documents"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/documents"]
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 
@@ -176,6 +176,16 @@ export function hygiene(root = ".") {
     for (const m of read(file).matchAll(/from\s+"([^"]+)"/g)) {
       if (!m[1].startsWith("./") && m[1] !== "@aleeforoughi/feather-intent" && m[1] !== "@aleeforoughi/feather-context") problems.push(`${path.relative(root, file)} imports ${m[1]}; the composer imports only the IR, the context and its own modules`)
     }
+  }
+  // The web manifestation renders plans with Feather: it imports Feather's packages and React, never the network or
+  // a model, and reads semantic tokens only, like every component.
+  const WEB_IMPORTS = new Set(["react", "@aleeforoughi/feather-intent", "@aleeforoughi/feather-context", "@aleeforoughi/feather-liquid", "@aleeforoughi/feather-react", "@aleeforoughi/feather-tokens"])
+  for (const file of walk(at("packages/manifest-web/src")).filter((f) => /\.tsx?$/.test(f) && !/\.(test|stories)\.tsx?$/.test(f) && !f.includes(`${path.sep}test${path.sep}`))) {
+    const text = read(file)
+    for (const m of text.matchAll(/from\s+"([^"]+)"/g)) {
+      if (!m[1].startsWith("./") && !WEB_IMPORTS.has(m[1])) problems.push(`${path.relative(root, file)} imports ${m[1]}; the web manifestation imports only Feather's packages and React`)
+    }
+    if (/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\boklch\(|\bhsla?\(/.test(text)) problems.push(`${path.relative(root, file)} uses a raw color; read semantic tokens`)
   }
   const entry = read(at(`${REACT}/src/index.ts`))
   for (const atom of atoms) if (!entry.includes(`"./components/ui/${atom}"`)) problems.push(`${REACT}/src/index.ts does not export ${atom} — products cannot import it`)

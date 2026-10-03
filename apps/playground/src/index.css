@@ -1,0 +1,7 @@
+/* A product's stylesheet, as the README tells a caller to write it, plus the web manifestation's own classes. */
+@import "tailwindcss";
+@import "@aleeforoughi/feather-react/styles.css";
+
+@source "../../../packages/manifest-web/src";
+@source not "../../../packages/manifest-web/src/**/*.test.tsx";
+@source not "../../../packages/manifest-web/src/**/*.stories.tsx";

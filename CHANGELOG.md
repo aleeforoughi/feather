@@ -1,5 +1,61 @@
 # Feather — changelog
 
+## 1.10.0 — 2026-10-03
+
+**The liquid composer (milestone L3).** Semantics in, the right experience out: one Experience IR, composed for
+the person, their abilities and their device. Three new packages.
+
+- `@aleeforoughi/feather-context`: the render context types (persona, capability, device, brand, locale). It is
+  types only. The host passes the context per render, and Feather stores none of it.
+- `@aleeforoughi/feather-liquid`: `compose(experience, context) → LayoutPlan`.
+  - It is pure and deterministic, with no clock, no randomness and no model call, and it never throws.
+  - Every value in the plan comes from a named rule (`RULES`) at a principle 8 priority level (safety,
+    accessibility, user setting, OS, task, learned, aesthetics, default). The plan's `trace` records the rule,
+    the reason and what it overrode.
+  - The rules cover:
+    - one primary act;
+    - irreversible acts, which are confirmed once and never take the default focus;
+    - the recommendation first, then its alternatives;
+    - critical detail, which is never hidden;
+    - density and target size;
+    - routing by output: web, switch, voice or text;
+    - explanation depth;
+    - reduced motion;
+    - plain text without a card;
+    - contrast;
+    - importance;
+    - structure.
+  - The plan gives `order`, the reading, speaking and scanning order, and a confirm `keyword` in the plan's
+    language. Audio and video get `textEquivalent` when there is no sound.
+  - Every rule has tests. Every valid fixture in every reference context is snapshot-tested. Invariants (every
+    node once, focus never on an irreversible act, no body the output cannot carry) hold for every fixture in 64
+    contexts.
+  - An experience ten times the largest fixture composes in under 5 ms.
+- `@aleeforoughi/feather-manifest-web`: `<FeatherExperience>` and `<PlanView>` render a plan with Feather's
+  organisms and atoms.
+  - They apply every decision in the plan, and move focus once, on mount.
+  - Every act becomes a reply checked with `validateReply`; a refused reply is never sent.
+  - Voice and text plans render a plain summary until their own manifestations arrive (L4).
+  - Its stories are the new *Experiences* in Storybook, and pass axe in both reference themes.
+- `apps/playground`: pick or edit an experience, change the person and the device, and see the result in four
+  reference contexts, with the plan, the trace and the compose time. Its end-to-end tests run in CI.
+
+Changes to existing packages:
+
+- **IR:**
+  - An act that states a `consequence` is irreversible: `"reversible": true` beside one is an error, and an
+    IrreversibleAction may confirm it.
+  - An IrreversibleAction's `confirms` may name any irreversible act, including a Choice.
+  - Spec defaults (IrreversibleAction `critical`, Warning `high`) are documented and applied by the composer.
+  - `validate()` never throws: a document it cannot read gives the issue `unreadable`.
+  - Validation is faster on large experiences.
+- **Organisms:**
+  - Recommendation, IrreversibleAction and Approval take `defaultExpanded`.
+  - Approval and Recommendation take `arm`, and arm whenever they state a consequence that nothing else confirms.
+  - `useThemeMotion` honors a `MotionPreference` set by the plan.
+- **Hygiene** checks the new packages' boundaries: the composer imports only the IR and the context; the web
+  manifestation imports only Feather and React, and uses no raw colors.
+
 ## 1.9.0 — 2026-10-03
 
 **Decision organisms (milestone L2).** Ten components that each render one Experience IR node as a complete,

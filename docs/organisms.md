@@ -100,13 +100,25 @@ in both reference themes in Storybook, the axe suite and the visual suite.
 
 ### `Recommendation` (IR node: Recommendation)
 
-- Props: `intent`, `summary`, `label?`, `confidence?` (0–1), `consequence?`, `reversible?`, `importance?`,
+- Props: `intent`, `summary`, `label?`, `confidence?` (0–1), `consequence?`, `arm?`, `reversible?`, `importance?`,
   `expandable?`, `primary?`, `locale?`, `onAct(act: "accept")`.
 - It shows the summary. Confidence shows as text ("Confidence: medium (78%)"), never as a bare number or color.
   Labels: below 0.5 "low", below 0.8 "medium", otherwise "high".
 - One button, labelled by `label` or the intent, performs `accept`.
 - A `consequence`, when given, shows verbatim.
-- Without one, the button's description says what happens next: for an irreversible recommendation, "Next,
+- **`arm?: boolean`: whether accepting arms first (two deliberate acts). Default: when it states a consequence.**
+  A consequence makes the act irreversible, so a Recommendation that commits by itself never commits on one
+  click. A layout plan passes its `confirm`; a Recommendation that an IrreversibleAction commits does not arm
+  (that IrreversibleAction confirms it, so nobody confirms one effect twice). With `arm` true, accept follows the
+  IrreversibleAction confirm pattern:
+  1. The first button ("Book the venue…") arms: `data-variant="armed"` on the root, announced politely
+     ("Armed: press again to book the venue").
+  2. "Yes, book the venue" appears next to "Cancel", focus moves to it, and only it calls `onAct("accept")`.
+     Escape or Cancel disarms and returns focus to the first button (it calls nothing).
+  3. Armed never times out. The consequence stays visible and described by the act.
+  4. After accepting it is `done` (`data-variant="done"`): the outcome ("Confirmed: spends AED 1,050"), no
+     control that could act again, and focus on the outcome text.
+- Without a consequence, the button's description says what happens next: for an irreversible recommendation, "Next,
   you confirm. Nothing is done until you do." (it never commits on accept); otherwise, "Accepting applies it.
   You can undo it."
 
@@ -130,9 +142,12 @@ in both reference themes in Storybook, the axe suite and the visual suite.
 ### `Approval` (IR node: Approval), built on `AttentionCard`
 
 - Props: `intent`, `request`, `requester?` (`{ name, role?, kind? }`, shown with `RoleChip`), `scope?`,
-  `consequence?`, `reversible?`, `importance?`, `expandable?`, `onAct(act: "approve" | "reject", reason?)`.
-- Approve performs `approve`. When it has a consequence (which makes it irreversible), approve follows the
-  IrreversibleAction confirm pattern, arming first.
+  `consequence?`, `arm?`, `reversible?`, `importance?`, `expandable?`, `onAct(act: "approve" | "reject", reason?)`.
+- Approve performs `approve`. **`arm?: boolean` says whether approving arms first (two deliberate acts).
+  Default: when it states a consequence** (which makes it irreversible), and then approve follows the
+  IrreversibleAction confirm pattern, arming first. A layout plan passes its `confirm`. An Approval that an
+  IrreversibleAction commits does not arm (`arm={false}`): that IrreversibleAction carries the confirmation, so a
+  person never confirms one effect twice. The consequence and "Cannot be undone" still show.
 - Reject opens an optional reason field (Textarea with a label) with "Send rejection" and "Back". Sending calls
   `onAct("reject", reason || undefined)`. Escape backs out.
 

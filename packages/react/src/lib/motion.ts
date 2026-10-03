@@ -1,3 +1,4 @@
+import * as React from "react"
 import { useReducedMotion } from "motion/react"
 
 /** Cubic-bezier control points, as motion takes them. */
@@ -21,9 +22,17 @@ export function themeMotion(): { duration: number; ease: Ease } {
   }
 }
 
-/** The theme's motion, or none at all when the user asked their system for reduced motion. */
+/**
+ * Motion a host asks for on behalf of the experience it renders (a layout plan's `motion`). "reduced" makes every
+ * component below it move as if the system asked for reduced motion. "full" never overrides the system's own request.
+ */
+export const MotionPreference = React.createContext<"full" | "reduced" | undefined>(undefined)
+
+/** The theme's motion, or none at all when the system or the surrounding `MotionPreference` asks for reduced motion. */
 export function useThemeMotion(): { duration: number; ease: Ease; reduced: boolean } {
-  const reduced = useReducedMotion() ?? false
+  const system = useReducedMotion() ?? false
+  const asked = React.useContext(MotionPreference)
+  const reduced = system || asked === "reduced"
   const m = themeMotion()
   return reduced ? { duration: 0, ease: m.ease, reduced } : { ...m, reduced }
 }

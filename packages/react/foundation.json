@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-react",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "tokenSchema": "feather-tokens/2",
   "themeAxes": {
     "shape": [
@@ -173,6 +173,7 @@
         "approval-warning"
       ],
       "stories": [
+        "Committed Elsewhere",
         "Critical",
         "Default",
         "Irreversible",
@@ -812,9 +813,13 @@
       "slots": [
         "recommendation",
         "recommendation-accept",
+        "recommendation-cancel",
         "recommendation-confidence",
+        "recommendation-confirm",
         "recommendation-eyebrow",
         "recommendation-next",
+        "recommendation-outcome",
+        "recommendation-status",
         "recommendation-summary"
       ],
       "stories": [
@@ -826,6 +831,7 @@
         "Long Text",
         "Low Confidence",
         "Primary",
+        "With consequence (arms)",
         "With Expandable"
       ]
     },

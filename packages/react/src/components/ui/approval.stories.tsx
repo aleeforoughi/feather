@@ -132,3 +132,19 @@ export const KeyboardRejectWithoutReason: Story = {
     await expectDone(canvasElement, args.onAct, "Rejection sent.")
   },
 }
+
+/** An IrreversibleAction commits the effect, so this Approval does not arm: one press approves. */
+export const CommittedElsewhere: Story = {
+  args: { intent: "approve the payment", request: "Pay the venue deposit", reversible: false, consequence: { spend: { amount: 1050, currency: "AED" } }, arm: false },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.tab()
+    const approve = canvas.getByRole("button", { name: "Approve: Pay the venue deposit" })
+    await expect(approve).toHaveFocus()
+    await expect(approve).toHaveTextContent(/^Approve$/)
+    await userEvent.keyboard("{Enter}")
+    await expect(args.onAct).toHaveBeenCalledTimes(1)
+    await expect(args.onAct).toHaveBeenCalledWith("approve")
+    await expectDone(canvasElement, args.onAct, "Approved.")
+  },
+}

@@ -18,9 +18,18 @@ section 12.
   `schema/feather.ir-0.json` and `docs/ir/nodes.md` from it (run `pnpm --filter @aleeforoughi/feather-intent
   generate` after changing it). `src/types.ts` mirrors it by hand. No dependencies.
 - `conformance/ir`: valid and invalid IR fixtures; every invalid one lists exactly the issues it must produce.
+- `packages/context` (`@aleeforoughi/feather-context`): the render context types (persona, capability, device,
+  brand). Types only.
+- `packages/liquid` (`@aleeforoughi/feather-liquid`): the composer, `compose(experience, context) → LayoutPlan`.
+  Imports only intent and context. Its rules are in `src/rules.ts`, documented in `docs/composer.md`, and proven in
+  `test/rules.test.ts` (every rule), `test/invariants.test.ts` (what must always hold) and `test/plans/`
+  (snapshots of every fixture in every reference context; update them with `-u` and review the diff).
+- `packages/manifest-web` (`@aleeforoughi/feather-manifest-web`): renders a plan on the web (`FeatherExperience`,
+  `PlanView`), following the contract in `docs/composer.md`. Its stories are the "Experiences" in Storybook.
 - `packages/documents`: document templates and the render kit. Private.
 - `apps/storybook`: Storybook config, the axe suite (`vitest.config.ts`) and the visual suite (`visual/`).
 - `apps/showcase`: consumes the built packages like an outside product.
+- `apps/playground`: one IR in four contexts, with the plan and trace; end-to-end tests run with `pnpm test:playground`.
 - `scripts/feather-hygiene.mjs`: the release gate. `legacy/branch-tools`: QOOE's copy-a-branch tools, not run.
 
 ## Rules

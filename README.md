@@ -3,25 +3,33 @@
 **Feather renders the next necessary human interaction, shaped to this person, on this device, right now, and
 dissolves it when its purpose is done.** Semantics in, the right experience out.
 
-Feather is becoming the first *liquid* design system: callers will describe what must happen (an Experience IR),
-and Feather composes the interface for the person, their abilities and their device at runtime. The plan, its
+Feather is becoming the first *liquid* design system: callers describe what must happen (an Experience IR), and
+Feather composes the interface for the person, their abilities and their device at runtime. The plan, its
 principles and its milestones are in [`docs/PLAN.md`](docs/PLAN.md).
 
-Feather today has two halves:
+What is built so far:
 
-- The static foundation (milestone L0): 35 themeable React components, a token-driven theme engine and the gates
-  that keep them clean.
-- The contract the liquid system is built on (L1): the [Experience IR](docs/ir/README.md), with its validator and
-  conformance fixtures.
+- **The static foundation (L0):** themeable React components, a token-driven theme engine, and the gates that keep
+  them clean.
+- **The contract (L1):** the [Experience IR](docs/ir/README.md), with its validator and conformance fixtures.
+- **Decision organisms (L2):** [ten components](docs/organisms.md), each rendering one IR node as a complete,
+  accessible interaction.
+- **The liquid composer (L3):** [`compose(experience, context)`](docs/composer.md) turns an experience and who it is
+  for into a layout plan by named rules, with a trace of every decision. The web manifestation renders that plan,
+  and the playground shows one experience in four contexts.
 
 | Package | What it is |
 |---|---|
 | [`@aleeforoughi/feather-tokens`](packages/tokens) | Token schema `feather-tokens/2`, the theme engine and `feather-brand` CLI, the foundation CSS, the reference themes and fonts. |
 | [`@aleeforoughi/feather-intent`](packages/intent) | The Experience IR `feather.ir/0`: TypeScript types, JSON Schema, `validate()`, `validateReply()` and the `feather-ir` CLI. No dependencies. |
-| [`@aleeforoughi/feather-react`](packages/react) | 28 atoms and 7 molecules on Base UI and Tailwind CSS v4, styled only through tokens. |
+| [`@aleeforoughi/feather-context`](packages/context) | Who an experience is rendered for, and where: persona, capability, device and brand types. Types only. |
+| [`@aleeforoughi/feather-liquid`](packages/liquid) | The composer: `compose(experience, context)` gives a layout plan, by named rules, with a trace. Pure and deterministic. |
+| [`@aleeforoughi/feather-manifest-web`](packages/manifest-web) | The web manifestation: `<FeatherExperience>` and `<PlanView>` render a plan with Feather's components, and turn every act into a validated reply. |
+| [`@aleeforoughi/feather-react`](packages/react) | 28 atoms, 7 molecules and 10 organisms on Base UI and Tailwind CSS v4, styled only through tokens. |
 | [`@aleeforoughi/feather-documents`](packages/documents) | Token-themed HTML/CSS document templates and the render and verify kit (not published yet). |
 | [`apps/storybook`](apps/storybook) | Every component and story, switchable between the reference themes; home of the a11y and visual suites. |
 | [`apps/showcase`](apps/showcase) | The component sheet, built against the packages exactly as a product would. |
+| [`apps/playground`](apps/playground) | Edit an experience, change the person and the device, and see the plan, the trace and the result in four contexts. |
 
 ## Ask Feather for an experience
 
@@ -43,8 +51,24 @@ if (!result.ok) console.error(formatIssues(result.issues))
 ```
 
 How the IR works, and every rule and error code, is in [`docs/ir/README.md`](docs/ir/README.md); every node
-type is in [`docs/ir/nodes.md`](docs/ir/nodes.md). The composer that turns an experience into an interface is
-milestone L3.
+type is in [`docs/ir/nodes.md`](docs/ir/nodes.md).
+
+Render it for the person in front of you. The host passes the context on every render, and Feather stores none of
+it:
+
+```tsx
+import { FeatherExperience } from "@aleeforoughi/feather-manifest-web"
+
+<FeatherExperience
+  experience={experience}
+  context={{ device: { surface: "phone" }, persona: { explanation: "brief" } }}
+  onReply={(reply) => send(reply)} // { experience, node, act, value? }, already checked with validateReply
+/>
+```
+
+To see what Feather decided and why, call `compose(experience, context)` from `@aleeforoughi/feather-liquid`. Each
+value in the plan comes with the rule that chose it and what it overrode. The rules are in
+[`docs/composer.md`](docs/composer.md).
 
 ## Use Feather in a product
 
@@ -114,6 +138,8 @@ pnpm hygiene               # the release gate
 pnpm manifest              # rebuild Storybook and regenerate packages/react/foundation.json
 pnpm test:a11y             # axe on every story (FEATHER_THEME=paper-sharp|void-pill)
 pnpm test:visual           # every story in both themes against visual/__screenshots__
+pnpm --filter @feather-apps/playground dev   # the playground
+pnpm test:playground       # build the playground and run its end-to-end tests (CHROMIUM_PATH to reuse a browser)
 ```
 
 The visual baselines are recorded in CI's Playwright container (the *Record visual baselines* workflow), so a
@@ -122,7 +148,8 @@ local run only matches pixel for pixel inside `mcr.microsoft.com/playwright:v1.6
 ### Gates
 
 Every change passes CI: lint, types, unit tests, the package build, the hygiene gate, the Storybook build, axe
-on every story in both reference themes, and visual regression of every story in both themes. What earns a
+on every story in both reference themes, visual regression of every story in both themes, and the playground's
+end-to-end tests. What earns a
 component its place, and how it is versioned, is in [`FEATHER.md`](FEATHER.md).
 
 ### Release

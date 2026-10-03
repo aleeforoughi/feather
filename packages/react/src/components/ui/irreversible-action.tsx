@@ -49,7 +49,7 @@ function holdLabel(act: string): string {
  * Confirm mode: the first button arms, then focus moves to "Yes, ..." beside "Cancel". Hold mode: one button, held
  * for 1.5 s by pointer or with Space or Enter held down.
  */
-function IrreversibleAction({ intent, label, consequence, importance = "critical", expandable, locale = "en", mode = "confirm", holdMs = HOLD_MS, onAct, className }: {
+function IrreversibleAction({ intent, label, consequence, importance = "critical", expandable, locale = "en", mode = "confirm", holdMs = HOLD_MS, defaultExpanded = false, onAct, className }: {
   intent: string
   label?: string
   consequence: Consequence
@@ -59,6 +59,8 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
   mode?: "confirm" | "hold"
   /** How long a hold lasts, in milliseconds (default 1500). */
   holdMs?: number
+  /** Whether "Why?" starts open (a layout plan's `expanded`). Confirming closes it. */
+  defaultExpanded?: boolean
   onAct: (act: "confirm" | "cancel") => void
   className?: string
 }) {
@@ -66,7 +68,7 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
   const m = useThemeMotion()
   const act = upperFirst(label ?? intent)
   const [armed, setArmed] = React.useState(false)
-  const [whyOpen, setWhyOpen] = React.useState(false)
+  const [whyOpen, setWhyOpen] = React.useState(defaultExpanded)
   const [status, setStatus] = React.useState("")
   const [progress, setProgress] = React.useState(0)
   const [holding, setHolding] = React.useState(false)
