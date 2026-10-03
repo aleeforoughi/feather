@@ -1,0 +1,6 @@
+// @aleeforoughi/feather-liquid: the liquid composer. compose(experience, context) → LayoutPlan.
+export { compose, type ComposeResult } from "./compose.ts"
+export { REFERENCE_CONTEXTS, type ReferenceContextName } from "./context.ts"
+export { PRIORITY, decide, type Candidate, type Level } from "./priority.ts"
+export { RULES, type RuleInfo } from "./rules.ts"
+export * from "./plan.ts"

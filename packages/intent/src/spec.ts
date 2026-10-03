@@ -456,8 +456,8 @@ export const NODES: NodeSpec[] = [
       consequence: { ...consequenceField, required: true },
       confirms: {
         kind: "ref",
-        doc: "The irreversible act this commits (a Recommendation or Approval marked reversible: false). When an experience has a single IrreversibleAction, it confirms them implicitly.",
-        to: ["Recommendation", "Approval", "Action", "Alternative"],
+        doc: "The irreversible act this commits (any act marked reversible: false, such as a Recommendation, an Approval or a Choice). When an experience has a single IrreversibleAction, it confirms them implicitly.",
+        to: ACTS.filter((t) => t !== "IrreversibleAction" && t !== "ExploreMore"),
       },
     },
   },

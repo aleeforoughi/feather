@@ -1,0 +1,747 @@
+{
+  "phone": {
+    "plan": "feather.plan/0",
+    "experience": "cooking_step_three",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 44,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "portions",
+    "focus": "portions",
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "step",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "audio_guide",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "video_demo",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "portions",
+            "type": "Input",
+            "organism": "Input",
+            "emphasis": "primary"
+          },
+          {
+            "id": "cooking_progress",
+            "type": "Progress",
+            "organism": "Progress",
+            "emphasis": "default"
+          },
+          {
+            "id": "next",
+            "type": "Action",
+            "organism": "Action",
+            "emphasis": "default"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "a phone is used by touch",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "portions",
+        "because": "none marked: Input \"portions\" is the act that most needs the person",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "plan.focus",
+        "value": "portions",
+        "because": "focus starts on the primary act \"portions\"",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": null,
+            "because": "no act to start on"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node step.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node audio_guide.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node video_demo.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node portions.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cooking_progress.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node next.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  },
+  "desktop-detailed": {
+    "plan": "feather.plan/0",
+    "experience": "cooking_step_three",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "compact",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "portions",
+    "focus": "portions",
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "step",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "audio_guide",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "video_demo",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "portions",
+            "type": "Input",
+            "organism": "Input",
+            "emphasis": "primary"
+          },
+          {
+            "id": "cooking_progress",
+            "type": "Progress",
+            "organism": "Progress",
+            "emphasis": "default"
+          },
+          {
+            "id": "next",
+            "type": "Action",
+            "organism": "Action",
+            "emphasis": "default"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "compact",
+        "because": "the person's density (compact)",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "portions",
+        "because": "none marked: Input \"portions\" is the act that most needs the person",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "plan.focus",
+        "value": "portions",
+        "because": "focus starts on the primary act \"portions\"",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": null,
+            "because": "no act to start on"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node step.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node audio_guide.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node video_demo.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node portions.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cooking_progress.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node next.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  },
+  "low-vision-low-precision": {
+    "plan": "feather.plan/0",
+    "experience": "cooking_step_three",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "spacious",
+    "minTarget": 44,
+    "motion": "reduced",
+    "contrast": "AAA",
+    "cues": "audio-and-text",
+    "primary": "portions",
+    "focus": "portions",
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "step",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "audio_guide",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "video_demo",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "portions",
+            "type": "Input",
+            "organism": "Input",
+            "emphasis": "primary"
+          },
+          {
+            "id": "cooking_progress",
+            "type": "Progress",
+            "organism": "Progress",
+            "emphasis": "default"
+          },
+          {
+            "id": "next",
+            "type": "Action",
+            "organism": "Action",
+            "emphasis": "default"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AAA",
+        "because": "low vision: WCAG AAA contrast",
+        "overrode": [
+          {
+            "rule": "contrast",
+            "value": "AA",
+            "because": "WCAG 2.2 AA in every theme"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "spacious",
+        "because": "low motor precision: room between targets",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "low motor precision: targets of at least 44 px",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "reduced-motion",
+        "subject": "plan.motion",
+        "value": "reduced",
+        "because": "the operating system asks for reduced motion",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "full",
+            "because": "nothing asks to reduce motion"
+          }
+        ]
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "portions",
+        "because": "none marked: Input \"portions\" is the act that most needs the person",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "plan.focus",
+        "value": "portions",
+        "because": "focus starts on the primary act \"portions\"",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": null,
+            "because": "no act to start on"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node step.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node audio_guide.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node video_demo.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node portions.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cooking_progress.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node next.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  },
+  "screenless": {
+    "plan": "feather.plan/0",
+    "experience": "cooking_step_three",
+    "locale": "en",
+    "manifestation": "voice",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "portions",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "step",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "audio_guide",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "video_demo",
+            "type": "Media",
+            "organism": "Media",
+            "emphasis": "default"
+          },
+          {
+            "id": "portions",
+            "type": "Input",
+            "organism": "Input",
+            "emphasis": "primary"
+          },
+          {
+            "id": "cooking_progress",
+            "type": "Progress",
+            "organism": "Progress",
+            "emphasis": "default"
+          },
+          {
+            "id": "next",
+            "type": "Action",
+            "organism": "Action",
+            "emphasis": "default"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "output-routing",
+        "subject": "plan.manifestation",
+        "value": "voice",
+        "because": "no visual output: the experience is spoken",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "web",
+            "because": "nothing asks for another body"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "portions",
+        "because": "none marked: Input \"portions\" is the act that most needs the person",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "output-routing",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "a voice manifestation has no focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "portions",
+            "because": "focus starts on the primary act \"portions\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node step.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node audio_guide.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node video_demo.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node portions.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cooking_progress.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node next.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  }
+}

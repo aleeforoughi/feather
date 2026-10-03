@@ -346,7 +346,7 @@ An act that cannot be undone: spending, publishing, sending, consent. Always exp
 |---|---|---|---|
 | `label` |  | string | The words for the act; defaults to the intent. |
 | `consequence` | yes | { spend?, publish?, send?, consent?, delete?, statement? } | What the act does, stated so it can be shown verbatim. At least one entry. |
-| `confirms` |  | id of a Recommendation or Approval or Action or Alternative | The irreversible act this commits (a Recommendation or Approval marked reversible: false). When an experience has a single IrreversibleAction, it confirms them implicitly. |
+| `confirms` |  | id of a Action or Choice or Input or Approval or Recommendation or PredictedChoice or Alternative or Autopick or Correction or Preference | The irreversible act this commits (any act marked reversible: false, such as a Recommendation, an Approval or a Choice). When an experience has a single IrreversibleAction, it confirms them implicitly. |
 
 **Replies:** `confirm`: Confirmed by a deliberate act. `cancel`: Not done.
 

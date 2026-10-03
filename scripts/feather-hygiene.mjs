@@ -25,7 +25,7 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/intent", "packages/documents"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/documents"]
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 
@@ -165,6 +165,16 @@ export function hygiene(root = ".") {
   for (const file of walk(at("packages/intent/src")).filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))) {
     for (const m of read(file).matchAll(/from\s+"([^"]+)"/g)) {
       if (!m[1].startsWith("./")) problems.push(`${path.relative(root, file)} imports ${m[1]}; the IR package imports only its own modules`)
+    }
+  }
+  // The context package is types only; the composer imports only the IR and the context (docs/PLAN.md section 5).
+  if (Object.keys(json("packages/context/package.json").dependencies ?? {}).length) problems.push("@aleeforoughi/feather-context must have no dependencies")
+  for (const file of walk(at("packages/context/src")).filter((f) => f.endsWith(".ts"))) {
+    if (/^\s*export\s+(const|function|class|let|enum)\b/m.test(read(file))) problems.push(`${path.relative(root, file)} exports runtime code; the context package is types only`)
+  }
+  for (const file of walk(at("packages/liquid/src")).filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))) {
+    for (const m of read(file).matchAll(/from\s+"([^"]+)"/g)) {
+      if (!m[1].startsWith("./") && m[1] !== "@aleeforoughi/feather-intent" && m[1] !== "@aleeforoughi/feather-context") problems.push(`${path.relative(root, file)} imports ${m[1]}; the composer imports only the IR, the context and its own modules`)
     }
   }
   const entry = read(at(`${REACT}/src/index.ts`))

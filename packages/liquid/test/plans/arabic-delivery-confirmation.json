@@ -1,0 +1,842 @@
+{
+  "phone": {
+    "plan": "feather.plan/0",
+    "experience": "confirm_cod_order",
+    "locale": "ar-AE",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 44,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "place_order",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "greeting",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "total",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "window",
+            "type": "Date",
+            "organism": "Date",
+            "emphasis": "default"
+          },
+          {
+            "id": "address",
+            "type": "Location",
+            "organism": "Location",
+            "emphasis": "default"
+          },
+          {
+            "id": "place_order",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "primary",
+            "confirm": "confirm"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "change_address",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "a phone is used by touch",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "place_order",
+        "because": "the caller marked IrreversibleAction \"place_order\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"place_order\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "place_order",
+            "because": "focus starts on the primary act \"place_order\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node greeting.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node total.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node window.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node place_order.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node place_order.confirm",
+        "value": "confirm",
+        "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node change_address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      }
+    ]
+  },
+  "desktop-detailed": {
+    "plan": "feather.plan/0",
+    "experience": "confirm_cod_order",
+    "locale": "ar-AE",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "compact",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "place_order",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "greeting",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "total",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "window",
+            "type": "Date",
+            "organism": "Date",
+            "emphasis": "default"
+          },
+          {
+            "id": "address",
+            "type": "Location",
+            "organism": "Location",
+            "emphasis": "default"
+          },
+          {
+            "id": "place_order",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "primary",
+            "confirm": "confirm"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "change_address",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "compact",
+        "because": "the person's density (compact)",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "place_order",
+        "because": "the caller marked IrreversibleAction \"place_order\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"place_order\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "place_order",
+            "because": "focus starts on the primary act \"place_order\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node greeting.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node total.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node window.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node place_order.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node place_order.confirm",
+        "value": "confirm",
+        "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node change_address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      }
+    ]
+  },
+  "low-vision-low-precision": {
+    "plan": "feather.plan/0",
+    "experience": "confirm_cod_order",
+    "locale": "ar-AE",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "spacious",
+    "minTarget": 44,
+    "motion": "reduced",
+    "contrast": "AAA",
+    "cues": "audio-and-text",
+    "primary": "place_order",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "greeting",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "total",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "window",
+            "type": "Date",
+            "organism": "Date",
+            "emphasis": "default"
+          },
+          {
+            "id": "address",
+            "type": "Location",
+            "organism": "Location",
+            "emphasis": "default"
+          },
+          {
+            "id": "place_order",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "primary",
+            "confirm": "confirm"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "change_address",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AAA",
+        "because": "low vision: WCAG AAA contrast",
+        "overrode": [
+          {
+            "rule": "contrast",
+            "value": "AA",
+            "because": "WCAG 2.2 AA in every theme"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "spacious",
+        "because": "low motor precision: room between targets",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "low motor precision: targets of at least 44 px",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "reduced-motion",
+        "subject": "plan.motion",
+        "value": "reduced",
+        "because": "the operating system asks for reduced motion",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "full",
+            "because": "nothing asks to reduce motion"
+          }
+        ]
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "place_order",
+        "because": "the caller marked IrreversibleAction \"place_order\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"place_order\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "place_order",
+            "because": "focus starts on the primary act \"place_order\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node greeting.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node total.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node window.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node place_order.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node place_order.confirm",
+        "value": "confirm",
+        "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node change_address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      }
+    ]
+  },
+  "screenless": {
+    "plan": "feather.plan/0",
+    "experience": "confirm_cod_order",
+    "locale": "ar-AE",
+    "manifestation": "voice",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "place_order",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "greeting",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "total",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "window",
+            "type": "Date",
+            "organism": "Date",
+            "emphasis": "default"
+          },
+          {
+            "id": "address",
+            "type": "Location",
+            "organism": "Location",
+            "emphasis": "default"
+          },
+          {
+            "id": "place_order",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "primary",
+            "confirm": "spoken-keyword"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "change_address",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "output-routing",
+        "subject": "plan.manifestation",
+        "value": "voice",
+        "because": "no visual output: the experience is spoken",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "web",
+            "because": "nothing asks for another body"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "place_order",
+        "because": "the caller marked IrreversibleAction \"place_order\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"place_order\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "place_order",
+            "because": "focus starts on the primary act \"place_order\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node greeting.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node total.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node window.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node place_order.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node place_order.confirm",
+        "value": "spoken-keyword",
+        "because": "spoken: the person says the keyword after hearing the consequence",
+        "overrode": [
+          {
+            "rule": "irreversible-explicit",
+            "value": "confirm",
+            "because": "two deliberate acts: arm, then confirm"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node change_address.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      }
+    ]
+  }
+}

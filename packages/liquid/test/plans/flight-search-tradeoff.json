@@ -1,0 +1,991 @@
+{
+  "phone": {
+    "plan": "feather.plan/0",
+    "experience": "book_flight",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 44,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "select_flight",
+    "focus": "select_flight",
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "trip",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "recommended_flight",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default"
+          },
+          {
+            "id": "price_rec",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "select_flight",
+            "type": "Choice",
+            "organism": "Choice",
+            "emphasis": "primary"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "alt_early",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_early",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              },
+              {
+                "id": "alt_budget",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_budget",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "a phone is used by touch",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "select_flight",
+        "because": "the caller marked Choice \"select_flight\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "plan.focus",
+        "value": "select_flight",
+        "because": "focus starts on the primary act \"select_flight\"",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": null,
+            "because": "no act to start on"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_early",
+        "value": "attached to alt_early",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_budget",
+        "value": "attached to alt_budget",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trip.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node recommended_flight.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node price_rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node select_flight.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node select_flight.preselected",
+        "value": null,
+        "because": "nothing to preselect"
+      }
+    ]
+  },
+  "desktop-detailed": {
+    "plan": "feather.plan/0",
+    "experience": "book_flight",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "compact",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "select_flight",
+    "focus": "select_flight",
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "trip",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "recommended_flight",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default"
+          },
+          {
+            "id": "price_rec",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "select_flight",
+            "type": "Choice",
+            "organism": "Choice",
+            "emphasis": "primary"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "alt_early",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_early",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              },
+              {
+                "id": "alt_budget",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_budget",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "compact",
+        "because": "the person's density (compact)",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "select_flight",
+        "because": "the caller marked Choice \"select_flight\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "plan.focus",
+        "value": "select_flight",
+        "because": "focus starts on the primary act \"select_flight\"",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": null,
+            "because": "no act to start on"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_early",
+        "value": "attached to alt_early",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_budget",
+        "value": "attached to alt_budget",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trip.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node recommended_flight.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node price_rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node select_flight.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node select_flight.preselected",
+        "value": null,
+        "because": "nothing to preselect"
+      }
+    ]
+  },
+  "low-vision-low-precision": {
+    "plan": "feather.plan/0",
+    "experience": "book_flight",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "spacious",
+    "minTarget": 44,
+    "motion": "reduced",
+    "contrast": "AAA",
+    "cues": "audio-and-text",
+    "primary": "select_flight",
+    "focus": "select_flight",
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "trip",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "recommended_flight",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default"
+          },
+          {
+            "id": "price_rec",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "select_flight",
+            "type": "Choice",
+            "organism": "Choice",
+            "emphasis": "primary"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "alt_early",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_early",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              },
+              {
+                "id": "alt_budget",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_budget",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AAA",
+        "because": "low vision: WCAG AAA contrast",
+        "overrode": [
+          {
+            "rule": "contrast",
+            "value": "AA",
+            "because": "WCAG 2.2 AA in every theme"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "spacious",
+        "because": "low motor precision: room between targets",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "low motor precision: targets of at least 44 px",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "reduced-motion",
+        "subject": "plan.motion",
+        "value": "reduced",
+        "because": "the operating system asks for reduced motion",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "full",
+            "because": "nothing asks to reduce motion"
+          }
+        ]
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "select_flight",
+        "because": "the caller marked Choice \"select_flight\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "plan.focus",
+        "value": "select_flight",
+        "because": "focus starts on the primary act \"select_flight\"",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": null,
+            "because": "no act to start on"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_early",
+        "value": "attached to alt_early",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_budget",
+        "value": "attached to alt_budget",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trip.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node recommended_flight.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node price_rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node select_flight.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node select_flight.preselected",
+        "value": null,
+        "because": "nothing to preselect"
+      }
+    ]
+  },
+  "screenless": {
+    "plan": "feather.plan/0",
+    "experience": "book_flight",
+    "locale": "en",
+    "manifestation": "voice",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "select_flight",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "trip",
+            "type": "Text",
+            "organism": "Text",
+            "emphasis": "default"
+          },
+          {
+            "id": "recommended_flight",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default"
+          },
+          {
+            "id": "price_rec",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "select_flight",
+            "type": "Choice",
+            "organism": "Choice",
+            "emphasis": "primary"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "alt_early",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_early",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              },
+              {
+                "id": "alt_budget",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default",
+                "attached": [
+                  {
+                    "id": "trade_budget",
+                    "type": "Tradeoff",
+                    "organism": "Tradeoff",
+                    "emphasis": "default"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "output-routing",
+        "subject": "plan.manifestation",
+        "value": "voice",
+        "because": "no visual output: the experience is spoken",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "web",
+            "because": "nothing asks for another body"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "select_flight",
+        "because": "the caller marked Choice \"select_flight\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "output-routing",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "a voice manifestation has no focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "select_flight",
+            "because": "focus starts on the primary act \"select_flight\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_early",
+        "value": "attached to alt_early",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "structure",
+        "subject": "node trade_budget",
+        "value": "attached to alt_budget",
+        "because": "a tradeoff renders with the option it describes"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trip.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node recommended_flight.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node price_rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_early.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node alt_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node trade_budget.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "node select_flight.emphasis",
+        "value": "primary",
+        "because": "the primary act",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node select_flight.preselected",
+        "value": null,
+        "because": "nothing to preselect"
+      }
+    ]
+  }
+}

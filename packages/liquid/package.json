@@ -1,0 +1,28 @@
+{
+  "name": "@aleeforoughi/feather-liquid",
+  "version": "1.9.0",
+  "description": "The liquid composer: compose(experience, context) turns an Experience IR and who it is for into a layout plan, by named rules, with a trace of every decision. Pure and deterministic.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/aleeforoughi/feather.git", "directory": "packages/liquid" },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "src", "!src/**/*.test.ts"],
+  "sideEffects": false,
+  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aleeforoughi/feather-context": "workspace:^",
+    "@aleeforoughi/feather-intent": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "vitest": "5.0.3"
+  }
+}

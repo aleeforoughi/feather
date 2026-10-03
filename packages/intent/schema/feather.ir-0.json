@@ -2364,7 +2364,7 @@
           "additionalProperties": false
         },
         "confirms": {
-          "description": "The irreversible act this commits (a Recommendation or Approval marked reversible: false). When an experience has a single IrreversibleAction, it confirms them implicitly.",
+          "description": "The irreversible act this commits (any act marked reversible: false, such as a Recommendation, an Approval or a Choice). When an experience has a single IrreversibleAction, it confirms them implicitly.",
           "$ref": "#/$defs/id"
         }
       },

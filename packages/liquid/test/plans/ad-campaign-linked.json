@@ -1,0 +1,849 @@
+{
+  "phone": {
+    "plan": "feather.plan/0",
+    "experience": "approve_campaign_linked",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 44,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "go",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "rec",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default",
+            "expanded": false
+          },
+          {
+            "id": "cap",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "go",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "critical",
+            "confirm": "confirm"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "less",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              },
+              {
+                "id": "own",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "a phone is used by touch",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "go",
+        "because": "the caller marked IrreversibleAction \"go\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"go\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "go",
+            "because": "focus starts on the primary act \"go\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node rec.expanded",
+        "value": false,
+        "because": "detail on demand, behind \"Why?\" (principle 5)"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cap.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "critical-never-hidden",
+        "subject": "node go.emphasis",
+        "value": "critical",
+        "because": "critical importance",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": "primary",
+            "because": "the primary act"
+          },
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node go.confirm",
+        "value": "confirm",
+        "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node less.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node own.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  },
+  "desktop-detailed": {
+    "plan": "feather.plan/0",
+    "experience": "approve_campaign_linked",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "compact",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "go",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "rec",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default",
+            "expanded": true
+          },
+          {
+            "id": "cap",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "go",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "critical",
+            "confirm": "confirm"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "less",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              },
+              {
+                "id": "own",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "compact",
+        "because": "the person's density (compact)",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "go",
+        "because": "the caller marked IrreversibleAction \"go\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"go\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "go",
+            "because": "focus starts on the primary act \"go\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "explanation-depth",
+        "subject": "node rec.expanded",
+        "value": true,
+        "because": "the person wants detailed explanations",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": false,
+            "because": "detail on demand, behind \"Why?\" (principle 5)"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cap.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "critical-never-hidden",
+        "subject": "node go.emphasis",
+        "value": "critical",
+        "because": "critical importance",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": "primary",
+            "because": "the primary act"
+          },
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node go.confirm",
+        "value": "confirm",
+        "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node less.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node own.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  },
+  "low-vision-low-precision": {
+    "plan": "feather.plan/0",
+    "experience": "approve_campaign_linked",
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "card",
+    "density": "spacious",
+    "minTarget": 44,
+    "motion": "reduced",
+    "contrast": "AAA",
+    "cues": "audio-and-text",
+    "primary": "go",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "rec",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default",
+            "expanded": false
+          },
+          {
+            "id": "cap",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "go",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "critical",
+            "confirm": "confirm"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "less",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              },
+              {
+                "id": "own",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AAA",
+        "because": "low vision: WCAG AAA contrast",
+        "overrode": [
+          {
+            "rule": "contrast",
+            "value": "AA",
+            "because": "WCAG 2.2 AA in every theme"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.density",
+        "value": "spacious",
+        "because": "low motor precision: room between targets",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "low motor precision: targets of at least 44 px",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "reduced-motion",
+        "subject": "plan.motion",
+        "value": "reduced",
+        "because": "the operating system asks for reduced motion",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "full",
+            "because": "nothing asks to reduce motion"
+          }
+        ]
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "go",
+        "because": "the caller marked IrreversibleAction \"go\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"go\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "go",
+            "because": "focus starts on the primary act \"go\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "explanation-depth",
+        "subject": "node rec.expanded",
+        "value": false,
+        "because": "the person wants brief explanations"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cap.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "critical-never-hidden",
+        "subject": "node go.emphasis",
+        "value": "critical",
+        "because": "critical importance",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": "primary",
+            "because": "the primary act"
+          },
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node go.confirm",
+        "value": "confirm",
+        "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node less.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node own.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  },
+  "screenless": {
+    "plan": "feather.plan/0",
+    "experience": "approve_campaign_linked",
+    "locale": "en",
+    "manifestation": "voice",
+    "chrome": "card",
+    "density": "comfortable",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": "go",
+    "focus": null,
+    "regions": [
+      {
+        "id": "main",
+        "nodes": [
+          {
+            "id": "rec",
+            "type": "Recommendation",
+            "organism": "Recommendation",
+            "emphasis": "default",
+            "expanded": false
+          },
+          {
+            "id": "cap",
+            "type": "Price",
+            "organism": "Price",
+            "emphasis": "default"
+          },
+          {
+            "id": "go",
+            "type": "IrreversibleAction",
+            "organism": "IrreversibleAction",
+            "emphasis": "critical",
+            "confirm": "spoken-keyword"
+          }
+        ]
+      },
+      {
+        "id": "secondary",
+        "nodes": [
+          {
+            "id": "~alternatives",
+            "type": "AlternativeGroup",
+            "organism": "AlternativeList",
+            "emphasis": "default",
+            "items": [
+              {
+                "id": "less",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              },
+              {
+                "id": "own",
+                "type": "Alternative",
+                "organism": "AlternativeList",
+                "emphasis": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "trace": [
+      {
+        "rule": "output-routing",
+        "subject": "plan.manifestation",
+        "value": "voice",
+        "because": "no visual output: the experience is spoken",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "web",
+            "because": "nothing asks for another body"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "subject": "plan.primary",
+        "value": "go",
+        "because": "the caller marked IrreversibleAction \"go\" primary",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": null,
+            "because": "the experience has no act"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "the primary act \"go\" cannot be undone, so it never takes the default focus",
+        "overrode": [
+          {
+            "rule": "recommendation-first",
+            "value": "go",
+            "because": "focus starts on the primary act \"go\""
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision or more than a line"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node rec.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node rec.expanded",
+        "value": false,
+        "because": "detail on demand, behind \"Why?\" (principle 5)"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node cap.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "critical-never-hidden",
+        "subject": "node go.emphasis",
+        "value": "critical",
+        "because": "critical importance",
+        "overrode": [
+          {
+            "rule": "one-primary",
+            "value": "primary",
+            "because": "the primary act"
+          },
+          {
+            "rule": "defaults",
+            "value": "default",
+            "because": "normal importance"
+          }
+        ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "subject": "node go.confirm",
+        "value": "spoken-keyword",
+        "because": "spoken: the person says the keyword after hearing the consequence",
+        "overrode": [
+          {
+            "rule": "irreversible-explicit",
+            "value": "confirm",
+            "because": "two deliberate acts: arm, then confirm"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "subject": "node less.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      },
+      {
+        "rule": "recommendation-first",
+        "subject": "structure",
+        "value": "alternatives in the secondary region",
+        "because": "the recommendation comes first, then the alternatives, together in one list"
+      },
+      {
+        "rule": "defaults",
+        "subject": "node own.emphasis",
+        "value": "default",
+        "because": "normal importance"
+      }
+    ]
+  }
+}
