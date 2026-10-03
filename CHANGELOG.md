@@ -33,6 +33,8 @@ use it without React, npm or a build step. The guide is [docs/callers.md](docs/c
 
 ## 1.13.1 — 2026-10-03
 
+*Not released on its own; it ships in 1.14.0.*
+
 **JetBrains Mono everywhere.** Every font Feather sets on its own is JetBrains Mono.
 
 - `font-mono` (code, data, the playground's IR editor and plan) is JetBrains Mono. It used to be the platform's
