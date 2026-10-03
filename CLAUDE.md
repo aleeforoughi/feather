@@ -26,6 +26,13 @@ section 12.
   (snapshots of every fixture in every reference context; update them with `-u` and review the diff).
 - `packages/manifest-web` (`@aleeforoughi/feather-manifest-web`): renders a plan on the web (`FeatherExperience`,
   `PlanView`), following the contract in `docs/composer.md`. Its stories are the "Experiences" in Storybook.
+- `packages/dialog` (`@aleeforoughi/feather-dialog`): the turn-based engine text and voice share (no I/O, no DOM,
+  no clock). `packages/manifest-text` (the `feather-text` CLI), `packages/manifest-voice` (any speech engine) and
+  `packages/manifest-switch` (scanning and dwell over manifest-web) are the other bodies. Their contract is
+  `docs/manifestations.md`.
+- `conformance/manifest`: the cross-body suite. Every fixture and act through all four bodies; same reply, and a
+  deliberate act for anything irreversible. Written independently of the bodies; a body bug fails it, never a
+  driver workaround.
 - `packages/documents`: document templates and the render kit. Private.
 - `apps/storybook`: Storybook config, the axe suite (`vitest.config.ts`) and the visual suite (`visual/`).
 - `apps/showcase`: consumes the built packages like an outside product.

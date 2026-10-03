@@ -161,5 +161,6 @@ The web manifestation renders a plan with Feather's organisms and atoms. It must
     never move focus on render.
 - **Turn every act into a reply:** an organism's `onAct(act, value?)` becomes `{ experience, node, act, value }`.
   It is checked with `validateReply` before `onReply` receives it, and a reply that fails is never emitted.
-- **For `voice` and `text` plans, which arrive at L4,** render a plain, accessible summary of the plan: what is
-  asked, the consequence of any irreversible act, the acts available. Never render a broken page.
+- **For `voice` and `text` plans,** which have their own bodies (`manifest-voice`, `manifest-text`; see
+  [`manifestations.md`](manifestations.md)), the web renders a plain, accessible summary of the plan: what is
+  asked, the consequence of any irreversible act, the acts available. Never a broken page.

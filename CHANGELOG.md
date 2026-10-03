@@ -1,5 +1,37 @@
 # Feather — changelog
 
+## 1.11.0 — 2026-10-03
+
+**More than one body (milestone L4).** The action is permanent; its manifestation is not. One experience now
+takes four bodies (web, switch, voice and text), and a conformance suite proves they agree.
+
+- `@aleeforoughi/feather-dialog`: the turn-based engine text and voice share.
+  - Its turns are browse, value, confirm, readback and done.
+  - It is pure, with no I/O, no DOM and no clock, and every reply is checked with `validateReply`.
+  - Only the plan's keyword commits an irreversible act. A number, "yes", or the act's label never does.
+  - It owns the sentences every non-visual body says. They match the web organisms' consequences word for word.
+- `@aleeforoughi/feather-manifest-text`: `renderTurn`, `runText`, and the `feather-text` CLI.
+  - The conversation goes to stderr and replies go to stdout as JSON lines.
+  - No meaning depends on colour, and plan text is stripped of control characters.
+- `@aleeforoughi/feather-manifest-voice`: `speechFor`, `createVoiceDialog().hear(alternatives)` and
+  `runVoice(engine)`, for any speech engine.
+  - Spoken numbers, readback of values, and the consequence in full before the keyword.
+  - The caller's words are said verbatim.
+  - A misheard alternative never changes state.
+- `@aleeforoughi/feather-manifest-switch`: scanning over the web body.
+  - One switch (auto-scan, started only by the first press) or two (step). Dwell is optional.
+  - The highlight is real focus, a ring and a description, never colour alone.
+  - Escape in a text field belongs to the scanner, so no form is backed out by accident. Open popups are scanned.
+  - Dwell may arm an act; it never commits one.
+- `conformance/manifest`, the L4 exit test (960 tests): every valid fixture, plus synthetic ones for paths the
+  fixtures miss, and every available act, driven through all four bodies by their own inputs.
+  - The same reply in every body.
+  - For anything irreversible, the single act emits nothing until the deliberate step: the confirm button, the
+    typed or spoken keyword, or a second switch selection.
+  - The suite was written independently of the bodies, and its first run found three switch defects, now fixed.
+- The playground shows each context in its own body.
+- `manifest-web` takes its wording and formatting from `feather-dialog`, so every body says the same thing.
+
 ## 1.10.0 — 2026-10-03
 
 **The liquid composer (milestone L3).** Semantics in, the right experience out: one Experience IR, composed for

@@ -17,6 +17,9 @@ What is built so far:
 - **The liquid composer (L3):** [`compose(experience, context)`](docs/composer.md) turns an experience and who it is
   for into a layout plan by named rules, with a trace of every decision. The web manifestation renders that plan,
   and the playground shows one experience in four contexts.
+- **More than one body (L4):** the same experience as [web, switch scanning, voice and plain text](docs/manifestations.md).
+  A conformance suite proves every act reaches the same reply in all four, and that an irreversible act needs a
+  deliberate act in each.
 
 | Package | What it is |
 |---|---|
@@ -25,11 +28,16 @@ What is built so far:
 | [`@aleeforoughi/feather-context`](packages/context) | Who an experience is rendered for, and where: persona, capability, device and brand types. Types only. |
 | [`@aleeforoughi/feather-liquid`](packages/liquid) | The composer: `compose(experience, context)` gives a layout plan, by named rules, with a trace. Pure and deterministic. |
 | [`@aleeforoughi/feather-manifest-web`](packages/manifest-web) | The web manifestation: `<FeatherExperience>` and `<PlanView>` render a plan with Feather's components, and turn every act into a validated reply. |
+| [`@aleeforoughi/feather-manifest-switch`](packages/manifest-switch) | Switch access on the web: scanning (one or two switches) and dwell over the web body. Dwell may arm an act; it never commits one. |
+| [`@aleeforoughi/feather-dialog`](packages/dialog) | The turn-based engine text and voice share: what to present, what the person may answer, and the reply it becomes. No I/O. |
+| [`@aleeforoughi/feather-manifest-text`](packages/manifest-text) | Plain text and the terminal, with the `feather-text` CLI (conversation on stderr, replies as JSON lines on stdout). |
+| [`@aleeforoughi/feather-manifest-voice`](packages/manifest-voice) | Prompts, spoken confirmations and readback for any speech engine. |
 | [`@aleeforoughi/feather-react`](packages/react) | 28 atoms, 7 molecules and 10 organisms on Base UI and Tailwind CSS v4, styled only through tokens. |
 | [`@aleeforoughi/feather-documents`](packages/documents) | Token-themed HTML/CSS document templates and the render and verify kit (not published yet). |
 | [`apps/storybook`](apps/storybook) | Every component and story, switchable between the reference themes; home of the a11y and visual suites. |
 | [`apps/showcase`](apps/showcase) | The component sheet, built against the packages exactly as a product would. |
-| [`apps/playground`](apps/playground) | Edit an experience, change the person and the device, and see the plan, the trace and the result in four contexts. |
+| [`apps/playground`](apps/playground) | Edit an experience, change the person and the device, and see the plan, the trace and the result in four contexts, each in its own body. |
+| [`conformance`](conformance) | IR fixtures, and the cross-body suite: every act, in every body, reaches the same reply. |
 
 ## Ask Feather for an experience
 
@@ -139,6 +147,7 @@ pnpm manifest              # rebuild Storybook and regenerate packages/react/fou
 pnpm test:a11y             # axe on every story (FEATHER_THEME=paper-sharp|void-pill)
 pnpm test:visual           # every story in both themes against visual/__screenshots__
 pnpm --filter @feather-apps/playground dev   # the playground
+node packages/manifest-text/dist/cli.js conformance/ir/valid/ad-campaign-launch.json   # an experience in the terminal
 pnpm test:playground       # build the playground and run its end-to-end tests (CHROMIUM_PATH to reuse a browser)
 ```
 
