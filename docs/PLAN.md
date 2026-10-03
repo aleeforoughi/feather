@@ -184,6 +184,16 @@ Each milestone ships on its own. Targets are the exit gate.
 - Build `manifest-text` (terminal and plain text), `manifest-voice` (prompts, confirmations and readback for any speech engine), and `manifest-switch` (scanning order and dwell on web).
 - **Exit:** every fixture renders in all four manifestations. A conformance test proves the same acts reach the same reply events in each. An irreversible act needs a deliberate act in every manifestation.
 
+### V1. Visual hygiene (before L5)
+- Turn the visual rules in `docs/visual-system.md` into tokens. Normalize every component onto them, without
+  redesigning any.
+- Enforce them in three gates: static hygiene, a rendered audit of every story, and a principle review.
+- **Exit:**
+  - Every component and story passes both hard gates in both reference themes and all three densities.
+  - Controls in a row share one height.
+  - No arbitrary value remains outside the documented optical exceptions.
+  - Visual baselines are re-recorded and reviewed.
+
 ### L5. Person-shaped (weeks 7–8)
 - Persona slice dimensions: density, explanation depth, motion, autonomy (how often to autopick), and preferred input mode.
 - Define the capability profile: input, output, perception, motor, communication, reading, and temporary state.
@@ -258,6 +268,13 @@ review, and every delegated task names its files and its exit test.
 6. Text and voice share one turn-based engine, `@aleeforoughi/feather-dialog` (→ intent, liquid). Both are
    conversations in turns, and two copies would drift apart on exactly what L4 must keep the same: which acts
    reach which replies, and how an irreversible act is confirmed. The contract is in `docs/manifestations.md`.
+
+**Decided 2026-10-03 (V1, with the owner):**
+
+7. A visual hygiene layer becomes milestone V1, before L5. The spec is in `docs/visual-system.md`:
+   - The rules are a frame that brand themes live inside. A brand axis selects among compliant value sets.
+   - There is one canonical easing curve; the motion axis scales durations only.
+   - Default control height is 44px (tight 36, spacious 52).
 
 The original questions:
 
