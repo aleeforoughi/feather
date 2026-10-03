@@ -1,13 +1,20 @@
 name: Publish
 
-# Publishes @aleeforoughi/feather-tokens and @aleeforoughi/feather-react to GitHub Packages when a version tag
-# (v1.7.0) is pushed. The tag must match the packages' version, and every CI gate must pass first.
+# Releases Feather from main: when the version in package.json has no v<version> tag yet, every gate runs again,
+# the packages are published to GitHub Packages, and the tag and a GitHub release (notes from CHANGELOG.md) are
+# created. Pushing to main with an unchanged version publishes nothing. To release, bump the version in every
+# package.json, add the CHANGELOG entry, and merge to main.
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -15,20 +22,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Is this version released yet?
+        id: version
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "v$version is already released; nothing to publish."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: pnpm/action-setup@v4
+        if: steps.version.outputs.release == 'true'
       - uses: actions/setup-node@v5
+        if: steps.version.outputs.release == 'true'
         with:
           node-version: 24
           cache: pnpm
           registry-url: https://npm.pkg.github.com
           scope: "@aleeforoughi"
-      - run: pnpm install --frozen-lockfile
-      - name: Tag matches the version
-        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
-      - run: pnpm lint && pnpm build && pnpm typecheck && pnpm test && pnpm hygiene
-      - name: Publish
+      - name: Gates
+        if: steps.version.outputs.release == 'true'
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm lint && pnpm build && pnpm typecheck && pnpm test && pnpm hygiene
+          grep -q "^## ${{ steps.version.outputs.version }} " CHANGELOG.md
+      - name: Publish the packages
+        if: steps.version.outputs.release == 'true'
         run: |
           echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
           pnpm -r --filter "./packages/**" publish --no-git-checks --access restricted
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag and release
+        if: steps.version.outputs.release == 'true'
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          awk -v v="$version" '$0 ~ "^## "v" " {on=1; next} /^## / {on=0} on' CHANGELOG.md > release-notes.md
+          gh release create "v$version" --target "$GITHUB_SHA" --title "Feather $version" --notes-file release-notes.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

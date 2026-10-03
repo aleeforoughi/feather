@@ -127,9 +127,10 @@ component its place, and how it is versioned, is in [`FEATHER.md`](FEATHER.md).
 
 ### Release
 
-All packages share one version. Bump it in every `package.json`, add the `CHANGELOG.md` entry, run
-`pnpm manifest`, and push a `v<version>` tag: the *Publish* workflow checks every gate again and publishes to
-GitHub Packages.
+All packages share one version. To release, bump it in every `package.json`, add the `CHANGELOG.md` entry,
+run `pnpm manifest`, and merge to `main`. The *Publish* workflow sees a version with no `v<version>` tag, checks
+every gate again, publishes to GitHub Packages, then creates the tag and a GitHub release from the changelog
+entry. A push to `main` with an unchanged version publishes nothing.
 
 ## History
 
