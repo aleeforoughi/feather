@@ -253,6 +253,12 @@ review, and every delegated task names its files and its exit test.
    alone, and the `qooe-core` build check is no longer part of the L0 exit.*
 5. Proprietary (all rights reserved) for now.
 
+**Decided 2026-10-03 (L4, by the composer owner):**
+
+6. Text and voice share one turn-based engine, `@aleeforoughi/feather-dialog` (→ intent, liquid). Both are
+   conversations in turns, and two copies would drift apart on exactly what L4 must keep the same: which acts
+   reach which replies, and how an irreversible act is confirmed. The contract is in `docs/manifestations.md`.
+
 The original questions:
 
 1. Repo name and visibility (`aleeforoughi/feather`, private to start?).
