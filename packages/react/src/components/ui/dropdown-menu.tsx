@@ -90,7 +90,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "group/dropdown-menu-item relative flex cursor-default items-center gap-2 rounded-control px-3 py-3 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover not-data-[variant=destructive]:focus:**:text-fg-primary data-inset:pl-10 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
+        "group/dropdown-menu-item relative flex cursor-default items-center gap-2 rounded-control min-h-control px-3 py-2 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover not-data-[variant=destructive]:focus:**:text-fg-primary data-inset:pl-10 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
         className
       )}
       {...props}
@@ -115,7 +115,7 @@ function DropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        "flex cursor-default items-center gap-2 rounded-control px-3 py-3 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover not-data-[variant=destructive]:focus:**:text-fg-primary data-inset:pl-10 data-popup-open:bg-surface-hover data-open:bg-surface-hover [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex cursor-default items-center gap-2 rounded-control min-h-control px-3 py-2 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover not-data-[variant=destructive]:focus:**:text-fg-primary data-inset:pl-10 data-popup-open:bg-surface-hover data-open:bg-surface-hover [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -161,7 +161,7 @@ function DropdownMenuCheckboxItem({
       data-slot="dropdown-menu-checkbox-item"
       data-inset={inset}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-control py-3 pr-8 pl-3 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover focus:**:text-fg-primary data-inset:pl-10 data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative flex cursor-default items-center gap-2 rounded-control min-h-control py-2 pr-8 pl-3 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover focus:**:text-fg-primary data-inset:pl-10 data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       checked={checked}
@@ -202,7 +202,7 @@ function DropdownMenuRadioItem({
       data-slot="dropdown-menu-radio-item"
       data-inset={inset}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-control py-3 pr-8 pl-3 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover focus:**:text-fg-primary data-inset:pl-10 data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative flex cursor-default items-center gap-2 rounded-control min-h-control py-2 pr-8 pl-3 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover focus:**:text-fg-primary data-inset:pl-10 data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

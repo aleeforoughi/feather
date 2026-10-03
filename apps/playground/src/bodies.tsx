@@ -17,7 +17,7 @@ export interface BodyProps {
   onReply: (reply: ReplyEvent, body: string) => void
 }
 
-const LOG = "max-h-96 min-h-24 overflow-auto rounded-lg border bg-muted p-3 text-sm text-foreground"
+const LOG = "max-h-96 min-h-24 overflow-auto rounded-card border border-line-secondary bg-muted inset-utility type-body-sm text-fg-primary"
 
 /** Derived state that starts over when the plan does, without an effect. */
 function useSession<T>(plan: LayoutPlan, experience: Experience, make: () => T): T {
@@ -33,7 +33,7 @@ function useSession<T>(plan: LayoutPlan, experience: Experience, make: () => T):
 function Line({ id, label, hint, value, onChange, onSubmit }: { id: string; label: string; hint?: string; value: string; onChange: (v: string) => void; onSubmit: () => void }) {
   return (
     <form
-      className="flex flex-col gap-1"
+      className="flex flex-col gap-label"
       onSubmit={(e) => {
         e.preventDefault()
         onSubmit()
@@ -42,7 +42,7 @@ function Line({ id, label, hint, value, onChange, onSubmit }: { id: string; labe
       <Label htmlFor={id}>{label}</Label>
       <Input id={id} value={value} autoComplete="off" spellCheck={false} aria-describedby={hint ? `${id}-hint` : undefined} onChange={(e) => onChange(e.target.value)} />
       {hint && (
-        <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+        <p id={`${id}-hint`} className="type-caption text-fg-secondary">
           {hint}
         </p>
       )}
@@ -113,7 +113,7 @@ export function VoiceBody({ plan, experience, onReply }: BodyProps) {
   }
   return (
     <div data-slot="playground-voice" className="flex flex-col gap-2">
-      <div data-testid="voice-log" role="log" aria-live="polite" aria-label="Transcript" tabIndex={0} className={`${LOG} flex flex-col gap-1`}>
+      <div data-testid="voice-log" role="log" aria-live="polite" aria-label="Transcript" tabIndex={0} className={`${LOG} flex flex-col gap-label`}>
         {shown.map((s, i) => (
           <p key={i} data-variant={s.who} className={s.who === "you" ? "pl-4" : undefined}>
             <span className="font-medium">{s.who === "feather" ? "Feather says:" : "You said:"}</span> {s.text}
@@ -138,7 +138,7 @@ export function VoiceBody({ plan, experience, onReply }: BodyProps) {
 export function SwitchBody({ plan, experience, onReply }: BodyProps) {
   return (
     <div data-slot="playground-switch" className="flex flex-col gap-2">
-      <p data-testid="switch-hint" className="text-sm text-muted-foreground">Tab: next · Enter: select</p>
+      <p data-testid="switch-hint" className="type-body-sm text-fg-secondary">Tab: next · Enter: select</p>
       <SwitchExperience plan={plan} experience={experience} scan="step" onReply={(r) => onReply(r, "switch")} />
     </div>
   )

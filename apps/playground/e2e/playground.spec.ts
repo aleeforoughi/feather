@@ -2,8 +2,15 @@ import { expect, test, type Page } from "@playwright/test"
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/")
-  await page.getByLabel("Fixture").selectOption("ad-campaign-launch")
+  await choose(page, "Fixture", "ad-campaign-launch")
 })
+
+/** Picks a value in one of the playground's Feather Selects, as a person would: open it, then choose the option. */
+async function choose(page: Page, label: string, value: string) {
+  await page.getByLabel(label, { exact: true }).click()
+  await page.locator(`[role="option"][data-value="${value}"]`).click()
+  await expect(page.getByRole("listbox")).toBeHidden()
+}
 
 const SPEND = '{"experience":"approve_campaign","node":"go","act":"confirm"}'
 const body = (page: Page, name: string) => page.locator(`[data-testid="context-panel"][data-body="${name}"]`)
@@ -76,7 +83,7 @@ test("voice: nothing is spoken on load or while the toggle is off", async ({ pag
     if (synth) synth.speak = (u) => void (window as unknown as { spoken: string[] }).spoken.push(u.text)
   })
   await page.reload()
-  await page.getByLabel("Fixture").selectOption("ad-campaign-launch")
+  await choose(page, "Fixture", "ad-campaign-launch")
   await fourContexts(page)
   const voice = body(page, "voice")
   await expect(voice.getByRole("checkbox", { name: "Speak aloud" })).toHaveAttribute("aria-checked", "false")
@@ -114,13 +121,12 @@ test("the rest of the page stays usable by keyboard beside the switch panel", as
 })
 
 test("the Rendered tab renders any context through its own body", async ({ page }) => {
-  const choose = page.getByLabel("Context", { exact: true })
   await expect(page.getByTestId("rendered-body")).toContainText("web")
   for (const [context, name] of [["terminal", "text"], ["screenless", "voice"], ["switch", "switch"], ["desktop", "web"], ["low-vision", "web"]] as const) {
-    await choose.selectOption(context)
+    await choose(page, "Context", context)
     await expect(page.getByTestId("rendered-body")).toContainText(name)
   }
-  await choose.selectOption("terminal")
+  await choose(page, "Context", "terminal")
   await page.getByLabel("Type a reply").fill("1")
   await page.getByLabel("Type a reply").press("Enter")
   await expect(page.getByRole("log")).toContainText('Type "confirm"')

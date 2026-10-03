@@ -1,5 +1,30 @@
 # Feather — changelog
 
+## 1.13.1 — 2026-10-03
+
+**JetBrains Mono everywhere.** Every font Feather sets on its own is JetBrains Mono.
+
+- `font-mono` (code, data, the playground's IR editor and plan) is JetBrains Mono. It used to be the platform's
+  monospace (SF Mono, Menlo, Consolas), which differs from the body text.
+- The fallbacks behind the brand fonts (`--font-sans`, `--font-heading` and the heading roles) are JetBrains Mono
+  instead of Geist. foundation.css no longer bundles Geist; a brand that picks Geist still gets it through
+  `brand-fonts.css`.
+- Storybook's own chrome and its docs pages use JetBrains Mono and the default theme's black and white, instead of
+  Storybook's Nunito Sans.
+- The showcase's brand sets JetBrains Mono for display and body.
+- **Dropdowns match the controls.**
+  - The playground's selects were native `<select>`s with their own classes: 32px tall, a 10px corner, 8px padding
+    and 14px text. They are now Feather's `Select`, on the same control frame as inputs and buttons (44px, the
+    control radius, the control padding), and their open list follows the system rather than the operating system.
+  - In Feather itself, select items now use the trigger's 16px type, not 14px. Select, dropdown-menu and navigation
+    items are `min-h-control` (new utility), so they follow the density like every control. Before, they had fixed
+    12px padding.
+  - A select's list grows to fit its longest option instead of clipping it.
+  - The playground's own layout is on the visual system: type roles, 1px borders, region insets, and label and field
+    gaps.
+- The reference brands `paper-sharp` and `void-pill` keep their own fonts. They exist to show that a brand
+  reshapes Feather through tokens.
+
 ## 1.13.0 — 2026-10-03
 
 **A default theme: feather.** What Feather looks like with no brand.

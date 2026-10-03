@@ -15,6 +15,7 @@ export const cn: CnFunction = createCn({
       "motion-role": [{ motion: MOTION }],
       h: [{ h: ["control", "indicator"] }],
       w: [{ w: ["indicator"] }],
+      "min-h": [{ "min-h": ["control"] }],
       size: [{ size: ["control", "icon-slot"] }],
       "region-inset": [{ inset: ["content", "header", "action", "utility", "display"] }],
       px: [{ px: ["control", "container"] }],

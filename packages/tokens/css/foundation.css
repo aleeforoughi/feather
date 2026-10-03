@@ -4,7 +4,6 @@
  * their Tailwind mapping (@theme inline: bg-primary, text-success…). A brand overrides them with the CSS that
  * feather-brand writes from its tokens, which uses a stronger selector (:root:root), so import order does not
  * matter. Import inside a Tailwind CSS v4 stylesheet, after `@import "tailwindcss"`. */
-@import "../fonts/geist.css";
 @import "../fonts/jetbrains-mono.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -13,8 +12,10 @@
     /* Selection indicators (the active tab line, a selected rail): 2px, the weight of the focus ring
        (docs/visual-system.md section 8). Only indicators use it; borders stay 1px. */
     --spacing-indicator: 2px;
-    --font-heading: var(--brand-font-display, var(--brand-font-body, 'Geist Variable', sans-serif));
-    --font-sans: var(--brand-font-body, 'Geist Variable', sans-serif);
+    --font-heading: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+    --font-sans: var(--brand-font-body, "JetBrains Mono Variable", monospace);
+    /* Code, data and anything set in font-mono: always JetBrains Mono, whatever the brand's text font. */
+    --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
     /* Motion axis (calm | snappy): every transition utility follows the brand's motion. */
     --default-transition-duration: var(--motion-duration, 150ms);
     --default-transition-timing-function: var(--motion-ease, cubic-bezier(0.4, 0, 0.2, 1));
@@ -479,6 +480,10 @@
 @utility h-control {
   height: var(--control-height);
 }
+/* A row that holds one line like a control (a menu or list item) but may wrap: at least the control height. */
+@utility min-h-control {
+  min-height: var(--control-height);
+}
 @utility size-control {
   width: var(--control-height);
   height: var(--control-height);
@@ -616,35 +621,35 @@
 /* Typography roles (section 4): components use roles, not sizes. Line heights are rem on the 4px grid. The heading
    roles use the brand's display font and its headingWeight when it sets one. */
 @utility type-display {
-  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: 3rem;
   line-height: 3.5rem;
   font-weight: var(--heading-weight, 700);
   letter-spacing: -0.025em;
 }
 @utility type-heading-1 {
-  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: 2.5rem;
   line-height: 3rem;
   font-weight: var(--heading-weight, 700);
   letter-spacing: -0.02em;
 }
 @utility type-heading-2 {
-  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: 2rem;
   line-height: 2.5rem;
   font-weight: var(--heading-weight, 600);
   letter-spacing: -0.015em;
 }
 @utility type-heading-3 {
-  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: var(--heading-weight, 600);
   letter-spacing: -0.01em;
 }
 @utility type-title {
-  font-family: var(--brand-font-display, var(--brand-font-body, "Geist Variable", sans-serif));
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: 1.25rem;
   line-height: 1.75rem;
   font-weight: var(--heading-weight, 600);

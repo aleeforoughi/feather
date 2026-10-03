@@ -136,6 +136,11 @@ No fourth height exists.
   so its height is the density's control height, 36px at tight density. Tight density is opt-in for pointer-heavy
   utility surfaces; the composer routes low motor precision to spacious.
 - Stacked choice rows (checkbox, radio, menu items) therefore sit on a 44px pitch.
+- **A list item is a control row.** Select, dropdown-menu and navigation items are `min-h-control`: the control height
+  of the density, growing only if the label wraps. A select's items use the trigger's type role (`type-body`), so
+  the chosen value reads the same open and closed, and its list is at least as wide as the trigger and grows to fit its
+  longest option. The list insets its items by one step (4px), so item text lines up with the trigger's text at
+  default density, and the list's corner is one step larger than the items' (section 7).
 - A control whose label wraps grows by its extra lines instead of clipping: its control height is then a minimum
   (`min-h-(--control-height)`), never a cap.
 - The nearest `data-density` governs. A plan's own density (set by the web manifestation from `plan.density`)

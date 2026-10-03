@@ -85,7 +85,7 @@ function SelectContent({
         <SelectPrimitive.Popup
           data-slot="select-content"
           data-align-trigger={alignItemWithTrigger}
-          className={cn("relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-32 overflow-x-hidden overflow-y-auto rounded-card border border-line-secondary bg-popover text-popover-foreground shadow-2 data-[align-trigger=true]:transition-none", popoverMotion, className)}
+          className={cn("relative isolate z-50 max-h-(--available-height) w-max min-w-(--anchor-width) max-w-(--available-width) overflow-x-hidden overflow-y-auto rounded-card border border-line-secondary bg-popover text-popover-foreground shadow-2 data-[align-trigger=true]:transition-none", popoverMotion, className)}
           {...props}
         >
           <SelectScrollUpButton />
@@ -119,7 +119,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-control py-3 pr-8 pl-3 type-body-sm text-fg-primary select-none motion-state focus:bg-surface-hover not-data-[variant=destructive]:focus:**:text-fg-primary data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "relative flex w-full cursor-default items-center gap-2 rounded-control min-h-control py-2 pr-8 pl-3 type-body text-fg-primary select-none motion-state focus:bg-surface-hover not-data-[variant=destructive]:focus:**:text-fg-primary data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       {...props}

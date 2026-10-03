@@ -5,7 +5,6 @@ import "@aleeforoughi/feather-tokens/fonts/sora.css"
 import "@aleeforoughi/feather-tokens/fonts/inter.css"
 import "@aleeforoughi/feather-tokens/fonts/fraunces.css"
 import "@aleeforoughi/feather-tokens/fonts/dm-sans.css"
-import "@aleeforoughi/feather-tokens/fonts/geist.css"
 import "@aleeforoughi/feather-tokens/fonts/jetbrains-mono.css"
 import { buildTheme, type BrandTokens } from "@aleeforoughi/feather-tokens"
 import voidPill from "@aleeforoughi/feather-tokens/themes/void-pill.json"
@@ -14,6 +13,7 @@ import feather from "@aleeforoughi/feather-tokens/themes/feather.json"
 import featherDark from "@aleeforoughi/feather-tokens/themes/feather-dark.json"
 // From source, not the package build: the stories import their components from source, and providers must be
 // the same module instances as the components that read them.
+import { featherTheme } from "./feather-theme"
 import { FeatherProvider } from "../../../packages/react/src/provider"
 
 /** Reference themes (@aleeforoughi/feather-tokens/themes): built by the same engine that writes a product's
@@ -77,6 +77,8 @@ const preview: Preview = {
   initialGlobals: { theme: "feather" },
   parameters: {
     layout: "centered",
+    // Docs pages in the default theme's font.
+    docs: { theme: featherTheme },
     controls: {
       matchers: {
         color: /(background|color)$/i,

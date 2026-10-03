@@ -2,7 +2,7 @@
 // that knows nothing about it would.
 import * as React from "react"
 import type { RenderContext } from "@aleeforoughi/feather-context"
-import { Checkbox, Label } from "@aleeforoughi/feather-react"
+import { Checkbox, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@aleeforoughi/feather-react"
 
 export interface Controls {
   density: string
@@ -57,22 +57,33 @@ export function toContext(c: Controls): RenderContext {
   } as RenderContext
 }
 
-const SELECT =
-  "h-8 w-full rounded-lg border border-input bg-background px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-
-function Select({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) {
+/** A labelled choice, in Feather's own Select: the trigger is the control frame inputs and buttons use, and the list
+ * follows the radius hierarchy and the item height. An empty value is "not set". */
+export function Choice({ label, value, items, onChange, className }: { label: string; value: string; items: { value: string; label: string }[]; onChange: (value: string) => void; className?: string }) {
   const id = React.useId()
+  const UNSET = "__unset__"
+  const list = items.map((i) => ({ ...i, value: i.value === "" ? UNSET : i.value }))
   return (
-    <div className="flex flex-col gap-1">
+    <div className={className ? `flex flex-col gap-label ${className}` : "flex flex-col gap-label"}>
       <Label htmlFor={id}>{label}</Label>
-      <select id={id} data-slot="playground-select" className={SELECT} value={value} onChange={(e) => onChange(e.target.value)}>
-        <option value="">not set</option>
-        {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
-        ))}
-      </select>
+      <Select items={list} value={value === "" ? UNSET : value} onValueChange={(v) => onChange(v === UNSET || v == null ? "" : String(v))}>
+        <SelectTrigger id={id} data-slot="playground-select" className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {list.map((i) => (
+            <SelectItem key={i.value} value={i.value} data-value={i.value === UNSET ? "" : i.value}>
+              {i.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
+}
+
+function Pick({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) {
+  return <Choice label={label} value={value} items={[{ value: "", label: "not set" }, ...options.map((o) => ({ value: o, label: o }))]} onChange={onChange} />
 }
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
@@ -87,8 +98,8 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset data-slot="playground-group" className="grid grid-cols-2 gap-3 rounded-lg border p-3">
-      <legend className="px-1 text-sm font-medium">{title}</legend>
+    <fieldset data-slot="playground-group" className="grid grid-cols-2 gap-field rounded-card border border-line-secondary inset-content">
+      <legend className="px-1 type-label">{title}</legend>
       {children}
     </fieldset>
   )
@@ -97,23 +108,23 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 export function ContextControls({ value, onChange }: { value: Controls; onChange: (next: Controls) => void }) {
   const set = <K extends keyof Controls>(key: K) => (v: Controls[K]) => onChange({ ...value, [key]: v })
   return (
-    <div data-slot="playground-controls" className="flex flex-col gap-3">
+    <div data-slot="playground-controls" className="flex flex-col gap-field">
       <Group title="Persona">
-        <Select label="Density" value={value.density} options={["compact", "comfortable", "spacious"]} onChange={set("density")} />
-        <Select label="Explanation" value={value.explanation} options={["brief", "standard", "detailed"]} onChange={set("explanation")} />
-        <Select label="Motion" value={value.motion} options={["full", "reduced"]} onChange={set("motion")} />
-        <Select label="Input mode" value={value.inputMode} options={["pointer", "touch", "keyboard", "voice", "switch"]} onChange={set("inputMode")} />
+        <Pick label="Density" value={value.density} options={["compact", "comfortable", "spacious"]} onChange={set("density")} />
+        <Pick label="Explanation" value={value.explanation} options={["brief", "standard", "detailed"]} onChange={set("explanation")} />
+        <Pick label="Motion" value={value.motion} options={["full", "reduced"]} onChange={set("motion")} />
+        <Pick label="Input mode" value={value.inputMode} options={["pointer", "touch", "keyboard", "voice", "switch"]} onChange={set("inputMode")} />
         <div className="col-span-2"><Toggle label="These were learned, not set by the person" checked={value.learned} onChange={set("learned")} /></div>
       </Group>
       <Group title="Capability">
-        <Select label="Precision" value={value.precision} options={["typical", "low"]} onChange={set("precision")} />
-        <Select label="Vision" value={value.vision} options={["typical", "low"]} onChange={set("vision")} />
-        <Select label="Visual output" value={value.visual} options={["available", "unavailable"]} onChange={set("visual")} />
-        <Select label="Audio output" value={value.audio} options={["available", "unavailable"]} onChange={set("audio")} />
+        <Pick label="Precision" value={value.precision} options={["typical", "low"]} onChange={set("precision")} />
+        <Pick label="Vision" value={value.vision} options={["typical", "low"]} onChange={set("vision")} />
+        <Pick label="Visual output" value={value.visual} options={["available", "unavailable"]} onChange={set("visual")} />
+        <Pick label="Audio output" value={value.audio} options={["available", "unavailable"]} onChange={set("audio")} />
         <div className="col-span-2"><Toggle label="Switch input" checked={value.switchInput} onChange={set("switchInput")} /></div>
       </Group>
       <Group title="Device">
-        <Select label="Surface" value={value.surface} options={["phone", "tablet", "desktop", "watch", "speaker", "terminal"]} onChange={set("surface")} />
+        <Pick label="Surface" value={value.surface} options={["phone", "tablet", "desktop", "watch", "speaker", "terminal"]} onChange={set("surface")} />
         <div className="flex items-end"><Toggle label="Reduced motion (OS)" checked={value.reducedMotion} onChange={set("reducedMotion")} /></div>
       </Group>
     </div>
