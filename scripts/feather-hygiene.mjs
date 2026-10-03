@@ -13,8 +13,8 @@
 //              emphasis color meets its contrast floor (docs/visual-system.md section 5): always a hard failure
 //   visual     Gate 1 of the visual system (docs/visual-system.md section 12): static rules over the source of packages/react
 //              and every manifest-* package (spacing steps, arbitrary values, motion, radius, border, shadow, weight,
-//              opacity, icons, data-slot / data-variant, useThemeMotion). Components are normalized in a later phase, so
-//              these are warnings with a count per rule; FEATHER_HYGIENE_V1=1 makes every one a failure.
+//              opacity, icons, data-slot / data-variant, useThemeMotion). Since V1 normalized every component,
+//              every finding is a failure (V1 is done); FEATHER_HYGIENE_V1=0 turns them back into counted warnings.
 //   release    fonts are installed, every package / manifest / changelog agrees on the version
 //   packaging  published source has no "@/" alias imports, the package entry exports every component,
 //              every stylesheet import is a dependency of its package, the IR package has no dependencies,
@@ -43,7 +43,7 @@ const TAILWIND_NATIVE = /^--(spacing|shadow-(xs|sm|md|lg|xl)|radius-(xs|control|
 /** Where the optical exceptions live (docs/visual-system.md section 9). */
 const OPTICAL_EXCEPTIONS = `${REACT}/optical-exceptions.json`
 
-export function hygiene(root = ".", { v1 = process.env.FEATHER_HYGIENE_V1 === "1" } = {}) {
+export function hygiene(root = ".", { v1 = process.env.FEATHER_HYGIENE_V1 !== "0" } = {}) {
   const at = (p) => path.join(root, p)
   const problems = []
   const notes = []

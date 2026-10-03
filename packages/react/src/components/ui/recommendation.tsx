@@ -126,10 +126,13 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
         }
       }}
     >
-      <div data-slot="recommendation-header" className="flex items-start gap-2">
-        <Icon icon={SparklesIcon} size={16} aria-hidden className="text-primary" />
+      {/* The icon belongs to the eyebrow, so the summary and everything below share one left edge. */}
+      <div data-slot="recommendation-header" className="min-w-0">
         <div data-slot="recommendation-body" className="min-w-0 space-y-1">
-          <p data-slot="recommendation-eyebrow" className="type-caps text-fg-secondary">Recommended</p>
+          <p data-slot="recommendation-eyebrow" className="flex items-center gap-2 type-caps text-fg-secondary">
+            <Icon icon={SparklesIcon} size={16} aria-hidden className="text-primary" />
+            Recommended
+          </p>
           <p data-slot="recommendation-summary" className="font-heading type-body font-medium text-fg-primary break-words">{summary}</p>
           {confidence !== undefined && (
             <p data-slot="recommendation-confidence" data-variant={confidenceLabel(confidence)} className="type-body-sm text-fg-secondary">{confidenceText(confidence)}</p>

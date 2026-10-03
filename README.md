@@ -17,6 +17,9 @@ What is built so far:
 - **The liquid composer (L3):** [`compose(experience, context)`](docs/composer.md) turns an experience and who it is
   for into a layout plan by named rules, with a trace of every decision. The web manifestation renders that plan,
   and the playground shows one experience in four contexts.
+- **Visual hygiene (V1):** every value comes from [one finite visual system](docs/visual-system.md) (4px grid, three
+  densities, one control frame, type roles, one emphasis scale, one motion curve), enforced by static hygiene and a
+  rendered audit of every story.
 - **More than one body (L4):** the same experience as [web, switch scanning, voice and plain text](docs/manifestations.md).
   A conformance suite proves every act reaches the same reply in all four, and that an irreversible act needs a
   deliberate act in each.

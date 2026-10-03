@@ -1,5 +1,53 @@
 # Feather — changelog
 
+## 1.12.0 — 2026-10-03
+
+**Visual hygiene (milestone V1).** Every pixel, gap, radius, type size, border, shadow, duration and curve now
+comes from one finite system, `docs/visual-system.md`. Brand themes choose values inside it and can never step
+outside it. Every component was normalized onto the system. Normalized means the values moved; nothing was
+redesigned, and anatomy, API and behaviour are unchanged. **This is a deliberate visual release:** most
+components look different.
+
+- **Tokens** (`@aleeforoughi/feather-tokens`):
+  - a fixed 4px spacing unit;
+  - three densities (tight, default, spacious) with 36, 44 and 52px controls, as CSS variables on `:root` and per
+    `[data-density]`;
+  - radius tiers per brand shape that always nest. The default shape is now `rounded`;
+  - one emphasis scale for text, icons and borders (`text-fg-*`, `border-line-*`, `bg-surface-*`). The engine
+    derives each emphasis color by exact oklab search and checks it against its contrast floor; the primary
+    border reaches 3:1;
+  - four elevation levels. This also fixes shadows that never reached Tailwind's utilities;
+  - one easing curve and six durations per motion axis. A brand's motion setting now scales durations only;
+  - type roles on a 4px line grid, font rendering, reduced motion built in, one 2px focus ring, a scrim, 2px
+    selection indicators, and layout tokens.
+  - `headingWeight` is limited to 400–700 and component border widths to 0 or 1px.
+- **Components** (`@aleeforoughi/feather-react`):
+  - Buttons, inputs, selects, toggles and tabs share one frame at the density height.
+  - Every control, checkbox, radio, switch, menu row, link and disclosure reaches a 44px hit area through an
+    invisible extension. A text field is its own target.
+  - Motion roles replace every ad-hoc transition. There is no `transition-all` and no layout animation; the
+    accordion animates a grid track, and progress and hold fills scale.
+  - Dialogs, tables and galleries sit on whole pixels.
+  - New: `Icon`, which renders glyphs in a pixel-aligned slot, with an optical registry for asymmetric glyphs.
+  - `cn` now merges the system's own utilities.
+- **Manifestations:**
+  - The web manifestation sets `data-density` from the plan instead of rescaling spacing.
+  - Switch scanning uses the same focus ring.
+- **Three gates** (docs/visual-system.md §12):
+  - **Static hygiene** fails on any off-system value.
+  - **A new rendered audit** measures every story in both themes and all three densities: control heights,
+    targets, borders and focus, layout shift, type, radius, icons, whole pixels and motion. It is a CI job, and
+    its self-test (56 fixtures) proves that each rule fires.
+  - **A principle review** is recorded below.
+- **Results.** The rendered audit went from 8,158 failures to 0, static findings from 403 to 0, with zero
+  optical exceptions. Axe passes in both themes, and all 960 conformance tests still pass.
+- **Principle review for this release:**
+  - Alignment: the Recommendation and IrreversibleAction headings now share one left edge with their content (the
+    icon moved into the eyebrow).
+  - Hierarchy, emphasis, consistency, rhythm, depth and accessibility hold across both reference themes.
+  - Follow-ups: a "warm" warning tint for the budget bar; reduced motion for JS-driven loops when the OS
+    preference changes after load; Sonner's own toast offsets.
+
 ## 1.11.0 — 2026-10-03
 
 **More than one body (milestone L4).** The action is permanent; its manifestation is not. One experience now

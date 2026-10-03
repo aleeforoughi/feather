@@ -41,6 +41,11 @@ section 12.
 
 ## Rules
 
+- Every visual value comes from `docs/visual-system.md`: spacing steps, density utilities (`h-control`, `p-card`…),
+  `type-*` roles, `text-fg-*`/`border-line-*`/`bg-surface-*` emphasis, radius tiers, `shadow-1|2|3`, 1px borders,
+  `motion-*` roles, `Icon` for glyphs, 44px hit areas. An arbitrary value needs an entry in
+  `packages/react/optical-exceptions.json`. `pnpm hygiene` and the rendered audit (`pnpm test:audit`, in CI)
+  enforce it. Normalize, never redesign.
 - Components read semantic tokens only, never raw colors. Every visible part has a `data-slot`, and every
   variant or state a `data-variant`. Motion comes from `useThemeMotion`. Use relative imports in
   `packages/react/src`, never `@/`.

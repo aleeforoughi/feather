@@ -52,6 +52,7 @@ interface Case {
 }
 
 const violating: Case[] = [
+  { name: "targets.size: a small control next to (not behind) a modal is still a target", body: '<div class="row"><span class="cb nofx" role="checkbox" tabindex="0" aria-checked="false"></span></div><div role="dialog" aria-modal="false" style="position:absolute;left:200px;top:0;width:100px;height:40px">Panel</div>', css: ".nofx::after{content:none}", fires: ["targets.size"] },
   { name: "controls.height: a wrapped label below the control height", body: '<div class="row"><button class="btn" data-slot="button" style="height:40px;width:90px;white-space:normal;line-height:16px;font-size:14px">Launch the recommended test</button></div>', only: ["controls.height", "targets.size"], fires: ["controls.height"] },
   { name: "controls.height: a nearer data-density still decides", body: '<div class="row" data-density="tight"><button class="btn" data-slot="button">Save</button></div>', fires: ["controls.height"] },
   { name: "controls.height: 40px button", body: '<div class="row"><button class="btn" data-slot="button" style="height:40px;width:60px">X</button></div>', fires: ["controls.height"] },
@@ -95,6 +96,9 @@ const violating: Case[] = [
 ]
 
 const clean: Case[] = [
+  { name: "clean: a fixed-position element in a scrolled story is not a hover shift", body: '<div class="row"><button class="btn" data-slot="button">Save</button></div><div style="height:1400px"></div><input type="radio" aria-hidden="true" tabindex="-1" style="position:fixed;top:0;left:0;width:20px;height:20px;opacity:0;pointer-events:none"><div class="row"><button class="btn" data-slot="button">Lower</button></div>' },
+  { name: "clean: a small control behind an open modal dialog is not a target", body: '<div class="row"><span class="cb nofx" role="checkbox" tabindex="-1" aria-checked="false"></span></div><div role="dialog" aria-modal="true" style="position:absolute;inset:40px;background:#fff"><p>Dialog</p></div>', css: ".nofx::after{content:none}" },
+  { name: "clean: a box inside a hidden ancestor never counts as a hover shift", body: '<div class="row"><button class="btn" data-slot="button">Save</button></div><div style="height:1400px"></div><div style="display:none"><div class="sb-loader" style="height:20px"></div></div>' },
   { name: "clean: a wrapped label grows the control instead of clipping", body: '<div class="row"><button class="btn" data-slot="button" style="height:64px;width:120px;white-space:normal">Launch the recommended test now</button></div>' },
   { name: "clean: a plan's own data-density overrides the page's", body: '<div class="row" data-density="default"><button class="btn" data-slot="button">Save</button></div>', densities: ["tight"] },
   { name: "clean: a display:none element is not a shift, even after scroll", body: '<div class="row"><button class="btn" data-slot="button">Save</button></div><div style="height:1400px"></div><div style="display:none" class="sb-preparing-story"></div>' },

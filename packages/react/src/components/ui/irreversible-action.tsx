@@ -185,10 +185,13 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
         }
       }}
     >
-      <div data-slot="irreversible-action-header" className="flex items-start gap-2">
-        <Icon icon={TriangleAlertIcon} size={16} aria-hidden className="text-destructive" />
+      {/* The icon belongs to the warning, so the consequence and the action share one left edge. */}
+      <div data-slot="irreversible-action-header" className="min-w-0">
         <div data-slot="irreversible-action-body" className="min-w-0 space-y-1">
-          <p data-slot="irreversible-action-warning" className="type-caps text-fg-primary">Cannot be undone</p>
+          <p data-slot="irreversible-action-warning" className="flex items-center gap-2 type-caps text-fg-primary">
+            <Icon icon={TriangleAlertIcon} size={16} aria-hidden className="text-destructive" />
+            Cannot be undone
+          </p>
           <ConsequenceStatement id={consequenceId} consequence={consequence} locale={locale} />
         </div>
       </div>

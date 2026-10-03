@@ -371,13 +371,20 @@ export function install(c: Consts): void {
     const out = new Map<Element, Snap>()
     for (const el of all()) {
       const r = rect(el)
-      // display:none (a hidden Storybook overlay) has no box; scroll compensation would invent a movement for it.
-      if (r.width === 0 && r.height === 0 && cs(el).display === "none") continue
+      // An element that is not rendered (display:none, or inside one: a hidden Storybook overlay) has no box; scroll
+      // compensation would invent a movement for it.
+      if (el.getClientRects().length === 0) continue
       let sx = 0
       let sy = 0
-      for (let p: Element | null = el.parentElement; p; p = p.parentElement) {
-        sx += p.scrollLeft
-        sy += p.scrollTop
+      // A fixed-position element (or one inside a fixed container) does not move when its ancestors scroll, so it gets
+      // no scroll compensation: adding it would invent a shift.
+      let fixed = false
+      for (let p: Element | null = el; p && !fixed; p = p.parentElement) fixed = cs(p).position === "fixed"
+      if (!fixed) {
+        for (let p: Element | null = el.parentElement; p; p = p.parentElement) {
+          sx += p.scrollLeft
+          sy += p.scrollTop
+        }
       }
       out.set(el, [r.x + sx, r.y + sy, r.width, r.height])
     }
@@ -463,8 +470,12 @@ export function install(c: Consts): void {
       const textEntry = (el: Element) =>
         el instanceof HTMLTextAreaElement ||
         (el instanceof HTMLElement && el.isContentEditable) ||
-        (el instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit", "reset", "range", "color", "file", "image", "hidden"].includes(el.type))
-      for (const el of els.filter((e) => e.matches(c.interactive))) {
+        (el instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit", "reset", "range", "color", "image", "hidden"].includes(el.type))
+      // An element behind an open modal dialog (or under inert or aria-hidden) cannot be acted on right now, so it is
+      // not a target until the dialog closes.
+      const modal = [...document.querySelectorAll('[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"], dialog[open]')].filter((d) => d.getClientRects().length > 0)
+      const inert = (el: Element) => el.closest('[inert], [aria-hidden="true"]') !== null || (modal.length > 0 && !modal.some((d) => d.contains(el)))
+      for (const el of els.filter((e) => e.matches(c.interactive) && !inert(e))) {
         const u = hitArea(el)
         const w = u.r - u.l
         const h = u.b - u.t
