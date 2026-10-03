@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 /** Where a budget stands: below target (ok), approaching the cap (warm), close to it (hot), past it (over). */
 export type BudgetZone = "ok" | "warm" | "hot" | "over"
@@ -44,7 +44,7 @@ function budgetGeometry({ spent, target, cap, reserved = 0 }: BudgetInput & { re
 
 const ZONE_FILL: Record<BudgetZone, string> = {
   ok: "bg-success",
-  warm: "bg-warning/70",
+  warm: "bg-warning",
   hot: "bg-warning",
   over: "bg-destructive",
 }
@@ -96,37 +96,37 @@ function BudgetBar({ spent, cap, target = null, reserved = 0, size = "default", 
         aria-valuemax={cap}
         aria-valuenow={spent}
         aria-valuetext={`${caption}, ${ZONE_LABEL[zone]}`}
-        className={cn("relative w-full rounded-full bg-muted", mini ? "h-1" : "h-2")}
+        className={cn("relative w-full rounded-full bg-surface-pressed", mini ? "h-1" : "h-2")}
       >
-        <div className="absolute inset-0 overflow-hidden rounded-full">
-          <div data-slot="budget-bar-fill" className={cn("absolute inset-y-0 left-0 transition-[width]", ZONE_FILL[zone])} style={{ width: `${g.fill}%` }} />
+        <div data-slot="budget-bar-clip" className="absolute inset-0 overflow-hidden rounded-full">
+          <div data-slot="budget-bar-fill" className={cn("motion-state absolute inset-y-0 left-0 w-full origin-left", ZONE_FILL[zone])} style={{ transform: `scaleX(${g.fill / 100})` }} />
           {zone === "over" && g.overshoot > 0 && (
             <div data-slot="budget-bar-overshoot" className="absolute inset-y-0 bg-destructive" style={{ left: `${g.cap}%`, width: `${g.overshoot}%`, backgroundImage: STRIPES(4) }} />
           )}
           {g.reserved > 0 && (
-            <div data-slot="budget-bar-reserved" className={cn("absolute inset-y-0 opacity-50", ZONE_FILL[zone])} style={{ left: `${g.fill}%`, width: `${g.reserved}%`, backgroundImage: STRIPES(6) }} />
+            <div data-slot="budget-bar-reserved" className={cn("absolute inset-y-0", ZONE_FILL[zone])} style={{ left: `${g.fill}%`, width: `${g.reserved}%`, backgroundImage: STRIPES(6) }} />
           )}
         </div>
         {!mini && g.target != null && <Marker at={g.target} />}
         {!mini && <Marker at={g.cap} strong />}
       </div>
       {!mini && (
-        <div className="relative mt-1 h-4 text-[11px] text-muted-foreground" aria-hidden>
+        <div data-slot="budget-bar-scale" className="relative mt-1 h-4 type-caption text-fg-tertiary" aria-hidden>
           {g.target != null && !crowded && <MarkerLabel at={g.target} text={`target ${format(target!)}`} align="end" />}
           <MarkerLabel at={g.cap} text={`cap ${format(cap)}`} align={g.target != null && g.cap - g.target < 24 ? "start" : "end"} />
         </div>
       )}
-      {!mini && <p data-slot="budget-bar-caption" className="mt-1 text-xs text-muted-foreground">{caption}</p>}
+      {!mini && <p data-slot="budget-bar-caption" className="mt-1 type-caption text-fg-secondary">{caption}</p>}
     </div>
   )
 }
 
 function Marker({ at, strong }: { at: number; strong?: boolean }) {
-  return <span data-slot="budget-bar-marker" aria-hidden className={cn("absolute -top-1 -bottom-1 w-px -translate-x-1/2 bg-foreground/60", strong && "w-0.5 bg-foreground")} style={{ left: `${at}%` }} />
+  return <span data-slot="budget-bar-marker" aria-hidden className={cn("absolute w-px -translate-x-1/2", strong ? "-top-2 -bottom-2 bg-fg-primary" : "-top-1 -bottom-1 bg-fg-tertiary")} style={{ left: `${at}%` }} />
 }
 
 function MarkerLabel({ at, text, align }: { at: number; text: string; align: "start" | "end" }) {
-  return <span className={cn("absolute whitespace-nowrap", align === "end" ? "-translate-x-full pr-1" : "pl-1")} style={{ left: `${at}%` }}>{text}</span>
+  return <span data-slot="budget-bar-marker-label" className={cn("absolute whitespace-nowrap", align === "end" ? "-translate-x-full pr-1" : "pl-1")} style={{ left: `${at}%` }}>{text}</span>
 }
 
 export { BudgetBar, budgetGeometry, budgetZone }

@@ -1,6 +1,8 @@
 import * as React from "react"
 import { MinusIcon, PlusIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
+
+import { Icon } from "./icon"
 
 /** How much a node matters, as the Experience IR names it. */
 type TradeoffImportance = "low" | "normal" | "high" | "critical"
@@ -30,10 +32,10 @@ function Tradeoff({ summary, gains, costs, importance, className, ...props }: Tr
       data-slot="tradeoff"
       data-variant={variant}
       data-importance={importance}
-      className={cn("flex flex-col gap-2 text-sm", className)}
+      className={cn("flex flex-col gap-2 type-body-sm", className)}
       {...props}
     >
-      {summary && <p data-slot="tradeoff-summary" className="text-foreground">{summary}</p>}
+      {summary && <p data-slot="tradeoff-summary" className="text-fg-primary">{summary}</p>}
       {(hasGains || hasCosts) && (
         <div data-slot="tradeoff-columns" className="grid gap-3 sm:grid-cols-2">
           {hasGains && <TradeoffList kind="gain" title="Gains" items={gains!} titleId={`${uid}-gains`} />}
@@ -45,18 +47,20 @@ function Tradeoff({ summary, gains, costs, importance, className, ...props }: Tr
 }
 
 function TradeoffList({ kind, title, items, titleId }: { kind: "gain" | "cost"; title: string; items: string[]; titleId: string }) {
-  const Icon = kind === "gain" ? PlusIcon : MinusIcon
+  const glyph = kind === "gain" ? PlusIcon : MinusIcon
   return (
     <div data-slot={kind === "gain" ? "tradeoff-gains" : "tradeoff-costs"} data-variant={kind} className="flex flex-col gap-1">
-      <p id={titleId} data-slot="tradeoff-title" className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+      <p id={titleId} data-slot="tradeoff-title" className="type-caps text-fg-secondary">
         {title}
       </p>
-      <ul aria-labelledby={titleId} className="flex flex-col gap-1">
+      <ul aria-labelledby={titleId} data-slot="tradeoff-items" className="flex flex-col gap-1">
         {items.map((item, i) => (
-          <li key={`${i}-${item}`} data-slot="tradeoff-item" data-variant={kind} className="flex items-start gap-1.5">
-            <Icon aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-foreground" />
-            <span className="sr-only">{kind === "gain" ? "Gain:" : "Cost:"}</span>
-            <span className="min-w-0 break-words">{item}</span>
+          <li key={`${i}-${item}`} data-slot="tradeoff-item" data-variant={kind} className="flex items-start gap-2">
+            <span data-slot="tradeoff-item-icon" className="flex h-5 shrink-0 items-center">
+              <Icon icon={glyph} size={16} aria-hidden="true" className="text-fg-primary" />
+            </span>
+            <span data-slot="tradeoff-item-prefix" className="sr-only">{kind === "gain" ? "Gain:" : "Cost:"}</span>
+            <span data-slot="tradeoff-item-text" className="min-w-0 break-words">{item}</span>
           </li>
         ))}
       </ul>

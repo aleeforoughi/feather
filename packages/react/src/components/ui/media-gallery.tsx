@@ -1,9 +1,10 @@
 import * as React from "react"
 import { motion } from "motion/react"
 import { ImagesIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { useThemeMotion } from "../../lib/motion"
+import { Icon } from "./icon"
 import { Lightbox, lightboxChecker, type LightboxImage } from "./lightbox"
 
 export type MediaGallerySection = { key: string; title: string; items: LightboxImage[] }
@@ -15,13 +16,13 @@ function MediaTile({ image, onOpen, className, ...props }: { image: LightboxImag
       type="button"
       data-slot="media-tile"
       onClick={onOpen}
-      className={cn("group/media-tile block w-full overflow-hidden rounded-lg border border-border text-left focus-visible:outline-2 focus-visible:outline-ring", className)}
+      className={cn("group/media-tile motion-hover block w-full overflow-hidden rounded-card border border-line-secondary text-left hover:border-line-primary", className)}
       {...props}
     >
-      <span className={cn("flex aspect-square items-center justify-center p-2", lightboxChecker)}>
-        <img src={image.src} alt={image.alt} loading="lazy" className="max-h-full max-w-full object-contain transition-transform group-hover/media-tile:scale-105" />
+      <span data-slot="media-tile-stage" className={cn("flex h-32 items-center justify-center p-2", lightboxChecker)}>
+        <img data-slot="media-tile-image" src={image.src} alt={image.alt} loading="lazy" className="max-h-full max-w-full object-contain" />
       </span>
-      <span data-slot="media-tile-label" className="block truncate px-2 py-1.5 text-xs text-muted-foreground">
+      <span data-slot="media-tile-label" className="block truncate px-3 py-2 type-caption text-fg-secondary">
         {image.caption ?? image.alt}
       </span>
     </button>
@@ -35,11 +36,12 @@ function MediaTile({ image, onOpen, className, ...props }: { image: LightboxImag
 function MediaGallery({ sections, empty = "No images yet.", className }: { sections: MediaGallerySection[]; empty?: React.ReactNode; className?: string }) {
   const all = sections.flatMap((s) => s.items)
   const [open, setOpen] = React.useState<number | null>(null)
-  const motionTheme = useThemeMotion()
+  // Tiles enter like a toast: medium, 8px.
+  const motionTheme = useThemeMotion("toast")
   if (all.length === 0) {
     return (
-      <div data-slot="media-gallery" className={cn("flex min-h-64 flex-col items-center justify-center gap-3 p-8 text-center text-muted-foreground", className)}>
-        <ImagesIcon className="size-10" />
+      <div data-slot="media-gallery" className={cn("flex flex-col items-center justify-center gap-element px-8 py-20 text-center type-body text-fg-secondary", className)}>
+        <Icon icon={ImagesIcon} size={32} />
         <p>{empty}</p>
       </div>
     )
@@ -49,15 +51,15 @@ function MediaGallery({ sections, empty = "No images yet.", className }: { secti
     <div data-slot="media-gallery" className={cn("space-y-8", className)}>
       {sections.map((section) => (
         <section key={section.key} data-slot="media-gallery-section" aria-labelledby={`media-${section.key}`}>
-          <h2 id={`media-${section.key}`} className="mb-3 flex items-baseline gap-2 font-heading text-lg font-semibold">
+          <h2 data-slot="media-gallery-title" id={`media-${section.key}`} className="mb-3 flex items-baseline gap-2 type-title text-fg-primary">
             {section.title}
-            <span className="text-sm font-normal text-muted-foreground">{section.items.length}</span>
+            <span data-slot="media-gallery-count" className="type-body-sm text-fg-secondary">{section.items.length}</span>
           </h2>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <ul data-slot="media-gallery-list" className="grid grid-cols-2 gap-element sm:grid-cols-3 lg:grid-cols-4">
             {section.items.map((image, i) => {
               const at = n++
               return (
-                <motion.li key={`${image.src}-${at}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: motionTheme.duration * 2, ease: motionTheme.ease, delay: motionTheme.reduced ? 0 : Math.min(i, 12) * 0.03 }}>
+                <motion.li key={`${image.src}-${at}`} data-slot="media-gallery-item" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: motionTheme.duration, ease: motionTheme.ease, delay: motionTheme.reduced ? 0 : Math.min(i, 12) * 0.03 }}>
                   <MediaTile image={image} onOpen={() => setOpen(at)} />
                 </motion.li>
               )

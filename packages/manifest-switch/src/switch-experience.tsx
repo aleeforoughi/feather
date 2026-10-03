@@ -5,7 +5,7 @@
 // mouse or keyboard. Nothing here re-decides what the plan decided.
 //
 // The highlight is three signals, none of them colour alone: real focus (so assistive technology reads the control),
-// a thick outline with an offset in the `ring` token (shape, not hue), and "Selected for scanning" as a sr-only
+// a 2px outline with a 2px offset in the `ring` token (shape, not hue), and "Selected for scanning" as a sr-only
 // description on the control (aria-describedby, read once on focus; there is no live region). The wrapper's
 // `data-variant` is "scanned" while a control is highlighted, and the control carries `data-scanned="true"`.
 import * as React from "react"
@@ -306,11 +306,12 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
     // One scanner per plan and mode; the rest is read from `live`.
   }, [plan, scan, scanMs, dwellMs, clock, hintId])
 
-  // The ring, in the `ring` token: an outline of a fixed weight with an offset, so it is a shape and not only a hue.
+  // The ring, in the `ring` token: the same 2px outline with a 2px offset as the focus ring (docs/visual-system.md section 8), so it is a shape and
+  // not only a hue. It appears on the `focus` motion role.
   // With reduced motion nothing about it transitions.
   const ring =
-    "[&_[data-scanned=true]]:outline-[3px] [&_[data-scanned=true]]:outline-offset-[3px] [&_[data-scanned=true]]:outline-solid [&_[data-scanned=true]]:outline-ring"
-  const motion = reduced ? "[&_[data-scanned]]:transition-none" : "[&_[data-scanned]]:transition-[outline-offset] [&_[data-scanned]]:duration-150"
+    "[&_[data-scanned=true]]:outline-2 [&_[data-scanned=true]]:outline-offset-2 [&_[data-scanned=true]]:outline-solid [&_[data-scanned=true]]:outline-ring"
+  const motion = reduced ? "[&_[data-scanned]]:transition-none" : "[&_[data-scanned]]:motion-focus"
   return (
     <div ref={root} role="group" tabIndex={0} aria-label="Switch scanning: press Space or Enter to start" data-slot="switch-scanner" data-variant={state} data-scan={scan} data-motion={plan.motion} className={[ring, motion, className ?? ""].filter(Boolean).join(" ")}>
       <span id={hintId} data-slot="switch-scan-hint" className="sr-only">

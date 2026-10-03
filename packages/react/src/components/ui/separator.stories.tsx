@@ -12,7 +12,7 @@ const meta = {
     <div className="w-72">
       <div className="space-y-1">
         <h4 className="text-sm font-medium">Design system</h4>
-        <p className="text-sm text-muted-foreground">Building blocks for consistent interfaces.</p>
+        <p className="type-body-sm text-fg-secondary">Building blocks for consistent interfaces.</p>
       </div>
       <Separator {...args} className="my-4" />
       <p className="text-sm">Docs, tokens, and components.</p>

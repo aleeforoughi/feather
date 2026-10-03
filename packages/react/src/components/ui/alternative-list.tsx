@@ -3,10 +3,11 @@
 import * as React from "react"
 import { motion } from "motion/react"
 import { CheckIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { useThemeMotion } from "../../lib/motion"
 import { Button } from "./button"
+import { Icon } from "./icon"
 import { Input } from "./input"
 import { Label } from "./label"
 import { Tradeoff } from "./tradeoff"
@@ -131,7 +132,7 @@ function AlternativeList({ alternatives, onAct, className }: AlternativeListProp
 
   return (
     <div data-slot="alternative-list" data-variant={chosen ? "chosen" : "open"} className={cn("flex flex-col gap-3", className)}>
-      <ul className="flex flex-col gap-3">
+      <ul data-slot="alternative-list-items" className="flex flex-col gap-3">
         {alternatives.map((alt) => (
           <AlternativeRow
             key={alt.id}
@@ -175,9 +176,9 @@ function AlternativeRow({
     <li
       data-slot="alternative-list-item"
       data-variant={state}
-      className="flex flex-col gap-2 rounded-lg p-3 ring-1 ring-foreground/10 data-[variant=chosen]:ring-2 data-[variant=chosen]:ring-primary"
+      className="flex flex-col gap-2 rounded-card border border-line-secondary p-3 motion-state data-[variant=chosen]:border-primary"
     >
-      <div className="flex flex-wrap items-center gap-2">
+      <div data-slot="alternative-list-row" className="flex flex-wrap items-center gap-2">
         <Button
           ref={buttonRef}
           type="button"
@@ -188,13 +189,13 @@ function AlternativeRow({
           aria-expanded={alt.input ? state === "editing" : undefined}
           aria-controls={alt.input && state === "editing" ? formId : undefined}
           onClick={onChoose}
-          className="h-auto min-h-8 max-w-full whitespace-normal py-1 text-left"
+          className="h-auto! min-h-(--control-height) max-w-full whitespace-normal py-1 text-left"
         >
-          {state === "chosen" && <CheckIcon aria-hidden="true" />}
+          {state === "chosen" && <Icon icon={CheckIcon} aria-hidden="true" />}
           {label}
         </Button>
         {state === "chosen" && (
-          <span data-slot="alternative-list-chosen" className="text-xs font-medium text-muted-foreground">
+          <span data-slot="alternative-list-chosen" className="type-label text-fg-secondary">
             Chosen
           </span>
         )}
@@ -253,7 +254,7 @@ function AlternativeField({
         }
       }}
     >
-      <div className="flex min-w-40 flex-1 flex-col gap-1.5">
+      <div data-slot="alternative-list-field-group" className="flex min-w-32 flex-1 flex-col gap-2">
         <Label htmlFor={`${uid}-value`}>
           {FIELD_LABEL[kind]} for {label}
         </Label>
@@ -272,7 +273,7 @@ function AlternativeField({
         />
       </div>
       {kind === "Price" && (
-        <div className="flex w-24 flex-col gap-1.5">
+        <div data-slot="alternative-list-currency-group" className="flex w-24 flex-col gap-2">
           <Label htmlFor={`${uid}-currency`}>Currency</Label>
           <Input
             id={`${uid}-currency`}
@@ -289,7 +290,7 @@ function AlternativeField({
       <Button type="submit" data-slot="alternative-list-submit" disabled={value === null}>
         Use this
       </Button>
-      <p className="sr-only" id={`${uid}-hint`}>
+      <p data-slot="alternative-list-hint" className="sr-only" id={`${uid}-hint`}>
         Press Escape to cancel.
       </p>
     </motion.form>

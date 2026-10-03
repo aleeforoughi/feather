@@ -81,14 +81,12 @@ describe("density, targets, motion and contrast", () => {
     expect(rootOf(view("ad-campaign-launch", desktop).container).style.getPropertyValue("--spacing")).toBe("")
   })
 
-  it("minTarget 44 makes every control at least 44 px", () => {
+  it("writes minTarget as data-min-target; the 44 px targets come from the components, not from plan classes", () => {
     const touch = rootOf(view("user-signup", phone).container)
     expect(touch.getAttribute("data-min-target")).toBe("44")
-    expect(touch.className).toContain("min-h-[44px]")
-    expect(touch.className).toContain("[&_input:not([type=checkbox])")
+    expect(touch.className).not.toContain("min-h-[44px]")
     const precise = rootOf(view("user-signup", desktop).container)
     expect(precise.getAttribute("data-min-target")).toBe("24")
-    expect(precise.className).not.toContain("min-h-[44px]")
   })
 
   it("contrast is exposed as data-contrast", () => {

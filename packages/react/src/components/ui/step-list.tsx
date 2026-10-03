@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion } from "motion/react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { useThemeMotion } from "../../lib/motion"
 
@@ -28,10 +28,11 @@ function StepItem({
   detail?: React.ReactNode
   className?: string
 }) {
-  const m = useThemeMotion()
+  // Steps enter with the `state` role: a short fade and a 4px rise, one after another.
+  const m = useThemeMotion("state")
   const marker = {
-    pending: "border border-border text-muted-foreground",
-    active: "border-2 border-primary text-primary",
+    pending: "border border-line-secondary text-fg-secondary",
+    active: "border border-primary bg-surface-selected text-fg-primary",
     done: "bg-primary text-primary-foreground",
     blocked: "bg-destructive text-primary-foreground",
   }[status]
@@ -39,22 +40,22 @@ function StepItem({
     <motion.li
       data-slot="step-item"
       data-variant={status}
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: m.duration * 2, ease: m.ease, delay: m.reduced ? 0 : index * 0.04 }}
-      className={cn("flex gap-3", className)}
+      transition={{ duration: m.duration, ease: m.ease, delay: m.reduced ? 0 : index * 0.04 }}
+      className={cn("flex gap-element", className)}
     >
-      <span data-slot="step-marker" className={cn("relative flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-medium", marker)} aria-hidden>
-        {status === "active" && !m.reduced && <span className="absolute inset-0 animate-ping rounded-full border-2 border-primary opacity-40" />}
-        {index}
+      <span data-slot="step-marker" className={cn("relative flex size-8 shrink-0 items-center justify-center rounded-full type-label", marker)} aria-hidden>
+        {status === "active" && !m.reduced && <span data-slot="step-marker-pulse" className="motion-ping absolute inset-0 rounded-full border border-primary" />}
+        <span data-slot="step-marker-index">{index}</span>
       </span>
-      <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium">{title}</span>
+      <div data-slot="step-item-body" className="min-w-0 flex-1 space-y-1">
+        <div data-slot="step-item-heading" className="flex flex-wrap items-center gap-2">
+          <span data-slot="step-item-title" className="type-label text-fg-primary">{title}</span>
           {tags}
-          <span className="sr-only">{status}</span>
+          <span data-slot="step-item-status" className="sr-only">{status}</span>
         </div>
-        {detail && <p data-slot="step-item-detail" className="text-xs text-muted-foreground">{detail}</p>}
+        {detail && <p data-slot="step-item-detail" className="type-caption text-fg-secondary">{detail}</p>}
       </div>
     </motion.li>
   )

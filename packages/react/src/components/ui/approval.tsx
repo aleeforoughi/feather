@@ -3,6 +3,7 @@ import { ShieldCheckIcon, TriangleAlertIcon } from "lucide-react"
 
 import { AttentionCard } from "./attention-card"
 import { Button } from "./button"
+import { Icon } from "./icon"
 import { ConsequenceStatement, type Consequence } from "./consequence-statement"
 import { Label } from "./label"
 import { RoleChip } from "./role-avatar"
@@ -122,7 +123,7 @@ function Approval({ intent, request, requester, scope, consequence, arm, importa
 
   const content = (
     <div
-      className="space-y-3 text-foreground"
+      data-slot="approval-content" className="space-y-3 text-fg-primary"
       onKeyDown={(e) => {
         if (e.key === "Escape" && (mode === "armed" || mode === "rejecting")) {
           e.preventDefault()
@@ -131,31 +132,31 @@ function Approval({ intent, request, requester, scope, consequence, arm, importa
       }}
     >
       {requester && (
-        <p data-slot="approval-requester" className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+        <p data-slot="approval-requester" className="flex flex-wrap items-center gap-2 type-body-sm text-fg-secondary">
           Requested by <RoleChip title={requester.name} tag={requesterTag(requester)} />
         </p>
       )}
       {scope && (
-        <p data-slot="approval-scope" className="text-sm">
-          <span className="font-medium">Covers: </span>
+        <p data-slot="approval-scope" className="type-body-sm">
+          <span data-slot="approval-scope-label" className="font-medium">Covers: </span>
           {scope}
         </p>
       )}
       {irreversible && (
-        <p data-slot="approval-warning" className="flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase">
-          <TriangleAlertIcon aria-hidden className="size-4 shrink-0 text-destructive" />
+        <p data-slot="approval-warning" className="flex items-center gap-2 type-caps text-fg-primary">
+          <Icon icon={TriangleAlertIcon} size={16} aria-hidden className="text-destructive" />
           Cannot be undone
         </p>
       )}
       {consequence && <ConsequenceStatement id={consequenceId} consequence={consequence} locale={locale} />}
 
       {mode === "done" ? (
-        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="approval-outcome" className="rounded-md text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50">{outcome}</p>
+        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="approval-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">{outcome}</p>
       ) : mode === "rejecting" ? (
         <div data-slot="approval-reject-form" className="space-y-2">
           <Label htmlFor={`${id}-reason`}>Reason for rejecting (optional)</Label>
           <Textarea ref={reasonRef} id={`${id}-reason`} data-slot="approval-reason" value={reason} onChange={(e) => setReason(e.target.value)} />
-          <div className="flex flex-wrap gap-2">
+          <div data-slot="approval-reject-actions" className="flex flex-wrap gap-2">
             <Button type="button" data-slot="approval-send-rejection" variant="outline" onClick={sendRejection}>Send rejection</Button>
             <Button type="button" data-slot="approval-back" variant="outline" onClick={backOut}>Back</Button>
           </div>
@@ -188,7 +189,7 @@ function Approval({ intent, request, requester, scope, consequence, arm, importa
         </div>
       )}
 
-      <p role="status" data-slot="approval-status" data-variant={mode} className={mode === "armed" ? "text-sm font-medium" : "sr-only"}>{status}</p>
+      <p role="status" data-slot="approval-status" data-variant={mode} className={mode === "armed" ? "type-label text-fg-primary" : "sr-only"}>{status}</p>
 
       {expandable && mode !== "done" && <WhyDisclosure expandable={expandable} open={whyOpen} onOpenChange={setWhyOpen} forceOpen={importance === "critical"} />}
     </div>
@@ -199,7 +200,7 @@ function Approval({ intent, request, requester, scope, consequence, arm, importa
       <AttentionCard
         eyebrow={`Approval needed: ${intent}`}
         title={request}
-        icon={<ShieldCheckIcon />}
+        icon={<Icon icon={ShieldCheckIcon} size={20} />}
         description={content}
       />
     </div>

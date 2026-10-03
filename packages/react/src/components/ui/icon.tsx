@@ -1,5 +1,5 @@
 import type { LucideIcon, LucideProps } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 import { iconName, opticalFor, opticalViewBox } from "../../lib/optical"
 
 /** The icon sizes (docs/visual-system.md section 2). "slot" follows the density: --icon-slot (16, 20 or 24px). */

@@ -29,17 +29,12 @@ export interface PlanViewProps {
   className?: string
 }
 
-/** Everything below the plan's wrappers that the plan decides: spacing, targets and motion, as classes and variables. */
-const TARGET_44 =
-  "[&_button:not([role=radio]):not([role=checkbox]):not([role=switch])]:min-h-[44px] [&_button:not([role=radio]):not([role=checkbox]):not([role=switch])]:min-w-[44px] " +
-  "[&_a]:inline-flex [&_a]:min-h-[44px] [&_a]:items-center [&_summary]:min-h-[44px] [&_summary]:py-2 " +
-  "[&_input:not([type=checkbox]):not([type=radio]):not([type=hidden])]:min-h-[44px] [&_textarea]:min-h-[44px] [&_select]:min-h-[44px] " +
-  "[&_[role=radio]]:after:-inset-[14px] [&_[role=checkbox]]:after:-inset-[14px] [&_[role=switch]]:after:-inset-[14px]"
-
 /**
  * Renders a plan: the regions in order (main, then secondary), each node in a wrapper with `data-feather-node`,
- * `data-organism` and `data-emphasis`. The plan's chrome, density, minimum target, motion, contrast, expansion,
- * confirmation, preselection and focus are applied; the renderer never re-decides.
+ * `data-organism` and `data-emphasis`. The plan's chrome, density, motion, contrast, expansion,
+ * confirmation, preselection and focus are applied; the renderer never re-decides. The plan's minimum target is written
+ * as `data-min-target` only: every component reaches 44 x 44px through `hit-area` (docs/visual-system.md section 3), so
+ * the renderer adds no target classes of its own.
  *
  * A voice or text plan has no screen to draw on, so it renders a plain, accessible summary instead.
  */
@@ -91,7 +86,7 @@ export function PlanView({ plan, onReply, experience, onRejectedReply, autoFocus
     </div>
   )
 
-  const classes = [plan.minTarget === 44 && !spoken ? TARGET_44 : "", "text-foreground", className ?? ""].filter(Boolean).join(" ")
+  const classes = ["text-fg-primary", className ?? ""].filter(Boolean).join(" ")
   return (
     <MotionPreference.Provider value={plan.motion}>
       <RenderingContext.Provider value={rendering}>

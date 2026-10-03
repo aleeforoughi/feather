@@ -17,7 +17,8 @@ export const CONTROL_HEIGHT: Record<Density, number> = { tight: 36, default: 44,
 export const CONTROL_HEIGHT_SET = [36, 44, 52]
 
 /** `data-size` values that pin a height regardless of density (section 3). `default` (or no attribute) follows the density. */
-export const SIZE_HEIGHT: Record<string, number> = { xs: 36, sm: 36, lg: 52, icon: 44, "icon-xs": 36, "icon-sm": 36, "icon-lg": 52 }
+// Pinned sizes only: `default` and `icon` follow the surrounding density (visual-system.md section 3).
+export const SIZE_HEIGHT: Record<string, number> = { xs: 36, sm: 36, lg: 52, "icon-xs": 36, "icon-sm": 36, "icon-lg": 52 }
 
 /**
  * The data-slot names of the control frame (section 3): buttons, fields, triggers and the organisms' action buttons.

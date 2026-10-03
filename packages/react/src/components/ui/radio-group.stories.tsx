@@ -17,7 +17,7 @@ const meta = {
         ["comfortable", "Comfortable"],
         ["spacious", "Spacious"],
       ].map(([value, label]) => (
-        <div key={value} className="flex items-center gap-2">
+        <div key={value} className="flex h-control items-center gap-2">
           <RadioGroupItem value={value} id={`radio-${value}`} />
           <Label htmlFor={`radio-${value}`}>{label}</Label>
         </div>

@@ -9,7 +9,7 @@ const meta = {
     layout: "padded",
     docs: { description: { component: "Use progress to show how far along a task with a known length has come." } },
   },
-  args: { value: 60, className: "w-72" },
+  args: { value: 60, className: "w-72", "aria-label": "Progress" },
 } satisfies Meta<typeof Progress>
 
 export default meta
@@ -24,6 +24,7 @@ export const Complete: Story = { args: { value: 100 } }
 export const WithLabel: Story = {
   args: {
     value: 45,
+    "aria-label": "Uploading",
     children: (
       <>
         <ProgressLabel>Uploading</ProgressLabel>

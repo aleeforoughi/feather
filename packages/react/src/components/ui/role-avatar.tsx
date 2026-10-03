@@ -1,16 +1,18 @@
 import * as React from "react"
-import { cn } from "cn"
+import type { LucideIcon } from "lucide-react"
+import { cn } from "../../lib/cn"
 
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "./avatar"
 import { Badge } from "./badge"
+import { Icon } from "./icon"
 
 /** What a person or agent is doing right now. */
 export type RoleState = "idle" | "working" | "waiting" | "done"
 
 const STATE_LABEL: Record<RoleState, string> = { idle: "Idle", working: "Working", waiting: "Waiting", done: "Done" }
 const STATE_DOT: Record<RoleState, string> = {
-  idle: "bg-muted-foreground/50",
-  working: "bg-success animate-pulse",
+  idle: "bg-fg-tertiary",
+  working: "bg-success motion-loading",
   waiting: "bg-warning",
   done: "bg-primary",
 }
@@ -39,12 +41,12 @@ type RoleBase = {
 }
 
 /** The role's avatar: an icon (or initials) on a soft background; `emphasis` rings it in the primary color. */
-function RoleAvatar({ title, icon: Icon, emphasis, size = "default", className }: RoleBase & { size?: "default" | "sm" | "lg" }) {
+function RoleAvatar({ title, icon: Glyph, emphasis, size = "default", className }: RoleBase & { size?: "default" | "sm" | "lg" }) {
   return (
     <Avatar size={size} title={title} data-slot="role-avatar" data-variant={emphasis ? "emphasis" : "default"} className={cn(emphasis && "ring-2 ring-primary ring-offset-1 ring-offset-background", className)}>
-      <AvatarFallback className={cn("text-[10px] font-semibold", emphasis ? "bg-primary text-primary-foreground" : "bg-muted text-foreground")}>
-        {Icon ? <Icon aria-hidden className={size === "sm" ? "size-3" : "size-4"} /> : <span aria-hidden>{roleInitials(title)}</span>}
-        <span className="sr-only">{title}</span>
+      <AvatarFallback className={cn(emphasis ? "bg-primary text-primary-foreground" : "bg-surface-subtle text-fg-primary")}>
+        {Glyph ? <Icon icon={Glyph as LucideIcon} size={size === "lg" ? 20 : 16} aria-hidden /> : <span data-slot="role-avatar-initials" aria-hidden className="type-caps">{roleInitials(title)}</span>}
+        <span data-slot="role-avatar-title" className="sr-only">{title}</span>
       </AvatarFallback>
     </Avatar>
   )
@@ -53,10 +55,10 @@ function RoleAvatar({ title, icon: Icon, emphasis, size = "default", className }
 /** A compact pill: avatar and title, with an optional tag (e.g. "advisory"). */
 function RoleChip({ title, icon, emphasis, tag, className }: RoleBase & { tag?: React.ReactNode }) {
   return (
-    <span data-slot="role-chip" data-variant="chip" className={cn("inline-flex min-w-0 items-center gap-1.5 rounded-full border bg-background py-0.5 pr-2.5 pl-0.5 text-xs font-medium", className)}>
+    <span data-slot="role-chip" data-variant="chip" className={cn("inline-flex min-w-0 items-center gap-2 rounded-full border border-line-secondary bg-surface-base py-1 pr-3 pl-1 type-label text-fg-primary", className)}>
       <RoleAvatar title={title} icon={icon} emphasis={emphasis} size="sm" />
-      <span className="truncate">{title}</span>
-      {tag && <span className="text-[10px] font-normal text-muted-foreground">{tag}</span>}
+      <span data-slot="role-chip-title" className="truncate">{title}</span>
+      {tag && <span data-slot="role-chip-tag" className="type-caption text-fg-secondary">{tag}</span>}
     </span>
   )
 }
@@ -73,21 +75,21 @@ function RoleCard({ title, icon, emphasis, kind, state, meta, metrics, className
 }) {
   const stats = (metrics ?? []).filter(Boolean)
   return (
-    <div data-slot="role-card" data-variant="card" className={cn("flex items-start gap-3 rounded-xl border bg-card p-3 text-card-foreground", className)}>
+    <div data-slot="role-card" data-variant="card" className={cn("flex items-start gap-element rounded-card border border-line-secondary bg-card p-card text-fg-primary", className)}>
       <RoleAvatar title={title} icon={icon} emphasis={emphasis} size="lg" />
-      <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="truncate text-sm font-medium">{title}</span>
+      <div data-slot="role-card-body" className="min-w-0 flex-1 space-y-1">
+        <div data-slot="role-card-heading" className="flex flex-wrap items-center gap-2">
+          <span data-slot="role-card-title" className="truncate type-label">{title}</span>
           {kind && <Badge variant={emphasis ? "default" : "secondary"}>{kind}</Badge>}
         </div>
         {state && (
-          <p data-slot="role-state" data-variant={state} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span aria-hidden className={cn("size-2 rounded-full", STATE_DOT[state])} />
+          <p data-slot="role-state" data-variant={state} className="flex items-center gap-2 type-caption text-fg-secondary">
+            <span data-slot="role-state-dot" aria-hidden className={cn("size-2 rounded-full", STATE_DOT[state])} />
             {STATE_LABEL[state]}
           </p>
         )}
-        {meta && <p className="text-xs text-muted-foreground">{meta}</p>}
-        {stats.length > 0 && <p className="text-xs text-muted-foreground">{stats.join(" · ")}</p>}
+        {meta && <p data-slot="role-card-meta" className="type-caption text-fg-secondary">{meta}</p>}
+        {stats.length > 0 && <p data-slot="role-card-metrics" className="type-caption text-fg-secondary">{stats.join(" · ")}</p>}
       </div>
     </div>
   )

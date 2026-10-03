@@ -32,6 +32,8 @@ export interface Consts {
 export interface StaticOpts {
   density: string
   expectedHeight: number
+  /** The control height of each density: an element inside a nearer [data-density] (a plan's own) follows it. */
+  densityHeights: Record<string, number>
   radii: number[]
   durations: number[]
 }
@@ -337,6 +339,29 @@ export function install(c: Consts): void {
   }
 
   // ---- layout snapshots ---------------------------------------------------------------------------------------
+  /** The density that governs an element: the nearest [data-density] above it, else the page's. */
+  function densityOf(el: Element, o: StaticOpts): { name: string; height: number } {
+    const name = el.closest("[data-density]")?.getAttribute("data-density") ?? o.density
+    return { name, height: o.densityHeights[name] ?? o.expectedHeight }
+  }
+
+  /** How many lines of text an element's content occupies (distinct line boxes). */
+  function lines(el: Element): number {
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    const tops = new Set<number>()
+    for (const r of range.getClientRects()) if (r.width > 0 && r.height > 0) tops.add(Math.round(r.top))
+    // Rects of nested inline boxes share a line's top within a few pixels; group them.
+    const sorted = [...tops].sort((a, b) => a - b)
+    let count = 0
+    let last = -Infinity
+    for (const t of sorted) {
+      if (t - last > 4) count++
+      last = t
+    }
+    return count
+  }
+
   type Snap = [number, number, number, number]
   let base = new Map<Element, Snap>()
   function snapshot(): Map<Element, Snap> {
@@ -346,6 +371,8 @@ export function install(c: Consts): void {
     const out = new Map<Element, Snap>()
     for (const el of all()) {
       const r = rect(el)
+      // display:none (a hidden Storybook overlay) has no box; scroll compensation would invent a movement for it.
+      if (r.width === 0 && r.height === 0 && cs(el).display === "none") continue
       let sx = 0
       let sy = 0
       for (let p: Element | null = el.parentElement; p; p = p.parentElement) {
@@ -394,9 +421,13 @@ export function install(c: Consts): void {
         const r = rect(el)
         const size = el.getAttribute("data-size")
         const fixed = size && size !== "default" ? c.sizeHeights[size] : undefined
-        const want = fixed ?? o.expectedHeight
-        const why = fixed !== undefined ? `data-size=${size}` : `density ${o.density}`
-        if (!inList(r.height, c.controlHeights)) out.push(make("controls.height", "height", el, `36 | 44 | 52 (${why}: ${want})`, `${f2(r.height)}px`))
+        const local = densityOf(el, o)
+        const want = fixed ?? local.height
+        const why = fixed !== undefined ? `data-size=${size}` : `density ${local.name}`
+        // A control whose label wraps grows instead of clipping: its height is then a minimum (visual-system.md §3).
+        if (lines(el) > 1) {
+          if (r.height < want - 0.1) out.push(make("controls.height", "height", el, `>= ${want}px (${why}, wrapped label)`, `${f2(r.height)}px`))
+        } else if (!inList(r.height, c.controlHeights)) out.push(make("controls.height", "height", el, `36 | 44 | 52 (${why}: ${want})`, `${f2(r.height)}px`))
         else if (!near(r.height, want)) out.push(make("controls.height", "height", el, `${want}px (${why})`, `${f2(r.height)}px`))
         if (isIconOnly(el) && !near(r.width, r.height)) out.push(make("controls.square", "width", el, "square (width = height)", `${f2(r.width)} x ${f2(r.height)}px`))
       }
@@ -426,11 +457,19 @@ export function install(c: Consts): void {
       }
 
       // 2. targets
+      // A text-entry field cannot carry an extended hit area (an <input> has no ::after), so its target is its own box,
+      // which must be at least the density's control height (visual-system.md section 3: tight is opt-in for pointer
+      // surfaces; people who need large targets are routed to spacious by the composer).
+      const textEntry = (el: Element) =>
+        el instanceof HTMLTextAreaElement ||
+        (el instanceof HTMLElement && el.isContentEditable) ||
+        (el instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit", "reset", "range", "color", "file", "image", "hidden"].includes(el.type))
       for (const el of els.filter((e) => e.matches(c.interactive))) {
         const u = hitArea(el)
         const w = u.r - u.l
         const h = u.b - u.t
-        if (w < c.target - 0.1 || h < c.target - 0.1) out.push(make("targets.size", "hit-area", el, `>= ${c.target} x ${c.target}px`, `${f2(w)} x ${f2(h)}px`))
+        const minH = textEntry(el) ? Math.min(c.target, densityOf(el, o).height) : c.target
+        if (w < c.target - 0.1 || h < minH - 0.1) out.push(make("targets.size", "hit-area", el, `>= ${c.target} x ${f2(minH)}px`, `${f2(w)} x ${f2(h)}px`))
       }
 
       // 3. borders

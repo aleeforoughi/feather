@@ -79,7 +79,7 @@ export async function runAudit(page: Page, ctx: Ctx): Promise<Row[]> {
       rows.push({ ...f, story: ctx.story, theme: ctx.theme.name, density })
     }
   }
-  const opts = (d: Density): StaticOpts => ({ density: d, expectedHeight: heights[d], radii: ctx.theme.radii, durations: ctx.theme.durations })
+  const opts = (d: Density): StaticOpts => ({ density: d, expectedHeight: heights[d], densityHeights: heights, radii: ctx.theme.radii, durations: ctx.theme.durations })
 
   await page.evaluate(install, consts())
   const a = api(page)

@@ -52,6 +52,8 @@ interface Case {
 }
 
 const violating: Case[] = [
+  { name: "controls.height: a wrapped label below the control height", body: '<div class="row"><button class="btn" data-slot="button" style="height:40px;width:90px;white-space:normal;line-height:16px;font-size:14px">Launch the recommended test</button></div>', only: ["controls.height", "targets.size"], fires: ["controls.height"] },
+  { name: "controls.height: a nearer data-density still decides", body: '<div class="row" data-density="tight"><button class="btn" data-slot="button">Save</button></div>', fires: ["controls.height"] },
   { name: "controls.height: 40px button", body: '<div class="row"><button class="btn" data-slot="button" style="height:40px;width:60px">X</button></div>', fires: ["controls.height"] },
   { name: "controls.height: 44px button in the tight density", body: CLEAN_ROW, densities: ["tight"], fires: ["controls.height"] },
   { name: "controls.height: size attribute pins the height", body: '<div class="row"><button class="btn" data-slot="button" data-size="lg" style="height:44px;width:60px">X</button></div>', only: ["controls.height"], fires: ["controls.height"] },
@@ -63,6 +65,7 @@ const violating: Case[] = [
   { name: "targets.size: extension clipped by overflow hidden", body: '<div class="row"><span class="cb" role="checkbox" tabindex="0" aria-checked="false" style="overflow:hidden"></span></div>', only: ["targets.size"], fires: ["targets.size"] },
   { name: "targets.size: extension covered by another element", body: '<div class="row"><span class="cb" role="checkbox" tabindex="0" aria-checked="false"></span></div><div style="position:absolute;z-index:9;left:0;top:0;width:100%;height:100%"></div>', fires: ["targets.size"] },
   { name: "targets.size: 36px button, extension too small", body: TIGHT_ROW, css: TIGHT_CSS + ".t::after{inset:-2px}", densities: ["tight"], fires: ["targets.size"] },
+  { name: "targets.size: a text field below the density's control height", body: '<div class="row"><input class="btn fld" data-slot="input" style="height:32px" value=""></div>', densities: ["tight"], only: ["targets.size", "controls.height"], fires: ["targets.size"] },
   { name: "borders.width: 2px border", body: '<div class="row"><div style="border:2px solid #111;width:40px;height:40px"></div></div>', only: ["borders.width"], fires: ["borders.width"] },
   { name: "focus.ring: 1px outline", body: CLEAN_ROW, css: ":focus-visible{outline-width:1px}", fires: ["focus.ring"] },
   { name: "focus.ring: 3px ring in box-shadow", body: CLEAN_ROW, css: ":focus-visible{outline:none;box-shadow:0 0 0 3px #06f}", fires: ["focus.ring"] },
@@ -92,9 +95,13 @@ const violating: Case[] = [
 ]
 
 const clean: Case[] = [
+  { name: "clean: a wrapped label grows the control instead of clipping", body: '<div class="row"><button class="btn" data-slot="button" style="height:64px;width:120px;white-space:normal">Launch the recommended test now</button></div>' },
+  { name: "clean: a plan's own data-density overrides the page's", body: '<div class="row" data-density="default"><button class="btn" data-slot="button">Save</button></div>', densities: ["tight"] },
+  { name: "clean: a display:none element is not a shift, even after scroll", body: '<div class="row"><button class="btn" data-slot="button">Save</button></div><div style="height:1400px"></div><div style="display:none" class="sb-preparing-story"></div>' },
   { name: "clean: every control, default density, sharp theme", body: CLEAN_ROW },
   { name: "clean: every control, default density, pill theme (snappy)", body: CLEAN_ROW, theme: pill, css: ".btn{border-radius:16px}" },
   { name: "clean: 36px controls with a 5px extended hit area, tight density", body: TIGHT_ROW, css: TIGHT_CSS, densities: ["tight"] },
+  { name: "clean: a 36px text field is its own target at tight density", body: '<div class="row"><input class="btn fld t" data-slot="input" value=""></div>', css: TIGHT_CSS, densities: ["tight"] },
   { name: "clean: 52px controls, spacious density", body: CLEAN_ROW.replaceAll('class="btn', 'class="btn s').replace('class="cb', 'class="cb'), css: ".s{height:52px}.sq.s{width:52px}", densities: ["spacious"] },
   { name: "clean: a 2px box-shadow ring is an equivalent focus ring", body: CLEAN_ROW, css: ":focus-visible{outline:none;box-shadow:0 0 0 2px #06f}" },
   { name: "clean: a gapped ring (2px gap, 2px ring) is equivalent", body: CLEAN_ROW, css: ":focus-visible{outline:none;box-shadow:0 0 0 2px #fff,0 0 0 4px #06f}" },

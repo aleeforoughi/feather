@@ -1,8 +1,9 @@
 import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
+import { Icon } from "./icon"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -20,7 +21,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground",
+        "flex flex-wrap items-center gap-2 type-body-sm wrap-break-word text-fg-secondary",
         className
       )}
       {...props}
@@ -32,7 +33,7 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn("inline-flex items-center gap-1", className)}
+      className={cn("inline-flex items-center gap-2", className)}
       {...props}
     />
   )
@@ -47,7 +48,7 @@ function BreadcrumbLink({
     defaultTagName: "a",
     props: mergeProps<"a">(
       {
-        className: cn("transition-colors hover:text-foreground", className),
+        className: cn("hit-area inline-flex items-center motion-hover hover:text-fg-primary", className),
       },
       props
     ),
@@ -65,7 +66,7 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn("font-normal text-foreground", className)}
+      className={cn("text-fg-primary", className)}
       {...props}
     />
   )
@@ -81,11 +82,11 @@ function BreadcrumbSeparator({
       data-slot="breadcrumb-separator"
       role="presentation"
       aria-hidden="true"
-      className={cn("[&>svg]:size-3.5", className)}
+      className={cn("flex items-center", className)}
       {...props}
     >
       {children ?? (
-        <ChevronRightIcon />
+        <Icon icon={ChevronRightIcon} size={16} />
       )}
     </li>
   )
@@ -101,13 +102,12 @@ function BreadcrumbEllipsis({
       role="presentation"
       aria-hidden="true"
       className={cn(
-        "flex size-5 items-center justify-center [&>svg]:size-4",
+        "flex size-5 items-center justify-center",
         className
       )}
       {...props}
     >
-      <MoreHorizontalIcon
-      />
+      <Icon icon={MoreHorizontalIcon} size={16} />
       <span className="sr-only">More</span>
     </span>
   )

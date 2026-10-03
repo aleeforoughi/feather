@@ -2,10 +2,11 @@
 
 import * as React from "react"
 import { SparklesIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { Badge } from "./badge"
 import { Button } from "./button"
+import { Icon } from "./icon"
 import { Label } from "./label"
 import { RadioGroup, RadioGroupItem } from "./radio-group"
 import { confidenceText } from "./recommendation"
@@ -53,9 +54,9 @@ function PredictedChoice({ intent, prompt, options, predicted, onAct, className 
       data-slot="predicted-choice"
       data-variant={current.id === predicted.option ? "predicted" : "changed"}
       data-intent={intent}
-      className={cn("flex flex-col gap-3 text-sm", className)}
+      className={cn("flex flex-col gap-3 type-body-sm", className)}
     >
-      <p id={promptId} data-slot="predicted-choice-prompt" className="font-medium">
+      <p id={promptId} data-slot="predicted-choice-prompt" className="type-label text-fg-primary">
         {prompt}
       </p>
       <RadioGroup
@@ -79,26 +80,26 @@ function PredictedChoice({ intent, prompt, options, predicted, onAct, className 
               data-slot="predicted-choice-option"
               data-variant={isPredicted ? "likely" : "other"}
               data-state={option.id === selected ? "selected" : "unselected"}
-              className="flex items-start gap-2 rounded-lg p-2 ring-1 ring-foreground/10 data-[state=selected]:ring-2 data-[state=selected]:ring-primary"
+              className="flex items-start gap-2 rounded-card border border-line-secondary p-3 motion-state data-[state=selected]:border-primary"
             >
-              <RadioGroupItem value={option.id} id={inputId} aria-describedby={describedBy} className="mt-0.5" />
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <Label htmlFor={inputId} className="flex-wrap leading-snug">
-                  <span className="min-w-0 break-words">{option.label}</span>
+              <RadioGroupItem value={option.id} id={inputId} aria-describedby={describedBy} />
+              <div data-slot="predicted-choice-body" className="flex min-w-0 flex-1 flex-col gap-1">
+                <Label htmlFor={inputId} className="flex-wrap">
+                  <span data-slot="predicted-choice-label" className="min-w-0 break-words">{option.label}</span>
                   {isPredicted && (
                     <Badge variant="secondary" data-slot="predicted-choice-likely">
-                      <SparklesIcon aria-hidden="true" />
+                      <Icon icon={SparklesIcon} size={16} aria-hidden="true" data-icon="inline-start" />
                       Likely
                     </Badge>
                   )}
                 </Label>
                 {option.description && (
-                  <p id={descriptionId} data-slot="predicted-choice-description" className="break-words text-muted-foreground">
+                  <p id={descriptionId} data-slot="predicted-choice-description" className="break-words text-fg-secondary">
                     {option.description}
                   </p>
                 )}
                 {detail && (
-                  <p id={summaryId} data-slot="predicted-choice-summary" className="break-words text-muted-foreground">
+                  <p id={summaryId} data-slot="predicted-choice-summary" className="break-words text-fg-secondary">
                     {detail}
                   </p>
                 )}
@@ -112,7 +113,7 @@ function PredictedChoice({ intent, prompt, options, predicted, onAct, className 
           type="button"
           data-slot="predicted-choice-action"
           data-variant={action.act}
-          className="h-auto min-h-8 max-w-full whitespace-normal py-1"
+          className="h-auto! min-h-(--control-height) max-w-full whitespace-normal py-1"
           onClick={() => (action.act === "accept" ? onAct("accept") : onAct("change", current.id))}
         >
           {action.text}

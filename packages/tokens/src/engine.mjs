@@ -387,6 +387,8 @@ export function buildTheme(input) {
     "--surface-selected": mix(primary, "var(--card)", 12),
     "--surface-disabled": mix(text, "var(--card)", 6),
     "--surface-inverse": text,
+    // The scrim behind a dialog or sheet: it dims the page without hiding it; a dark theme needs more to read.
+    "--scrim": darkBg ? "rgb(0 0 0 / 0.5)" : "rgb(0 0 0 / 0.1)",
     // Focus: one ring, three variants.
     "--ring": primary,
     "--ring-danger": "var(--destructive)",

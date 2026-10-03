@@ -64,7 +64,7 @@ function Outcome({ children }: { children: React.ReactNode }) {
     ref.current?.focus()
   }, [])
   return (
-    <p ref={ref} tabIndex={-1} role="status" data-slot="experience-outcome" className="rounded-md text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+    <p ref={ref} tabIndex={-1} role="status" data-slot="experience-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">
       {children}
     </p>
   )
@@ -73,7 +73,7 @@ function Outcome({ children }: { children: React.ReactNode }) {
 /** A problem with what the person gave, shown beside the field and announced politely. */
 function Problem({ id, children }: { id: string; children?: string }) {
   return (
-    <p id={id} role="status" data-slot="experience-problem" className={children ? "text-sm font-medium text-foreground" : "sr-only"}>
+    <p id={id} role="status" data-slot="experience-problem" className={children ? "type-label text-fg-primary" : "sr-only"}>
       {children ? `That did not work: ${children}` : ""}
     </p>
   )
@@ -87,7 +87,7 @@ export function Detail({ expandable, expanded, importance }: { expandable: Expan
 
 export function TextAtom({ ir }: { ir: TextNode }) {
   return (
-    <p data-slot="experience-text" className="text-sm leading-relaxed break-words whitespace-pre-line text-foreground">
+    <p data-slot="experience-text" className="type-body-sm break-words whitespace-pre-line text-fg-primary">
       {ir.text}
     </p>
   )
@@ -101,7 +101,7 @@ export function ActionAtom({ ir, emphasis }: { ir: ActionNode; emphasis: string 
       data-slot="experience-action"
       variant={emphasis === "primary" || emphasis === "critical" ? "default" : "outline"}
       onClick={() => emit(ir.id, "activate")}
-      className="h-auto min-h-8 max-w-full py-1 whitespace-normal"
+      className="h-auto! min-h-(--control-height) max-w-full py-1 whitespace-normal"
     >
       {upperFirst(ir.label ?? ir.intent)}
     </Button>
@@ -112,17 +112,17 @@ export function PriceAtom({ ir }: { ir: PriceNode }) {
   const { plan } = useRendering()
   const period = periodText(ir.period)
   return (
-    <p data-slot="experience-price" data-variant={ir.period ?? "once"} className="flex flex-wrap items-baseline gap-x-2 text-sm">
-      {ir.label && <span className="text-muted-foreground">{ir.label}</span>}
-      <span className="text-base font-semibold text-foreground">{formatMoney(ir.amount, ir.currency, plan.locale)}</span>
-      {period && <span className="text-muted-foreground">{period}</span>}
+    <p data-slot="experience-price" data-variant={ir.period ?? "once"} className="flex flex-wrap items-baseline gap-x-2 type-body-sm">
+      {ir.label && <span className="text-fg-secondary">{ir.label}</span>}
+      <span data-slot="experience-price-amount" className="type-body font-semibold text-fg-primary">{formatMoney(ir.amount, ir.currency, plan.locale)}</span>
+      {period && <span className="text-fg-secondary">{period}</span>}
     </p>
   )
 }
 
 export function PersonAtom({ ir }: { ir: PersonNode }) {
   return (
-    <p data-slot="experience-person" data-variant={ir.kind ?? "human"} className="flex flex-wrap items-center gap-1.5 text-sm">
+    <p data-slot="experience-person" data-variant={ir.kind ?? "human"} className="flex flex-wrap items-center gap-2 type-body-sm">
       <RoleChip title={ir.name} tag={requesterTag({ role: ir.role, kind: ir.kind === "agent" ? "agent" : undefined })} />
     </p>
   )
@@ -131,14 +131,14 @@ export function PersonAtom({ ir }: { ir: PersonNode }) {
 export function DateAtom({ ir }: { ir: DateNode }) {
   const { plan } = useRendering()
   return (
-    <p data-slot="experience-date" data-variant={ir.until ? "range" : "single"} className="flex flex-wrap items-baseline gap-x-2 text-sm">
-      {ir.label && <span className="text-muted-foreground">{ir.label}</span>}
-      <span className="font-medium text-foreground">
+    <p data-slot="experience-date" data-variant={ir.until ? "range" : "single"} className="flex flex-wrap items-baseline gap-x-2 type-body-sm">
+      {ir.label && <span className="text-fg-secondary">{ir.label}</span>}
+      <span className="font-medium text-fg-primary">
         <time dateTime={ir.value}>{formatDate(ir.value, plan.locale)}</time>
         {ir.until && (
           <>
             {" "}
-            <span className="font-normal text-muted-foreground">to</span> <time dateTime={ir.until}>{formatDate(ir.until, plan.locale)}</time>
+            <span className="font-normal text-fg-secondary">to</span> <time dateTime={ir.until}>{formatDate(ir.until, plan.locale)}</time>
           </>
         )}
       </span>
@@ -148,14 +148,14 @@ export function DateAtom({ ir }: { ir: DateNode }) {
 
 export function LocationAtom({ ir }: { ir: LocationNode }) {
   return (
-    <div data-slot="experience-location" className="space-y-0.5 text-sm">
-      <p className="font-medium text-foreground">
+    <div data-slot="experience-location" className="space-y-1 type-body-sm">
+      <p className="font-medium text-fg-primary">
         <span className="sr-only">Location: </span>
         {ir.name}
       </p>
-      {ir.address && <p className="text-muted-foreground">{ir.address}</p>}
+      {ir.address && <p className="text-fg-secondary">{ir.address}</p>}
       {ir.coordinates && (
-        <p className="text-muted-foreground">
+        <p className="text-fg-secondary">
           <bdi>
             {ir.coordinates.lat}, {ir.coordinates.lng}
           </bdi>
@@ -170,11 +170,11 @@ const STATE_WORD: Record<StatusNode["state"], string> = { idle: "Idle", working:
 export function StatusAtom({ ir }: { ir: StatusNode }) {
   const attention = ir.state === "failed" || ir.state === "blocked"
   return (
-    <p role="status" data-slot="experience-status" data-variant={ir.state} className="flex flex-wrap items-center gap-2 text-sm">
+    <p role="status" data-slot="experience-status" data-variant={ir.state} className="flex flex-wrap items-center gap-2 type-body-sm">
       <Badge variant={attention ? "outline" : "secondary"} className={cx(attention && "border-destructive")}>
         {STATE_WORD[ir.state]}
       </Badge>
-      <span className="min-w-0 break-words text-foreground">{ir.label}</span>
+      <span className="min-w-0 break-words text-fg-primary">{ir.label}</span>
     </p>
   )
 }
@@ -185,10 +185,10 @@ export function ProgressAtom({ ir }: { ir: ProgressNode }) {
   const percent = ir.value === undefined ? undefined : Math.round(Math.min(1, Math.max(0, ir.value)) * 100)
   const bar = percent !== undefined || ir.steps === undefined
   return (
-    <div data-slot="experience-progress" data-variant={percent === undefined ? "indeterminate" : "determinate"} className="space-y-2 text-sm">
+    <div data-slot="experience-progress" data-variant={percent === undefined ? "indeterminate" : "determinate"} className="space-y-2 type-body-sm">
       <div className="flex items-baseline justify-between gap-2">
-        <span id={`${id}-label`} className="font-medium text-foreground">{ir.label}</span>
-        {percent !== undefined && <span data-slot="experience-progress-value" className="text-muted-foreground">{percent}%</span>}
+        <span id={`${id}-label`} className="font-medium text-fg-primary">{ir.label}</span>
+        {percent !== undefined && <span data-slot="experience-progress-value" className="text-fg-secondary">{percent}%</span>}
       </div>
       {bar && (
         <div
@@ -199,12 +199,12 @@ export function ProgressAtom({ ir }: { ir: ProgressNode }) {
           aria-valuemax={100}
           aria-valuenow={percent}
           aria-valuetext={percent === undefined ? "In progress" : `${percent}%`}
-          className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+          className="h-2 w-full overflow-hidden rounded-full bg-surface-pressed"
         >
           <div
             data-slot="experience-progress-fill"
-            className={cx("h-full rounded-full bg-primary", percent === undefined && "w-1/3", percent === undefined && !m.reduced && "animate-pulse")}
-            style={percent === undefined ? undefined : { width: `${percent}%` }}
+            className={cx("h-full w-full origin-left bg-primary motion-state", percent === undefined && "scale-x-1/3", percent === undefined && !m.reduced && "motion-loading")}
+            style={percent === undefined ? undefined : { transform: `scaleX(${percent / 100})` }}
           />
         </div>
       )}
@@ -222,9 +222,9 @@ export function ProgressAtom({ ir }: { ir: ProgressNode }) {
 /** The text equivalent of a medium, behind a disclosure so it never crowds the media. */
 function Transcript({ text }: { text: string }) {
   return (
-    <details data-slot="experience-media-transcript" className="text-sm">
-      <summary className="min-h-6 cursor-pointer rounded-md font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50">Transcript</summary>
-      <p className="mt-1 text-muted-foreground">{text}</p>
+    <details data-slot="experience-media-transcript" className="type-body-sm">
+      <summary data-slot="experience-media-transcript-trigger" className="hit-area block min-h-6 cursor-pointer rounded-xs type-label text-fg-primary underline-offset-4 motion-hover hover:underline">Transcript</summary>
+      <p className="mt-1 text-fg-secondary">{text}</p>
     </details>
   )
 }
@@ -235,35 +235,35 @@ export function MediaAtom({ ir, textEquivalent = false }: { ir: MediaNode; textE
   // With no audio to hear, the text equivalent stands in place of the audio or video.
   if (textEquivalent) {
     return (
-      <figure data-slot="experience-media" data-variant={`${ir.kind}.text`} className="space-y-1 text-sm">
-        <p className="font-medium text-foreground">{upperFirst(ir.kind)}: {words ?? "no description"}</p>
-        {ir.transcript && <p data-slot="experience-media-text" className="text-muted-foreground">{ir.transcript}</p>}
+      <figure data-slot="experience-media" data-variant={`${ir.kind}.text`} className="space-y-1 type-body-sm">
+        <p className="font-medium text-fg-primary">{upperFirst(ir.kind)}: {words ?? "no description"}</p>
+        {ir.transcript && <p data-slot="experience-media-text" className="text-fg-secondary">{ir.transcript}</p>}
       </figure>
     )
   }
   return (
-    <figure data-slot="experience-media" data-variant={ir.kind} className="space-y-2 text-sm">
+    <figure data-slot="experience-media" data-variant={ir.kind} className="space-y-2 type-body-sm">
       {ir.kind === "image" &&
-        (src ? <img src={src} alt={ir.alt ?? ""} loading="lazy" className="max-w-full rounded-lg" /> : <p className="text-muted-foreground">Image: {ir.alt}</p>)}
+        (src ? <img src={src} alt={ir.alt ?? ""} loading="lazy" className="max-w-full rounded-card" /> : <p className="text-fg-secondary">Image: {ir.alt}</p>)}
       {ir.kind === "video" &&
         (src ? (
-          <video src={src} controls preload="metadata" aria-label={ir.alt} className="w-full rounded-lg">
+          <video src={src} controls preload="metadata" aria-label={ir.alt} className="w-full rounded-card">
             {ir.captions && safeUrl(ir.captions) && <track kind="captions" src={safeUrl(ir.captions)} label="Captions" />}
           </video>
         ) : (
-          <p className="text-muted-foreground">Video: {ir.alt}</p>
+          <p className="text-fg-secondary">Video: {ir.alt}</p>
         ))}
-      {ir.kind === "audio" && (src ? <audio src={src} controls preload="metadata" aria-label={words ?? "Audio"} className="w-full" /> : <p className="text-muted-foreground">Audio</p>)}
+      {ir.kind === "audio" && (src ? <audio src={src} controls preload="metadata" aria-label={words ?? "Audio"} className="w-full" /> : <p className="text-fg-secondary">Audio</p>)}
       {ir.kind === "document" &&
         (src ? (
-          <a href={src} target="_blank" rel="noreferrer noopener" className="inline-flex min-h-6 items-center rounded-md font-medium underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+          <a href={src} target="_blank" rel="noreferrer noopener" className="hit-area inline-flex min-h-6 items-center rounded-xs type-label text-fg-primary underline underline-offset-4">
             {words ?? "Open the document"}
             <span className="sr-only"> (opens in a new tab)</span>
           </a>
         ) : (
-          <p className="text-muted-foreground">Document: {words}</p>
+          <p className="text-fg-secondary">Document: {words}</p>
         ))}
-      {ir.caption && ir.kind !== "document" && <figcaption className="text-muted-foreground">{ir.caption}</figcaption>}
+      {ir.caption && ir.kind !== "document" && <figcaption className="text-fg-secondary">{ir.caption}</figcaption>}
       {ir.transcript && <Transcript text={ir.transcript} />}
     </figure>
   )
@@ -271,8 +271,9 @@ export function MediaAtom({ ir, textEquivalent = false }: { ir: MediaNode; textE
 
 export function ConfirmationAtom({ ir }: { ir: ConfirmationNode }) {
   return (
-    <div role="status" data-slot="experience-confirmation" className="flex items-start gap-2 rounded-lg bg-muted p-2.5 text-sm text-foreground">
-      <span aria-hidden>✓</span>
+    <div role="status" data-slot="experience-confirmation" className="flex items-start gap-2 rounded-card bg-surface-subtle p-3 type-body-sm text-fg-primary">
+      {/* A text glyph: this package imports only Feather and React, and Feather exports no Icon glyph for a check. */}
+      <span aria-hidden data-slot="experience-confirmation-icon" className="flex w-4 shrink-0 justify-center">✓</span>
       <span className="min-w-0 break-words">
         <span className="sr-only">Done: </span>
         {ir.text}
@@ -286,9 +287,9 @@ export function WarningAtom({ ir }: { ir: WarningNode }) {
   const danger = ir.severity === "danger"
   const [acknowledged, setAcknowledged] = React.useState(false)
   return (
-    <Alert data-slot="experience-warning" data-variant={danger ? "danger" : "caution"} className={cx("border-2", danger ? "border-destructive" : "border-warning")}>
+    <Alert data-slot="experience-warning" data-variant={danger ? "danger" : "caution"} className={danger ? "border-destructive" : "border-warning"}>
       <AlertTitle>{danger ? "Danger" : "Warning"}</AlertTitle>
-      <AlertDescription className="space-y-2 text-foreground">
+      <AlertDescription className="space-y-2 text-fg-primary">
         <p className="break-words">{ir.text}</p>
         {ir.acknowledge &&
           (acknowledged ? (
@@ -333,35 +334,34 @@ export function ChoiceAtom({ ir, preselected }: { ir: ChoiceNode; preselected: s
     const optionId = `${id}-${option.id}`
     const descriptionId = `${optionId}-description`
     return (
-      <div key={option.id} data-slot="experience-choice-option" data-state={(multiple ? many.includes(option.id) : single === option.id) ? "selected" : "unselected"} className="flex items-start gap-2 rounded-lg p-2 ring-1 ring-foreground/10 data-[state=selected]:ring-2 data-[state=selected]:ring-primary">
+      <div key={option.id} data-slot="experience-choice-option" data-state={(multiple ? many.includes(option.id) : single === option.id) ? "selected" : "unselected"} className="flex items-start gap-2 rounded-card border border-line-secondary p-3 motion-state data-[state=selected]:border-primary">
         {multiple ? (
           <Checkbox
             id={optionId}
             checked={many.includes(option.id)}
             aria-describedby={option.description ? descriptionId : undefined}
             onCheckedChange={(checked) => setMany((current) => (checked ? [...current, option.id] : current.filter((o) => o !== option.id)))}
-            className="mt-0.5"
           />
         ) : (
-          <RadioGroupItem value={option.id} id={optionId} aria-describedby={option.description ? descriptionId : undefined} className="mt-0.5" />
+          <RadioGroupItem value={option.id} id={optionId} aria-describedby={option.description ? descriptionId : undefined} />
         )}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Label htmlFor={optionId} className="leading-snug break-words">{option.label}</Label>
-          {option.description && <p id={descriptionId} className="text-sm break-words text-muted-foreground">{option.description}</p>}
+          <Label htmlFor={optionId} className="break-words">{option.label}</Label>
+          {option.description && <p id={descriptionId} className="type-body-sm break-words text-fg-secondary">{option.description}</p>}
         </div>
       </div>
     )
   })
   return (
-    <div data-slot="experience-choice" data-variant={sent ? "chosen" : multiple ? "multiple" : "single"} className="flex flex-col gap-3 text-sm">
-      <p id={promptId} data-slot="experience-choice-prompt" className="font-medium text-foreground">{ir.prompt}</p>
+    <div data-slot="experience-choice" data-variant={sent ? "chosen" : multiple ? "multiple" : "single"} className="flex flex-col gap-3 type-body-sm">
+      <p id={promptId} data-slot="experience-choice-prompt" className="font-medium text-fg-primary">{ir.prompt}</p>
       {multiple ? (
         <div role="group" aria-labelledby={promptId} className="grid gap-2">{rows}</div>
       ) : (
         <RadioGroup aria-labelledby={promptId} defaultValue={preselected} onValueChange={(value) => setSingle(String(value))}>{rows}</RadioGroup>
       )}
       <div>
-        <Button type="button" data-slot="experience-choice-submit" disabled={!ready} onClick={send} className="h-auto min-h-8 max-w-full py-1 whitespace-normal">
+        <Button type="button" data-slot="experience-choice-submit" disabled={!ready} onClick={send} className="h-auto! min-h-(--control-height) max-w-full py-1 whitespace-normal">
           {multiple ? (many.length > 0 ? `Choose ${many.length} selected` : "Choose") : single ? `Choose ${label(single)}` : "Choose"}
         </Button>
       </div>
@@ -416,13 +416,13 @@ export function InputAtom({ ir }: { ir: InputNode }) {
       data-variant={sent ?? (text === "" ? "blank" : "ready")}
       data-kind={ir.kind}
       noValidate
-      className="flex flex-col gap-2 text-sm"
+      className="flex flex-col gap-2 type-body-sm"
       onSubmit={(e) => {
         e.preventDefault()
         submit()
       }}
     >
-      <Label htmlFor={fieldId} className="leading-snug">{ir.prompt}</Label>
+      <Label htmlFor={fieldId}>{ir.prompt}</Label>
       {ir.kind === "long-text" ? (
         <Textarea {...common} />
       ) : (
@@ -436,7 +436,7 @@ export function InputAtom({ ir }: { ir: InputNode }) {
           autoComplete={AUTOCOMPLETE[ir.kind] ?? "off"}
         />
       )}
-      {hint && <p id={hintId} data-slot="experience-input-hint" className="text-muted-foreground">{hint}</p>}
+      {hint && <p id={hintId} data-slot="experience-input-hint" className="text-fg-secondary">{hint}</p>}
       <div className="flex flex-wrap items-center gap-2">
         <Button type="submit" data-slot="experience-input-submit" disabled={text === ""}>Send answer</Button>
         {ir.required !== true && (
@@ -470,8 +470,8 @@ function SwitchPreference({ ir }: { ir: PreferenceNode }) {
   const [on, setOn] = React.useState(ir.value === true)
   const [problem, setProblem] = React.useState<string>()
   return (
-    <div data-slot="experience-preference" data-variant="switch" className="flex flex-col gap-1 text-sm">
-      <label className="flex items-center justify-between gap-3 font-medium text-foreground">
+    <div data-slot="experience-preference" data-variant="switch" className="flex flex-col gap-1 type-body-sm">
+      <label className="flex items-center justify-between gap-3 type-label text-fg-primary">
         <span id={`${id}-label`} className="min-w-0 break-words">{ir.label}</span>
         <Switch
           checked={on}
@@ -498,13 +498,13 @@ function OptionsPreference({ ir, options }: { ir: PreferenceNode; options: Array
   const [problem, setProblem] = React.useState<string>()
   const wording = (o: string | number | boolean) => (typeof o === "boolean" ? (o ? "On" : "Off") : String(o))
   return (
-    <div data-slot="experience-preference" data-variant="options" className="flex flex-col gap-3 text-sm">
-      <p id={`${id}-label`} className="font-medium text-foreground">{ir.label}</p>
+    <div data-slot="experience-preference" data-variant="options" className="flex flex-col gap-3 type-body-sm">
+      <p id={`${id}-label`} className="font-medium text-fg-primary">{ir.label}</p>
       <RadioGroup aria-labelledby={`${id}-label`} defaultValue={String(startAt)} onValueChange={(value) => setPicked(Number(value))}>
         {options.map((option, i) => (
-          <div key={i} data-slot="experience-preference-option" data-state={picked === i ? "selected" : "unselected"} className="flex items-center gap-2 rounded-lg p-2 ring-1 ring-foreground/10 data-[state=selected]:ring-2 data-[state=selected]:ring-primary">
+          <div key={i} data-slot="experience-preference-option" data-state={picked === i ? "selected" : "unselected"} className="flex items-center gap-2 rounded-card border border-line-secondary p-3 motion-state data-[state=selected]:border-primary">
             <RadioGroupItem value={String(i)} id={`${id}-${i}`} />
-            <Label htmlFor={`${id}-${i}`} className="leading-snug break-words">{wording(option)}</Label>
+            <Label htmlFor={`${id}-${i}`} className="break-words">{wording(option)}</Label>
           </div>
         ))}
       </RadioGroup>
@@ -541,7 +541,7 @@ function FieldPreference({ ir }: { ir: PreferenceNode }) {
       data-slot="experience-preference"
       data-variant="field"
       noValidate
-      className="flex flex-col gap-2 text-sm"
+      className="flex flex-col gap-2 type-body-sm"
       onSubmit={(e) => {
         e.preventDefault()
         if (text === "") return
@@ -565,7 +565,7 @@ function FieldPreference({ ir }: { ir: PreferenceNode }) {
             setRaw(e.target.value)
             setSaved(false)
           }}
-          className="min-w-40 flex-1"
+          className="min-w-32 flex-1"
         />
         <Button type="submit" data-slot="experience-preference-submit" disabled={text === ""}>Set</Button>
       </div>
@@ -600,24 +600,26 @@ export function ComparisonAtom({ ir }: { ir: ComparisonNode }) {
   const { nodes, plan } = useRendering()
   const names = ir.items.map((item) => nameOf(nodes.get(item), item, plan.locale))
   const show = (value: string | number | boolean) => (typeof value === "boolean" ? (value ? "Yes" : "No") : String(value))
+  // The cells use the 8px inline padding (not the density's 16px), so a comparison of several items fits a narrow plan
+  // without a scrolling region.
   return (
-    <div data-slot="experience-comparison" className="text-sm">
+    <div data-slot="experience-comparison" className="type-body-sm">
       <Table>
         <TableCaption className="sr-only">{`Comparison of ${names.join(", ")}`}</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead scope="col" className="text-start"><span className="sr-only">Criterion</span></TableHead>
+            <TableHead scope="col" className="px-2! text-start"><span className="sr-only">Criterion</span></TableHead>
             {names.map((name, i) => (
-              <TableHead key={ir.items[i]} scope="col" className="text-start whitespace-normal">{name}</TableHead>
+              <TableHead key={ir.items[i]} scope="col" className="px-2! text-start whitespace-normal">{name}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {ir.criteria.map((criterion) => (
             <TableRow key={criterion.label}>
-              <TableHead scope="row" className="text-start whitespace-normal">{criterion.label}</TableHead>
+              <TableHead scope="row" className="px-2! text-start whitespace-normal">{criterion.label}</TableHead>
               {ir.items.map((item) => (
-                <TableCell key={item} className="whitespace-normal">{criterion.values[item] === undefined ? "" : show(criterion.values[item])}</TableCell>
+                <TableCell key={item} className="px-2! whitespace-normal">{criterion.values[item] === undefined ? "" : show(criterion.values[item])}</TableCell>
               ))}
             </TableRow>
           ))}
@@ -633,8 +635,8 @@ export function PredictionNoteAtom({ ir, node }: { ir: PredictedChoiceNode; node
   const choice = nodes.get(ir.of)
   const option = choice?.type === "Choice" ? choice.options.find((o) => o.id === ir.option)?.label ?? ir.option : ir.option
   return (
-    <p data-slot="experience-prediction-note" data-variant={node.emphasis} className="text-sm text-muted-foreground">
-      <span className="font-medium text-foreground">Likely: {option}.</span>
+    <p data-slot="experience-prediction-note" data-variant={node.emphasis} className="type-body-sm text-fg-secondary">
+      <span className="font-medium text-fg-primary">Likely: {option}.</span>
       {ir.summary ? ` ${ir.summary}` : ""}
       {ir.confidence !== undefined ? ` ${confidenceText(ir.confidence)}.` : ""}
     </p>
@@ -653,10 +655,10 @@ export function AutopickAtom({ ir }: { ir: AutopickNode }) {
     if (result.ok) setOutcome(what === "keep" ? "kept" : "undone")
   }
   return (
-    <div data-slot="experience-autopick" data-variant={outcome ?? "pending"} data-intent={ir.intent} className="flex flex-col gap-2 text-sm">
-      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Decided for you</p>
-      <p className="font-medium break-words text-foreground">{ir.summary}</p>
-      {ir.undoWithin !== undefined && !outcome && <p data-slot="experience-autopick-window" className="text-muted-foreground">You can undo this for {ir.undoWithin} {ir.undoWithin === 1 ? "second" : "seconds"}.</p>}
+    <div data-slot="experience-autopick" data-variant={outcome ?? "pending"} data-intent={ir.intent} className="flex flex-col gap-2 type-body-sm">
+      <p className="type-caps text-fg-secondary">Decided for you</p>
+      <p className="type-label break-words text-fg-primary">{ir.summary}</p>
+      {ir.undoWithin !== undefined && !outcome && <p data-slot="experience-autopick-window" className="text-fg-secondary">You can undo this for {ir.undoWithin} {ir.undoWithin === 1 ? "second" : "seconds"}.</p>}
       {outcome ? (
         <Outcome>{outcome === "kept" ? "Kept." : "Undone."}</Outcome>
       ) : (

@@ -1,10 +1,11 @@
 import * as React from "react"
 import { SparklesIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { Button } from "./button"
 import { Card } from "./card"
 import { ConsequenceStatement, type Consequence } from "./consequence-statement"
+import { Icon } from "./icon"
 import { outcomeText } from "./irreversible-action"
 import { WhyDisclosure, type Expandable } from "./why-disclosure"
 
@@ -125,25 +126,25 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
         }
       }}
     >
-      <div className="flex items-start gap-2">
-        <SparklesIcon aria-hidden className="mt-0.5 size-4 shrink-0 text-primary" />
-        <div className="min-w-0 space-y-1">
-          <p data-slot="recommendation-eyebrow" className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Recommended</p>
-          <p data-slot="recommendation-summary" className="font-heading text-base leading-snug font-medium break-words">{summary}</p>
+      <div data-slot="recommendation-header" className="flex items-start gap-2">
+        <Icon icon={SparklesIcon} size={16} aria-hidden className="text-primary" />
+        <div data-slot="recommendation-body" className="min-w-0 space-y-1">
+          <p data-slot="recommendation-eyebrow" className="type-caps text-fg-secondary">Recommended</p>
+          <p data-slot="recommendation-summary" className="font-heading type-body font-medium text-fg-primary break-words">{summary}</p>
           {confidence !== undefined && (
-            <p data-slot="recommendation-confidence" data-variant={confidenceLabel(confidence)} className="text-sm text-muted-foreground">{confidenceText(confidence)}</p>
+            <p data-slot="recommendation-confidence" data-variant={confidenceLabel(confidence)} className="type-body-sm text-fg-secondary">{confidenceText(confidence)}</p>
           )}
         </div>
       </div>
       {consequence && <ConsequenceStatement id={`${id}-consequence`} consequence={consequence} locale={locale} />}
-      {!hasConsequence && <p id={`${id}-next`} data-slot="recommendation-next" className="text-sm text-muted-foreground">{nextStepText(reversible)}</p>}
+      {!hasConsequence && <p id={`${id}-next`} data-slot="recommendation-next" className="type-body-sm text-fg-secondary">{nextStepText(reversible)}</p>}
       {done && (
-        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="recommendation-outcome" className="rounded-md text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="recommendation-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">
           {acceptOutcome(consequence, locale)}
         </p>
       )}
       {!done && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div data-slot="recommendation-actions" className="flex flex-wrap items-center gap-2">
           <Button
             ref={firstRef}
             data-slot="recommendation-accept"
@@ -153,7 +154,7 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
             aria-label={`Accept recommendation: ${actText}`}
             aria-describedby={describedBy}
             onClick={startAccept}
-            className="h-auto min-h-8 py-1 whitespace-normal"
+            className="h-auto! min-h-(--control-height) max-w-full py-1 whitespace-normal"
           >
             {actText}{needsConfirm ? "…" : ""}
           </Button>
@@ -174,7 +175,7 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
                   if (e.detail > 1) return
                   confirm()
                 }}
-                className="h-auto min-h-8 py-1 whitespace-normal"
+                className="h-auto! min-h-(--control-height) max-w-full py-1 whitespace-normal"
               >
                 Yes, {lowerFirst(actText)}
               </Button>
@@ -185,7 +186,7 @@ function Recommendation({ intent, summary, label, confidence, consequence, rever
         </div>
       )}
       {needsConfirm && (
-        <p role="status" data-slot="recommendation-status" data-variant={armed ? "armed" : "idle"} className={cn("text-sm font-medium", armed ? "text-foreground" : "sr-only")}>{status}</p>
+        <p role="status" data-slot="recommendation-status" data-variant={armed ? "armed" : "idle"} className={cn("type-label", armed ? "text-fg-primary" : "sr-only")}>{status}</p>
       )}
     </Card>
   )

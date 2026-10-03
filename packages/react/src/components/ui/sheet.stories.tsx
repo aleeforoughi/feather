@@ -19,7 +19,7 @@ const meta = {
           <SheetTitle>Edit profile</SheetTitle>
           <SheetDescription>Make changes to your profile here.</SheetDescription>
         </SheetHeader>
-        <div className="flex flex-col gap-2 px-4">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="sheet-name">Name</Label>
           <Input id="sheet-name" defaultValue="Jordan Lee" />
         </div>

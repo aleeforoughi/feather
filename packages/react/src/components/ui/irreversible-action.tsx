@@ -1,11 +1,12 @@
 import * as React from "react"
 import { TriangleAlertIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { useThemeMotion } from "../../lib/motion"
 import { Button } from "./button"
 import { Card } from "./card"
 import { ConsequenceStatement, consequenceSentences, type Consequence } from "./consequence-statement"
+import { Icon } from "./icon"
 import { WhyDisclosure, type Expandable } from "./why-disclosure"
 
 /** How long a hold must last, in milliseconds. */
@@ -172,7 +173,7 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
       data-variant={variant}
       data-mode={mode}
       data-importance={importance}
-      className={cn("gap-3 px-(--card-spacing) ring-2 ring-destructive", className)}
+      className={cn("gap-3 border-destructive px-(--card-spacing)", className)}
       onKeyDown={(e) => {
         if (e.key !== "Escape" || done) return
         if (mode === "confirm" && armed) {
@@ -184,20 +185,20 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
         }
       }}
     >
-      <div className="flex items-start gap-2">
-        <TriangleAlertIcon aria-hidden className="mt-0.5 size-4 shrink-0 text-destructive" />
-        <div className="min-w-0 space-y-1">
-          <p data-slot="irreversible-action-warning" className="text-xs font-semibold tracking-wide text-foreground uppercase">Cannot be undone</p>
+      <div data-slot="irreversible-action-header" className="flex items-start gap-2">
+        <Icon icon={TriangleAlertIcon} size={16} aria-hidden className="text-destructive" />
+        <div data-slot="irreversible-action-body" className="min-w-0 space-y-1">
+          <p data-slot="irreversible-action-warning" className="type-caps text-fg-primary">Cannot be undone</p>
           <ConsequenceStatement id={consequenceId} consequence={consequence} locale={locale} />
         </div>
       </div>
 
       {done && (
-        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="irreversible-action-outcome" className="rounded-md text-sm font-semibold text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+        <p ref={outcomeRef} tabIndex={-1} role="status" data-slot="irreversible-action-outcome" className="rounded-xs type-body-sm font-semibold text-fg-primary">
           {outcomeText(consequence, locale)}
         </p>
       )}
-      {!done && <div className="flex flex-wrap items-center gap-2">
+      {!done && <div data-slot="irreversible-action-actions" className="flex flex-wrap items-center gap-2">
         {mode === "confirm" ? (
           <>
             <Button
@@ -209,7 +210,7 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
               disabled={armed}
               aria-describedby={consequenceId}
               onClick={arm}
-              className="h-auto min-h-8 border-destructive py-1 whitespace-normal"
+              className="h-auto! min-h-(--control-height) max-w-full border-destructive py-1 whitespace-normal"
             >
               {act}…
             </Button>
@@ -230,7 +231,7 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
                     if (e.detail > 1) return
                     confirm()
                   }}
-                  className="h-auto min-h-8 py-1 whitespace-normal"
+                  className="h-auto! min-h-(--control-height) max-w-full py-1 whitespace-normal"
                 >
                   Yes, {lowerFirst(act)}
                 </Button>
@@ -268,20 +269,23 @@ function IrreversibleAction({ intent, label, consequence, importance = "critical
                 releaseHold(true)
               }
             }}
-            className="relative h-auto min-h-8 touch-none border-destructive overflow-hidden py-1 whitespace-normal"
+            className="h-auto! min-h-(--control-height) max-w-full touch-none border-destructive py-1 whitespace-normal"
           >
-            <span aria-hidden data-slot="irreversible-action-fill" style={{ width: `${progress * 100}%` }} className="pointer-events-none absolute inset-y-0 left-0 bg-destructive/30" />
-            <span className="relative">{holdLabel(act)}</span>
+            {/* The track clips the fill, so the button itself never needs overflow (it would clip the hit area). */}
+            <span aria-hidden data-slot="irreversible-action-track" className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+              <span data-slot="irreversible-action-fill" style={{ transform: `scaleX(${progress})` }} className="block size-full origin-left bg-destructive/30" />
+            </span>
+            <span data-slot="irreversible-action-hold-label" className="relative">{holdLabel(act)}</span>
           </Button>
         )}
       </div>}
       {!done && mode === "hold" && (
-        <p id={hintId} data-slot="irreversible-action-hint" className="text-sm text-muted-foreground">
+        <p id={hintId} data-slot="irreversible-action-hint" className="type-body-sm text-fg-secondary">
           Press and hold for {(holdMs / 1000).toFixed(holdMs % 1000 === 0 ? 0 : 1)} seconds, with the pointer or by holding Space or Enter. Letting go early does nothing.
         </p>
       )}
 
-      <p role="status" data-slot="irreversible-action-status" data-variant={showArmed ? "armed" : "idle"} className={cn("text-sm font-medium", status ? "text-foreground" : "sr-only")}>
+      <p role="status" data-slot="irreversible-action-status" data-variant={showArmed ? "armed" : "idle"} className={cn("type-label", status ? "text-fg-primary" : "sr-only")}>
         {status}
       </p>
 

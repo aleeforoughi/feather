@@ -9,6 +9,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+    /* Selection indicators (the active tab line, a selected rail): 2px, the weight of the focus ring
+       (docs/visual-system.md section 8). Only indicators use it; borders stay 1px. */
+    --spacing-indicator: 2px;
     --font-heading: var(--brand-font-display, var(--brand-font-body, 'Geist Variable', sans-serif));
     --font-sans: var(--brand-font-body, 'Geist Variable', sans-serif);
     /* Motion axis (calm | snappy): every transition utility follows the brand's motion. */
@@ -29,6 +32,7 @@
     /* Surfaces (section 6): bg-surface-raised... */
     --color-surface-base: var(--surface-base);
     --color-surface-subtle: var(--surface-subtle);
+    --color-scrim: var(--scrim);
     --color-surface-raised: var(--surface-raised);
     --color-surface-overlay: var(--surface-overlay);
     --color-surface-hover: var(--surface-hover);
@@ -159,6 +163,7 @@
     --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
     --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));
     --warning-muted: color-mix(in oklab, var(--warning) 12%, var(--card));
+    --scrim: rgb(0 0 0 / 0.1);
     --info-muted: color-mix(in oklab, var(--info) 12%, var(--card));
     --text-primary: var(--foreground);
     --text-secondary: var(--muted-foreground);
@@ -225,6 +230,7 @@
     --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
     --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));
     --warning-muted: color-mix(in oklab, var(--warning) 12%, var(--card));
+    --scrim: rgb(0 0 0 / 0.5);
     --info-muted: color-mix(in oklab, var(--info) 12%, var(--card));
     --text-primary: var(--foreground);
     --text-secondary: var(--muted-foreground);
@@ -455,6 +461,25 @@
   opacity: var(--opacity-disabled);
 }
 
+/* Press (section 10): scale 0.985 while a control is held. Use `active:press` with a motion role that lists scale. */
+@utility press {
+  scale: 0.985;
+}
+/* Hit area (section 3): an invisible extension of at least 44 x 44px, centered on the element, so a smaller visual (a
+   tight 36px control, a 16px checkbox) still reaches the target. Never clip it with overflow. */
+@utility hit-area {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 2.75rem);
+    height: max(100%, 2.75rem);
+    translate: -50% -50%;
+  }
+}
+
 /* Layout (section 11): margins and gutters follow the breakpoints; content stops at 1440px. */
 @utility feather-container {
   box-sizing: border-box;
@@ -542,7 +567,7 @@
 /* Motion roles (section 10): a component picks a role, never milliseconds. Each lists the properties it transitions
    (never all), its duration primitive and the one curve. Distances are the component's, from the same section. */
 @utility motion-press {
-  transition-property: transform, background-color, box-shadow;
+  transition-property: transform, translate, scale, background-color, box-shadow;
   transition-duration: var(--duration-micro);
   transition-timing-function: var(--ease-standard);
 }
@@ -552,27 +577,27 @@
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-hover {
-  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-property: color, background-color, border-color, box-shadow, transform, translate, scale, opacity;
   transition-duration: var(--duration-base);
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-state {
-  transition-property: color, background-color, border-color, outline-color, box-shadow, opacity;
+  transition-property: color, background-color, border-color, outline-color, box-shadow, opacity, transform, rotate;
   transition-duration: var(--duration-base);
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-switch {
-  transition-property: transform, background-color, border-color;
+  transition-property: transform, translate, scale, background-color, border-color;
   transition-duration: var(--duration-medium);
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-tooltip {
-  transition-property: opacity, transform;
+  transition-property: opacity, transform, translate, scale;
   transition-duration: var(--duration-base);
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-popover {
-  transition-property: opacity, transform;
+  transition-property: opacity, transform, translate, scale;
   transition-duration: var(--duration-medium);
   transition-timing-function: var(--ease-standard);
 }
@@ -582,17 +607,98 @@
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-dialog {
-  transition-property: opacity, transform;
+  transition-property: opacity, transform, translate, scale;
   transition-duration: var(--duration-slow);
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-toast {
-  transition-property: opacity, transform;
+  transition-property: opacity, transform, translate, scale;
   transition-duration: var(--duration-medium);
   transition-timing-function: var(--ease-standard);
 }
 @utility motion-page {
-  transition-property: opacity, transform;
+  transition-property: opacity, transform, translate, scale;
   transition-duration: var(--duration-large);
   transition-timing-function: var(--ease-standard);
+}
+
+/* Loading (section 10, loading only): a calm 1600ms breath for skeletons and live indicators. These are the only
+   durations outside the six, and they never carry a state change. Reduced motion ends them at once (above). */
+@keyframes feather-breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes feather-ping {
+  from {
+    opacity: 0.6;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 1.75;
+  }
+}
+@utility motion-loading {
+  animation: feather-breathe 1600ms var(--ease-standard) infinite;
+}
+@utility motion-ping {
+  animation: feather-ping 1600ms var(--ease-standard) infinite;
+}
+
+/* A checkerboard from the surface tokens (transparent images show their shape on any brand): 20px squares. Used by
+   Lightbox and MediaGallery. */
+@utility bg-checker {
+  background-image: conic-gradient(
+    var(--surface-hover) 25%,
+    var(--surface-base) 0 50%,
+    var(--surface-hover) 0 75%,
+    var(--surface-base) 0
+  );
+  background-size: 1.25rem 1.25rem;
+}
+
+/* Attention (AttentionCard's icon): a short wiggle, then a pause, on a 2600ms loop. A CSS animation, so the reduced
+   motion rules above end it at once even if the page was already open when the preference changed. */
+@keyframes feather-wiggle {
+  0%,
+  46%,
+  100% {
+    rotate: 0deg;
+  }
+  12% {
+    rotate: -12deg;
+  }
+  23% {
+    rotate: 12deg;
+  }
+  35% {
+    rotate: -6deg;
+  }
+}
+@utility motion-wiggle {
+  animation: feather-wiggle 2600ms var(--ease-standard) infinite;
+}
+
+/* Sonner (the `toast` role, section 10). Sonner injects its own unlayered CSS (400ms, its own curve, no focus ring), so the
+   system's values are set here with a higher specificity and without !important: the reduced motion rules above still win.
+   Entering uses the `toast` duration (medium); children and exits use base. Sonner keeps the distances, because its
+   stacking depends on them. */
+[data-sonner-toaster] [data-sonner-toast] {
+  transition-duration: var(--duration-medium);
+  transition-timing-function: var(--ease-standard);
+}
+[data-sonner-toaster] [data-sonner-toast] > *,
+[data-sonner-toaster] [data-sonner-toast][data-styled="true"] [data-button],
+[data-sonner-toaster] .sonner-loader {
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+}
+[data-sonner-toaster] [data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="false"] {
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+}
+[data-sonner-toaster] [data-sonner-toast]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }

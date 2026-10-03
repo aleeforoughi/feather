@@ -54,8 +54,8 @@ export function summarize(plan: LayoutPlan): SummaryItem[] {
 export function PlainSummary({ plan }: { plan: LayoutPlan }) {
   const items = summarize(plan)
   return (
-    <section data-slot="experience-summary" data-variant={plan.manifestation} aria-label="Summary" className="text-sm text-foreground">
-      <ul className="flex flex-col gap-3">
+    <section data-slot="experience-summary" data-variant={plan.manifestation} aria-label="Summary" className="type-body-sm text-fg-primary">
+      <ul data-slot="experience-summary-items" className="flex flex-col gap-3">
         {items.map((item) => (
           <li key={item.id} data-slot="experience-summary-item" data-variant={item.emphasis} data-feather-node={item.id} data-organism={item.organism} data-emphasis={item.emphasis} className="space-y-1">
             {item.lines.map((line, i) => (
@@ -66,7 +66,7 @@ export function PlainSummary({ plan }: { plan: LayoutPlan }) {
             ))}
             {item.confirm && <p data-slot="experience-summary-confirm" className="font-medium">{item.confirm}</p>}
             {item.acts.length > 0 && (
-              <p data-slot="experience-summary-acts" className="text-muted-foreground">
+              <p data-slot="experience-summary-acts" className="text-fg-secondary">
                 Available: {item.acts.join(", ")}.
               </p>
             )}

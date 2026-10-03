@@ -1,6 +1,8 @@
 import * as React from "react"
 import { ChevronDownIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
+
+import { Icon } from "./icon"
 
 /** Detail on demand, as the IR states it: at least one entry. */
 export type Expandable = { why?: React.ReactNode; detail?: React.ReactNode }
@@ -36,7 +38,7 @@ function WhyDisclosure({ expandable, open, onOpenChange, forceOpen = false, clas
     onOpenChange?.(next)
   }
   const panel = (
-    <div id={panelId} hidden={!isOpen} data-slot="why-disclosure-panel" data-variant={isOpen ? "open" : "closed"} className="space-y-1 text-sm text-muted-foreground">
+    <div id={panelId} hidden={!isOpen} data-slot="why-disclosure-panel" data-variant={isOpen ? "open" : "closed"} className="space-y-1 type-body-sm text-fg-secondary">
       {entries.map((e) => (
         <div key={e.kind} data-slot="why-disclosure-entry" data-variant={e.kind}>{e.content}</div>
       ))}
@@ -63,10 +65,10 @@ function WhyDisclosure({ expandable, open, onOpenChange, forceOpen = false, clas
             toggle()
           }
         }}
-        className="group/why inline-flex min-h-6 items-center gap-1 rounded-md px-1 text-sm font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="group/why hit-area inline-flex min-h-10 items-center gap-2 rounded-xs px-1 type-label text-fg-primary underline-offset-4 motion-hover hover:underline"
       >
         Why?
-        <ChevronDownIcon aria-hidden className="size-4 transition-transform group-aria-expanded/why:rotate-180" />
+        <Icon icon={ChevronDownIcon} size={16} aria-hidden className="motion-state group-aria-expanded/why:rotate-180" />
       </button>
       {panel}
     </div>

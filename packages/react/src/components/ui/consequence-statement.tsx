@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 /** What an act does, as the IR states it (`feather.ir/0` consequence). Mirrored by convention, not imported. */
 export type Consequence = {
@@ -47,7 +47,7 @@ function ConsequenceStatement({ consequence, locale = "en", id, className }: { c
   const sentences = consequenceSentences(consequence, locale)
   if (sentences.length === 0) return null
   return (
-    <div id={id} data-slot="consequence-statement" data-variant="consequence" className={cn("space-y-0.5 text-sm font-medium text-foreground", className)}>
+    <div id={id} data-slot="consequence-statement" data-variant="consequence" className={cn("space-y-1 type-label text-fg-primary", className)}>
       {sentences.map((sentence, i) => (
         <p key={i} data-slot="consequence-statement-item" className="select-text">{sentence}</p>
       ))}

@@ -26,7 +26,7 @@ type Story = StoryObj<typeof meta>
 
 export const Tones: Story = {
   render: () => (
-    <ActivityFeed className="w-[32rem] rounded-xl ring-1 ring-foreground/10">
+    <ActivityFeed className="w-[32rem] rounded-card border border-line-secondary">
       {LINES.map((l, i) => (
         <ActivityItem key={i} tone={l.tone} icon={iconFor(l.tone)} time={`10:4${i}`} actor={l.actor && <Badge variant="outline">{l.actor}</Badge>} text={l.text} />
       ))}
@@ -43,7 +43,7 @@ function Streaming() {
   return (
     <div className="w-[32rem] space-y-3">
       <div className="flex items-center gap-2 text-sm"><LiveDot live /> Live · Brand designer is working <WorkingDots /></div>
-      <ActivityFeed followKey={n} className="rounded-xl ring-1 ring-foreground/10">
+      <ActivityFeed followKey={n} className="rounded-card border border-line-secondary">
         {LINES.slice(0, n).map((l, i) => (
           <ActivityItem key={i} tone={l.tone} icon={iconFor(l.tone)} text={l.text} typed={i === n - 1} />
         ))}
@@ -54,4 +54,4 @@ function Streaming() {
 
 export const Live: Story = { render: () => <Streaming /> }
 
-export const Empty: Story = { render: () => <ActivityFeed className="w-[32rem] rounded-xl ring-1 ring-foreground/10" emptyText="Waiting for the first move…" /> }
+export const Empty: Story = { render: () => <ActivityFeed className="w-[32rem] rounded-card border border-line-secondary" emptyText="Waiting for the first move…" /> }

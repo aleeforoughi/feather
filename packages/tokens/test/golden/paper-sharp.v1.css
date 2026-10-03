@@ -45,6 +45,7 @@
   --surface-selected: color-mix(in oklab, #c2410c 12%, var(--card));
   --surface-disabled: color-mix(in oklab, #1b1a17 6%, var(--card));
   --surface-inverse: #1b1a17;
+  --scrim: rgb(0 0 0 / 0.1);
   --ring: #c2410c;
   --ring-danger: var(--destructive);
   --ring-inverse: var(--text-inverse);

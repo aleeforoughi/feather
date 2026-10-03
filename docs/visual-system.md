@@ -125,7 +125,17 @@ A row `[Input][Select][Button]` is one continuous band. An icon-only control is 
 
 No fourth height exists.
 
-**Targets.** Every interactive element has a hit area of at least 44 × 44px. A tight 36px control and a 16px
+**Targets.** Every interactive element has a hit area of at least 44 × 44px.
+- A text-entry field (input, textarea, contenteditable) is its own target. It cannot carry an extended hit area,
+  so its height is the density's control height, 36px at tight density. Tight density is opt-in for pointer-heavy
+  utility surfaces; the composer routes low motor precision to spacious.
+- Stacked choice rows (checkbox, radio, menu items) therefore sit on a 44px pitch.
+- A control whose label wraps grows by its extra lines instead of clipping: its control height is then a minimum
+  (`min-h-(--control-height)`), never a cap.
+- The nearest `data-density` governs. A plan's own density (set by the web manifestation from `plan.density`)
+  overrides the page's.
+- `default` and `icon` sizes follow the surrounding density; only `xs`, `sm` and `lg` (and their `icon-` twins)
+  pin a height. A tight 36px control and a 16px
 checkbox reach it through an invisible extended hit area (`::after` inset), never by growing visually.
 
 ## 4. Typography roles
@@ -204,7 +214,7 @@ The surface tokens are:
 - `--surface-disabled` (6%);
 - `--surface-inverse`.
 
-A component never invents its own gray. **Depth order:** surface tone first, then a border, then overlap, and
+`--scrim` dims the page behind a dialog or sheet (`bg-scrim`). A component never invents its own gray. **Depth order:** surface tone first, then a border, then overlap, and
 only then a shadow.
 
 ## 7. Radius and shape
@@ -233,6 +243,9 @@ A brand's `shape` picks a tier set. Every set obeys nesting:
 - 1px solid, always inside the box.
 - Hierarchy comes through the emphasis colors (§5).
 - Selected, error and success states change the border's color, not its width.
+
+**Indicators.** A selection indicator (the active tab line, a selected rail) is 2px, the weight of the focus
+ring, drawn with `h-indicator` or `w-indicator`. It is never a border.
 
 **Focus.**
 - `outline: 2px solid var(--ring)` with `outline-offset: 2px` on `:focus-visible`, the same on every focusable
@@ -358,7 +371,9 @@ These are tokens (`--layout-margin`, `--layout-gutter`, `--layout-max`) plus a `
 **Gate 1, static hygiene** (`pnpm hygiene`, every release). It scans the source of packages/react and every
 `manifest-*` package, excluding stories and tests, and fails on:
 - a spacing, size or inset step outside §2;
-- an arbitrary value `-[...]` with px, rem, em, ms or %, unless it is listed in optical-exceptions.json;
+- an arbitrary value `-[...]` with px, rem, em, ms or %, unless it is listed in optical-exceptions.json. Viewport
+  units (`vh`, `dvh`, `vw`) are allowed for the size caps of tall or wide containers, which the step scale cannot
+  express and which never land on fractional pixels by themselves;
 - `transition-all`, `transition: all`, a `duration-<number>`, or an `ease-*` other than `ease-standard`;
 - `rounded-sm|md|lg|xl|2xl|3xl`;
 - `border-2|4|8` or `border-[…]`;

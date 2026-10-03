@@ -1,9 +1,10 @@
 "use client"
 
 import { ChevronDownIcon, PlusIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { Button } from "./button"
+import { Icon } from "./icon"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu"
 
 type ExploreMoreProps = {
@@ -36,12 +37,12 @@ function ExploreMore({ intent, label, topics, onAct, className }: ExploreMorePro
         <DropdownMenu>
           <DropdownMenuTrigger
             data-slot="explore-more-trigger"
-            render={<Button variant="outline" className="h-auto min-h-8 max-w-full whitespace-normal py-1 text-left" />}
+            render={<Button variant="outline" className="h-auto! min-h-(--control-height) max-w-full whitespace-normal py-1 text-left" />}
           >
             {text}
-            <ChevronDownIcon aria-hidden="true" data-icon="inline-end" />
+            <Icon icon={ChevronDownIcon} aria-hidden="true" data-icon="inline-end" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent data-slot="explore-more-menu" align="start" className="w-auto min-w-48 max-w-[min(24rem,90vw)]">
+          <DropdownMenuContent data-slot="explore-more-menu" align="start" className="w-auto min-w-32 max-w-sm">
             {topics!.map((topic) => (
               <DropdownMenuItem key={topic} data-slot="explore-more-topic" className="whitespace-normal break-words" onClick={() => onAct("expand", topic)}>
                 {topic}
@@ -54,10 +55,10 @@ function ExploreMore({ intent, label, topics, onAct, className }: ExploreMorePro
           type="button"
           variant="outline"
           data-slot="explore-more-button"
-          className="h-auto min-h-8 max-w-full whitespace-normal py-1 text-left"
+          className="h-auto! min-h-(--control-height) max-w-full whitespace-normal py-1 text-left"
           onClick={() => onAct("expand")}
         >
-          <PlusIcon aria-hidden="true" data-icon="inline-start" />
+          <Icon icon={PlusIcon} aria-hidden="true" data-icon="inline-start" />
           {text}
         </Button>
       )}

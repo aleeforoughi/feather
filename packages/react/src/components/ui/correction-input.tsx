@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { Button } from "./button"
 import { Input } from "./input"
@@ -42,7 +42,7 @@ function CorrectionInput({ intent, prompt, original, onAct, className }: Correct
       data-variant={value === null ? "blank" : "ready"}
       data-intent={intent}
       noValidate
-      className={cn("flex flex-col gap-2 text-sm", className)}
+      className={cn("flex flex-col gap-2 type-body-sm", className)}
       onSubmit={(e) => {
         e.preventDefault()
         if (value === null) return
@@ -53,14 +53,14 @@ function CorrectionInput({ intent, prompt, original, onAct, className }: Correct
       }}
     >
       {original && (
-        <p id={originalId} data-slot="correction-input-original" className="break-words text-muted-foreground">
-          Understood as: <span className="font-medium text-foreground">{original}</span>
+        <p id={originalId} data-slot="correction-input-original" className="break-words text-fg-secondary">
+          Understood as: <span data-slot="correction-input-original-text" className="font-medium text-fg-primary">{original}</span>
         </p>
       )}
-      <Label htmlFor={`${uid}-field`} className="leading-snug">
+      <Label htmlFor={`${uid}-field`}>
         {prompt}
       </Label>
-      <div className="flex flex-wrap items-center gap-2">
+      <div data-slot="correction-input-row" className="flex flex-wrap items-center gap-2">
         <Input
           ref={inputRef}
           id={`${uid}-field`}
@@ -70,7 +70,7 @@ function CorrectionInput({ intent, prompt, original, onAct, className }: Correct
           aria-describedby={original ? originalId : undefined}
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
-          className="min-w-40 flex-1"
+          className="min-w-32 flex-1"
         />
         <Button type="submit" data-slot="correction-input-submit" disabled={value === null}>
           Submit correction

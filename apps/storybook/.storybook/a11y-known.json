@@ -1,15 +1,6 @@
 {
   "$comment": "Accessibility debt carried over from Feather 1.7.0, per reference theme: story id -> axe rules it still breaks. The a11y suite fails on any violation not listed here, and on any listed one that no longer occurs (delete it then). Fixed in 1.7.1; this list only shrinks.",
   "paper-sharp": {
-    "molecules-activityfeed--tones": [
-      "color-contrast"
-    ],
-    "atoms-alert--destructive": [
-      "color-contrast"
-    ],
-    "molecules-attentioncard--danger": [
-      "color-contrast"
-    ],
     "atoms-badge--destructive": [
       "color-contrast"
     ],
@@ -21,44 +12,7 @@
     ],
     "atoms-field--with-error": [
       "color-contrast"
-    ],
-    "atoms-progress--complete": [
-      "aria-progressbar-name"
-    ],
-    "atoms-progress--default": [
-      "aria-progressbar-name"
-    ],
-    "atoms-progress--empty": [
-      "aria-progressbar-name"
-    ],
-    "atoms-progress--indeterminate": [
-      "aria-progressbar-name"
-    ],
-    "atoms-tabs--default": [
-      "color-contrast"
-    ],
-    "atoms-tabs--line": [
-      "color-contrast"
-    ],
-    "atoms-tabs--vertical": [
-      "color-contrast"
     ]
   },
-  "void-pill": {
-    "atoms-alert--destructive": [
-      "color-contrast"
-    ],
-    "atoms-progress--complete": [
-      "aria-progressbar-name"
-    ],
-    "atoms-progress--default": [
-      "aria-progressbar-name"
-    ],
-    "atoms-progress--empty": [
-      "aria-progressbar-name"
-    ],
-    "atoms-progress--indeterminate": [
-      "aria-progressbar-name"
-    ]
-  }
+  "void-pill": {}
 }

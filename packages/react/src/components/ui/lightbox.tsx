@@ -1,18 +1,18 @@
 import * as React from "react"
 import { ChevronLeftIcon, ChevronRightIcon, DownloadIcon } from "lucide-react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { Button } from "./button"
+import { Icon } from "./icon"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog"
 
 export type LightboxImage = { src: string; alt: string; caption?: string; downloadName?: string }
 
 /**
- * A checkerboard backdrop from the theme's muted and background tokens: transparent images show their
- * shape on any brand. Shared by Lightbox and MediaGallery.
+ * A checkerboard backdrop from the theme's surface tokens (the `bg-checker` utility in foundation.css): transparent
+ * images show their shape on any brand. Shared by Lightbox and MediaGallery.
  */
-const checker =
-  "bg-[conic-gradient(var(--muted)_25%,var(--background)_0_50%,var(--muted)_0_75%,var(--background)_0)] bg-size-[20px_20px]"
+const checker = "bg-checker"
 
 /** One image of a set, large, with previous / next (buttons and arrow keys) and download. */
 function Lightbox({
@@ -55,22 +55,22 @@ function Lightbox({
           </DialogDescription>
         </DialogHeader>
         {image && (
-          <div data-slot="lightbox-stage" className={cn("flex max-h-[70vh] items-center justify-center overflow-hidden rounded-lg", checker)}>
-            <img src={image.src} alt={image.alt} className="max-h-[70vh] w-auto max-w-full object-contain" />
+          <div data-slot="lightbox-stage" className={cn("flex max-h-[60vh] items-center justify-center overflow-hidden rounded-card", checker)}>
+            <img data-slot="lightbox-image" src={image.src} alt={image.alt} className="max-h-[60vh] w-auto max-w-full object-contain" />
           </div>
         )}
         <div data-slot="lightbox-nav" className="flex items-center justify-between gap-2">
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled={!many} onClick={() => step(-1)}>
-              <ChevronLeftIcon /> Previous
+          <div data-slot="lightbox-steps" className="flex gap-2">
+            <Button variant="outline" disabled={!many} onClick={() => step(-1)}>
+              <Icon icon={ChevronLeftIcon} /> Previous
             </Button>
-            <Button variant="outline" size="sm" disabled={!many} onClick={() => step(1)}>
-              Next <ChevronRightIcon />
+            <Button variant="outline" disabled={!many} onClick={() => step(1)}>
+              Next <Icon icon={ChevronRightIcon} />
             </Button>
           </div>
           {image && (
-            <Button variant="outline" size="sm" nativeButton={false} render={<a href={image.src} download={image.downloadName ?? ""} />}>
-              <DownloadIcon /> Download
+            <Button variant="outline" nativeButton={false} render={<a href={image.src} download={image.downloadName ?? ""} />}>
+              <Icon icon={DownloadIcon} /> Download
             </Button>
           )}
         </div>

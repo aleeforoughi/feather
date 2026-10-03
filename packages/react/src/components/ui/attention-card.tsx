@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion } from "motion/react"
-import { cn } from "cn"
+import { cn } from "../../lib/cn"
 
 import { useThemeMotion } from "../../lib/motion"
 
@@ -25,7 +25,8 @@ function AttentionCard({
   variant?: "default" | "danger"
   className?: string
 }) {
-  const m = useThemeMotion()
+  // It enters like a popover (medium, 8px, scale 0.99 to 1). The attention pulse loops on the same curve.
+  const m = useThemeMotion("popover")
   const ring = variant === "danger" ? "ring-destructive" : "ring-primary"
   return (
     <motion.section
@@ -33,28 +34,26 @@ function AttentionCard({
       aria-label={typeof title === "string" ? title : undefined}
       data-slot="attention-card"
       data-variant={variant}
-      initial={{ opacity: 0, scale: 0.97, y: -6 }}
+      initial={{ opacity: 0, scale: 0.99, y: -8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: m.duration * 2, ease: m.ease }}
-      className={cn("relative overflow-hidden rounded-lg border-2 bg-card p-5", variant === "danger" ? "border-destructive" : "border-primary", className)}
+      transition={{ duration: m.duration, ease: m.ease }}
+      className={cn("relative overflow-hidden rounded-card border p-card", variant === "danger" ? "border-destructive bg-destructive-muted" : "border-primary bg-card", className)}
     >
-      {!m.reduced && <motion.span aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-lg ring-4", ring)} animate={{ opacity: [0, 0.55, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }} />}
-      <div className="relative flex flex-wrap items-start gap-4">
+      {!m.reduced && <motion.span data-slot="attention-card-pulse" aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-card ring-4", ring)} animate={{ opacity: [0, 0.55, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: m.ease }} />}
+      <div data-slot="attention-card-body" className="relative flex flex-wrap items-start gap-group">
         {icon && (
-          <motion.span
+          <span
             data-slot="attention-card-icon"
-            animate={m.reduced ? {} : { rotate: [0, -12, 12, -6, 0] }}
-            transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.4 }}
-            className={cn("flex size-10 shrink-0 items-center justify-center rounded-full [&_svg]:size-5", variant === "danger" ? "bg-destructive text-primary-foreground" : "bg-primary text-primary-foreground")}
+            className={cn("flex size-10 shrink-0 items-center justify-center rounded-full [&_svg]:size-5", !m.reduced && "motion-wiggle", variant === "danger" ? "bg-destructive text-primary-foreground" : "bg-primary text-primary-foreground")}
             aria-hidden
           >
             {icon}
-          </motion.span>
+          </span>
         )}
-        <div className="min-w-0 flex-1 space-y-1">
-          {eyebrow && <p className={cn("text-xs font-medium tracking-wide uppercase", variant === "danger" ? "text-destructive" : "text-primary")}>{eyebrow}</p>}
-          <h2 data-slot="attention-card-title" className="font-heading text-lg font-semibold">{title}</h2>
-          {description && <div className="text-sm text-muted-foreground">{description}</div>}
+        <div data-slot="attention-card-content" className="min-w-0 flex-1 space-y-1">
+          {eyebrow && <p data-slot="attention-card-eyebrow" className="type-caps text-fg-secondary">{eyebrow}</p>}
+          <h2 data-slot="attention-card-title" className="font-heading type-title text-fg-primary">{title}</h2>
+          {description && <div data-slot="attention-card-description" className="type-body-sm text-fg-secondary">{description}</div>}
         </div>
         {actions && <div data-slot="attention-card-actions" className="flex gap-2">{actions}</div>}
       </div>
