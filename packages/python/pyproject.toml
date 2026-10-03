@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "feather-sdk"
+dynamic = ["version"]
+description = "Write and check Feather Experience IR (feather.ir/0) from Python: builders, validate() and validate_reply(). No dependencies."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+license = { text = "UNLICENSED" }
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Typing :: Typed",
+]
+
+[tool.setuptools]
+packages = ["feather_sdk"]
+
+[tool.setuptools.dynamic]
+version = { attr = "feather_sdk._version.__version__" }
+
+[tool.setuptools.package-data]
+feather_sdk = ["_spec.json", "py.typed"]
