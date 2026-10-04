@@ -9,13 +9,17 @@
   `color-contrast` in four stories. The default red is now chosen per side of the theme: `#b42318` on a light
   background and `#ff6b62` on a dark one, the same reds as `foundation.css` and the default theme.
 - **A new contrast floor:** `--destructive` reaches 4.5:1 on the background, the surface and its own 12% tint
-  (`CONTRAST_FLOORS.destructive`). A brand red that misses it is refused with the ratio it reached.
+  (`CONTRAST_FLOORS.destructive`). A brand red that misses it is refused with the ratio it reached. A brand red
+  between about 4.0:1 and 4.5:1 that built before is now refused; pick a darker red on a light background.
+  - Not covered yet: the hover tint of the destructive Badge and Button (`bg-destructive/20`, an opacity outside the
+    visual system) brings the light default to 4.4:1 over paper-sharp's background. The fix is to put those tints on
+    tokens in the atoms, in a later release.
 - **`a11y-known.json` is empty.** No accessibility debt remains in either reference theme.
 - **Size gate:** `pnpm size` (in CI after hygiene) bundles `liquid` and `manifest-web` as a product would, minified
   and gzipped, with React and the component library left out. Budget: 60 KB (PLAN.md section 9). Today: 29.7 KB.
   It also prints the figure with the component library bundled in, 176 KB, which is not gated.
-- Visual change: the destructive stories in paper-sharp and void-pill use the new reds. Their baselines are
-  re-recorded.
+- Visual change: paper-sharp and void-pill render their destructive parts in the new reds. The visual baselines
+  (feather and feather-dark, which name their own reds) do not change.
 
 ## 1.15.0 — 2026-10-04
 
