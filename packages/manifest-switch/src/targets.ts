@@ -6,6 +6,8 @@ const CONTROLS =
 
 function hiddenOrDisabled(el: HTMLElement): boolean {
   if (el.hasAttribute("disabled") || el.getAttribute("aria-disabled") === "true") return true
+  // A read-only field (a Form after it was sent) cannot be changed, so there is nothing to scan to.
+  if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && el.readOnly) return true
   if (el.closest("[hidden], [inert], [aria-hidden='true'], fieldset[disabled]")) return true
   const view = el.ownerDocument.defaultView
   for (let node: HTMLElement | null = el; node; node = node.parentElement) {

@@ -121,6 +121,67 @@ describe("the reply flow", () => {
     expect(screen.getByText(/above the maximum 12/)).toBeTruthy()
   })
 
+  it("a Form sends every answer with one reply, and only the answered fields", async () => {
+    const user = userEvent.setup()
+    const onReply = vi.fn()
+    render(<FeatherExperience experience={fixture("poster-details-form")} context={phone} onReply={onReply} />)
+    expect(screen.getAllByRole("button", { name: "Run again with my answers" })).toHaveLength(1)
+    await user.type(screen.getByRole("textbox", { name: "Market time" }), "  Saturdays, 8am  ")
+    await user.type(screen.getByRole("spinbutton", { name: "Stall fee" }), "150.5")
+    await user.click(screen.getByRole("button", { name: "Run again with my answers" }))
+    expect(onReply).toHaveBeenCalledTimes(1)
+    expect(onReply).toHaveBeenCalledWith({ experience: "poster_details", node: "details", act: "submit", value: { market_time: "Saturdays, 8am", stall_fee: 150.5 } })
+    // Sent: the values stay, read-only, and nothing is left that could send again.
+    expect(screen.getByRole("status")).toBeTruthy()
+    expect(document.querySelector('[data-slot="form-group"]')?.getAttribute("data-variant")).toBe("sent")
+    expect((screen.getByRole("textbox", { name: "Market time" }) as HTMLInputElement).value).toBe("  Saturdays, 8am  ")
+    expect(screen.getByRole("textbox", { name: "Market time" }).hasAttribute("readonly")).toBe(true)
+    expect(screen.queryByRole("button", { name: "Run again with my answers" })).toBeNull()
+  })
+
+  it("a Form: Enter in a field submits, and a bad answer is shown beside its field and never sent", async () => {
+    const user = userEvent.setup()
+    const onReply = vi.fn()
+    render(<FeatherExperience experience={fixture("poster-details-form")} context={phone} onReply={onReply} />)
+    const email = screen.getByRole("textbox", { name: "Contact email" })
+    await user.type(email, "not-an-email{Enter}")
+    expect(onReply).not.toHaveBeenCalled()
+    expect(email.getAttribute("aria-invalid")).toBe("true")
+    expect(document.activeElement).toBe(email)
+    expect(document.getElementById(email.getAttribute("aria-describedby")!.split(" ").pop()!)?.textContent).toMatch(/email address/)
+    await user.clear(email)
+    await user.type(email, "market@example.com{Enter}")
+    expect(onReply).toHaveBeenCalledTimes(1)
+    expect(onReply).toHaveBeenCalledWith({ experience: "poster_details", node: "details", act: "submit", value: { contact: "market@example.com" } })
+  })
+
+  it("a Form with nothing answered sends nothing; its Skip sends skip, and a form with a required field has no Skip", async () => {
+    const user = userEvent.setup()
+    const onReply = vi.fn()
+    const { unmount } = render(<FeatherExperience experience={fixture("poster-details-form")} context={phone} onReply={onReply} />)
+    await user.click(screen.getByRole("button", { name: "Run again with my answers" }))
+    expect(onReply).not.toHaveBeenCalled()
+    expect(document.querySelector('[data-slot="form-group-status"]')?.textContent).toMatch(/Answer at least one question/)
+    await user.click(screen.getByRole("button", { name: "Skip" }))
+    expect(onReply).toHaveBeenCalledTimes(1)
+    expect(onReply).toHaveBeenCalledWith({ experience: "poster_details", node: "details", act: "skip" })
+    unmount()
+
+    onReply.mockClear()
+    render(<FeatherExperience experience={fixture("shipping-address-form")} context={phone} onReply={onReply} />)
+    expect(screen.queryByRole("button", { name: "Skip" })).toBeNull()
+    await user.type(screen.getByRole("textbox", { name: "Phone for the courier" }), "+971 4 123 4567")
+    await user.click(screen.getByRole("button", { name: "Give the shipping address" }))
+    // Required fields are empty: refused, and focus is on the first.
+    expect(onReply).not.toHaveBeenCalled()
+    expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Full name" }))
+    await user.type(screen.getByRole("textbox", { name: "Full name" }), "Sam Lee")
+    await user.type(screen.getByRole("textbox", { name: "Street and number" }), "1 Palm Road")
+    await user.type(screen.getByRole("textbox", { name: "City" }), "Dubai{Enter}")
+    expect(onReply).toHaveBeenCalledTimes(1)
+    expect(onReply).toHaveBeenCalledWith({ experience: "shipping_address", node: "address", act: "submit", value: { name: "Sam Lee", street: "1 Palm Road", city: "Dubai", phone: "+971 4 123 4567" } })
+  })
+
   it("an Approval: approve, and reject with a reason", async () => {
     const user = userEvent.setup()
     const onReply = vi.fn()
@@ -150,6 +211,22 @@ describe("the reply flow", () => {
     expect(onReply).not.toHaveBeenCalled()
     expect(onRejectedReply).toHaveBeenCalledTimes(1)
     expect(onRejectedReply.mock.calls[0]![0][0].code).toBe("wrong-experience")
+  })
+
+  it("a Form whose reply the validator rejects stays open, says so, and can be sent again", async () => {
+    const user = userEvent.setup()
+    const onReply = vi.fn()
+    const onRejectedReply = vi.fn()
+    const ir = fixture("poster-details-form") as Experience
+    const composed = compose(ir, phone)
+    if (!composed.ok) throw new Error("invalid fixture")
+    render(<PlanView plan={composed.plan} experience={{ ...ir, experience: "some_other_experience" }} onReply={onReply} onRejectedReply={onRejectedReply} />)
+    await user.type(screen.getByRole("textbox", { name: "Market time" }), "Saturdays{Enter}")
+    expect(onReply).not.toHaveBeenCalled()
+    expect(onRejectedReply).toHaveBeenCalledTimes(1)
+    expect(document.querySelector('[data-slot="form-group"]')?.getAttribute("data-variant")).toBe("default")
+    expect(document.querySelector('[data-slot="form-group-status"]')?.textContent).toMatch(/^Not sent\./)
+    expect(screen.getByRole("button", { name: "Run again with my answers" })).toBeTruthy()
   })
 
   it("a Preference, a Warning acknowledgement and an Autopick reply as the IR says", async () => {

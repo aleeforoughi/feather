@@ -6,8 +6,10 @@ import arabicDelivery from "../../../conformance/ir/valid/arabic-delivery-confir
 import compareSubscriptionPlans from "../../../conformance/ir/valid/compare-subscription-plans.json"
 import flightSearch from "../../../conformance/ir/valid/flight-search-tradeoff.json"
 import newsletterSignup from "../../../conformance/ir/valid/newsletter-signup.json"
+import posterDetailsForm from "../../../conformance/ir/valid/poster-details-form.json"
 import predictedNewsTopic from "../../../conformance/ir/valid/predicted-news-topic.json"
 import purchaseApproval from "../../../conformance/ir/valid/purchase-approval.json"
+import shippingAddressForm from "../../../conformance/ir/valid/shipping-address-form.json"
 import textOnly from "../../../conformance/ir/valid/text-only.json"
 import { FeatherExperience } from "./feather-experience"
 
@@ -69,3 +71,20 @@ export const CompareSubscriptionPlans: Story = { args: { experience: compareSubs
 
 /** An input, a preference and an action. */
 export const NewsletterSignup: Story = { args: { experience: newsletterSignup.ir } }
+
+/** A Form asks several things and sends every answer with one act: five optional questions under four headings, and an action beside it. */
+export const PosterDetailsForm: Story = { args: { experience: posterDetailsForm.ir } }
+
+/** A Form with required fields cannot be skipped. */
+export const ShippingAddressForm: Story = { args: { experience: shippingAddressForm.ir } }
+
+/** Type in a field and press Enter: one reply, with only the answered fields. */
+export const PosterDetailsFormKeyboard: Story = {
+  args: { experience: posterDetailsForm.ir },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await userEvent.type(canvas.getByRole("textbox", { name: "Contact email" }), "market@example.com{Enter}")
+    await expect(args.onReply).toHaveBeenCalledTimes(1)
+    await expect(args.onReply).toHaveBeenCalledWith({ experience: "poster_details", node: "details", act: "submit", value: { contact: "market@example.com" } })
+  },
+}

@@ -417,3 +417,32 @@ test("the bundle exports mount, validate, validateReply and version", async ({ p
   expect(await page.evaluate((ad) => window.__feather.embed.validate(ad).ok, AD)).toBe(true)
   expect(await page.evaluate(([ad, reply]) => window.__feather.embed.validateReply(ad, reply).ok, [AD, SPEND] as const)).toBe(true)
 })
+
+test("i: a Form in the host sends one reply with only the filled fields, and Enter in a field submits", async ({ page }) => {
+  const POSTER = fixture("poster-details-form")
+  await mount(page, "slot-a", POSTER)
+  const form = page.locator('#slot-a [data-slot="form-group"]')
+  await expect(form).toBeVisible()
+  // The host's own button and input rules do not reach it: one real submit button, in Feather's geometry.
+  await expect(form.locator('[data-slot="form-group-submit"]')).toHaveCount(1)
+  expect(await form.locator('[data-slot="form-group-control"]').first().evaluate((el) => getComputedStyle(el).height)).toBe("44px")
+
+  await form.getByLabel("Market time").fill("Saturdays, 8am to 1pm")
+  await form.getByLabel("Stall fee").fill("150")
+  await form.locator('[data-slot="form-group-submit"]').click()
+  await expect.poll(() => page.evaluate(() => window.__feather.replies.length)).toBe(1)
+  const replies = await page.evaluate(() => window.__feather.replies)
+  expect(replies[0]).toStrictEqual({ slot: "slot-a", reply: { experience: "poster_details", node: "details", act: "submit", value: { market_time: "Saturdays, 8am to 1pm", stall_fee: 150 } } })
+  await expect(form).toHaveAttribute("data-variant", "sent")
+  await expect(form.locator('[data-slot="form-group-status"]')).toContainText("Sent.")
+  expect(await page.evaluate(() => window.__feather.issues)).toEqual([])
+
+  // Typing in a field and pressing Enter submits, as a native form does.
+  await page.evaluate(() => window.__feather.views["slot-a"]!.unmount())
+  await mount(page, "slot-b", POSTER)
+  const second = page.locator('#slot-b [data-slot="form-group"]')
+  await second.getByLabel("Contact email").fill("market@example.com")
+  await second.getByLabel("Contact email").press("Enter")
+  await expect.poll(() => page.evaluate(() => window.__feather.replies.length)).toBe(2)
+  expect((await page.evaluate(() => window.__feather.replies))[1]).toStrictEqual({ slot: "slot-b", reply: { experience: "poster_details", node: "details", act: "submit", value: { contact: "market@example.com" } } })
+})

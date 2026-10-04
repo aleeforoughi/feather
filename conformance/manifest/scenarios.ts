@@ -85,7 +85,7 @@ export function currencyOf(experience: Experience): string | undefined {
 
 const TODAY = "2026-01-15"
 
-function inputValue(n: Extract<IRNode, { type: "Input" }>): string | number {
+function inputValue(n: { kind: string; min?: number; max?: number; maxLength?: number }): string | number {
   switch (n.kind) {
     case "number":
     case "money":
@@ -103,6 +103,29 @@ function inputValue(n: Extract<IRNode, { type: "Input" }>): string | number {
   }
 }
 
+/** What a person answers a Form field: a value of its kind, different for every field so a mixed-up answer is caught. */
+export function fieldValue(field: Extract<IRNode, { type: "Form" }>["fields"][number]): string | number {
+  switch (field.kind) {
+    case "number":
+    case "money":
+      return Math.min(field.max ?? 25, Math.max(field.min ?? 25, 25))
+    case "text":
+    case "long-text":
+      return `Answer for ${field.id}`.slice(0, field.maxLength ?? 200)
+    default:
+      return inputValue(field)
+  }
+}
+
+/**
+ * The answers of a Form scenario: every field, except the first optional one, which is left out (an unanswered field is not
+ * sent). With `all`, every field is answered.
+ */
+export function formAnswers(form: Extract<IRNode, { type: "Form" }>, all = false): Record<string, string | number> {
+  const leftOut = all ? undefined : form.fields.find((f) => f.required !== true)?.id
+  return Object.fromEntries(form.fields.filter((f) => f.id !== leftOut).map((f) => [f.id, fieldValue(f)]))
+}
+
 /** The value a valid reply carries, or undefined when the act carries none. */
 export function valueFor(ir: IRNode, act: string, experience: Experience): ReplyValue | undefined {
   switch (ir.type) {
@@ -115,6 +138,8 @@ export function valueFor(ir: IRNode, act: string, experience: Experience): Reply
     }
     case "Input":
       return act === "submit" ? inputValue(ir) : undefined
+    case "Form":
+      return act === "submit" ? formAnswers(ir) : undefined
     case "Alternative": {
       switch (ir.input) {
         case undefined:
@@ -162,6 +187,8 @@ export function scenariosOf(fixture: string, experience: Experience, plan: Layou
     const ir = irs.get(offer.node)!
     const value = valueFor(ir, offer.act, experience)
     add({ node: offer.node, act: offer.act, value, deliberate: offer.confirm })
+    // A Form is also answered in full: every field, none left out.
+    if (ir.type === "Form" && offer.act === "submit") add({ id: `${offer.node}.submit-all`, node: offer.node, act: "submit", value: formAnswers(ir, true), deliberate: offer.confirm })
     // A rejection's reason is optional: the person may give none.
     if (ir.type === "Approval" && offer.act === "reject") add({ id: `${offer.node}.reject-no-reason`, node: offer.node, act: "reject", noReason: true, deliberate: false })
     // An IrreversibleAction's cancel: arm, then back out.

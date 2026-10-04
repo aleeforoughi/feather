@@ -2,6 +2,7 @@
 // available act is driven through each body its own way, and the replies must be the same, with a deliberate step
 // wherever the plan asks for one. Nothing here works around a body: if a body is wrong, a test fails.
 import { render } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { afterAll, describe, expect, it } from "vitest"
 import type { ReplyEvent } from "@aleeforoughi/feather-intent"
 import { renderTurn } from "@aleeforoughi/feather-manifest-text"
@@ -198,4 +199,55 @@ describe("adversarial: only the keyword commits an armed act", () => {
       }
     }
   }
+})
+
+// ── Forms: what the web markup contract promises beyond the replies (docs/manifestations.md section 5) ───────────────────
+describe("a form on the web: errors, the skip control and the sent status", () => {
+  const form = (name: string) => FIXTURES.find((f) => f.name === name)!
+  const mount = (name: string, replies: ReplyEvent[]) => {
+    const fx = form(name)
+    return render(<PlanView plan={planFor(fx.ir, "web")} experience={fx.ir} onReply={(r) => void replies.push(r)} />)
+  }
+  const slot = (root: HTMLElement, name: string) => root.querySelector<HTMLElement>(`[data-slot="${name}"]`)
+
+  it("offers skip only when no field is required", () => {
+    const a = mount("shipping-address-form", [])
+    truth(slot(a.container, "form-group-skip") === null, "shipping-address-form has a required field, so it has no skip control")
+    a.unmount()
+    const b = mount("poster-details-form", [])
+    truth(slot(b.container, "form-group-skip") !== null, "poster-details-form has no required field, so it has a skip control")
+    b.unmount()
+  })
+
+  it("sends nothing and says what is wrong when a required field is empty", async () => {
+    const replies: ReplyEvent[] = []
+    const { container, unmount } = mount("shipping-address-form", replies)
+    await userEvent.setup().click(slot(container, "form-group-submit")!)
+    eq(replies, [], "a form with an empty required field must not send")
+    truth(container.querySelectorAll('[data-slot="form-group-error"]').length > 0, "an empty required field shows a form-group-error")
+    unmount()
+  })
+
+  it("sends nothing for an answer that does not fit its kind", async () => {
+    const replies: ReplyEvent[] = []
+    const { container, unmount } = mount("poster-details-form", replies)
+    const user = userEvent.setup()
+    const email = container.querySelector<HTMLElement>('[data-slot="form-group-field"][data-field-id="contact"] [data-slot="form-group-control"]')!
+    await user.type(email, "not an email")
+    await user.click(slot(container, "form-group-submit")!)
+    eq(replies, [], "an invalid email must not be sent")
+    truth(container.querySelectorAll('[data-slot="form-group-error"]').length > 0, "an invalid email shows a form-group-error")
+    unmount()
+  })
+
+  it("shows the sent status after the one reply", async () => {
+    const replies: ReplyEvent[] = []
+    const { container, unmount } = mount("poster-details-form", replies)
+    const user = userEvent.setup()
+    await user.type(container.querySelector<HTMLElement>('[data-slot="form-group-field"][data-field-id="market_time"] [data-slot="form-group-control"]')!, "9am")
+    await user.click(slot(container, "form-group-submit")!)
+    eq(replies.length, 1, "one reply for the whole form")
+    truth(slot(container, "form-group-status") !== null, "after sending, a form-group-status says so")
+    unmount()
+  })
 })

@@ -197,3 +197,19 @@ in both reference themes in Storybook, the axe suite and the visual suite.
   prefilled empty.
 - Submit is disabled while the field is blank or whitespace. Enter in the field submits. After submitting, the
   field clears and focus stays in it.
+
+### `FormGroup` (IR node: Form)
+
+- Props: `id?`, `intent`, `prompt?`, `fields`, `submitLabel?`, `importance?`, `expandable?`, `primary?`, `defaultExpanded?`,
+  `onAct(act: "submit" | "skip", value?)`. `onAct` may return `{ ok: false, message }` when the caller refuses the reply;
+  the form then stays open and says so.
+- One real `<form>` (`noValidate`) with one submit button (the label, else the intent) and, only when no field is
+  required, a secondary "Skip". Enter in a single-line field submits.
+- Submit checks every field the way the IR checks an Input's answer (text trimmed, numbers parsed, dates ISO 8601, an
+  empty optional field left out), shows each problem beside its field (`aria-invalid`, `aria-describedby`, the words),
+  moves focus to the first invalid field, and calls `onAct` only when every answer is valid and at least one is given.
+- After a successful act the root is `data-variant="sent"` (or `skipped`): values stay visible and read-only, the buttons
+  go, and a polite status ("Sent. 2 answers were sent.") takes focus. The caller renders a new node to start over.
+- Slots: `form-group` (root), `form-group-prompt`, `form-group-section` and `form-group-section-heading`,
+  `form-group-field` (with `data-field-id`), `form-group-control`, `form-group-error`, `form-group-submit`,
+  `form-group-skip`, `form-group-status`; fields with no group sit in `form-group-ungrouped`.

@@ -30,6 +30,11 @@ function amountPhrase(n: number, style: Style): string {
   return style === "voice" && Number.isInteger(n) && n >= 0 && n <= 20 ? CARDINALS[n]! : String(n)
 }
 
+/** What a person types or says for a Form field's answer. */
+function fieldPhrase(kind: string, value: string | number, style: Style): string {
+  return typeof value === "number" && (kind === "number" || kind === "money") ? amountPhrase(value, style) : String(value)
+}
+
 const show = (v: string | number | boolean) => (typeof v === "boolean" ? (v ? "yes" : "no") : String(v))
 
 /** Where a value is picked from a list in the value turn: the number of the choice with this label. */
@@ -87,6 +92,24 @@ export function driveTalk(talker: Talker, plan: LayoutPlan, s: Scenario, style: 
 
   // 2. Its value, read back when the body reads back.
   const state = () => talker.turn.state as Turn["state"]
+  if (ir.type === "Form" && s.act === "submit") {
+    // A Form is one act asked as a sequence: a question per field in order (an unanswered optional field is skipped), then
+    // one read-back that the person sends. Nothing may be emitted before the send.
+    const answers = (s.value ?? {}) as Record<string, string | number>
+    for (const [i, field] of ir.fields.entries()) {
+      if (state() !== "value") throw new Error(`${style}: question ${i + 1} of the form "${s.node}" was not asked (the turn is "${state()}")`)
+      const asked = talker.turn.parts.filter((p) => p.kind === "question").map((p) => p.text).join(" ")
+      if (!asked.includes(field.prompt)) throw new Error(`${style}: question ${i + 1} of "${s.node}" should ask "${field.prompt}", it asked "${asked}"`)
+      const answered = answers[field.id] !== undefined
+      say(answered ? fieldPhrase(field.kind, answers[field.id]!, style) : "skip")
+      if (replies.length > 0) throw new Error(`${style}: the form "${s.node}" emitted a reply before it was sent (${JSON.stringify(replies)})`)
+    }
+    if (state() !== "review") throw new Error(`${style}: after the last question of "${s.node}" the body should read the answers back (the turn is "${state()}")`)
+    const summary = talker.turn.parts.map((p) => p.text).join(" ")
+    for (const field of ir.fields) if (!summary.includes(field.prompt)) throw new Error(`${style}: the read-back of "${s.node}" leaves out "${field.prompt}"`)
+    say("send")
+    return { before: [...replies], after: null }
+  }
   if (state() === "value") {
     say(valuePhrase(ir, s, talker.turn, irs, currencyKnown, style))
     if (state() === "readback") say("yes")

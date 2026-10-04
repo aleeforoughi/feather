@@ -7,6 +7,7 @@ import {
   AlternativeList,
   CorrectionInput,
   ExploreMore,
+  FormGroup,
   IrreversibleAction,
   PredictedChoice,
   Recommendation,
@@ -36,7 +37,7 @@ import {
 import { useRendering } from "./rendering"
 
 /** The organisms that show "Why?" themselves, and so open it from `defaultExpanded`. */
-const OWN_DETAIL = new Set<IRNode["type"]>(["Recommendation", "IrreversibleAction", "Approval"])
+const OWN_DETAIL = new Set<IRNode["type"]>(["Recommendation", "IrreversibleAction", "Approval", "Form"])
 
 /** Marks an element a host organism rendered as the plan node it stands for, since it cannot wrap it. */
 function mark(el: Element | null | undefined, node: PlanNode) {
@@ -117,6 +118,22 @@ function Body({ node, ir }: { node: PlanNode; ir: IRNode }) {
     }
     case "Input":
       return <InputAtom ir={ir} />
+    case "Form":
+      return (
+        <FormGroup
+          id={ir.id}
+          intent={ir.intent}
+          prompt={ir.prompt}
+          fields={ir.fields}
+          submitLabel={ir.submitLabel}
+          importance={ir.importance}
+          expandable={ir.expandable}
+          primary={node.emphasis === "primary" || node.emphasis === "critical"}
+          defaultExpanded={node.expanded}
+          // The reply is checked with validateReply before it leaves; a reply it refuses leaves the form open, with why.
+          onAct={(act, value) => emit(ir.id, act, value)}
+        />
+      )
     case "Price":
       return <PriceAtom ir={ir} />
     case "Person":

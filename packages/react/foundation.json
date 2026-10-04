@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-react",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "tokenSchema": "feather-tokens/2",
   "themeAxes": {
     "shape": [
@@ -600,6 +600,60 @@
         "Field Set Group",
         "Horizontal",
         "With Error"
+      ]
+    },
+    {
+      "name": "form-group",
+      "level": "organism",
+      "file": "src/components/ui/form-group.tsx",
+      "exports": [
+        "autocompleteFor",
+        "checkForm",
+        "checkFormField",
+        "fieldHint",
+        "FormGroup",
+        "formSections",
+        "formStatusText"
+      ],
+      "slots": [
+        "form-group",
+        "form-group-actions",
+        "form-group-content",
+        "form-group-control-row",
+        "form-group-currency",
+        "form-group-error",
+        "form-group-error-icon",
+        "form-group-error-prefix",
+        "form-group-error-text",
+        "form-group-field",
+        "form-group-header",
+        "form-group-hint",
+        "form-group-label",
+        "form-group-label-row",
+        "form-group-marker",
+        "form-group-prompt",
+        "form-group-section",
+        "form-group-section-fields",
+        "form-group-section-heading",
+        "form-group-skip",
+        "form-group-status",
+        "form-group-status-icon",
+        "form-group-status-text",
+        "form-group-submit",
+        "form-group-ungrouped"
+      ],
+      "stories": [
+        "All Required",
+        "Critical",
+        "Default",
+        "Every Kind",
+        "Keyboard: type and press Enter",
+        "Long Text",
+        "Not Primary",
+        "Sent",
+        "Skipped",
+        "With Errors",
+        "With Expandable"
       ]
     },
     {

@@ -119,6 +119,11 @@ The [composer](composer.md) uses it to choose the layout, the emphasis and the b
 **Theme** is `"feather"` (the default, black and white), `"feather-dark"`, or a brand's `feather-tokens/2`
 object, the same file `feather-brand` reads. Each view takes its own, and its popups follow it.
 
+**Asking several things?** Use one `Form` (`nodes.Form(id=…, intent=…, fields=[{"id": "venue", "prompt": "Venue
+address", "kind": "long-text", "group": "Place"}, …])`), not several Inputs. It sends every answer with one act, as
+`{"act": "submit", "value": {"venue": "…"}}`, so nothing the person typed is lost, and it asks in turns by voice and
+text.
+
 ## 4. Receive the reply (server)
 
 ```python

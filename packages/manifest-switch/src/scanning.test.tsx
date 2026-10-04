@@ -290,6 +290,43 @@ describe("leaving a text field", () => {
   })
 })
 
+describe("a Form", () => {
+  failOnConsole()
+  afterEach(() => vi.useRealTimers())
+
+  it("is reached field by field: Escape leaves a field, the one submit sends every answer, and a sent form has nothing left to scan", () => {
+    const onReply = vi.fn()
+    render(<FeatherSwitchExperience experience={fixture("shipping-address-form")} context={switchContext} scan="step" onReply={onReply} />)
+    for (const [label, value] of [["Full name", "Sam Lee"], ["Street and number", "1 Palm Road"], ["City", "Dubai"]] as const) {
+      const field = screen.getByRole("textbox", { name: label }) as HTMLInputElement
+      if (document.activeElement !== field) nextUntil((el) => el === field)
+      fireEvent.change(field, { target: { value } })
+      fireEvent.keyDown(field, { key: "Escape" })
+      expect(field.value).toBe(value)
+    }
+    nextUntil((el) => el.getAttribute("data-slot") === "form-group-submit")
+    press("Enter")
+    expect(onReply).toHaveBeenCalledTimes(1)
+    expect(onReply).toHaveBeenCalledWith({ experience: "shipping_address", node: "address", act: "submit", value: { name: "Sam Lee", street: "1 Palm Road", city: "Dubai" } })
+    // Sent: its fields are read-only and its buttons are gone, so no target is left in it.
+    const form = document.querySelector("[data-slot=form-group]") as HTMLElement
+    expect(form.getAttribute("data-variant")).toBe("sent")
+    press("Tab")
+    expect(form.querySelector("[data-scanned=true]")).toBeNull()
+  })
+
+  it("dwell selects the submit button, as it does any reversible act", () => {
+    vi.useFakeTimers()
+    const onReply = vi.fn()
+    render(<FeatherSwitchExperience experience={fixture("poster-details-form")} context={switchContext} dwellMs={500} onReply={onReply} />)
+    fireEvent.change(screen.getByRole("textbox", { name: "Market time" }), { target: { value: "Saturdays" } })
+    fireEvent.pointerEnter(screen.getByRole("button", { name: "Run again with my answers" }))
+    act(() => void vi.advanceTimersByTime(500))
+    expect(onReply).toHaveBeenCalledTimes(1)
+    expect(onReply).toHaveBeenCalledWith({ experience: "poster_details", node: "details", act: "submit", value: { market_time: "Saturdays" } })
+  })
+})
+
 describe("popups", () => {
   failOnConsole()
 

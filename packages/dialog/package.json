@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-dialog",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "description": "The dialog engine: turn-based interaction over a layout plan for the bodies that talk (text, voice). Pure and deterministic: no DOM, no I/O, no clock.",
   "license": "UNLICENSED",
   "type": "module",

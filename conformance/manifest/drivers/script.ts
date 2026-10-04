@@ -23,6 +23,30 @@ const nth =
   (selector: string, i: number): Find =>
   (root) =>
     root.querySelectorAll<HTMLElement>(selector)[i] ?? null
+/** The element itself when it matches (the node's host may be the form's own root), else the first match inside it. */
+const within =
+  (selector: string): Find =>
+  (root) =>
+    root.matches(selector) ? root : root.querySelector<HTMLElement>(selector)
+
+/** A form field's control: [data-slot=form-group-control] inside [data-slot=form-group-field][data-field-id]. If the slot is a wrapper, the input inside it. */
+const formControl =
+  (id: string): Find =>
+  (root) => {
+    const el = within(`[data-slot="form-group-field"][data-field-id="${id}"] [data-slot="form-group-control"]`)(root)
+    if (!el) return null
+    return el.matches("input, textarea, select") ? el : (el.querySelector<HTMLElement>("input, textarea, select") ?? el)
+  }
+
+/** The submit button, only when its accessible name is the form's submitLabel (or its intent): a wrong name is a failure. */
+const formSubmit =
+  (name: string): Find =>
+  (root) => {
+    const el = within('[data-slot="form-group-submit"]')(root)
+    const got = (el?.getAttribute("aria-label") ?? el?.textContent ?? "").replace(/\s+/g, " ").trim().toLowerCase()
+    return el && got === name.trim().toLowerCase() ? el : null
+  }
+
 const press = (what: string, find: Find, skip?: (el: HTMLElement) => boolean): Step => ({ kind: "press", find, what, skip })
 const type = (what: string, find: Find, text: string): Step => ({ kind: "type", find, what, text })
 const checked = (el: HTMLElement) => el.getAttribute("aria-checked") === "true" || el.hasAttribute("data-checked")
@@ -75,6 +99,13 @@ export function scriptFor(ir: IRNode, s: Scenario, ctx: { predictedOptions: stri
     case "Input": {
       if (s.act === "skip") return act(press("Skip", slot("experience-input-skip")))
       return act(type("the answer", slot("experience-input-field"), typed(s.value)), press("Send answer", slot("experience-input-submit")))
+    }
+    case "Form": {
+      if (s.act === "skip") return act(press("Skip the form", within('[data-slot="form-group-skip"]')))
+      // Every field in the scenario's answers is typed, in the form's order; a field left out is not touched.
+      const answers = (s.value ?? {}) as Record<string, unknown>
+      const typing = ir.fields.filter((f) => answers[f.id] !== undefined).map((f) => type(`the field "${f.prompt}"`, formControl(f.id), typed(answers[f.id])))
+      return act(...typing, press(`the submit button "${ir.submitLabel ?? ir.intent}"`, formSubmit(ir.submitLabel ?? ir.intent)))
     }
     case "Correction":
       return act(type("the correction", slot("correction-input-field"), String(s.value)), press("Submit correction", slot("correction-input-submit")))

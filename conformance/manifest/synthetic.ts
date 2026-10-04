@@ -27,6 +27,30 @@ const SYNTHETIC: Fixture[] = [
     ]),
   },
   {
+    name: "synthetic-form-kinds",
+    ir: ir("book_a_table", [
+      { type: "Text", id: "intro", text: "A few details to hold the table." },
+      {
+        type: "Form",
+        id: "booking",
+        intent: "book the table",
+        prompt: "Your booking",
+        submitLabel: "Hold my table",
+        primary: true,
+        fields: [
+          { id: "guest", prompt: "Name for the booking", kind: "text", required: true, maxLength: 30, group: "You" },
+          { id: "mail", prompt: "Email for the confirmation", kind: "email", required: true, group: "You" },
+          { id: "tel", prompt: "Phone", kind: "phone", group: "You" },
+          { id: "party", prompt: "How many people", kind: "number", min: 1, max: 12, required: true, group: "The table" },
+          { id: "day", prompt: "Which day", kind: "date", required: true, group: "The table" },
+          { id: "deposit", prompt: "Deposit you would like to leave", kind: "money", currency: "AED", min: 0, max: 500, group: "The table" },
+          { id: "menu", prompt: "Menu link", kind: "url" },
+          { id: "notes", prompt: "Anything we should know", kind: "long-text", maxLength: 300 },
+        ],
+      },
+    ]),
+  },
+  {
     name: "synthetic-preferences",
     ir: ir("tune_settings", [
       { type: "Preference", id: "sound", intent: "sound", key: "sound", label: "Sound", value: false },

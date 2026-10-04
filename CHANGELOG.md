@@ -1,5 +1,47 @@
 # Feather — changelog
 
+## 1.15.0 — 2026-10-04
+
+**Form: several answers, one act.** A caller that asked several things with separate Inputs gave the person a "Send
+answer" button per field. An answer that was typed but not sent was lost silently when the person pressed the main
+action, and a sent answer showed no confirmation. Godpip's first Feather integration ran into this. A Form makes it
+impossible.
+
+- **IR: `Form`** (content, act, may be primary):
+  - an optional `prompt`;
+  - `fields`, each asked exactly as an Input of its kind is (same kinds, `required`, `min`/`max`, `maxLength`,
+    `currency`), with an optional `group` heading;
+  - an optional `submitLabel`.
+
+  It takes two acts:
+  - `submit`, with an object from field id to answer;
+  - `skip`, only when no field is required.
+
+  Fields left out were not answered. Every required field is present, and at least one field is answered.
+- **Validation:**
+  - a new code, `duplicate-field`;
+  - each field obeys the Input rules;
+  - the JSON Schema now also says that a money Input or field needs a currency.
+
+  Replies are checked field by field with the Input's own checks. Python matches TypeScript on the regenerated
+  parity corpus: 2501 experiences and 3655 replies.
+- **Composer:** with nothing marked primary, a Form ranks after a Choice and before an Input.
+- **Web: `FormGroup`** (organism):
+  - one `<form>`, one submit button, and Enter submits;
+  - field groups under headings, and "Optional" or "Required" in words;
+  - inline errors with focus on the first one, and nothing is sent until every answer is valid;
+  - after sending, the answers stay visible, read-only, with "Sent. N answers were sent.";
+  - a reply the page refuses keeps the form open.
+- **Text and voice:**
+  - The fields are asked in turns inside one act, with group headings announced.
+  - Optional fields can be skipped, and a required one is re-asked with the reason.
+  - A read-back lists every answer. The person sends it, or changes one by number or name.
+  - Only then is one reply produced.
+  - Voice understands spoken numbers, amounts, phone digits and spelled email or URL symbols.
+- **Switch:** a sent form leaves nothing to scan.
+- **Conformance:** the form fixtures and a synthetic one with every kind reach the same reply in web, switch, text and
+  voice, each submitted with a field left out, with every field answered, and skipped where that is allowed.
+
 ## 1.14.0 — 2026-10-03
 
 **Callers can use Feather.** A system that decides what a person must do, Godpip first, can now install Feather and
