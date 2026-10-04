@@ -5,6 +5,7 @@ import type { BrandTokens } from "../src/index.mjs"
 import {
   CONTRAST_FLOORS,
   DENSITIES,
+  DESTRUCTIVE_TINTS,
   DENSITY,
   DURATIONS,
   EASE_STANDARD,
@@ -19,6 +20,7 @@ import {
   contrastRatio,
   fontImports,
   migrateTokens,
+  oklabMix,
 } from "../src/index.mjs"
 
 const here = import.meta.dirname
@@ -345,7 +347,7 @@ describe("emphasis", () => {
 
         "--border-primary", "--border-secondary", "--border-tertiary", "--border-disabled", "--border-inverse",
         "--surface-base", "--surface-subtle", "--surface-raised", "--surface-overlay", "--surface-hover", "--surface-pressed", "--surface-selected", "--surface-disabled", "--surface-inverse",
-        "--destructive-muted", "--success-muted", "--warning-muted", "--info-muted",
+        "--destructive-muted", "--destructive-muted-hover", "--success-muted", "--warning-muted", "--info-muted",
         "--ring", "--ring-danger", "--ring-inverse", "--opacity-disabled",
       ]) expect(vars[name], name).toBeDefined()
       expect(vars["--text-disabled"]).toBe(`color-mix(in oklab, ${vars["--text-primary"]} 38%, ${vars["--background"]})`)
@@ -354,8 +356,46 @@ describe("emphasis", () => {
       expect(vars["--surface-hover"]).toContain(" 6%,")
       expect(vars["--surface-pressed"]).toContain(" 10%,")
       expect(vars["--surface-selected"]).toContain(" 12%,")
+      expect(vars["--destructive-muted"]).toBe(`color-mix(in oklab, var(--destructive) ${DESTRUCTIVE_TINTS.rest}%, var(--card))`)
       expect(vars["--opacity-disabled"]).toBe("0.5")
     }
+  })
+
+  describe("destructive text", () => {
+    /** The percentage of a destructive tint, read from its color-mix. */
+    const pct = (value: string) => Number(/ (\d+)%,/.exec(value)?.[1])
+
+    it.each(references)("%s: --destructive meets its floor on --background, --card and both tints laid on either", (_name, tokens) => {
+      const { vars, hex } = floorsHold(tokens())
+      const red = hex("--destructive")
+      for (const surface of [hex("--background"), hex("--card")]) {
+        expect(contrastRatio(red, surface)).toBeGreaterThanOrEqual(CONTRAST_FLOORS.destructive)
+        for (const tint of ["--destructive-muted", "--destructive-muted-hover"]) {
+          expect(contrastRatio(red, oklabMix(red, surface, pct(vars[tint]))), tint).toBeGreaterThanOrEqual(CONTRAST_FLOORS.destructive)
+        }
+      }
+    })
+
+    it("hovers on the strongest tint that holds the floor: one percent more would miss it", () => {
+      const { vars, hex } = floorsHold(richBrand())
+      const hover = pct(vars["--destructive-muted-hover"])
+      // #B91C1C on #FAF7F2 drops under 4.5:1 at 20%, so rich-brand hovers one step lighter instead of being refused.
+      expect(hover).toBe(19)
+      const red = hex("--destructive")
+      expect(contrastRatio(red, oklabMix(red, hex("--background"), hover + 1))).toBeLessThan(CONTRAST_FLOORS.destructive)
+      expect(pct(floorsHold(paper()).vars["--destructive-muted-hover"])).toBe(DESTRUCTIVE_TINTS.hover.strongest)
+    })
+
+    it("defaults to the reference themes' red, which holds the floor on light and dark", () => {
+      expect(floorsHold(paper()).vars["--destructive"]).toBe("#b42318")
+      expect(floorsHold(voidPill()).vars["--destructive"]).toBe("#ff6b62")
+    })
+
+    it("refuses a destructive color too faint to read on its tint", () => {
+      const built = buildTheme({ ...paper(), colors: { ...paper().colors, destructive: "#e5484d" } })
+      expect(built.ok).toBe(false)
+      if (!built.ok) expect(built.problems.join("\n")).toMatch(/colors\.destructive reaches \d\.\d\d:1.*--destructive needs 4\.5:1/)
+    })
   })
 
   describe("a deliberately hard brand", () => {
@@ -374,12 +414,6 @@ describe("emphasis", () => {
       const built = buildTheme({ ...paper(), colors: { ...paper().colors, mutedForeground: "#d8d4cc" } })
       expect(built.ok).toBe(false)
       if (!built.ok) expect(built.problems.join("\n")).toMatch(/colors\.mutedForeground reaches \d\.\d\d:1.*--text-secondary needs 4\.5:1/)
-    })
-
-    it("names the floor that fails when the destructive color is too faint for error text", () => {
-      const built = buildTheme({ ...paper(), colors: { ...paper().colors, destructive: "#e5484d" } })
-      expect(built.ok).toBe(false)
-      if (!built.ok) expect(built.problems.join("\n")).toMatch(/colors\.destructive reaches \d\.\d\d:1.*need 4\.5:1/)
     })
 
     it("refuses a brand whose text can reach 7:1 on neither surface, even when the background alone would do", () => {

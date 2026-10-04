@@ -252,7 +252,7 @@ surface:
 | `--border-secondary` | mix of text into surface at 16% (today's `--border`) | none: cards, panels, popover edges |
 | `--border-tertiary` | mix at 10% | none: dividers, table rows, internal sections. Never the only boundary of a control. |
 | `--border-disabled` | mix at 8% | none |
-| `--destructive` | the brand's `destructive`, or a default red per side (`#b42318` light, `#ff6b62` dark) | 4.5:1, also on its own 12% tint: the atoms set error and destructive text in it. A brand red that misses it is refused. |
+| `--destructive` | the brand's `destructive`, or a default red per side (`#b42318` light, `#ff6b62` dark) | 4.5:1, also on both of its own tints: see **Status colors** below. A brand red that misses it at rest is refused. |
 
 Further rules:
 - **Utilities.** Text and icons use `text-fg-primary`, `text-fg-secondary`, `text-fg-tertiary`, `text-fg-disabled`
@@ -268,6 +268,20 @@ Further rules:
 **Status colors** (destructive, success, warning, info) follow the same idea. Each has a strong role (a fill, or
 a 3:1 border) and a muted role (`--<status>-muted`, a tint for surfaces). The destructive color stays off text
 (docs/organisms.md).
+
+A destructive button or badge is the one place `--destructive` is text: it sits on its own tint, never on an
+opacity of the fill (`bg-destructive/10` is an arbitrary opacity). The engine derives both tints and checks the red
+against them:
+
+| token | derived from | contrast floor of `--destructive` on it |
+|---|---|---|
+| `--destructive` | the brand's `destructive`, or the reference red (`#b42318` light, `#ff6b62` dark) | 4.5:1 on `--background` and `--card` |
+| `--destructive-muted` (`bg-destructive-muted`, at rest) | 12% of the red mixed into `--card` | 4.5:1, laid on `--background` and on `--card` |
+| `--destructive-muted-hover` (`bg-destructive-muted-hover`) | the strongest mix from 20% down to 14% that holds the floor | 4.5:1, laid on `--background` and on `--card` |
+
+A red that misses the floor at rest is refused. A red that holds it at rest but not at 20% hovers one step lighter
+instead: rich-brand's `#B91C1C` reaches 4.49:1 at 20% on `#FAF7F2`, so it hovers at 19%. The floor is
+`CONTRAST_FLOORS.destructive`; the percentages are `DESTRUCTIVE_TINTS` in `packages/tokens/src/engine.mjs`.
 
 ## 6. Surfaces
 

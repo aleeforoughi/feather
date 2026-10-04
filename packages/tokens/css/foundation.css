@@ -43,6 +43,7 @@
     --color-surface-disabled: var(--surface-disabled);
     --color-surface-inverse: var(--surface-inverse);
     --color-destructive-muted: var(--destructive-muted);
+    --color-destructive-muted-hover: var(--destructive-muted-hover);
     --color-success-muted: var(--success-muted);
     --color-warning-muted: var(--warning-muted);
     --color-info-muted: var(--info-muted);
@@ -154,6 +155,7 @@
     --accent-foreground: var(--text-primary);
     --destructive: #b42318;
     --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+    --destructive-muted-hover: color-mix(in oklab, var(--destructive) 20%, var(--card));
     --success: #2f9e5c;
     --success-foreground: #000000;
     --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));
@@ -223,6 +225,7 @@
     --accent-foreground: var(--text-primary);
     --destructive: #ff6b62;
     --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+    --destructive-muted-hover: color-mix(in oklab, var(--destructive) 20%, var(--card));
     --success: #4cc27d;
     --success-foreground: #000000;
     --success-muted: color-mix(in oklab, var(--success) 12%, var(--card));

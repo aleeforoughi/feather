@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-embed",
-  "version": "1.15.1",
+  "version": "1.15.2",
   "description": "Feather in any web page with one script import: a self-contained, style-scoped bundle that renders an Experience IR and hands back the person's reply.",
   "license": "UNLICENSED",
   "type": "module",
