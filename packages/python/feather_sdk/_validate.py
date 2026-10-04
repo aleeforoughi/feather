@@ -199,7 +199,7 @@ def _run(doc: Any, add: Add) -> None:
                 continue
             if key == "primary":
                 if node["primary"] is not False:
-                    add("not-primary-capable", f"{at}{seg(key)}", f"{name} cannot be the primary act; only Action, Choice, Input, Approval, Recommendation and IrreversibleAction can.", nid)
+                    add("not-primary-capable", f"{at}{seg(key)}", f"{name} cannot be the primary act; only Action, Choice, Input, Form, Approval, Recommendation and IrreversibleAction can.", nid)
             else:
                 _unknown_field(add, f"{at}{seg(key)}", key, name, ["type", *fields], nid)
         if spec["act"] and get(node, "intent") is UNDEF:
@@ -460,6 +460,24 @@ def _check_node(add: Add, e: _Entry, by_id: dict[str, _Entry], predictions_of: d
             add("out-of-range", f"{at}/min", f"{name} accepts nothing: min {js_num(lo)} is above max {js_num(hi)}.", nid)
         if node.get("kind") == "money" and get(node, "currency") is UNDEF:
             add("missing-field", f"{at}/currency", f"{name} asks for money, so it needs a currency.", nid)
+    elif t == "Form":
+        # Each field is asked as an Input is, so it obeys the same rules; its id is the key of its answer.
+        seen_fields: set[str] = set()
+        fields = node.get("fields")
+        for i, fld in enumerate(fields if is_array(fields) else []):
+            if not is_object(fld):
+                continue
+            fid = fld.get("id")
+            label = f'{name}, field {chr(34) + fid + chr(34) if isinstance(fid, str) else i}'
+            if isinstance(fid, str):
+                if fid in seen_fields:
+                    add("duplicate-field", f"{at}/fields/{i}/id", f'{name} has two fields called "{fid}"; each answer is keyed by its field id.', nid)
+                seen_fields.add(fid)
+            lo, hi = fld.get("min"), fld.get("max")
+            if is_number(lo) and is_number(hi) and num(lo) > num(hi):
+                add("out-of-range", f"{at}/fields/{i}/min", f"{label} accepts nothing: min {js_num(lo)} is above max {js_num(hi)}.", nid)
+            if fld.get("kind") == "money" and get(fld, "currency") is UNDEF:
+                add("missing-field", f"{at}/fields/{i}/currency", f"{label} asks for money, so it needs a currency.", nid)
     elif t == "Date":
         start = parse_date(node["value"]) if isinstance(node.get("value"), str) else None
         end = parse_date(node["until"]) if isinstance(node.get("until"), str) else None

@@ -60,6 +60,8 @@ def acts_for(node: dict[str, Any]) -> list[str]:
         return acts if node.get("acknowledge") is True else []
     if node.get("type") == "Input" and node.get("required") is True:
         return [a for a in acts if a != "skip"]
+    if node.get("type") == "Form" and any(f.get("required") is True for f in node["fields"]):
+        return [a for a in acts if a != "skip"]
     return acts
 
 
@@ -153,32 +155,29 @@ def _check_value(node: dict[str, Any], act: str, value: Any, experience: dict[st
             return f'Choice "{node["of"]}" has no option {short(value)}'
         return f'"{value}" is the prediction itself; reply accept instead' if value == node["option"] else None
     if t == "Input":
+        return _check_answer(node, value) if act == "submit" else None
+    if t == "Form":
         if act != "submit":
             return None
-        kind = node.get("kind")
-        if kind in ("number", "money"):
-            if not is_finite(value):
-                currency = f" in {node.get('currency')}" if kind == "money" else ""
-                return f"a {kind} answer is a finite number{currency}"
-            lo, hi = node.get("min"), node.get("max")
-            if lo is not None and num(value) < num(lo):
-                return f"{js_num(value)} is below the minimum {js_num(lo)}"
-            if hi is not None and num(value) > num(hi):
-                return f"{js_num(value)} is above the maximum {js_num(hi)}"
-            return None
-        if kind == "date":
-            return None if isinstance(value, str) and parse_date(value) else "a date answer is an ISO 8601 date or date-time string"
-        if not _text(value):
-            return "the answer is a non-empty string"
-        s: str = value
-        if node.get("maxLength") is not None and chars(s) > node["maxLength"]:
-            return f"the answer is {chars(s)} characters; the most is {js_num(node['maxLength'])}"
-        if kind == "email" and not _EMAIL.fullmatch(s):
-            return f"{short(s)} is not an email address"
-        if kind == "phone" and not _PHONE.fullmatch(s):
-            return f"{short(s)} is not a phone number"
-        if kind == "url" and not url_can_parse(s):
-            return f"{short(s)} is not a URL"
+        if not is_object(value):
+            return "a form answer is an object from field id to answer"
+        fields = node["fields"]
+        ids = [f["id"] for f in fields]
+        unknown = [k for k in js_keys(value) if k not in ids]
+        if unknown:
+            return f'no field {", ".join(short(k) for k in unknown)} (fields: {", ".join(ids)})'
+        if len(js_keys(value)) == 0:
+            return "a form answer gives at least one field" if any(f.get("required") is True for f in fields) else "a form answer gives at least one field; reply skip to answer none"
+        missing = [f["id"] for f in fields if f.get("required") is True and value.get(f["id"], UNDEF) is UNDEF]
+        if missing:
+            many = len(missing) != 1
+            return f'required field{"s" if many else ""} {", ".join(chr(34) + m + chr(34) for m in missing)} {"have" if many else "has"} no answer'
+        for f in fields:
+            if value.get(f["id"], UNDEF) is UNDEF:
+                continue
+            problem = _check_answer(f, value[f["id"]])
+            if problem:
+                return f'field "{f["id"]}": {problem}'
         return None
     if t == "Alternative":
         kind = node.get("input")
@@ -209,6 +208,35 @@ def _check_value(node: dict[str, Any], act: str, value: Any, experience: dict[st
         if topics is not None and not includes(list(topics), value):
             return f'{short(value)} is not one of its topics ({", ".join(short(o) for o in topics)})'
         return None
+    return None
+
+
+def _check_answer(ask: dict[str, Any], value: Any) -> str | None:
+    """Why an answer does not fit what an Input (or a Form field, asked the same way) asks for, or None when it does."""
+    kind = ask.get("kind")
+    if kind in ("number", "money"):
+        if not is_finite(value):
+            currency = f" in {ask.get('currency')}" if kind == "money" else ""
+            return f"a {kind} answer is a finite number{currency}"
+        lo, hi = ask.get("min"), ask.get("max")
+        if lo is not None and num(value) < num(lo):
+            return f"{js_num(value)} is below the minimum {js_num(lo)}"
+        if hi is not None and num(value) > num(hi):
+            return f"{js_num(value)} is above the maximum {js_num(hi)}"
+        return None
+    if kind == "date":
+        return None if isinstance(value, str) and parse_date(value) else "a date answer is an ISO 8601 date or date-time string"
+    if not _text(value):
+        return "the answer is a non-empty string"
+    s: str = value
+    if ask.get("maxLength") is not None and chars(s) > ask["maxLength"]:
+        return f"the answer is {chars(s)} characters; the most is {js_num(ask['maxLength'])}"
+    if kind == "email" and not _EMAIL.fullmatch(s):
+        return f"{short(s)} is not an email address"
+    if kind == "phone" and not _PHONE.fullmatch(s):
+        return f"{short(s)} is not a phone number"
+    if kind == "url" and not url_can_parse(s):
+        return f"{short(s)} is not a URL"
     return None
 
 
