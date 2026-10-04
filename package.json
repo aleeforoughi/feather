@@ -1,7 +1,7 @@
 {
   "name": "feather",
   "private": true,
-  "version": "1.15.0",
+  "version": "1.15.1",
   "description": "Feather, the first liquid design system: semantics in, the right experience out.",
   "license": "UNLICENSED",
   "type": "module",
@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "test": "pnpm -r test",
     "hygiene": "node scripts/feather-hygiene.mjs",
+    "size": "pnpm --filter @aleeforoughi/feather-manifest-web size",
     "storybook": "pnpm --filter @feather-apps/storybook dev",
     "build-storybook": "pnpm --filter @feather-apps/storybook build",
     "manifest": "pnpm build-storybook && node packages/react/scripts/foundation-manifest.mjs",

@@ -1,5 +1,22 @@
 # Feather — changelog
 
+## 1.15.1 — 2026-10-04
+
+**The 1.7.0 accessibility debt is paid, and the size target is a gate.**
+
+- **Destructive contrast.** A theme that names no `destructive` color got `#e5484d`, which reaches only 3.7:1 on a
+  light background. The atoms set error and destructive text in it (Badge, Button, Field), so paper-sharp failed
+  `color-contrast` in four stories. The default red is now chosen per side of the theme: `#b42318` on a light
+  background and `#ff6b62` on a dark one, the same reds as `foundation.css` and the default theme.
+- **A new contrast floor:** `--destructive` reaches 4.5:1 on the background, the surface and its own 12% tint
+  (`CONTRAST_FLOORS.destructive`). A brand red that misses it is refused with the ratio it reached.
+- **`a11y-known.json` is empty.** No accessibility debt remains in either reference theme.
+- **Size gate:** `pnpm size` (in CI after hygiene) bundles `liquid` and `manifest-web` as a product would, minified
+  and gzipped, with React and the component library left out. Budget: 60 KB (PLAN.md section 9). Today: 29.7 KB.
+  It also prints the figure with the component library bundled in, 176 KB, which is not gated.
+- Visual change: the destructive stories in paper-sharp and void-pill use the new reds. Their baselines are
+  re-recorded.
+
 ## 1.15.0 — 2026-10-04
 
 **Form: several answers, one act.** A caller that asked several things with separate Inputs gave the person a "Send

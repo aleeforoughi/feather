@@ -1,18 +1,5 @@
 {
-  "$comment": "Accessibility debt carried over from Feather 1.7.0, per reference theme: story id -> axe rules it still breaks. The a11y suite fails on any violation not listed here, and on any listed one that no longer occurs (delete it then). Fixed in 1.7.1; this list only shrinks.",
-  "paper-sharp": {
-    "atoms-badge--destructive": [
-      "color-contrast"
-    ],
-    "atoms-button--destructive": [
-      "color-contrast"
-    ],
-    "atoms-dialog--confirmation": [
-      "color-contrast"
-    ],
-    "atoms-field--with-error": [
-      "color-contrast"
-    ]
-  },
+  "$comment": "Accessibility debt carried over from Feather 1.7.0, per reference theme: story id -> axe rules it still breaks. The a11y suite fails on any violation not listed here, and on any listed one that no longer occurs (delete it then). The last entries (paper-sharp's destructive contrast) were cleared in 1.15.1; this list only shrinks.",
+  "paper-sharp": {},
   "void-pill": {}
 }

@@ -34,6 +34,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm hygiene
+      - name: Size (liquid + manifest-web under 60 KB gzipped, PLAN.md section 9)
+        run: pnpm size
       - name: Build Storybook
         run: pnpm build-storybook
       - name: foundation.json matches the components and stories

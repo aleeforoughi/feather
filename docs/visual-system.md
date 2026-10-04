@@ -252,6 +252,7 @@ surface:
 | `--border-secondary` | mix of text into surface at 16% (today's `--border`) | none: cards, panels, popover edges |
 | `--border-tertiary` | mix at 10% | none: dividers, table rows, internal sections. Never the only boundary of a control. |
 | `--border-disabled` | mix at 8% | none |
+| `--destructive` | the brand's `destructive`, or a default red per side (`#b42318` light, `#ff6b62` dark) | 4.5:1, also on its own 12% tint: the atoms set error and destructive text in it. A brand red that misses it is refused. |
 
 Further rules:
 - **Utilities.** Text and icons use `text-fg-primary`, `text-fg-secondary`, `text-fg-tertiary`, `text-fg-disabled`

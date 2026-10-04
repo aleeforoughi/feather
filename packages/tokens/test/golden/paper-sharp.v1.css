@@ -13,7 +13,7 @@
   --muted-foreground: var(--text-secondary);
   --accent: color-mix(in oklab, #c2410c 18%, #faf7f2);
   --accent-foreground: var(--text-primary);
-  --destructive: #e5484d;
+  --destructive: #b42318;
   --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
   --success: #2f9e5c;
   --success-foreground: #000000;

@@ -176,6 +176,8 @@ export const CONTRAST_FLOORS = {
   borderPrimary: 3,
   /** Primary text on a tinted surface (hover, pressed, selected, a status tint). */
   onTint: 4.5,
+  /** The destructive color: the atoms set error and destructive text in it, on the surfaces and on its own tint. */
+  destructive: 4.5,
 }
 
 function expand(hex) {
@@ -335,9 +337,10 @@ export function buildTheme(input) {
   const surface = expand(c.surface)
   const primary = expand(c.primary)
   const accent = expand(c.accent ?? c.primary)
-  const destructive = expand(c.destructive ?? "#e5484d")
-  // Status colors: the brand's own when it names them, otherwise defaults tuned for a light or a dark background.
+  // The default red is chosen per side of the theme; on a light background the brighter red misses 4.5:1 as text.
   const darkBg = luminance(bg) < 0.2
+  const destructive = expand(c.destructive ?? (darkBg ? "#ff6b62" : "#b42318"))
+  // Status colors: the brand's own when it names them, otherwise defaults tuned for a light or a dark background.
   const status = (name, light, dark) => {
     const color = expand(c[name] ?? (darkBg ? dark : light))
     return [color, expand(c[`${name}Text`] ?? onColor(color, text, bg))]
@@ -358,6 +361,9 @@ export function buildTheme(input) {
   if (!tertiary) problems.push(`no mix of colors.text into colors.background reaches ${CONTRAST_FLOORS.textTertiary}:1 for --text-tertiary`)
   const borderPrimary = lightestMix(text, bg, on, CONTRAST_FLOORS.borderPrimary)
   if (!borderPrimary) problems.push(`no mix of colors.text into colors.background reaches ${CONTRAST_FLOORS.borderPrimary}:1 for --border-primary`)
+  const destructiveOn = [...on, oklabMix(destructive, surface, 12)]
+  const destructiveWorst = Math.min(...destructiveOn.map((s) => contrast(destructive, s)))
+  if (destructiveWorst < CONTRAST_FLOORS.destructive) problems.push(`colors.destructive reaches ${destructiveWorst.toFixed(2)}:1 on colors.background, colors.surface and its own tint; error and destructive text need ${CONTRAST_FLOORS.destructive}:1`)
   if (problems.length > 0) return { ok: false, problems }
   // Secondary sits between primary and tertiary: the brand's mutedForeground, or the mix halfway from the floor to full text.
   const halfway = oklabMix(text, bg, Math.ceil((tertiary.pct + 100) / 2))

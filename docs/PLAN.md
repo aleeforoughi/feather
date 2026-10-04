@@ -98,7 +98,7 @@ LayoutPlan = ordered regions → nodes → manifestation hints (density, depth, 
 
 The contract Godpip, QOOE and others will emit. Version it from day one (`feather.ir/0`).
 
-**Content nodes:** `Action`, `Choice`, `Input`, `Price`, `Person`, `Date`, `Location`, `Status`, `Progress`, `Media`, `Confirmation`, `Warning`, `Approval`, `Text`.
+**Content nodes:** `Action`, `Choice`, `Input`, `Price`, `Person`, `Date`, `Location`, `Status`, `Progress`, `Media`, `Confirmation`, `Warning`, `Approval`, `Text`, `Form` (added in 1.15.0). The generated reference is `docs/ir/nodes.md`.
 
 **Decision nodes:** `Recommendation`, `PredictedChoice`, `Alternative`, `Tradeoff`, `Autopick`, `Correction`, `Preference`, `Comparison`, `IrreversibleAction`, `ExploreMore`.
 

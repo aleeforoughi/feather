@@ -311,6 +311,8 @@ describe("emphasis", () => {
     expect(worst("--text-secondary")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.textSecondary)
     expect(worst("--text-tertiary")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.textTertiary)
     expect(worst("--border-primary")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.borderPrimary)
+    // The atoms set error and destructive text in --destructive.
+    expect(worst("--destructive")).toBeGreaterThanOrEqual(CONTRAST_FLOORS.destructive)
     // Icons take the text scale (text-fg-*, currentColor), so a meaningful icon reaches at least 3:1.
     for (const level of ["primary", "secondary", "tertiary"]) expect(worst(`--text-${level}`)).toBeGreaterThanOrEqual(CONTRAST_FLOORS.icon)
     // The engine reports exactly what it wrote.
@@ -372,6 +374,12 @@ describe("emphasis", () => {
       const built = buildTheme({ ...paper(), colors: { ...paper().colors, mutedForeground: "#d8d4cc" } })
       expect(built.ok).toBe(false)
       if (!built.ok) expect(built.problems.join("\n")).toMatch(/colors\.mutedForeground reaches \d\.\d\d:1.*--text-secondary needs 4\.5:1/)
+    })
+
+    it("names the floor that fails when the destructive color is too faint for error text", () => {
+      const built = buildTheme({ ...paper(), colors: { ...paper().colors, destructive: "#e5484d" } })
+      expect(built.ok).toBe(false)
+      if (!built.ok) expect(built.problems.join("\n")).toMatch(/colors\.destructive reaches \d\.\d\d:1.*need 4\.5:1/)
     })
 
     it("refuses a brand whose text can reach 7:1 on neither surface, even when the background alone would do", () => {
