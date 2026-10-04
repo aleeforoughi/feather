@@ -3,4 +3,4 @@
 export { speechFor, sayChoices, spokenNumber, MAX_SPOKEN_WORDS, type Speech } from "./speech.ts"
 export { createVoiceDialog, type VoiceDialog } from "./dialog.ts"
 export { runVoice, type VoiceEngine, type RunVoiceOptions, type RunVoiceResult } from "./run.ts"
-export { spokenToDigits, readbackWord } from "./hear.ts"
+export { spokenToDigits, readbackWord, spokenAnswer } from "./hear.ts"

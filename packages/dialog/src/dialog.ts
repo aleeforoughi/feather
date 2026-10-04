@@ -1,12 +1,12 @@
 // The dialog engine: a conversation over a layout plan, in turns. Pure and deterministic (no clock, no randomness, no
 // I/O, no DOM): the same plan and the same inputs always give the same turns and the same replies. The contract is
 // docs/manifestations.md section 1.
-import { actsFor, validateReply, type Experience, type IRNode, type ReplyEvent } from "@aleeforoughi/feather-intent"
+import { actsFor, validateReply, type Experience, type FormField, type FormNode, type IRNode, type ReplyEvent } from "@aleeforoughi/feather-intent"
 import type { Emphasis, LayoutPlan, PlanNode } from "@aleeforoughi/feather-liquid"
 import { formatDate, formatMoney, plainProblem } from "./format.ts"
 import { normalize, type Normalized } from "./normalize.ts"
 import { experienceCurrency, experienceOf, nodeIndex, planNodes } from "./plan-utils.ts"
-import { consequenceSentences, sentences, show } from "./words.ts"
+import { consequenceSentences, questionCount, SEND_WORD, sentences, show, SKIP_ALL_WORDS, SKIP_WORD } from "./words.ts"
 
 export interface DialogOptions {
   /** The experience the plan came from; replies are checked against it. Default: rebuilt from the plan's nodes. */
@@ -20,6 +20,8 @@ export interface Part {
   text: string
   /** The plan node it belongs to, if any. */
   node?: string
+  /** The Form field it asks about or reports, if any. */
+  field?: string
   emphasis?: Emphasis
 }
 
@@ -34,7 +36,7 @@ export interface Choice {
 }
 
 export interface Turn {
-  state: "browse" | "value" | "confirm" | "readback" | "done"
+  state: "browse" | "value" | "confirm" | "readback" | "review" | "done"
   /** What to present, in order. A body renders each part its own way. */
   parts: Part[]
   /** What the person can do now, numbered from 1. */
@@ -79,7 +81,18 @@ interface Pending {
   value?: unknown
 }
 
-type Mode = { kind: "browse" } | { kind: "value"; offer: Offer } | { kind: "readback"; pending: Pending } | { kind: "confirm"; pending: Pending } | { kind: "done" }
+/** A Form being asked: one act, a short sequence of questions, answers kept here until the person sends them. */
+interface FormRun {
+  offer: Offer
+  form: FormNode
+  answers: Map<string, unknown>
+  /** The field being asked. */
+  index: number
+  /** Changing one answer from the read-back: after it, the read-back again. */
+  editing: boolean
+}
+
+type Mode = { kind: "browse" } | { kind: "value"; offer: Offer } | { kind: "form"; run: FormRun } | { kind: "review"; run: FormRun } | { kind: "readback"; pending: Pending } | { kind: "confirm"; pending: Pending } | { kind: "done" }
 
 interface TurnOptions {
   problem?: string
@@ -88,10 +101,15 @@ interface TurnOptions {
   full?: boolean
   /** Parts to put first (what just happened). */
   lead?: Part[]
+  /** Form: the form has just been picked (say what it is for and how many questions). */
+  intro?: boolean
+  /** Form: a question has just been reached, so say its group if the group changed. */
+  heading?: boolean
 }
 
 const NO_REPLY_TO_ARM = new Set(["cancel", "reject"])
 const upperFirst = (s: string) => (s.length > 0 ? s[0]!.toUpperCase() + s.slice(1) : s)
+const lowerFirst = (s: string) => (s.length > 0 ? s[0]!.toLowerCase() + s.slice(1) : s)
 const lowerConsequence = (s: string) => s.replace(/^(Spends|Publishes|Sends|Gives|Deletes) /, (m) => m.toLowerCase())
 const clip = (s: string, max = 40) => (s.length > max ? `${[...s].slice(0, max - 1).join("")}…` : s)
 const NUMBER = /^[-+]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/
@@ -133,6 +151,8 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
         return ir.prompt
       case "Input":
         return act === "skip" ? `Skip: ${ir.prompt}` : ir.prompt
+      case "Form":
+        return act === "skip" ? `Skip: ${ir.prompt ?? ir.intent}` : upperFirst(ir.submitLabel ?? ir.intent)
       case "Warning":
         return `Acknowledge: ${ir.text}`
       case "Approval":
@@ -194,6 +214,7 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
       case "PredictedChoice":
         return o.act === "choose" || o.act === "change"
       case "Input":
+      case "Form":
         return o.act === "submit"
       case "Alternative":
         return ir.input !== undefined
@@ -221,6 +242,20 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
     return undefined
   }
 
+  /** An Input's question by kind, and a Form field's the same way. */
+  function askedAs(ir: { prompt: string; kind: string; min?: number; max?: number; currency?: string }): string {
+    const range = ir.min !== undefined && ir.max !== undefined ? ` from ${ir.min} to ${ir.max}` : ir.min !== undefined ? ` of at least ${ir.min}` : ir.max !== undefined ? ` of at most ${ir.max}` : ""
+    const kind: Record<string, string> = {
+      number: `a number${range}`,
+      money: `an amount${ir.currency ? ` in ${ir.currency}` : ""}${range}`,
+      date: "a date, like 2026-01-15",
+      email: "an email address",
+      phone: "a phone number",
+      url: "a web address",
+    }
+    return kind[ir.kind] ? `${ir.prompt} (${kind[ir.kind]})` : ir.prompt
+  }
+
   function questionFor(o: Offer): string {
     const ir = o.ir
     switch (ir.type) {
@@ -230,18 +265,8 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
         const choice = irs.get(ir.of)
         return `${choice?.type === "Choice" ? choice.prompt : "Which one?"} (instead of ${optionLabel(choice, ir.option)})`
       }
-      case "Input": {
-        const range = ir.min !== undefined && ir.max !== undefined ? ` from ${ir.min} to ${ir.max}` : ir.min !== undefined ? ` of at least ${ir.min}` : ir.max !== undefined ? ` of at most ${ir.max}` : ""
-        const kind: Record<string, string> = {
-          number: `a number${range}`,
-          money: `an amount${ir.currency ? ` in ${ir.currency}` : ""}${range}`,
-          date: "a date, like 2026-01-15",
-          email: "an email address",
-          phone: "a phone number",
-          url: "a web address",
-        }
-        return kind[ir.kind] ? `${ir.prompt} (${kind[ir.kind]})` : ir.prompt
-      }
+      case "Input":
+        return askedAs(ir)
       case "Alternative": {
         const kind = { Price: `an amount${currency ? ` in ${currency}` : ""}`, Date: "a date, like 2026-01-15", Text: "your words", Location: "a place", Person: "a name" }[ir.input ?? "Text"]
         return `${upperFirst(ir.label ?? ir.intent)}: give ${kind}.`
@@ -264,14 +289,14 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   const good = (value: unknown): Parsed => ({ ok: true, hasValue: true, value })
 
   /** A value in the person's words, for an act that takes free text, a number, a date or an amount. */
-  function parseFree(o: Offer, n: Normalized): Parsed {
+  function parseFree(o: Offer, n: Normalized, ask?: FormField): Parsed {
     const ir = o.ir
-    const kind = ir.type === "Input" ? ir.kind : ir.type === "Alternative" ? ir.input : ir.type === "Preference" ? typeof ir.value : "text"
+    const kind = ask ? ask.kind : ir.type === "Input" ? ir.kind : ir.type === "Alternative" ? ir.input : ir.type === "Preference" ? typeof ir.value : "text"
     switch (kind) {
       case "number":
       case "money": {
         let s = n.plain.toLowerCase()
-        const code = ir.type === "Input" ? ir.currency?.toLowerCase() : undefined
+        const code = ask ? ask.currency?.toLowerCase() : ir.type === "Input" ? ir.currency?.toLowerCase() : undefined
         if (code && s.endsWith(code)) s = s.slice(0, -code.length).trim()
         else if (code && s.startsWith(code)) s = s.slice(code.length).trim()
         const v = parseNumber(s)
@@ -300,6 +325,12 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   }
 
   /** What a value says, in words: for readback and outcomes. */
+  function describeField(ask: { kind: string; currency?: string }, value: unknown): string {
+    if (ask.kind === "money" && typeof value === "number") return ask.currency ? formatMoney(value, ask.currency, locale) : String(value)
+    if (ask.kind === "date" && typeof value === "string") return formatDate(value, locale)
+    return typeof value === "number" ? String(value) : `"${String(value)}"`
+  }
+
   function describe(o: Offer, value: unknown): string {
     const ir = o.ir
     switch (ir.type) {
@@ -308,9 +339,11 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
       case "PredictedChoice":
         return optionLabel(irs.get(ir.of), String(value))
       case "Input":
-        if (ir.kind === "money" && typeof value === "number") return ir.currency ? formatMoney(value, ir.currency, locale) : String(value)
-        if (ir.kind === "date" && typeof value === "string") return formatDate(value, locale)
-        return typeof value === "number" ? String(value) : `"${String(value)}"`
+        return describeField(ir, value)
+      case "Form": {
+        const count = typeof value === "object" && value !== null ? Object.keys(value).length : 0
+        return `${count} ${count === 1 ? "answer" : "answers"}`
+      }
       case "Alternative":
         if (typeof value === "object" && value !== null && "amount" in value && "currency" in value) return formatMoney(Number(value.amount), String(value.currency), locale)
         return ir.input === "Date" && typeof value === "string" ? formatDate(value, locale) : `"${String(value)}"`
@@ -321,8 +354,113 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
     }
   }
 
+  // ── Forms ────────────────────────────────────────────────────────────────────────────────────────────────────
+  const noneRequired = (form: FormNode) => !form.fields.some((f) => f.required === true)
+
+  /** The question for the field being asked, said the way an Input of its kind is, plus how to leave it out. */
+  function formQuestion(run: FormRun): string {
+    const { form, index } = run
+    const field = form.fields[index]!
+    const where = run.editing ? `Change question ${index + 1}` : `Question ${index + 1} of ${form.fields.length}`
+    if (field.required === true) return `${where}, required: ${askedAs(field)}`
+    const all = index === 0 && !run.editing && noneRequired(form) ? ` or "${SKIP_ALL_WORDS}" to skip the whole form` : ""
+    return `${where}: ${askedAs(field)}. Say "${SKIP_WORD}" to ${run.editing ? "take the answer out" : "leave it out"}${all}.`
+  }
+
+  /** Why one answer does not fit its field, in the words an Input of the same kind uses; undefined when it fits. */
+  function checkField(form: FormNode, field: FormField, value: unknown): string | undefined {
+    const loose: FormNode = { ...form, fields: form.fields.map((f) => ({ ...f, required: false })) }
+    const probe: Experience = { ...experience, nodes: experience.nodes.map((n) => (n.id === form.id ? loose : n)) }
+    const checked = validateReply(probe, { experience: experience.experience, node: form.id, act: "submit", value: { [field.id]: value } })
+    if (checked.ok) return undefined
+    return checked.issues.map((i) => upperFirst(plainProblem(i.message).replace(/^field "[^"]*":\s*/, ""))).join(" ")
+  }
+
+  function startForm(o: Offer): Turn {
+    mode = { kind: "form", run: { offer: o, form: o.ir as FormNode, answers: new Map(), index: 0, editing: false } }
+    return turnFor({ intro: true })
+  }
+
+  /** After an answer or a skipped question: the next question, or the read-back after the last (or after a change). */
+  function advance(run: FormRun): Turn {
+    if (!run.editing && run.index + 1 < run.form.fields.length) {
+      run.index++
+      mode = { kind: "form", run }
+      return turnFor({ heading: true })
+    }
+    run.editing = false
+    mode = { kind: "review", run }
+    return turnFor()
+  }
+
+  function skipForm(run: FormRun): Turn {
+    const sent = send({ ...run.offer, act: "skip", label: labelFor(run.offer.ir, "skip") }, false, undefined)
+    return sent.ok ? settle({ lead: [sent.outcome] }) : turnFor({ problem: sent.problem })
+  }
+
+  /** The one reply: only the answered fields, in field order. Nothing was sent before this. */
+  function sendForm(run: FormRun): Turn {
+    const value = Object.fromEntries(run.form.fields.filter((f) => run.answers.has(f.id)).map((f) => [f.id, run.answers.get(f.id)]))
+    const p: Pending = { offer: run.offer, hasValue: true, value }
+    if (confirmOf(run.offer) !== undefined) {
+      mode = { kind: "confirm", pending: p }
+      return turnFor()
+    }
+    const sent = send(run.offer, true, value)
+    if (sent.ok) return settle({ lead: [sent.outcome] })
+    mode = { kind: "review", run }
+    return turnFor({ problem: sent.problem })
+  }
+
+  function stepForm(run: FormRun, n: Normalized): Turn {
+    const field = run.form.fields[run.index]!
+    if (n.text === SKIP_ALL_WORDS) {
+      if (run.index === 0 && !run.editing && noneRequired(run.form)) return skipForm(run)
+      return turnFor({ problem: `The whole form can be skipped only at its start, and only when nothing in it is required. Say "${SKIP_WORD}" to leave this one out.` })
+    }
+    if (n.text === SKIP_WORD) {
+      if (field.required === true) return turnFor({ problem: "This one is required, so it cannot be skipped." })
+      run.answers.delete(field.id)
+      return advance(run)
+    }
+    const parsed = parseFree({ ...run.offer, ir: run.form }, n, field)
+    if (!parsed.ok) return turnFor({ problem: parsed.problem })
+    const problem = checkField(run.form, field, parsed.value)
+    if (problem) return turnFor({ problem })
+    run.answers.set(field.id, parsed.value)
+    return advance(run)
+  }
+
+  function stepReview(run: FormRun, n: Normalized): Turn {
+    const { form } = run
+    const count = run.answers.size
+    if (n.text === SKIP_WORD) return count === 0 ? skipForm(run) : turnFor({ problem: `Say "${SEND_WORD}" to send these answers, or "change" and a number or a field name.` })
+    const sends = [SEND_WORD, "submit", "yes", normalize(form.submitLabel ?? form.intent, locale).text]
+    if (sends.includes(n.text)) return count === 0 ? turnFor({ problem: `There is nothing to send yet. Say "${SKIP_WORD}" to skip the form, or change one.` }) : sendForm(run)
+    const change = /^(?:change|edit) (.+)$/.exec(n.text)
+    const target = change ? change[1]! : n.text
+    if (n.text === "change" || n.text === "edit") return turnFor({ problem: `Change which one? Say a number from 1 to ${form.fields.length} or a field name.` })
+    let i: number
+    if (/^\d{1,6}$/.test(target)) {
+      const k = Number(target)
+      if (k < 1 || k > form.fields.length) return turnFor({ problem: `There is no question ${clip(target)}. Pick a number from 1 to ${form.fields.length}.` })
+      i = k - 1
+    } else i = form.fields.findIndex((f) => same(f.prompt, target) || same(f.id, target) || same(f.id.replaceAll("_", " "), target))
+    if (i < 0) return turnFor({ problem: `I did not understand "${clip(n.raw)}". Say "${SEND_WORD}", or "change" and a number from 1 to ${form.fields.length} or a field name.` })
+    run.index = i
+    run.editing = true
+    mode = { kind: "form", run }
+    return turnFor()
+  }
+
   // ── Turns ────────────────────────────────────────────────────────────────────────────────────────────────────
-  const part = (kind: Part["kind"], text: string, node?: string, emphasis?: Emphasis): Part => ({ kind, text, ...(node === undefined ? {} : { node }), ...(emphasis === undefined ? {} : { emphasis }) })
+  const part = (kind: Part["kind"], text: string, node?: string, emphasis?: Emphasis, field?: string): Part => ({
+    kind,
+    text,
+    ...(node === undefined ? {} : { node }),
+    ...(field === undefined ? {} : { field }),
+    ...(emphasis === undefined ? {} : { emphasis }),
+  })
 
   function contentParts(): Part[] {
     const out: Part[] = []
@@ -350,6 +488,32 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
         const offer = mode.offer
         const choices = (optionsOf(offer) ?? []).map((opt, i) => ({ n: i + 1, label: opt.label, words: opt.words, node: offer.ir.id }))
         return { state: "value", parts: [...lead, ...problem, ...hint, part("question", questionFor(offer), offer.ir.id)], choices }
+      }
+      case "form": {
+        const { run } = mode
+        const { form, index } = run
+        const field = form.fields[index]!
+        const parts: Part[] = [...lead]
+        if (o.intro) {
+          if (form.prompt) parts.push(part("content", form.prompt, form.id))
+          parts.push(part("content", `${questionCount(form.fields.length)}.`, form.id))
+        }
+        const grouped = field.group !== undefined && (o.full === true || ((o.intro === true || o.heading === true) && (index === 0 || form.fields[index - 1]!.group !== field.group)))
+        if (grouped) parts.push(part("content", `${field.group}:`, form.id, undefined, field.id))
+        if (run.editing && run.answers.has(field.id)) parts.push(part("content", `Now: ${describeField(field, run.answers.get(field.id))}.`, form.id, undefined, field.id))
+        parts.push(...problem, ...hint, part("question", formQuestion(run), form.id, undefined, field.id))
+        return { state: "value", parts, choices: [] }
+      }
+      case "review": {
+        const { run } = mode
+        const { form } = run
+        const lines = form.fields.map((f, i) => part("content", `${i + 1}. ${f.prompt}: ${run.answers.has(f.id) ? describeField(f, run.answers.get(f.id)) : "not answered"}.`, form.id, undefined, f.id))
+        const count = run.answers.size
+        const ask =
+          count === 0
+            ? `You have not answered anything. Say "${SKIP_WORD}" to skip the form, or "change" and a number from 1 to ${form.fields.length} or a field name.`
+            : `Say "${SEND_WORD}" to ${lowerFirst(form.submitLabel ?? form.intent)}, or "change" and a number from 1 to ${form.fields.length} or a field name.`
+        return { state: "review", parts: [...lead, part("content", "Your answers:", form.id), ...lines, ...problem, ...hint, part("question", ask, form.id)], choices: [] }
       }
       case "readback": {
         const { offer, value } = mode.pending
@@ -455,7 +619,7 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   function commit(p: Pending): Turn {
     const sent = send(p.offer, p.hasValue, p.value)
     if (sent.ok) return settle({ lead: [sent.outcome] })
-    if (p.hasValue && needsValue(p.offer)) {
+    if (p.hasValue && needsValue(p.offer) && p.offer.ir.type !== "Form") {
       mode = { kind: "value", offer: p.offer }
       return turnFor({ problem: sent.problem })
     }
@@ -463,6 +627,7 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   }
 
   function pick(o: Offer): Turn {
+    if (o.ir.type === "Form" && o.act === "submit") return startForm(o)
     if (needsValue(o)) {
       mode = { kind: "value", offer: o }
       return turnFor()
@@ -470,10 +635,34 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
     return proceed({ offer: o, hasValue: false }, false)
   }
 
-  function backOut(): Turn {
+  function backOut(word: string): Turn {
     switch (mode.kind) {
       case "browse":
         return turnFor({ hint: "There is nothing to go back to." })
+      case "form": {
+        const { run } = mode
+        // "cancel" drops the form; "back" goes one step back, and from the first question drops it. Nothing was sent.
+        if (word === "back" && run.editing) {
+          run.editing = false
+          mode = { kind: "review", run }
+          return turnFor({ hint: "Nothing was changed." })
+        }
+        if (word === "back" && run.index > 0) {
+          run.index--
+          return turnFor({ heading: true })
+        }
+        return settle({ lead: [part("hint", "Nothing was sent.")] })
+      }
+      case "review": {
+        const { run } = mode
+        if (word === "back") {
+          run.index = run.form.fields.length - 1
+          run.editing = true
+          mode = { kind: "form", run }
+          return turnFor()
+        }
+        return settle({ lead: [part("hint", "Nothing was sent.")] })
+      }
       case "confirm": {
         const o = mode.pending.offer
         if (o.ir.type === "IrreversibleAction" && o.act === "confirm") {
@@ -514,13 +703,17 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
           ? 'Pick a number, or say the words shown. Say "repeat" to hear this again.'
           : mode.kind === "value"
             ? 'Answer the question, or say "back" to go back.'
-            : mode.kind === "readback"
+            : mode.kind === "form"
+              ? `Answer the question, say "${SKIP_WORD}" to leave an optional one out, say "back" for the question before, or "cancel" to drop the form. Nothing is sent until you say "${SEND_WORD}".`
+              : mode.kind === "review"
+                ? `Say "${SEND_WORD}" to send the answers, "change" and a number or a field name to change one, or "cancel" to drop the form.`
+                : mode.kind === "readback"
               ? "Say yes or no."
               : `Only the word "${keywordOf(mode.pending.offer)}" goes ahead. Anything else does nothing. Say "cancel" to stop.`
       return turnFor({ full: true, hint })
     }
     if (n.text === "repeat") return turnFor({ full: true })
-    if (n.text === "back" || n.text === "cancel") return backOut()
+    if (n.text === "back" || n.text === "cancel") return backOut(n.text)
 
     switch (mode.kind) {
       case "browse": {
@@ -534,6 +727,10 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
       }
       case "value":
         return stepValue(mode.offer, n)
+      case "form":
+        return stepForm(mode.run, n)
+      case "review":
+        return stepReview(mode.run, n)
       case "readback": {
         const p = mode.pending
         if (n.text === "no") {
@@ -545,7 +742,7 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
       }
       case "confirm": {
         const p = mode.pending
-        if (n.text === "no") return backOut()
+        if (n.text === "no") return backOut("cancel")
         if (n.text === normalize(keywordOf(p.offer), locale).text) return commit(p)
         return turnFor({ problem: "Nothing was done." })
       }

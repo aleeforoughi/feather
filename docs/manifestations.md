@@ -46,7 +46,7 @@ interface Dialog {
 interface Outcome { turn: Turn; replies: ReplyEvent[] }
 
 interface Turn {
-  state: "browse" | "value" | "confirm" | "readback" | "done"
+  state: "browse" | "value" | "confirm" | "readback" | "review" | "done"
   /** What to present, in order. A body renders each part its own way. */
   parts: Part[]
   /** What the person can do now, numbered from 1. */
@@ -58,6 +58,8 @@ interface Part {
   text: string
   /** The plan node it belongs to, if any. */
   node?: string
+  /** The Form field it asks about or reports, if any. */
+  field?: string
   emphasis?: Emphasis
 }
 
@@ -89,6 +91,7 @@ interface Choice {
   - PredictedChoice: `accept` is "Keep {label}"; `change` lists the other options.
   - Input: a question by kind. Its value is encoded as the IR says: number and money as a number, date as an ISO
     8601 string.
+  - Form: a short sequence inside one act, see "Forms" below.
   - Alternative with `input`: a question by kind.
   - Correction: free text.
   - Preference: its options, or a typed value.
@@ -108,6 +111,30 @@ interface Choice {
 - **readback** (only with `readback: true`). After a valid value, the turn says it back ("You said 42 AED.") and
   asks yes or no. "yes" (or the plan's keyword) sends the reply. "no" asks for the value again.
 - **done.** Nothing is left to act on. Its parts hold the outcomes.
+
+### Forms
+
+A Form is asked as a sequence inside ONE act. Picking its `submit` starts it; nothing is sent until the person sends.
+
+1. **The first turn** (`value`) says the form's `prompt` (if any) and how many questions there are ("5 questions."),
+   then asks the first field.
+2. **Each field** is one `value` turn, asked as an Input of its kind is ("Stall fee (an amount in AED of at least 0)"),
+   numbered ("Question 4 of 5: …"; "Question 1 of 4, required: …"). The question part carries `field`. A group heading
+   ("Schedule:") is said when the group changes. The value is parsed and checked exactly as an Input's is, and a bad
+   one is asked again with the validator's reason. There is no per-field read-back, even in voice.
+3. **Skip.** On an optional field, `skip` leaves it unanswered. A required field cannot be skipped: it is asked again
+   with "This one is required, so it cannot be skipped." When no field is required, the whole form is skipped at its
+   start by its `skip` choice in browse, or by saying `skip all` at question 1: one `skip` reply.
+4. **The read-back** (`review`). After the last field, every answer is said once, numbered, an unanswered one as "not
+   answered", then: `Say "send" to {submitLabel or intent}, or "change" and a number or a field name.` It takes `send`,
+   `submit`, `yes` or the submit label; `change 2`, `change venue address`, or the bare number or name asks that one
+   field again and returns to the read-back (`skip` there takes an optional answer out). Anything else sends nothing.
+5. **One reply.** Sending produces ONE `submit` reply whose value holds only the answered fields, in field order. If
+   nothing is answered, `skip` at the read-back sends the `skip` reply instead. If the plan puts `confirm` on the form,
+   the confirm turn follows the read-back.
+6. **Back and cancel.** `back` goes to the question before (from question 1, it drops the form; from the read-back, it
+   reopens the last question; while changing one answer, it keeps that answer). `cancel` drops the form. Dropping
+   sends nothing and forgets the answers.
 
 ### Inputs
 
@@ -175,7 +202,11 @@ Engine-agnostic: it speaks and listens through whatever the host provides.
   - It takes the engine's alternatives in order. The first one that matches a choice or a value wins. In a
     confirm turn, only an exact keyword match commits, and nothing is guessed.
   - Before matching, it maps spoken numbers to digits: in English, zero to twenty, "first" to "tenth", and
-    "option two".
+    "option two". In a value turn it also maps spoken answers the way they would be typed, by the kind the turn asks for (an Input or
+    a Form field): numbers and money in words ("twenty five", "one hundred and four", "two point five") to digits;
+    a phone said as digit words ("plus nine seven one …") to digits; an email or web address said with "at", "dot",
+    "slash" and "colon" to symbols. Dates and text are left as said. In a Form's read-back, "change two", "number two"
+    and "two" mean 2, and "yeah" means yes.
 - **`runVoice(plan, engine, onReply)`**, with `VoiceEngine = { speak(speech: Speech[]): Promise<void>;
   listen(): Promise<string[]> }`. A Web Speech adapter is optional and lives outside the package's core.
 - Voice uses the plan's locale for `lang`.
@@ -215,6 +246,9 @@ Switch access on the web, built on `manifest-web` (`PlanView`).
     on its own.
   - It stops when the experience is done.
 - **Irreversible acts** keep the organism's two deliberate acts: arm, then confirm. Each is a separate selection.
+- **A Form** is operated as any other fields and buttons: each field is a text target (typing pauses scanning, Escape
+  resumes it), then the submit control, and the skip control when it exists. All answers go with the one selection of
+  the submit control.
 
 ## 5. Conformance (`conformance/manifest`)
 
@@ -234,6 +268,14 @@ Then, for **every valid fixture** and **every available act** (§1, browse), inc
    - switch: switch presses;
    - text: typed lines into a dialog;
    - voice: transcripts into a voice dialog.
+   A **Form** scenario is its fields in order: every field answered except the first optional one, which is left
+   out (`submit`), every field answered (`submit-all`), and `skip` when no field is required. Web and switch type into
+   `[data-slot=form-group-control]` of each `[data-slot=form-group-field][data-field-id]` and select
+   `[data-slot=form-group-submit]` (named by `submitLabel` or the intent) or `[data-slot=form-group-skip]`; text and
+   voice answer each question in turn, then say `send` at the read-back. A body that replies before the send, asks a
+   question out of order, or leaves a field out of the read-back fails. On the web, an empty required field or an
+   invalid answer shows `[data-slot=form-group-error]` and sends nothing, and the sent form shows
+   `[data-slot=form-group-status]`.
 3. **Assertion:** the replies emitted equal exactly `[{ experience, node, act, value? }]`, identical in all four
    bodies.
 4. **Deliberate acts.** For a node with `confirm` in the plan, the body's single act (one click, one selection, one

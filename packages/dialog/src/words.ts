@@ -36,6 +36,15 @@ export function show(value: string | number | boolean): string {
   return typeof value === "boolean" ? (value ? "yes" : "no") : String(value)
 }
 
+/** The word that leaves an optional answer out, and the words that skip a whole Form at its start. */
+export const SKIP_WORD = "skip"
+export const SKIP_ALL_WORDS = "skip all"
+/** The words that send a Form's answers from its read-back. */
+export const SEND_WORD = "send"
+
+/** "1 question", "5 questions". */
+export const questionCount = (n: number) => `${n} ${n === 1 ? "question" : "questions"}`
+
 /** What `sentences` needs to resolve references: the plan's locale and the IR nodes by id. */
 export interface SentenceContext {
   locale: string
@@ -82,6 +91,11 @@ function linesOf(ir: IRNode, locale: string, nodes: ReadonlyMap<string, IRNode>)
     }
     case "Input":
       return [ir.prompt, `Give ${ir.kind === "long-text" ? "text" : ir.kind === "money" ? `an amount${ir.currency ? ` in ${ir.currency}` : ""}` : `a ${ir.kind}`}${ir.required ? ", required" : ", optional"}.`]
+    case "Form": {
+      const required = ir.fields.filter((f) => f.required === true).length
+      const count = `${questionCount(ir.fields.length)}${required === 0 ? ", all optional" : required === ir.fields.length ? ", all required" : `, ${required} required`}`
+      return [...(ir.prompt ? [ir.prompt] : []), `${count}: ${ir.fields.map((f) => f.prompt).join("; ")}.`]
+    }
     case "Price":
       return [`${ir.label ?? "Price"}: ${formatMoney(ir.amount, ir.currency, locale)}${periodText(ir.period) ? ` ${periodText(ir.period)}` : ""}.`]
     case "Person":
