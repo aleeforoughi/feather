@@ -268,6 +268,20 @@ Further rules:
 a 3:1 border) and a muted role (`--<status>-muted`, a tint for surfaces). The destructive color stays off text
 (docs/organisms.md).
 
+A destructive button or badge is the one place `--destructive` is text: it sits on its own tint, never on an
+opacity of the fill (`bg-destructive/10` is an arbitrary opacity). The engine derives both tints and checks the red
+against them:
+
+| token | derived from | contrast floor of `--destructive` on it |
+|---|---|---|
+| `--destructive` | the brand's `destructive`, or the reference red (`#b42318` light, `#ff6b62` dark) | 4.5:1 on `--background` and `--card` |
+| `--destructive-muted` (`bg-destructive-muted`, at rest) | 12% of the red mixed into `--card` | 4.5:1, laid on `--background` and on `--card` |
+| `--destructive-muted-hover` (`bg-destructive-muted-hover`) | the strongest mix from 20% down to 14% that holds the floor | 4.5:1, laid on `--background` and on `--card` |
+
+A red that misses the floor at rest is refused. A red that holds it at rest but not at 20% hovers one step lighter
+instead: rich-brand's `#B91C1C` reaches 4.49:1 at 20% on `#FAF7F2`, so it hovers at 19%. The floor is
+`CONTRAST_FLOORS.destructive`; the percentages are `DESTRUCTIVE_TINTS` in `packages/tokens/src/engine.mjs`.
+
 ## 6. Surfaces
 
 The surface tokens are:

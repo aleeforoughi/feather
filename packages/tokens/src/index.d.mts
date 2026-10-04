@@ -67,4 +67,8 @@ export const SHADOW_ALIASES: Record<"xs" | "sm" | "md" | "lg" | "xl", 1 | 2 | 3>
 export const DURATIONS: Record<"calm" | "snappy", Record<"micro" | "fast" | "base" | "medium" | "slow" | "large", number>>
 export const MOTION: typeof DURATIONS
 export const EASE_STANDARD: string
-export const CONTRAST_FLOORS: { textPrimary: number; textSecondary: number; textTertiary: number; icon: number; borderPrimary: number; onTint: number }
+export const CONTRAST_FLOORS: { textPrimary: number; textSecondary: number; textTertiary: number; icon: number; borderPrimary: number; onTint: number; destructive: number }
+/** `pct`% of hex `a` mixed into hex `b` in oklab, as a hex color: what CSS `color-mix(in oklab, a pct%, b)` makes. */
+export function oklabMix(a: string, b: string, pct: number): string
+/** The destructive tint percentages: the rest tint, and the range the hover tint is derived in (strongest first). */
+export const DESTRUCTIVE_TINTS: { rest: number; hover: { strongest: number; weakest: number } }

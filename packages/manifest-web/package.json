@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-manifest-web",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "The web manifestation: renders a liquid layout plan with Feather's organisms and atoms, and turns every act into a validated reply.",
   "license": "UNLICENSED",
   "type": "module",

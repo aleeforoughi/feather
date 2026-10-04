@@ -1,5 +1,31 @@
 # Feather — changelog
 
+## 1.16.0 — 2026-10-05
+
+**Destructive text reads on its tint.** The destructive Button and Badge laid their red text on `bg-destructive/10`
+and hovered on `bg-destructive/20`, arbitrary opacities the visual system forbids. On the 20% tint the reference
+red fell under AA. Normalized, not redesigned: the same red on the same kind of tint, now from tokens.
+
+- **Tokens:**
+  - a new `--destructive-muted-hover` (Tailwind `bg-destructive-muted-hover`): the strongest mix of the red into
+    `--card`, from 20% down to 14%, that keeps `--destructive` at 4.5:1;
+  - the rest tint is `--destructive-muted` (12%, unchanged).
+- **Engine:**
+  - `CONTRAST_FLOORS.destructive` (4.5): `--destructive` is checked on `--background`, `--card`, and both tints
+    laid on either. A red that misses it at rest is refused with the ratio it reached.
+  - When a brand names no destructive color, the default is now the reference themes' red: `#b42318` on a light
+    background, `#ff6b62` on a dark one. The old `#e5484d` reached 3.66:1 on paper-sharp's background, so
+    paper-sharp, void-pill and the showcase brand change red.
+  - Rich-brand's `#B91C1C` hovers at 19%, because it reaches 4.49:1 at 20%.
+  - New exports: `DESTRUCTIVE_TINTS` and `oklabMix`.
+- **Components:**
+  - Button and Badge (destructive): `bg-destructive-muted`, with `bg-destructive-muted-hover` on hover.
+  - DropdownMenu's destructive item focuses on `bg-destructive-muted`, not `bg-destructive/10`.
+- **Accessibility:** paper-sharp's last four known color-contrast debts from 1.7.0 are gone: the destructive Badge
+  and Button, the confirmation Dialog and the Field error. `a11y-known.json` is now empty for both reference themes.
+- **Docs:** the floor and the tints are in `docs/visual-system.md` section 5.
+- The destructive stories change, so every visual baseline is re-recorded (`RECORD`: `current`).
+
 ## 1.15.0 — 2026-10-04
 
 **Form: several answers, one act.** A caller that asked several things with separate Inputs gave the person a "Send

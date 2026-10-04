@@ -176,7 +176,13 @@ export const CONTRAST_FLOORS = {
   borderPrimary: 3,
   /** Primary text on a tinted surface (hover, pressed, selected, a status tint). */
   onTint: 4.5,
+  /** `--destructive` as text: on `--background`, `--card` and both destructive tints (rest and hover) laid on either. */
+  destructive: 4.5,
 }
+
+/** The destructive tints (section 5): the rest tint, and the strongest hover tint, stepping down to the weakest, that
+ * keeps `--destructive` at its floor. */
+export const DESTRUCTIVE_TINTS = { rest: 12, hover: { strongest: 20, weakest: 14 } }
 
 function expand(hex) {
   const h = hex.toLowerCase()
@@ -220,7 +226,7 @@ function fromOklab([L, a, b]) {
 }
 
 /** `pct`% of `a` mixed into `b` in oklab, as a hex color: the same mix CSS `color-mix(in oklab, a pct%, b)` makes. */
-function oklabMix(a, b, pct) {
+export function oklabMix(a, b, pct) {
   const [x, y] = [toOklab(a), toOklab(b)]
   return fromOklab(x.map((v, i) => (v * pct) / 100 + (y[i] * (100 - pct)) / 100))
 }
@@ -335,9 +341,10 @@ export function buildTheme(input) {
   const surface = expand(c.surface)
   const primary = expand(c.primary)
   const accent = expand(c.accent ?? c.primary)
-  const destructive = expand(c.destructive ?? "#e5484d")
   // Status colors: the brand's own when it names them, otherwise defaults tuned for a light or a dark background.
   const darkBg = luminance(bg) < 0.2
+  // The default red is the reference themes' own (themes/feather*.json): it reads as text on both tints.
+  const destructive = expand(c.destructive ?? (darkBg ? "#ff6b62" : "#b42318"))
   const status = (name, light, dark) => {
     const color = expand(c[name] ?? (darkBg ? dark : light))
     return [color, expand(c[`${name}Text`] ?? onColor(color, text, bg))]
@@ -376,6 +383,17 @@ export function buildTheme(input) {
   for (const [name, pct] of Object.entries(tints)) onTint(name, oklabMix(text, surface, pct))
   onTint("--surface-selected", oklabMix(primary, surface, 12))
   for (const [name, color] of [["--destructive-muted", destructive], ["--success-muted", success], ["--warning-muted", warning], ["--info-muted", info]]) onTint(name, oklabMix(color, surface, 12))
+  // Destructive text (a destructive button or badge) sits on --background, --card, and its tint laid on either.
+  const destructiveWorst = (pct) => Math.min(...on.flatMap((s) => [contrast(destructive, s), contrast(destructive, oklabMix(destructive, s, pct))]))
+  const { rest, hover } = DESTRUCTIVE_TINTS
+  let hoverPct = null
+  if (destructiveWorst(rest) < CONTRAST_FLOORS.destructive) {
+    problems.push(`colors.destructive reaches ${destructiveWorst(rest).toFixed(2)}:1 on colors.background, colors.surface and --destructive-muted; --destructive needs ${CONTRAST_FLOORS.destructive}:1`)
+  } else {
+    for (let pct = hover.strongest; pct >= hover.weakest && hoverPct === null; pct--) if (destructiveWorst(pct) >= CONTRAST_FLOORS.destructive) hoverPct = pct
+    if (hoverPct === null) problems.push(`colors.destructive reaches ${destructiveWorst(hover.weakest).toFixed(2)}:1 on a ${hover.weakest}% hover tint; --destructive needs ${CONTRAST_FLOORS.destructive}:1`)
+    else onTint("--destructive-muted-hover", oklabMix(destructive, surface, hoverPct))
+  }
   if (problems.length > 0) return { ok: false, problems }
 
   const shadows = ELEVATION[elevation]
@@ -398,7 +416,8 @@ export function buildTheme(input) {
     "--accent": mix(accent, bg, 18),
     "--accent-foreground": "var(--text-primary)",
     "--destructive": destructive,
-    "--destructive-muted": mix("var(--destructive)", "var(--card)", 12),
+    "--destructive-muted": mix("var(--destructive)", "var(--card)", rest),
+    "--destructive-muted-hover": mix("var(--destructive)", "var(--card)", hoverPct),
     "--success": success,
     "--success-foreground": successText,
     "--success-muted": mix("var(--success)", "var(--card)", 12),
