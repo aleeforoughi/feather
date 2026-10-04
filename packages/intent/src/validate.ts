@@ -42,6 +42,7 @@ export type IssueCode =
   | "too-many-selected"
   | "conflicting-prediction"
   | "duplicate-step"
+  | "duplicate-field"
   | "empty-tradeoff"
   | "comparison-mismatch"
   | "too-many-issues"
@@ -178,7 +179,7 @@ function run(input: unknown, add: Add) {
       if (key === "type" || has(fields, key)) continue
       if (key === "primary") {
         // "primary": false says nothing, so it is allowed on any node.
-        if (node.primary !== false) add("not-primary-capable", `${at}${seg(key)}`, `${name} cannot be the primary act; only Action, Choice, Input, Approval, Recommendation and IrreversibleAction can.`, id)
+        if (node.primary !== false) add("not-primary-capable", `${at}${seg(key)}`, `${name} cannot be the primary act; only Action, Choice, Input, Form, Approval, Recommendation and IrreversibleAction can.`, id)
       } else unknownField(add, `${at}${seg(key)}`, key, name, ["type", ...Object.keys(fields)], id)
     }
     if (spec.act && node.intent === undefined) add("missing-field", `${at}/intent`, `${name} is an act, so it needs an intent: what the person is doing, in a few words.`, id)
@@ -405,6 +406,21 @@ function checkNode(add: Add, { node, spec, at, name, id, index }: Entry, { byId,
       if (typeof node.min === "number" && typeof node.max === "number" && node.min > node.max) add("out-of-range", `${at}/min`, `${name} accepts nothing: min ${node.min} is above max ${node.max}.`, id)
       if (node.kind === "money" && node.currency === undefined) add("missing-field", `${at}/currency`, `${name} asks for money, so it needs a currency.`, id)
       return
+    case "Form": {
+      // Each field is asked as an Input is, so it obeys the same rules; its id is the key of its answer.
+      const seen = new Set<string>()
+      ;(Array.isArray(node.fields) ? node.fields : []).forEach((field, i) => {
+        if (!isObject(field)) return
+        const label = `${name}, field ${typeof field.id === "string" ? `"${field.id}"` : i}`
+        if (typeof field.id === "string") {
+          if (seen.has(field.id)) add("duplicate-field", `${at}/fields/${i}/id`, `${name} has two fields called "${field.id}"; each answer is keyed by its field id.`, id)
+          seen.add(field.id)
+        }
+        if (typeof field.min === "number" && typeof field.max === "number" && field.min > field.max) add("out-of-range", `${at}/fields/${i}/min`, `${label} accepts nothing: min ${field.min} is above max ${field.max}.`, id)
+        if (field.kind === "money" && field.currency === undefined) add("missing-field", `${at}/fields/${i}/currency`, `${label} asks for money, so it needs a currency.`, id)
+      })
+      return
+    }
     case "Date": {
       const start = typeof node.value === "string" ? parseDate(node.value) : undefined
       const end = typeof node.until === "string" ? parseDate(node.until) : undefined

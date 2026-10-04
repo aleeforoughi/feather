@@ -136,7 +136,7 @@ function targeted(base: Json): Array<[string, Json]> {
   add("no nodes", (d) => void (d.nodes = []))
   add("a second Recommendation without a target", (_, ns) => void ns.push({ type: "Recommendation", id: "extra_rec", intent: "decide", summary: "Another" }, { type: "Alternative", id: "extra_alt", intent: "other way" }))
   add("two primaries", (_, ns) => {
-    const capable = ns.filter((n) => ["Action", "Choice", "Input", "Approval", "Recommendation", "IrreversibleAction"].includes(n.type as string))
+    const capable = ns.filter((n) => ["Action", "Choice", "Input", "Form", "Approval", "Recommendation", "IrreversibleAction"].includes(n.type as string))
     for (const n of capable.slice(0, 2)) n.primary = true
     if (capable.length < 2) ns.push({ type: "Action", id: "extra_primary", intent: "go", primary: true }, { type: "Action", id: "extra_primary_2", intent: "go on", primary: true })
   })
@@ -236,6 +236,30 @@ function targeted(base: Json): Array<[string, Json]> {
   each("Input", "a value that is an object", (n) => void (n.value = { a: 1 }))
   each("Input", "a numeric value", (n) => void (n.value = 12.5))
   each("Input", "a kind that is not a kind", (n) => void (n.kind = "color"))
+  each("Form", "no fields", (n) => void (n.fields = []))
+  each("Form", "fields that are not a list", (n) => void (n.fields = { a: 1 }))
+  each("Form", "a field that is not an object", (n) => void ((n.fields as Json[])[0] = "a field"))
+  each("Form", "two fields with one id", (n) => void ((n.fields as Obj[]).push({ ...(n.fields as Obj[])[0] })))
+  each("Form", "a field without an id", (n) => void delete (n.fields as Obj[])[0].id)
+  each("Form", "a field with a bad id", (n) => void ((n.fields as Obj[])[0].id = "1st field"))
+  each("Form", "a field without a prompt", (n) => void delete (n.fields as Obj[])[0].prompt)
+  each("Form", "a field without a kind", (n) => void delete (n.fields as Obj[])[0].kind)
+  each("Form", "a field kind that is not a kind", (n) => void ((n.fields as Obj[])[0].kind = "color"))
+  each("Form", "a money field without a currency", (n) => {
+    const f = (n.fields as Obj[])[0]
+    f.kind = "money"
+    delete f.currency
+  })
+  each("Form", "a field with min above max", (n) => {
+    const f = (n.fields as Obj[])[0]
+    f.min = 10
+    f.max = 1
+  })
+  each("Form", "a field with a presentational key", (n) => void ((n.fields as Obj[])[0].color = "red"))
+  each("Form", "a field with an unknown key", (n) => void ((n.fields as Obj[])[0].hint = "x"))
+  each("Form", "a group too long", (n) => void ((n.fields as Obj[])[0].group = "g".repeat(61)))
+  each("Form", "a submit label too long", (n) => void (n.submitLabel = "s".repeat(61)))
+  each("Form", "no intent", (n) => void delete n.intent)
   each("Date", "an end before the start", (n) => {
     n.value = "2026-10-03T14:00:00Z"
     n.until = "2026-10-03T13:00:00Z"
@@ -387,6 +411,26 @@ export function buildIrCorpus(): IrCase[] {
 
 const optionIds = (n: Obj | undefined): string[] => (n && n.type === "Choice" ? (n.options as Obj[]).map((o) => o.id as string) : [])
 
+/** An answer that fits what an Input, or a Form field, asks for. */
+function answerFor(n: Obj): Json {
+  switch (n.kind) {
+    case "number":
+      return typeof n.min === "number" ? n.min : 5
+    case "money":
+      return typeof n.min === "number" ? n.min : 25
+    case "email":
+      return "person@example.com"
+    case "phone":
+      return "+971 50 123 4567"
+    case "url":
+      return "https://example.com/page"
+    case "date":
+      return "2026-10-03"
+    default:
+      return "hello there"
+  }
+}
+
 /** A value that fits the act, when it takes one. */
 function fits(n: Obj, act: string, ns: Obj[]): Json | undefined {
   switch (n.type) {
@@ -398,25 +442,10 @@ function fits(n: Obj, act: string, ns: Obj[]): Json | undefined {
       const ids = optionIds(ns.find((x) => x.id === n.of))
       return act === "change" ? (ids.find((i) => i !== n.option) ?? ids[0]) : undefined
     }
-    case "Input": {
-      if (act !== "submit") return undefined
-      switch (n.kind) {
-        case "number":
-          return typeof n.min === "number" ? n.min : 5
-        case "money":
-          return typeof n.min === "number" ? n.min : 25
-        case "email":
-          return "person@example.com"
-        case "phone":
-          return "+971 50 123 4567"
-        case "url":
-          return "https://example.com/page"
-        case "date":
-          return "2026-10-03"
-        default:
-          return "hello there"
-      }
-    }
+    case "Input":
+      return act === "submit" ? answerFor(n) : undefined
+    case "Form":
+      return act === "submit" ? Object.fromEntries((n.fields as Obj[]).map((f) => [f.id as string, answerFor(f)])) : undefined
     case "Alternative":
       return n.input === "Price" ? { amount: 10, currency: "AED" } : n.input === "Date" ? "2026-10-03T14:00:00+04:00" : n.input ? "a word" : undefined
     case "Preference":
@@ -450,6 +479,23 @@ function candidates(n: Obj, act: string, ns: Obj[]): Array<[string, Json | undef
     out.push(["above max", typeof n.max === "number" ? n.max + 1 : 1e9], ["below min", typeof n.min === "number" ? n.min - 1 : -1e9], ["too long for maxLength", "x".repeat(typeof n.maxLength === "number" ? n.maxLength + 1 : 4001)])
     for (const url of ["http://", "http://exa mple.com", "https://example.com:99999", "ftp://host", "file:///tmp/x", "http://1.2.3.4.5", "http://256.1.1.1", "javascript:alert(1)", "//example.com", "https://[::1]/x", "https://user@/x", "tel:+1555", "http:foo", "https://example.com/a b"]) out.push([`url ${url}`, url])
     out.push(["date-time", "2026-10-03T14:00:00Z"], ["bad date", "next week"])
+  }
+  if (n.type === "Form" && act === "submit") {
+    const fields = n.fields as Obj[]
+    const all = fits(n, act, ns) as Record<string, Json>
+    const first = fields[0].id as string
+    const required = fields.filter((f) => f.required === true).map((f) => f.id as string)
+    const without = (id: string) => Object.fromEntries(Object.entries(all).filter(([k]) => k !== id))
+    out.push(["every field", all], ["only the first field", { [first]: all[first] }], ["an unknown field", { ...all, nope: "x" }], ["an array of answers", Object.values(all)])
+    for (const id of required) out.push([`without required ${id}`, without(id)])
+    for (const f of fields) {
+      const id = f.id as string
+      out.push([`${id} blank`, { ...all, [id]: "  " }], [`${id} as a number`, { ...all, [id]: 5 }], [`${id} as text`, { ...all, [id]: "five" }], [`${id} null`, { ...all, [id]: null }], [`${id} too long`, { ...all, [id]: "x".repeat(typeof f.maxLength === "number" ? f.maxLength + 1 : 4001) }])
+      if (f.kind === "email") out.push([`${id} not an email`, { ...all, [id]: "not an email" }])
+      if (f.kind === "phone") out.push([`${id} not a phone`, { ...all, [id]: "call me" }])
+      if (f.kind === "date") out.push([`${id} not a date`, { ...all, [id]: "next week" }], [`${id} impossible date`, { ...all, [id]: "2026-02-30" }])
+      if (typeof f.min === "number") out.push([`${id} below min`, { ...all, [id]: (f.min as number) - 1 }])
+    }
   }
   if (n.type === "Alternative") {
     out.push(["negative price", { amount: -1, currency: "AED" }], ["price with extra key", { amount: 1, currency: "AED", tip: 2 }], ["price with bad currency", { amount: 1, currency: "aed" }], ["price with text amount", { amount: "1", currency: "AED" }], ["price in an array", [1, "AED"]])

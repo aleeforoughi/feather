@@ -16,6 +16,7 @@ export type Organism =
   | "Choice"
   | "PredictedChoice"
   | "Input"
+  | "Form"
   | "Price"
   | "Person"
   | "Date"

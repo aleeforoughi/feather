@@ -62,8 +62,12 @@ function objectSchema(fields: Record<string, Field>, atLeastOne = false): Schema
     ...(required.length ? { required } : {}),
     ...(atLeastOne ? { minProperties: 1 } : {}),
     additionalProperties: false,
+    // An answer in money needs its currency (an Input, or a Form field, asks the same way).
+    ...(asksMoney(fields) ? { if: { properties: { kind: { const: "money" } }, required: ["kind"] }, then: { properties: { currency: true }, required: ["currency"] } } : {}),
   }
 }
+
+const asksMoney = (fields: Record<string, Field>) => fields.kind?.kind === "enum" && fields.kind.values.includes("money") && fields.currency !== undefined
 
 function nodeSchema(spec: NodeSpec): Schema {
   const fields: Record<string, Field> = { ...commonFields, ...(spec.primaryCapable ? { primary: primaryField } : {}), ...spec.fields }

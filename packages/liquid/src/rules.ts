@@ -10,7 +10,7 @@ export interface RuleInfo {
 }
 
 export const RULES: RuleInfo[] = [
-  { id: "one-primary", source: "section 7, rule 1", summary: "One primary act per experience: the one the caller marks, or else the act that most needs the person (IrreversibleAction, Approval, Recommendation, Choice, Input, Action)." },
+  { id: "one-primary", source: "section 7, rule 1", summary: "One primary act per experience: the one the caller marks, or else the act that most needs the person (IrreversibleAction, Approval, Recommendation, Choice, Form, Input, Action)." },
   { id: "irreversible-explicit", source: "section 7, rule 2; principle 6", summary: "An irreversible act (an IrreversibleAction, an act marked reversible: false, or an act stating a consequence) never takes the default focus. Whatever commits it needs a deliberate act, once: arm and confirm, or a spoken or typed keyword in the plan's locale. An irreversible choice is never preselected; its prediction shows as a note." },
   { id: "recommendation-first", source: "section 7, rule 3", summary: "The recommendation comes first, then its alternatives, as one list. The predicted or selected option is preselected unless the act is irreversible; focus starts on the primary act." },
   { id: "critical-never-hidden", source: "section 7, rule 4", summary: "A critical node is emphasized, and its expandable detail shows open." },

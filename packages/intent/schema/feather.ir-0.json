@@ -59,6 +59,9 @@
           "$ref": "#/$defs/Input"
         },
         {
+          "$ref": "#/$defs/Form"
+        },
+        {
           "$ref": "#/$defs/Price"
         },
         {
@@ -478,6 +481,195 @@
         "id",
         "prompt",
         "kind",
+        "intent"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "money"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "currency": true
+        },
+        "required": [
+          "currency"
+        ]
+      }
+    },
+    "Form": {
+      "description": "Several facts asked of the person together and sent with one act. Use it instead of separate Inputs when the caller acts on the answers at once, so no answer is lost because it was typed but not sent.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "Form"
+        },
+        "id": {
+          "description": "Stable within the experience; replies and references use it.",
+          "$ref": "#/$defs/id"
+        },
+        "intent": {
+          "description": "What the human is doing here, in a few words. Required on act nodes.",
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 120
+        },
+        "importance": {
+          "description": "How much it matters. Default normal; critical is never hidden behind expansion.",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "critical"
+          ]
+        },
+        "reversible": {
+          "description": "Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.",
+          "type": "boolean"
+        },
+        "expandable": {
+          "description": "Detail on demand, behind \"Why?\". At least one entry.",
+          "type": "object",
+          "properties": {
+            "why": {
+              "description": "The reason, in a sentence or two.",
+              "type": "string",
+              "pattern": "\\S",
+              "maxLength": 4000
+            },
+            "detail": {
+              "description": "Longer supporting detail.",
+              "type": "string",
+              "pattern": "\\S",
+              "maxLength": 4000
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "primary": {
+          "description": "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
+          "type": "boolean"
+        },
+        "prompt": {
+          "description": "What the answers are for, in one line.",
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 4000
+        },
+        "fields": {
+          "description": "The questions, in order; ids unique within the form. Consecutive fields with the same group are shown together under it.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Unique among the fields; the key of its answer.",
+                "$ref": "#/$defs/id"
+              },
+              "prompt": {
+                "description": "The question.",
+                "type": "string",
+                "pattern": "\\S",
+                "maxLength": 4000
+              },
+              "kind": {
+                "description": "What kind of value.",
+                "enum": [
+                  "text",
+                  "long-text",
+                  "number",
+                  "email",
+                  "phone",
+                  "url",
+                  "date",
+                  "money"
+                ]
+              },
+              "required": {
+                "description": "An answer is needed to continue.",
+                "type": "boolean"
+              },
+              "value": {
+                "description": "The current value, if any.",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 4000
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "min": {
+                "description": "For number and money: the smallest accepted.",
+                "type": "number"
+              },
+              "max": {
+                "description": "For number and money: the largest accepted.",
+                "type": "number"
+              },
+              "maxLength": {
+                "description": "For text kinds: the longest accepted.",
+                "type": "integer",
+                "minimum": 1
+              },
+              "currency": {
+                "description": "For money: the currency.",
+                "$ref": "#/$defs/currency"
+              },
+              "group": {
+                "description": "A heading the field sits under, such as Schedule or Place.",
+                "type": "string",
+                "pattern": "\\S",
+                "maxLength": 60
+              }
+            },
+            "required": [
+              "id",
+              "prompt",
+              "kind"
+            ],
+            "additionalProperties": false,
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "money"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "properties": {
+                "currency": true
+              },
+              "required": [
+                "currency"
+              ]
+            }
+          },
+          "minItems": 1
+        },
+        "submitLabel": {
+          "description": "The words for the one act that sends every answer; defaults to the intent.",
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 60
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "fields",
         "intent"
       ],
       "additionalProperties": false

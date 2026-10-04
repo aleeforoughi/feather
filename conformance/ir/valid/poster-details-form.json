@@ -1,0 +1,64 @@
+{
+  "description": "Details a brief leaves open, asked together in one Form and sent with one act, grouped by topic. Nothing typed is lost because it was not sent on its own.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "poster_details",
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "why",
+        "text": "Godpip can fill in these details if you know them. A detail you leave empty stays a marked placeholder."
+      },
+      {
+        "type": "Form",
+        "id": "details",
+        "intent": "give the details I know",
+        "primary": true,
+        "prompt": "Details for the farmers market poster",
+        "submitLabel": "Run again with my answers",
+        "fields": [
+          {
+            "id": "market_time",
+            "group": "Schedule",
+            "prompt": "Market time",
+            "kind": "text",
+            "maxLength": 200
+          },
+          {
+            "id": "opening_date",
+            "group": "Schedule",
+            "prompt": "First market day",
+            "kind": "date"
+          },
+          {
+            "id": "venue",
+            "group": "Place",
+            "prompt": "Venue address",
+            "kind": "long-text",
+            "maxLength": 1000
+          },
+          {
+            "id": "stall_fee",
+            "group": "Money",
+            "prompt": "Stall fee",
+            "kind": "money",
+            "currency": "AED",
+            "min": 0
+          },
+          {
+            "id": "contact",
+            "group": "Contact",
+            "prompt": "Contact email",
+            "kind": "email"
+          }
+        ]
+      },
+      {
+        "type": "Action",
+        "id": "without",
+        "intent": "run again without them",
+        "label": "Run again without them"
+      }
+    ]
+  }
+}

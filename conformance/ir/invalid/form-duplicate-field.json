@@ -1,0 +1,32 @@
+{
+  "description": "Two fields of a form share an id, so their answers would collide.",
+  "expect": [
+    {
+      "code": "duplicate-field",
+      "path": "/nodes/0/fields/1/id"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "form_test",
+    "nodes": [
+      {
+        "type": "Form",
+        "id": "f",
+        "intent": "give details",
+        "fields": [
+          {
+            "id": "a",
+            "prompt": "A",
+            "kind": "text"
+          },
+          {
+            "id": "a",
+            "prompt": "Again",
+            "kind": "text"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "description": "A form whose answers belong together: a shipping address with required fields, so it cannot be skipped.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "shipping_address",
+    "locale": "en",
+    "nodes": [
+      {
+        "type": "Form",
+        "id": "address",
+        "intent": "give the shipping address",
+        "primary": true,
+        "fields": [
+          {
+            "id": "name",
+            "prompt": "Full name",
+            "kind": "text",
+            "required": true
+          },
+          {
+            "id": "street",
+            "prompt": "Street and number",
+            "kind": "text",
+            "required": true
+          },
+          {
+            "id": "city",
+            "prompt": "City",
+            "kind": "text",
+            "required": true
+          },
+          {
+            "id": "phone",
+            "prompt": "Phone for the courier",
+            "kind": "phone"
+          }
+        ]
+      }
+    ]
+  }
+}

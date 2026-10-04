@@ -30,6 +30,7 @@ const ORGANISM: Record<IRNode["type"], Organism> = {
   Action: "Action",
   Choice: "Choice",
   Input: "Input",
+  Form: "Form",
   Price: "Price",
   Person: "Person",
   Date: "Date",
@@ -53,7 +54,7 @@ const ORGANISM: Record<IRNode["type"], Organism> = {
 }
 
 /** When no node is marked primary, the act that most needs the person, in this order (composer rule 1). */
-const PRIMARY_ORDER: IRNode["type"][] = ["IrreversibleAction", "Approval", "Recommendation", "Choice", "Input", "Action"]
+const PRIMARY_ORDER: IRNode["type"][] = ["IrreversibleAction", "Approval", "Recommendation", "Choice", "Form", "Input", "Action"]
 
 /** Rule 9: text that fits on one line. Counted in code points, so Arabic or emoji text is not cut short. */
 const ONE_LINE = 120

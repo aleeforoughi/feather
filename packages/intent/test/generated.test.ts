@@ -7,7 +7,7 @@ import { DOCS_PATH, PY_NODES_PATH, PY_SPEC_PATH, SCHEMA_PATH, buildDocs, buildPy
 const VALIDATOR_ONLY = [
   "duplicate-id", "dangling-reference", "self-reference", "wrong-reference-type", "out-of-order", "ambiguous-alternative", "unneeded-confirmation",
   "multiple-primary", "irreversible-without-consequence", "missing-text-equivalent", "duplicate-option", "unknown-option", "too-many-selected",
-  "conflicting-prediction", "duplicate-step", "empty-tradeoff", "comparison-mismatch", "out-of-range", "invalid-date", "too-many-issues",
+  "conflicting-prediction", "duplicate-step", "duplicate-field", "empty-tradeoff", "comparison-mismatch", "out-of-range", "invalid-date", "too-many-issues",
 ]
 
 const fixtures = (dir: string) => {

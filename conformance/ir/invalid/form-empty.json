@@ -1,0 +1,21 @@
+{
+  "description": "A form with no fields asks nothing.",
+  "expect": [
+    {
+      "code": "too-few-items",
+      "path": "/nodes/0/fields"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "form_test",
+    "nodes": [
+      {
+        "type": "Form",
+        "id": "f",
+        "intent": "give details",
+        "fields": []
+      }
+    ]
+  }
+}

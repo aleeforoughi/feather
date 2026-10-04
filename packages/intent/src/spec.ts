@@ -69,7 +69,7 @@ export const consequenceField: Field = {
 export const DEFAULT_MAX_LENGTH = 4000
 
 /** Nodes a person acts on, which a Confirmation can confirm. */
-const ACTS = ["Action", "Choice", "Input", "Approval", "Recommendation", "PredictedChoice", "Alternative", "Autopick", "Correction", "Preference", "IrreversibleAction", "ExploreMore"] as const
+const ACTS = ["Action", "Choice", "Input", "Form", "Approval", "Recommendation", "PredictedChoice", "Alternative", "Autopick", "Correction", "Preference", "IrreversibleAction", "ExploreMore"] as const
 /** Nodes that offer a way to go, which Alternatives, Tradeoffs and Autopicks attach to. */
 const OPTIONS = ["Recommendation", "Alternative", "Choice", "Action", "Approval", "IrreversibleAction"] as const
 
@@ -90,6 +90,18 @@ export const commonFields: Record<string, Field> = {
 export const primaryField: Field = {
   kind: "boolean",
   doc: "This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.",
+}
+
+/** What an Input asks for. A Form's fields ask the same way, so their answers are encoded the same way. */
+const inputFields: Record<string, Field> = {
+  prompt: { kind: "string", doc: "The question.", required: true },
+  kind: { kind: "enum", doc: "What kind of value.", required: true, values: ["text", "long-text", "number", "email", "phone", "url", "date", "money"] },
+  required: { kind: "boolean", doc: "An answer is needed to continue." },
+  value: { kind: "text-or-number", doc: "The current value, if any." },
+  min: { kind: "number", doc: "For number and money: the smallest accepted." },
+  max: { kind: "number", doc: "For number and money: the largest accepted." },
+  maxLength: { kind: "number", doc: "For text kinds: the longest accepted.", min: 1, integer: true },
+  currency: { kind: "currency", doc: "For money: the currency." },
 }
 
 const none = {} as NodeSpec["acts"]
@@ -150,14 +162,36 @@ export const NODES: NodeSpec[] = [
       skip: { value: "none", doc: "The person chose not to answer (only when the Input is not required)." },
     },
     fields: {
-      prompt: { kind: "string", doc: "The question.", required: true },
-      kind: { kind: "enum", doc: "What kind of value.", required: true, values: ["text", "long-text", "number", "email", "phone", "url", "date", "money"] },
-      required: { kind: "boolean", doc: "An answer is needed to continue." },
-      value: { kind: "text-or-number", doc: "The current value, if any." },
-      min: { kind: "number", doc: "For number and money: the smallest accepted." },
-      max: { kind: "number", doc: "For number and money: the largest accepted." },
-      maxLength: { kind: "number", doc: "For text kinds: the longest accepted.", min: 1, integer: true },
-      currency: { kind: "currency", doc: "For money: the currency." },
+      ...inputFields,
+    },
+  },
+  {
+    type: "Form",
+    family: "content",
+    doc: "Several facts asked of the person together and sent with one act. Use it instead of separate Inputs when the caller acts on the answers at once, so no answer is lost because it was typed but not sent.",
+    act: true,
+    primaryCapable: true,
+    acts: {
+      submit: {
+        value: "required",
+        doc: "An object from field id to answer, each encoded as an Input of the same kind encodes it. A field left out was not answered; every required field is present, and at least one field is.",
+      },
+      skip: { value: "none", doc: "The person chose to answer none of it (only when no field is required)." },
+    },
+    fields: {
+      prompt: { kind: "string", doc: "What the answers are for, in one line." },
+      fields: {
+        kind: "array",
+        doc: "The questions, in order; ids unique within the form. Consecutive fields with the same group are shown together under it.",
+        required: true,
+        minItems: 1,
+        of: {
+          id: { kind: "id", doc: "Unique among the fields; the key of its answer.", required: true },
+          ...inputFields,
+          group: { kind: "string", doc: "A heading the field sits under, such as Schedule or Place.", maxLength: 60 },
+        },
+      },
+      submitLabel: { kind: "string", doc: "The words for the one act that sends every answer; defaults to the intent.", maxLength: 60 },
     },
   },
   {

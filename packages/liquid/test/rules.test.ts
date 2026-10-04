@@ -41,6 +41,11 @@ rule("one-primary", () => {
     expect(plan(doc(rec, spend)).primary).toBe("go")
     expect(plan(doc(choice, rec)).primary).toBe("rec")
     expect(plan(doc(text, choice)).primary).toBe("c")
+    // A Form asks more of the person than one Input does, so it comes first; a Choice still comes before both.
+    const form = { type: "Form", id: "f", intent: "give details", fields: [{ id: "a", prompt: "A", kind: "text" }] }
+    const input = { type: "Input", id: "i", intent: "give one", prompt: "One?", kind: "text" }
+    expect(plan(doc(input, form)).primary).toBe("f")
+    expect(plan(doc(form, choice)).primary).toBe("c")
     expect(decided(plan(doc(rec, spend)), "plan.primary").because).toContain("none marked")
   })
   it("has none when there is no act", () => {

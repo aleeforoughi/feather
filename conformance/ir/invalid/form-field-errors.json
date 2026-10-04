@@ -1,0 +1,46 @@
+{
+  "description": "Form fields are checked like Inputs: a missing prompt, a presentational field, an unknown kind and an impossible range.",
+  "expect": [
+    {
+      "code": "missing-field",
+      "path": "/nodes/0/fields/0/prompt"
+    },
+    {
+      "code": "presentational-field",
+      "path": "/nodes/0/fields/1/colour"
+    },
+    {
+      "code": "invalid-value",
+      "path": "/nodes/0/fields/1/kind"
+    },
+    {
+      "code": "out-of-range",
+      "path": "/nodes/0/fields/0/min"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "form_test",
+    "nodes": [
+      {
+        "type": "Form",
+        "id": "f",
+        "intent": "give details",
+        "fields": [
+          {
+            "id": "n",
+            "kind": "number",
+            "min": 5,
+            "max": 1
+          },
+          {
+            "id": "x",
+            "prompt": "X",
+            "kind": "colour",
+            "colour": "red"
+          }
+        ]
+      }
+    ]
+  }
+}

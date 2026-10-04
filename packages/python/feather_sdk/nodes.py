@@ -31,6 +31,31 @@ class ChoiceOption(TypedDict, total=False):
     """One line more."""
 
 
+class FormItem(TypedDict, total=False):
+    """The questions, in order; ids unique within the form. Consecutive fields with the same group are shown together under it."""
+
+    id: Required[str]
+    """Unique among the fields; the key of its answer."""
+    prompt: Required[str]
+    """The question."""
+    kind: Required[Literal["text", "long-text", "number", "email", "phone", "url", "date", "money"]]
+    """What kind of value."""
+    required: bool
+    """An answer is needed to continue."""
+    value: str | int | float
+    """The current value, if any."""
+    min: int | float
+    """For number and money: the smallest accepted."""
+    max: int | float
+    """For number and money: the largest accepted."""
+    maxLength: int
+    """For text kinds: the longest accepted."""
+    currency: str
+    """For money: the currency."""
+    group: str
+    """A heading the field sits under, such as Schedule or Place."""
+
+
 class Coordinates(TypedDict, total=False):
     """Latitude and longitude."""
 
@@ -259,6 +284,39 @@ def Input(
     return _node(
         "Input",
         {"id": id, "intent": intent, "importance": importance, "reversible": reversible, "expandable": expandable, "primary": primary, "prompt": prompt, "kind": kind, "required": required, "value": value, "min": min, "max": max, "maxLength": maxLength, "currency": currency},
+    )
+
+
+def Form(
+    *,
+    id: str,
+    intent: str,
+    fields: list[FormItem],
+    importance: Literal["low", "normal", "high", "critical"] | None = None,
+    reversible: bool | None = None,
+    expandable: Expandable | None = None,
+    primary: bool | None = None,
+    prompt: str | None = None,
+    submitLabel: str | None = None,
+) -> dict[str, Any]:
+    """Several facts asked of the person together and sent with one act. Use it instead of separate Inputs when the caller acts on the answers at once, so no answer is lost because it was typed but not sent.
+
+    Replies: submit (with value), skip.
+
+    Args:
+        id: Stable within the experience; replies and references use it.
+        intent: What the human is doing here, in a few words. Required on act nodes.
+        importance: How much it matters. Default normal; critical is never hidden behind expansion.
+        reversible: Whether the effect can be undone. Default true; an act that states a consequence cannot be undone.
+        expandable: Detail on demand, behind "Why?". At least one entry.
+        primary: This node is the experience's main act: it gets the emphasis. Where focus starts is the composer's decision, never on an irreversible act. At most one per experience.
+        prompt: What the answers are for, in one line.
+        fields: The questions, in order; ids unique within the form. Consecutive fields with the same group are shown together under it.
+        submitLabel: The words for the one act that sends every answer; defaults to the intent.
+    """
+    return _node(
+        "Form",
+        {"id": id, "intent": intent, "importance": importance, "reversible": reversible, "expandable": expandable, "primary": primary, "prompt": prompt, "fields": fields, "submitLabel": submitLabel},
     )
 
 
@@ -876,4 +934,4 @@ def ExploreMore(
     )
 
 
-__all__ = ["Text", "Action", "Choice", "Input", "Price", "Person", "Date", "Location", "Status", "Progress", "Media", "Confirmation", "Warning", "Approval", "Recommendation", "PredictedChoice", "Alternative", "Tradeoff", "Autopick", "Correction", "Preference", "Comparison", "IrreversibleAction", "ExploreMore"]
+__all__ = ["Text", "Action", "Choice", "Input", "Form", "Price", "Person", "Date", "Location", "Status", "Progress", "Media", "Confirmation", "Warning", "Approval", "Recommendation", "PredictedChoice", "Alternative", "Tradeoff", "Autopick", "Correction", "Preference", "Comparison", "IrreversibleAction", "ExploreMore"]

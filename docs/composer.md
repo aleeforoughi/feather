@@ -75,7 +75,7 @@ and a Warning `high` unless they say otherwise.
 
 | Rule | Decides |
 |---|---|
-| `one-primary` (7.1) | `plan.primary`: the node the caller marks, or else the first IrreversibleAction, Approval, Recommendation, Choice, Input or Action. Its emphasis is `primary`. |
+| `one-primary` (7.1) | `plan.primary`: the node the caller marks, or else the first IrreversibleAction, Approval, Recommendation, Choice, Form, Input or Action. Its emphasis is `primary`. |
 | `irreversible-explicit` (7.2) | An irreversible act never gets `plan.focus`. Whatever commits the effect gets `confirm`, once: an IrreversibleAction, or an irreversible act that no IrreversibleAction confirms (by its `confirms`, or implied when there is only one). The mode is `confirm` on screen, `spoken-keyword` by voice and `typed-keyword` in text, and the keyword modes carry `keyword` in the plan's language (English when Feather has none for it). An irreversible Choice is never preselected, and its prediction shows beside it as a `PredictionNote`. |
 | `recommendation-first` (7.3) | Alternatives follow in the `secondary` region, one AlternativeList per node they are alternatives to (`~alternatives:<for>`, or `~alternatives` when they name none). A reversible Choice preselects its predicted option, or the caller's selection. Focus starts on a reversible primary act. |
 | `critical-never-hidden` (7.4) | A critical node (with the IR's defaults) has emphasis `critical`, and its detail shows open (`expanded: true`), whatever the persona. |

@@ -89,11 +89,13 @@ export interface ChoiceNode extends NodeBase, PrimaryCapable {
 }
 
 /** A fact Feather does not have yet, asked of the person. */
+export type InputKind = "text" | "long-text" | "number" | "email" | "phone" | "url" | "date" | "money"
+
 export interface InputNode extends NodeBase, PrimaryCapable {
   type: "Input"
   intent: string
   prompt: string
-  kind: "text" | "long-text" | "number" | "email" | "phone" | "url" | "date" | "money"
+  kind: InputKind
   required?: boolean
   /** The current value, if any. */
   value?: string | number
@@ -104,6 +106,31 @@ export interface InputNode extends NodeBase, PrimaryCapable {
   maxLength?: number
   /** For money: the currency (ISO 4217). */
   currency?: string
+}
+
+/** One question of a Form: asked as an Input of the same kind is, and answered the same way. */
+export interface FormField {
+  id: string
+  prompt: string
+  kind: InputKind
+  required?: boolean
+  value?: string | number
+  min?: number
+  max?: number
+  maxLength?: number
+  currency?: string
+  /** A heading the field sits under; consecutive fields with the same group are shown together. */
+  group?: string
+}
+
+export interface FormNode extends NodeBase, PrimaryCapable {
+  type: "Form"
+  intent: string
+  /** What the answers are for, in one line. */
+  prompt?: string
+  fields: FormField[]
+  /** The words for the one act that sends every answer; defaults to the intent. */
+  submitLabel?: string
 }
 
 /** An amount of money. */
@@ -325,6 +352,7 @@ export type ContentNode =
   | ActionNode
   | ChoiceNode
   | InputNode
+  | FormNode
   | PriceNode
   | PersonNode
   | DateNode
@@ -368,7 +396,8 @@ export interface ReplyEvent {
   act: string
   /**
    * Only when the act carries one: an option id (an array of them for a multiple Choice); a string, number or ISO 8601
-   * date for an Input, by its kind; { amount, currency } for a Price Alternative; a string for the other inputs.
+   * date for an Input, by its kind; for a Form, an object from field id to such an answer; { amount, currency } for a
+   * Price Alternative; a string for the other inputs.
    */
-  value?: string | number | boolean | string[] | Money
+  value?: string | number | boolean | string[] | Money | Record<string, string | number>
 }

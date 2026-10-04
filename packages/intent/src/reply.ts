@@ -2,7 +2,7 @@
 // (web, voice, text, switch) must produce the same reply for the same act, so the acts a node takes and the encoding
 // of each value are part of the contract (spec.ts), and checked here. It never throws.
 import { specFor } from "./spec.ts"
-import type { Experience, IRNode, ReplyEvent } from "./types.ts"
+import type { Experience, FormField, IRNode, ReplyEvent } from "./types.ts"
 import { chars, isScalar, parseDate, validate } from "./validate.ts"
 
 export interface ReplyIssue {
@@ -32,6 +32,7 @@ export function actsFor(node: IRNode): string[] {
   // A Warning is acknowledged only when it asks to be; an Input is skipped only when it is optional.
   if (node.type === "Warning") return node.acknowledge === true ? acts : []
   if (node.type === "Input" && node.required === true) return acts.filter((a) => a !== "skip")
+  if (node.type === "Form" && node.fields.some((f) => f.required === true)) return acts.filter((a) => a !== "skip")
   return acts
 }
 
@@ -94,27 +95,24 @@ function checkValue(node: IRNode, act: string, value: unknown, experience: Exper
       if (typeof value !== "string" || !ids.includes(value)) return `Choice "${node.of}" has no option ${short(value)}`
       return value === node.option ? `"${value}" is the prediction itself; reply accept instead` : undefined
     }
-    case "Input": {
+    case "Input":
+      return act === "submit" ? checkAnswer(node, value) : undefined
+    case "Form": {
       if (act !== "submit") return undefined
-      switch (node.kind) {
-        case "number":
-        case "money":
-          if (!finite(value)) return `a ${node.kind} answer is a finite number${node.kind === "money" ? ` in ${node.currency}` : ""}`
-          if (node.min !== undefined && value < node.min) return `${value} is below the minimum ${node.min}`
-          if (node.max !== undefined && value > node.max) return `${value} is above the maximum ${node.max}`
-          return undefined
-        case "date":
-          return typeof value === "string" && parseDate(value) ? undefined : "a date answer is an ISO 8601 date or date-time string"
-        default: {
-          if (!text(value)) return "the answer is a non-empty string"
-          const s = value as string
-          if (node.maxLength !== undefined && chars(s) > node.maxLength) return `the answer is ${chars(s)} characters; the most is ${node.maxLength}`
-          if (node.kind === "email" && !EMAIL.test(s)) return `${short(s)} is not an email address`
-          if (node.kind === "phone" && !PHONE.test(s)) return `${short(s)} is not a phone number`
-          if (node.kind === "url" && !URL.canParse(s)) return `${short(s)} is not a URL`
-          return undefined
-        }
+      if (typeof value !== "object" || value === null || Array.isArray(value)) return "a form answer is an object from field id to answer"
+      const answers = value as Record<string, unknown>
+      const ids = node.fields.map((f) => f.id)
+      const unknown = Object.keys(answers).filter((k) => !ids.includes(k))
+      if (unknown.length) return `no field ${unknown.map(short).join(", ")} (fields: ${ids.join(", ")})`
+      if (Object.keys(answers).length === 0) return node.fields.some((f) => f.required === true) ? "a form answer gives at least one field" : "a form answer gives at least one field; reply skip to answer none"
+      const missing = node.fields.filter((f) => f.required === true && answers[f.id] === undefined).map((f) => f.id)
+      if (missing.length) return `required field${missing.length === 1 ? "" : "s"} ${missing.map((m) => `"${m}"`).join(", ")} ${missing.length === 1 ? "has" : "have"} no answer`
+      for (const field of node.fields) {
+        if (answers[field.id] === undefined) continue
+        const problem = checkAnswer(field, answers[field.id])
+        if (problem) return `field "${field.id}": ${problem}`
       }
+      return undefined
     }
     case "Alternative":
       switch (node.input) {
@@ -141,6 +139,29 @@ function checkValue(node: IRNode, act: string, value: unknown, experience: Exper
       return node.topics && !node.topics.includes(value as string) ? `${short(value)} is not one of its topics (${node.topics.map(short).join(", ")})` : undefined
     default:
       return undefined
+  }
+}
+
+/** Why an answer does not fit what an Input (or a Form field, asked the same way) asks for, or undefined when it does. */
+function checkAnswer(ask: Pick<FormField, "kind" | "min" | "max" | "maxLength" | "currency">, value: unknown): string | undefined {
+  const finite = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v)
+  switch (ask.kind) {
+    case "number":
+    case "money":
+      if (!finite(value)) return `a ${ask.kind} answer is a finite number${ask.kind === "money" ? ` in ${ask.currency}` : ""}`
+      if (ask.min !== undefined && value < ask.min) return `${value} is below the minimum ${ask.min}`
+      if (ask.max !== undefined && value > ask.max) return `${value} is above the maximum ${ask.max}`
+      return undefined
+    case "date":
+      return typeof value === "string" && parseDate(value) ? undefined : "a date answer is an ISO 8601 date or date-time string"
+    default: {
+      if (!(typeof value === "string" && value.trim() !== "" && chars(value) <= 4000)) return "the answer is a non-empty string"
+      if (ask.maxLength !== undefined && chars(value) > ask.maxLength) return `the answer is ${chars(value)} characters; the most is ${ask.maxLength}`
+      if (ask.kind === "email" && !EMAIL.test(value)) return `${short(value)} is not an email address`
+      if (ask.kind === "phone" && !PHONE.test(value)) return `${short(value)} is not a phone number`
+      if (ask.kind === "url" && !URL.canParse(value)) return `${short(value)} is not a URL`
+      return undefined
+    }
   }
 }
 

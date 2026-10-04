@@ -1,0 +1,27 @@
+{
+  "description": "A form field asks for money but names no currency.",
+  "expect": [
+    {
+      "code": "missing-field",
+      "path": "/nodes/0/fields/0/currency"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "form_test",
+    "nodes": [
+      {
+        "type": "Form",
+        "id": "f",
+        "intent": "give details",
+        "fields": [
+          {
+            "id": "fee",
+            "prompt": "Fee",
+            "kind": "money"
+          }
+        ]
+      }
+    ]
+  }
+}

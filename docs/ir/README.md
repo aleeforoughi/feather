@@ -39,9 +39,9 @@ pieces fit, and what the validator checks.
 
 ## Nodes
 
-There are 24 node types in two families:
+There are 25 node types in two families:
 
-- **Content:** `Text`, `Action`, `Choice`, `Input`, `Price`, `Person`, `Date`, `Location`, `Status`, `Progress`,
+- **Content:** `Text`, `Action`, `Choice`, `Input`, `Form`, `Price`, `Person`, `Date`, `Location`, `Status`, `Progress`,
   `Media`, `Confirmation`, `Warning`, `Approval`.
 - **Decision:** `Recommendation`, `PredictedChoice`, `Alternative`, `Tradeoff`, `Autopick`, `Correction`,
   `Preference`, `Comparison`, `IrreversibleAction`, `ExploreMore`.
@@ -93,6 +93,8 @@ scanned with a switch or typed a number, so each value has one encoding:
 | `change` on a PredictedChoice | another option id (the predicted one is `accept`) |
 | `submit` on an Input | a string for the text kinds (respecting `maxLength`, and a valid email, phone or URL for those kinds); a number for `number`, and for `money` in the Input's `currency`, within `min` and `max`; an ISO 8601 string for `date` |
 | `skip` on an Input | none; only when the Input is not `required` |
+| `submit` on a Form | an object from field id to answer, each encoded as an Input of the field's kind; a field left out was not answered, every `required` field is present, and at least one is |
+| `skip` on a Form | none; only when no field is `required` |
 | `choose` on an Alternative with `input` | `{ "amount", "currency" }` for Price, an ISO 8601 string for Date, words for Text, Location and Person |
 | `set` on a Preference | a string, number or boolean, one of its `options` when it has them |
 | `reject` on an Approval, `submit` on a Correction, `expand` on an ExploreMore | a string (for `expand`, one of its `topics` when it has them) |
@@ -108,8 +110,8 @@ and rejects fields other than `experience`, `node`, `act` and `value`.
 
 The validator checks structure, and these rules across nodes:
 
-1. **One primary act.** At most one node has `"primary": true`. Only Action, Choice, Input, Approval,
-   Recommendation and IrreversibleAction can be primary. `"primary": false` is allowed anywhere and means
+1. **One primary act.** At most one node has `"primary": true`. Only Action, Choice, Input, Form,
+   Approval, Recommendation and IrreversibleAction can be primary. `"primary": false` is allowed anywhere and means
    nothing.
 2. **Irreversible means explicit.** An `IrreversibleAction` must state its `consequence` (`spend`, `publish`,
    `send`, `consent`, `delete` or a `statement`), so Feather can show it verbatim and ask for a deliberate act.
@@ -138,9 +140,9 @@ rules that span several nodes or fields, so these codes come only from `validate
 `dangling-reference`, `self-reference`, `wrong-reference-type`, `out-of-order`, `ambiguous-alternative`,
 `unneeded-confirmation`, `multiple-primary`, `irreversible-without-consequence` (for acts other than an
 IrreversibleAction), `missing-text-equivalent`, `duplicate-option`, `unknown-option`, `too-many-selected`,
-`conflicting-prediction`, `duplicate-step`, `empty-tradeoff`, `comparison-mismatch`, `out-of-range` (a date
+`conflicting-prediction`, `duplicate-step`, `duplicate-field`, `empty-tradeoff`, `comparison-mismatch`, `out-of-range` (a date
 range or `min` above `max`), `invalid-date` (a well-formed but impossible date, such as February 30),
-`missing-field` (a money Input's `currency`) and `too-many-issues`.
+and `too-many-issues`.
 
 ## Validating
 
@@ -182,7 +184,7 @@ says what to change. `validate()` never throws, and reports at most 100 issues; 
 | `missing-text-equivalent` | Rule 3. |
 | `dangling-reference`, `self-reference`, `wrong-reference-type`, `out-of-order`, `ambiguous-alternative` | Rule 4. |
 | `conflicting-prediction` | Rule 5. |
-| `duplicate-option`, `unknown-option`, `too-many-selected`, `duplicate-step`, `comparison-mismatch` | Rules of single node types. |
+| `duplicate-option`, `unknown-option`, `too-many-selected`, `duplicate-step`, `duplicate-field`, `comparison-mismatch` | Rules of single node types. |
 | `too-many-issues` | More than 100 problems; the rest are not listed. |
 
 ## Fixtures

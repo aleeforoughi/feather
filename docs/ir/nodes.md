@@ -77,6 +77,20 @@ A fact the caller does not have yet, asked of the person.
 
 **Replies:** `submit` (with value): The value given: a string for text kinds, an ISO 8601 string for date, a number for number and for money (in the Input's currency). `skip`: The person chose not to answer (only when the Input is not required).
 
+### Form
+
+Several facts asked of the person together and sent with one act. Use it instead of separate Inputs when the caller acts on the answers at once, so no answer is lost because it was typed but not sent.
+
+*an act (needs `intent`); may be primary.*
+
+| Field | Required | Type | Meaning |
+|---|---|---|---|
+| `prompt` |  | string | What the answers are for, in one line. |
+| `fields` | yes | list of { id, prompt, kind, required?, value?, min?, max?, maxLength?, currency?, group? } | The questions, in order; ids unique within the form. Consecutive fields with the same group are shown together under it. |
+| `submitLabel` |  | string | The words for the one act that sends every answer; defaults to the intent. |
+
+**Replies:** `submit` (with value): An object from field id to answer, each encoded as an Input of the same kind encodes it. A field left out was not answered; every required field is present, and at least one field is. `skip`: The person chose to answer none of it (only when no field is required).
+
 ### Price
 
 An amount of money.
@@ -187,7 +201,7 @@ Something the person did took effect.
 | Field | Required | Type | Meaning |
 |---|---|---|---|
 | `text` | yes | string | What happened. |
-| `of` |  | id of a Action or Choice or Input or Approval or Recommendation or PredictedChoice or Alternative or Autopick or Correction or Preference or IrreversibleAction or ExploreMore | The act this confirms. |
+| `of` |  | id of a Action or Choice or Input or Form or Approval or Recommendation or PredictedChoice or Alternative or Autopick or Correction or Preference or IrreversibleAction or ExploreMore | The act this confirms. |
 
 **Replies:** none.
 
@@ -346,7 +360,7 @@ An act that cannot be undone: spending, publishing, sending, consent. Always exp
 |---|---|---|---|
 | `label` |  | string | The words for the act; defaults to the intent. |
 | `consequence` | yes | { spend?, publish?, send?, consent?, delete?, statement? } | What the act does, stated so it can be shown verbatim. At least one entry. |
-| `confirms` |  | id of a Action or Choice or Input or Approval or Recommendation or PredictedChoice or Alternative or Autopick or Correction or Preference | The irreversible act this commits (any act marked reversible: false, such as a Recommendation, an Approval or a Choice). When an experience has a single IrreversibleAction, it confirms them implicitly. |
+| `confirms` |  | id of a Action or Choice or Input or Form or Approval or Recommendation or PredictedChoice or Alternative or Autopick or Correction or Preference | The irreversible act this commits (any act marked reversible: false, such as a Recommendation, an Approval or a Choice). When an experience has a single IrreversibleAction, it confirms them implicitly. |
 
 **Replies:** `confirm`: Confirmed by a deliberate act. `cancel`: Not done.
 
