@@ -1,5 +1,5 @@
 // Reading a layout plan: every IR node it carries, the experience it came from. Pure; shared by the bodies.
-import { IR_VERSION, type Experience, type IRNode } from "@aleeforoughi/feather-intent"
+import { actsFor, IR_VERSION, type Experience, type IRNode } from "@aleeforoughi/feather-intent"
 import type { LayoutPlan, PlanNode } from "@aleeforoughi/feather-liquid"
 
 /** The nodes composed into a plan node: merged into it, attached to it, or grouped in it, in the plan's order. */
@@ -38,6 +38,29 @@ export function irNodes(plan: LayoutPlan): IRNode[] {
  */
 export function experienceOf(plan: LayoutPlan): Experience {
   return { ir: IR_VERSION, experience: plan.experience, locale: plan.locale, nodes: irNodes(plan) }
+}
+
+/**
+ * The intents of the act nodes `plan` has that `previous` did not, in plan order (docs/lifecycle.md section 2.4). A node
+ * counts when a person can act on it and sees it: it has an intent and at least one act, and it is not inside the collapsed
+ * "Other options". Progress and other content speak for themselves and are never named.
+ */
+export function addedActIntents(previous: LayoutPlan | undefined, plan: LayoutPlan): string[] {
+  const before = new Set(previous ? planNodes(previous).flatMap((n) => (n.node ? [n.node.id] : [])) : [])
+  const out: string[] = []
+  const visit = (node: PlanNode) => {
+    const ir = node.node
+    if (ir && !before.has(ir.id) && actsFor(ir).length > 0 && "intent" in ir && typeof ir.intent === "string" && node.organism !== "PredictionNote") out.push(ir.intent)
+    for (const child of [...(node.attached ?? []), ...(node.items ?? [])]) visit(child)
+  }
+  for (const region of plan.regions) for (const node of region.nodes) if (node.collapsed !== true) visit(node)
+  return out
+}
+
+/** The sentence that tells what is new, or undefined when nothing a person can act on was added. */
+export function newActsSentence(previous: LayoutPlan | undefined, plan: LayoutPlan): string | undefined {
+  const intents = addedActIntents(previous, plan)
+  return intents.length === 0 ? undefined : `New: ${intents.join(", ")}.`
 }
 
 /** The IR nodes by id. */

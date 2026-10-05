@@ -75,7 +75,7 @@ export function NodeView({ node }: { node: PlanNode }) {
         {node.type === "AlternativeGroup" ? <Alternatives group={node} /> : ir && <Body node={node} ir={ir} />}
         {ir?.expandable && !OWN_DETAIL.has(ir.type) && <Detail expandable={ir.expandable} expanded={node.expanded} importance={ir.importance} />}
         {attached.map((a) => (
-          <NodeView key={a.id} node={a} />
+          <NodeView key={`${a.id}:${a.type}`} node={a} />
         ))}
       </div>
     </NodeFrame>

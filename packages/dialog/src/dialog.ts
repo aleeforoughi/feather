@@ -1,11 +1,11 @@
 // The dialog engine: a conversation over a layout plan, in turns. Pure and deterministic (no clock, no randomness, no
 // I/O, no DOM): the same plan and the same inputs always give the same turns and the same replies. The contract is
 // docs/manifestations.md section 1.
-import { actsFor, validateReply, type Experience, type FormField, type FormNode, type IRNode, type ReplyEvent } from "@aleeforoughi/feather-intent"
+import { actsFor, validateReply, type Experience, type FormField, type FormNode, type IRNode, type ReplyEvent, type Resolution } from "@aleeforoughi/feather-intent"
 import type { Emphasis, LayoutPlan, PlanNode } from "@aleeforoughi/feather-liquid"
-import { formatDate, formatMoney, plainProblem } from "./format.ts"
+import { formatDate, formatMoney, httpUrl, plainProblem } from "./format.ts"
 import { normalize, type Normalized } from "./normalize.ts"
-import { experienceCurrency, experienceOf, nodeIndex, planNodes } from "./plan-utils.ts"
+import { experienceCurrency, experienceOf, newActsSentence, nodeIndex, planNodes } from "./plan-utils.ts"
 import { consequenceSentences, OTHER_OPTIONS_LABEL, questionCount, SEND_WORD, sentences, show, SKIP_ALL_WORDS, SKIP_WORD } from "./words.ts"
 
 export interface DialogOptions {
@@ -16,7 +16,7 @@ export interface DialogOptions {
 }
 
 export interface Part {
-  kind: "content" | "consequence" | "question" | "hint" | "problem" | "outcome"
+  kind: "content" | "consequence" | "question" | "hint" | "problem" | "outcome" | "update"
   text: string
   /** The plan node it belongs to, if any. */
   node?: string
@@ -53,8 +53,24 @@ export interface Dialog {
   readonly turn: Turn
   /** True once nothing is left to act on. */
   readonly done: boolean
+  /**
+   * True once the experience has collapsed to its resolution (docs/lifecycle.md): nothing more will come. An open experience
+   * with nothing to act on yet is `done` but not `resolved`: a body that is fed updates keeps waiting for the next one.
+   */
+  readonly resolved: boolean
   /** The person's input, typed or transcribed. Returns the next turn and every reply that went out. Never throws. */
   answer(input: string): Outcome
+  /**
+   * The experience changed (docs/lifecycle.md section 2): takes the plan composed from the updated experience and returns the
+   * next turn, which leads with what is new. A plan whose revision is not higher than the one the dialog has is ignored (the
+   * current turn is returned). Never throws.
+   */
+  update(plan: LayoutPlan, options?: UpdateOptions): Turn
+}
+
+export interface UpdateOptions {
+  /** The updated experience, so replies are checked against it. Default: rebuilt from the plan's nodes. */
+  experience?: Experience
 }
 
 /** One act the person can take: a node, an act, and the words for it. */
@@ -120,30 +136,56 @@ function parseNumber(text: string): number | undefined {
   return Number.isFinite(n) ? n : undefined
 }
 
-/** Starts a conversation over a plan. */
-export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dialog {
-  const locale = plan.locale
-  const experience = options.experience ?? experienceOf(plan)
-  const readback = options.readback === true
-  const irs = nodeIndex(plan)
-  const currency = experienceCurrency(irs.values())
-
-  const index = new Map<string, PlanNode>()
-  const mergedIds = new Set<string>()
-  for (const pn of planNodes(plan)) {
-    if (pn.node && !index.has(pn.node.id)) index.set(pn.node.id, pn)
-    for (const m of pn.merged ?? []) mergedIds.add(m.id)
+/** What a collapsed experience says: its summary, then its artifact as "{label}: {href}" (http and https only) or the label alone. */
+function resolutionLines(resolution: Resolution): Part[] {
+  const parts: Part[] = [{ kind: "content", text: resolution.summary }]
+  const artifact = resolution.artifact
+  if (artifact) {
+    const href = artifact.href === undefined ? undefined : httpUrl(artifact.href)
+    parts.push({ kind: "content", text: href ? `${artifact.label}: ${href}` : artifact.label })
   }
+  return parts
+}
 
+/** Starts a conversation over a plan. */
+export function createDialog(firstPlan: LayoutPlan, options: DialogOptions = {}): Dialog {
+  let plan = firstPlan
+  let locale = plan.locale
+  let experience = options.experience ?? experienceOf(plan)
+  const readback = options.readback === true
+  let irs = nodeIndex(plan)
+  let currency = experienceCurrency(irs.values())
+
+  let index = new Map<string, PlanNode>()
+  let mergedIds = new Set<string>()
   // Collapsed nodes (docs/manifestations.md section 1, browse): hidden, with everything composed into them, until the
   // person picks "Other options"; then they stay open for the rest of the experience.
-  const collapsedIds = new Set<string>()
-  for (const region of plan.regions) {
-    for (const top of region.nodes) {
-      if (top.collapsed !== true) continue
-      for (const pn of planNodes({ ...plan, regions: [{ ...region, nodes: [top] }] })) if (pn.node) collapsedIds.add(pn.node.id)
+  let collapsedIds = new Set<string>()
+  /** Set once the experience is resolved: what the done turn says (docs/lifecycle.md section 2.5). */
+  let resolutionParts: Part[] | undefined
+  /** (Re)reads the plan the dialog is over. */
+  function read(next: LayoutPlan, exp: Experience) {
+    plan = next
+    locale = next.locale
+    experience = exp
+    irs = nodeIndex(next)
+    currency = experienceCurrency(irs.values())
+    index = new Map()
+    mergedIds = new Set()
+    for (const pn of planNodes(next)) {
+      if (pn.node && !index.has(pn.node.id)) index.set(pn.node.id, pn)
+      for (const m of pn.merged ?? []) mergedIds.add(m.id)
     }
+    collapsedIds = new Set()
+    for (const region of next.regions) {
+      for (const top of region.nodes) {
+        if (top.collapsed !== true) continue
+        for (const pn of planNodes({ ...next, regions: [{ ...region, nodes: [top] }] })) if (pn.node) collapsedIds.add(pn.node.id)
+      }
+    }
+    resolutionParts = next.lifecycle === "collapsed" && next.resolution ? resolutionLines(next.resolution) : undefined
   }
+  read(plan, experience)
   let othersOpen = false
   const hidden = (id: string) => !othersOpen && collapsedIds.has(id)
 
@@ -548,12 +590,12 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
         return { state: "confirm", parts, choices: [] }
       }
       case "done":
-        return { state: "done", parts: [...lead.filter((p) => p.kind !== "outcome"), ...problem, ...hint, ...(outcomes.length > 0 ? outcomes : contentParts())], choices: [] }
+        return { state: "done", parts: [...lead.filter((p) => p.kind !== "outcome"), ...problem, ...hint, ...(resolutionParts ?? (outcomes.length > 0 ? outcomes : contentParts()))], choices: [] }
     }
   }
 
   let turn: Turn = (() => {
-    if (offers(true).length === 0) mode = { kind: "done" }
+    if (resolutionParts || offers(true).length === 0) mode = { kind: "done" }
     return turnFor({ full: true })
   })()
 
@@ -805,12 +847,83 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
     return proceedWith(true, parsed.value)
   }
 
+  // ── Updates (docs/lifecycle.md section 2) ────────────────────────────────────────────────────────────────────
+  /** The node's IR as it is now, as text, to tell whether an update changed it. */
+  const fingerprint = (map: Map<string, IRNode>, id: string) => JSON.stringify(map.get(id) ?? null)
+
+  function applyUpdate(next: LayoutPlan, exp: Experience): Turn {
+    const previous = plan
+    const before = irs
+    const was = mode
+    read(next, exp)
+    const changed = (ids: string[]) => ids.some((id) => !irs.has(id) || fingerprint(before, id) !== fingerprint(irs, id))
+    const idsOf = (o: Offer) => [...new Set([o.host.id, o.target.id, o.ir.id])]
+    const intentOf = (o: Offer) => ("intent" in o.ir && typeof o.ir.intent === "string" ? o.ir.intent : o.ir.id)
+    // What the person has already answered stays answered, while it is the same node.
+    for (const id of [...answered]) if (changed([id])) answered.delete(id)
+
+    // Collapsed: nothing to act on. The done turn is the summary and the artifact.
+    if (resolutionParts) {
+      mode = { kind: "done" }
+      return turnFor()
+    }
+
+    const lead: Part[] = []
+    const problems: Part[] = []
+    const fresh = (o: Offer) => offers(true).find((x) => x.ir.id === o.ir.id && x.act === o.act)
+    const keep = <T extends Offer>(o: T, apply: (fresh: Offer) => void, why: (gone: boolean) => string) => {
+      const next_ = changed(idsOf(o)) ? undefined : fresh(o)
+      if (next_) return apply(next_)
+      problems.push(part("problem", why(!irs.has(o.ir.id)), o.ir.id))
+      mode = { kind: "browse" }
+    }
+    switch (was.kind) {
+      case "value":
+        keep(was.offer, (f) => (mode = { kind: "value", offer: f }), (gone) => (gone ? `${upperFirst(intentOf(was.offer))} is no longer there, so your answer was not used.` : `${upperFirst(intentOf(was.offer))} changed, so your answer was not used.`))
+        break
+      case "readback":
+        keep(was.pending.offer, (f) => (mode = { kind: "readback", pending: { ...was.pending, offer: f } }), (gone) => (gone ? `${upperFirst(intentOf(was.pending.offer))} is no longer there, so your answer was not used.` : `${upperFirst(intentOf(was.pending.offer))} changed, so your answer was not used.`))
+        break
+      case "confirm":
+        // An armed act whose node changed or went away is disarmed: nothing is committed.
+        keep(was.pending.offer, (f) => (mode = { kind: "confirm", pending: { ...was.pending, offer: f } }), (gone) => (gone ? `${upperFirst(intentOf(was.pending.offer))} is no longer there. It was not confirmed, and nothing was done.` : `${upperFirst(intentOf(was.pending.offer))} changed. It was not confirmed, and nothing was done. Read it again before you confirm.`))
+        break
+      case "form":
+      case "review":
+        keep(was.run.offer, (f) => {
+          was.run.offer = f
+          was.run.form = f.ir as FormNode
+          mode = { kind: was.kind, run: was.run }
+        }, (gone) => (gone ? `${upperFirst(intentOf(was.run.offer))} is no longer there, so your answers were dropped. Nothing was sent.` : `${upperFirst(intentOf(was.run.offer))} changed, so your answers were dropped. Nothing was sent.`))
+        break
+      default:
+        break
+    }
+
+    const said = newActsSentence(previous, next)
+    if (said) lead.push(part("update", said))
+    if (mode.kind === "browse" || mode.kind === "done") mode = offers(true).length === 0 ? { kind: "done" } : { kind: "browse" }
+    return turnFor({ lead, problem: problems.map((p) => p.text).join(" ") || undefined })
+  }
+
   return {
     get turn() {
       return turn
     },
+    update(next: LayoutPlan, opts: UpdateOptions = {}): Turn {
+      try {
+        if (!next || next.experience !== plan.experience || !(next.revision > plan.revision)) return turn
+        turn = applyUpdate(next, opts.experience ?? experienceOf(next))
+      } catch {
+        // Never throws: whatever went wrong, the dialog keeps what it had.
+      }
+      return turn
+    },
     get done() {
       return turn.state === "done"
+    },
+    get resolved() {
+      return plan.lifecycle === "collapsed"
     },
     answer(input: string): Outcome {
       replies = []

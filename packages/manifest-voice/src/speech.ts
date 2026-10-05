@@ -19,7 +19,7 @@ const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "sev
 /** The number as it is spoken: words up to twenty, which is as far as `hear` maps back; digits beyond. */
 export const spokenNumber = (n: number) => NUMBER_WORDS[n] ?? String(n)
 
-const PAUSE: Partial<Record<Speech["kind"], number>> = { content: 200, consequence: 600, outcome: 300, problem: 300, hint: 200, choices: 0 }
+const PAUSE: Partial<Record<Speech["kind"], number>> = { content: 200, consequence: 600, outcome: 300, update: 300, problem: 300, hint: 200, choices: 0 }
 
 /**
  * Feather's own wording that assumes a screen or a keyboard ("the words shown", "Type", "above the maximum") becomes

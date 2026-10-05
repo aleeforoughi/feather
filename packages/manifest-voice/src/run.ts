@@ -1,4 +1,4 @@
-import type { DialogOptions } from "@aleeforoughi/feather-dialog"
+import type { DialogOptions, UpdateOptions } from "@aleeforoughi/feather-dialog"
 import type { ReplyEvent } from "@aleeforoughi/feather-intent"
 import type { LayoutPlan } from "@aleeforoughi/feather-liquid"
 import { createVoiceDialog } from "./dialog.ts"
@@ -10,9 +10,19 @@ export interface VoiceEngine {
   listen(): Promise<string[]>
 }
 
+/** A newer plan, composed from the experience after an update (docs/lifecycle.md). */
+export interface VoiceUpdate extends UpdateOptions {
+  plan: LayoutPlan
+}
+
 export interface RunVoiceOptions extends DialogOptions {
   /** How many times in a row nothing may be heard before it stops. Default 3. */
   maxSilences?: number
+  /**
+   * Asked before each time it listens: the next update, or nothing. It is drained, so every update waiting is applied, in
+   * order, and what is new is spoken. A collapsed plan ends the conversation with its summary.
+   */
+  nextUpdate?: () => VoiceUpdate | undefined | Promise<VoiceUpdate | undefined>
 }
 
 export interface RunVoiceResult {
@@ -24,12 +34,22 @@ export interface RunVoiceResult {
 
 /** Speaks, listens, answers, until the dialog is done or nothing is heard three times in a row. */
 export async function runVoice(plan: LayoutPlan, engine: VoiceEngine, onReply: (reply: ReplyEvent) => void | Promise<void>, options: RunVoiceOptions = {}): Promise<RunVoiceResult> {
-  const { maxSilences = 3, ...dialogOptions } = options
+  const { maxSilences = 3, nextUpdate, ...dialogOptions } = options
   const dialog = createVoiceDialog(plan, dialogOptions)
   const replies: ReplyEvent[] = []
   let silences = 0
   await engine.speak(speechFor(dialog.turn, plan))
-  while (!dialog.done) {
+  // With updates coming, nothing to act on yet is not the end: it waits until the experience collapses.
+  const over = () => (nextUpdate ? dialog.resolved : dialog.done)
+  while (!over()) {
+    if (nextUpdate) {
+      for (let waiting = await nextUpdate(); waiting; waiting = dialog.resolved ? undefined : await nextUpdate()) {
+        const { plan: next, ...updateOptions } = waiting
+        const said = dialog.hearUpdate(next, updateOptions).speech
+        if (said.length > 0) await engine.speak(said)
+      }
+      if (over()) break
+    }
     const heard = (await engine.listen()).filter((t) => t.trim() !== "")
     if (heard.length === 0) {
       silences++
@@ -45,5 +65,5 @@ export async function runVoice(plan: LayoutPlan, engine: VoiceEngine, onReply: (
     }
     await engine.speak(out.speech)
   }
-  return { replies, done: true, silent: false }
+  return { replies, done: dialog.done, silent: false }
 }

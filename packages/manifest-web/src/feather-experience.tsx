@@ -2,7 +2,7 @@
 import * as React from "react"
 import type { RenderContext } from "@aleeforoughi/feather-context"
 import type { Experience, Issue, ReplyEvent, ReplyIssue } from "@aleeforoughi/feather-intent"
-import { compose } from "@aleeforoughi/feather-liquid"
+import { compose, type LayoutPlan } from "@aleeforoughi/feather-liquid"
 import { PlanView } from "./plan-view"
 
 export interface FeatherExperienceProps {
@@ -21,11 +21,20 @@ export interface FeatherExperienceProps {
   className?: string
 }
 
+/** The plan to show, and the experience it was composed from. */
+export interface ShownPlan {
+  plan: LayoutPlan
+  experience: Experience
+}
+
 /**
- * Composes `experience` for `context` and renders the plan on the web. An invalid IR renders nothing and is reported
- * to `onIssues`: the composer refuses it, and a broken page is never drawn.
+ * Composes `experience` for `context` and returns what to show, reporting an invalid IR to `onIssues`. A plan whose
+ * revision is not higher than the one shown keeps what is shown (docs/lifecycle.md section 2.6): the caller's updates are in
+ * order, so a lower revision is stale. The same revision is stale too once the experience has been updated (revision above
+ * 0), unless only the context changed: the same experience composed for a new person or device is a new plan.
+ * Returns `null` while the IR is invalid.
  */
-export function FeatherExperience({ experience, context, onReply, onIssues, onRejectedReply, autoFocus, className }: FeatherExperienceProps) {
+export function useShownPlan(experience: unknown, context: RenderContext, onIssues?: (issues: Issue[]) => void): ShownPlan | null {
   const result = React.useMemo(() => compose(experience, context), [experience, context])
   // The callback may change on every render of the host; only a new result is worth reporting.
   const report = React.useRef(onIssues)
@@ -35,6 +44,22 @@ export function FeatherExperience({ experience, context, onReply, onIssues, onRe
   React.useEffect(() => {
     if (!result.ok) report.current?.(result.issues)
   }, [result])
+  // What is shown is state derived while rendering: a plan that is not newer is simply not taken.
+  const [shown, setShown] = React.useState<(ShownPlan & { context: RenderContext }) | undefined>(undefined)
   if (!result.ok) return null
-  return <PlanView plan={result.plan} experience={experience as Experience} onReply={onReply} onRejectedReply={onRejectedReply} autoFocus={autoFocus} className={className} />
+  const stale = shown !== undefined && shown.plan.experience === result.plan.experience && (result.plan.revision < shown.plan.revision || (result.plan.revision === shown.plan.revision && result.plan.revision > 0 && context === shown.context))
+  if (stale) return shown
+  if (shown?.plan !== result.plan || shown.experience !== experience || shown.context !== context) setShown({ plan: result.plan, experience: experience as Experience, context })
+  return { plan: result.plan, experience: experience as Experience }
+}
+
+/**
+ * Composes `experience` for `context` and renders the plan on the web. An invalid IR renders nothing and is reported
+ * to `onIssues`: the composer refuses it, and a broken page is never drawn. When the caller updates the experience, hand the
+ * new one to the same component: it changes in place (docs/lifecycle.md section 2).
+ */
+export function FeatherExperience({ experience, context, onReply, onIssues, onRejectedReply, autoFocus, className }: FeatherExperienceProps) {
+  const shown = useShownPlan(experience, context, onIssues)
+  if (!shown) return null
+  return <PlanView plan={shown.plan} experience={shown.experience} onReply={onReply} onRejectedReply={onRejectedReply} autoFocus={autoFocus} className={className} />
 }

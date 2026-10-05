@@ -1,4 +1,4 @@
-import { createDialog, nodeIndex, type Dialog, type DialogOptions, type Outcome } from "@aleeforoughi/feather-dialog"
+import { createDialog, nodeIndex, type Dialog, type DialogOptions, type Outcome, type UpdateOptions } from "@aleeforoughi/feather-dialog"
 import type { ReplyEvent } from "@aleeforoughi/feather-intent"
 import type { LayoutPlan } from "@aleeforoughi/feather-liquid"
 import { candidates } from "./hear.ts"
@@ -11,25 +11,37 @@ export interface VoiceDialog extends Dialog {
    * changes anything.
    */
   hear(transcripts: string[]): { speech: Speech[]; replies: ReplyEvent[] }
+  /**
+   * The experience changed (docs/lifecycle.md section 2): takes the new plan and returns what to say now. It leads with what
+   * is new; a collapsed plan is spoken as its summary and artifact, and the dialog is done. A plan whose revision is not
+   * higher than the one the dialog has is ignored, and nothing is said.
+   */
+  hearUpdate(plan: LayoutPlan, options?: UpdateOptions): { speech: Speech[] }
 }
 
+/** What happened to a dialog, in order, so a fresh dialog can be brought to the same state. */
+type Event = { kind: "answer"; input: string } | { kind: "update"; plan: LayoutPlan; options?: UpdateOptions }
+
 /** A dialog for voice: readback is on (override with `options.readback`), and `hear` takes alternatives. */
-export function createVoiceDialog(plan: LayoutPlan, options: DialogOptions = {}): VoiceDialog {
+export function createVoiceDialog(firstPlan: LayoutPlan, options: DialogOptions = {}): VoiceDialog {
   const dialogOptions: DialogOptions = { ...options, readback: options.readback ?? true }
-  const irs = nodeIndex(plan)
+  let plan = firstPlan
+  let irs = nodeIndex(plan)
   const inner = createDialog(plan, dialogOptions)
-  /** Every input the real dialog has been given, so a fresh dialog can be brought to the same state. */
-  const history: string[] = []
+  const history: Event[] = []
 
   /** Tries an input on a fresh dialog brought to the current state; the real dialog is never touched. */
   function accepts(input: string): boolean {
-    const probe = createDialog(plan, dialogOptions)
-    for (const past of history) probe.answer(past)
+    const probe = createDialog(firstPlan, dialogOptions)
+    for (const past of history) {
+      if (past.kind === "answer") probe.answer(past.input)
+      else probe.update(past.plan, past.options)
+    }
     return !probe.answer(input).turn.parts.some((p) => p.kind === "problem")
   }
 
   function apply(input: string): Outcome {
-    history.push(input)
+    history.push({ kind: "answer", input })
     return inner.answer(input)
   }
 
@@ -39,6 +51,16 @@ export function createVoiceDialog(plan: LayoutPlan, options: DialogOptions = {})
     return apply(tries.find(accepts) ?? tries[0]!)
   }
 
+  function update(next: LayoutPlan, opts?: UpdateOptions) {
+    const before = inner.turn
+    const turn = inner.update(next, opts)
+    if (turn === before) return { turn, changed: false }
+    history.push({ kind: "update", plan: next, options: opts })
+    plan = next
+    irs = nodeIndex(next)
+    return { turn, changed: true }
+  }
+
   return {
     get turn() {
       return inner.turn
@@ -46,10 +68,18 @@ export function createVoiceDialog(plan: LayoutPlan, options: DialogOptions = {})
     get done() {
       return inner.done
     },
+    get resolved() {
+      return inner.resolved
+    },
     answer: (input) => answer([input]),
+    update: (next, opts) => update(next, opts).turn,
     hear(transcripts) {
       const outcome = answer(transcripts)
       return { speech: speechFor(outcome.turn, plan), replies: outcome.replies }
+    },
+    hearUpdate(next, opts) {
+      const { turn, changed } = update(next, opts)
+      return { speech: changed ? speechFor(turn, plan) : [] }
     },
   }
 }

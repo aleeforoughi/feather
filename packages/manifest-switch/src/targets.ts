@@ -19,7 +19,28 @@ function hiddenOrDisabled(el: HTMLElement): boolean {
 
 /** The enabled, visible controls inside `root`, in DOM order (which is the plan's order). */
 export function targetsIn(root: HTMLElement): HTMLElement[] {
-  return Array.from(root.querySelectorAll<HTMLElement>(CONTROLS)).filter((el) => !hiddenOrDisabled(el))
+  // A collapsed experience has no targets (docs/lifecycle.md section 2.5): the artifact link it leaves is for reading and
+  // following by other means, and scanning stops.
+  return Array.from(root.querySelectorAll<HTMLElement>(CONTROLS)).filter((el) => !hiddenOrDisabled(el) && !el.matches('[data-slot="experience-resolution-artifact"]'))
+}
+
+/** What identifies a target across an update that remounts it: the plan node it is in, its slot, and its place among those. */
+export interface TargetSignature {
+  key: string
+  nth: number
+}
+
+const keyOf = (el: HTMLElement) => `${el.closest("[data-feather-node]")?.getAttribute("data-feather-node") ?? ""}|${el.getAttribute("data-slot") ?? el.tagName}|${el.getAttribute("role") ?? ""}`
+
+export function signatureOf(el: HTMLElement, targets: HTMLElement[]): TargetSignature {
+  const key = keyOf(el)
+  return { key, nth: targets.filter((t) => keyOf(t) === key).indexOf(el) }
+}
+
+/** The target with the same signature, if there is one (the same place among its kind, else the last of them). */
+export function findBySignature(sig: TargetSignature, targets: HTMLElement[]): HTMLElement | undefined {
+  const same = targets.filter((t) => keyOf(t) === sig.key)
+  return same[Math.min(Math.max(sig.nth, 0), same.length - 1)]
 }
 
 /** The nearest target at or above `el`, if it is one of `targets`. */

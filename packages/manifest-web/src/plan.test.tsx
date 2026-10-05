@@ -243,7 +243,7 @@ describe("voice and text plans", () => {
         for (const node of planNodes(composed.plan)) {
           expect(container.querySelector(`[data-feather-node="${node.id}"]`), `${name} (${label}): ${node.id}`).not.toBeNull()
         }
-        expect(container.querySelectorAll("button, input, textarea, a[href]"), `${name} (${label}) has nothing to operate`).toHaveLength(0)
+        expect(container.querySelectorAll("button, input, textarea, a[href]:not([data-slot=\"experience-resolution-artifact\"])"), `${name} (${label}) has nothing to operate`).toHaveLength(0)
         unmount()
       }
     }

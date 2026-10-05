@@ -39,6 +39,11 @@ describe("the plan carries every node, so replies can be checked", () => {
       const plan: LayoutPlan = result.plan
       const rebuilt = experienceOf(plan)
       const original = ir as { nodes: Array<{ id: string }> }
+      // A collapsed plan (L6) carries no nodes: only its resolution is rendered.
+      if (plan.lifecycle === "collapsed") {
+        expect(rebuilt.nodes).toEqual([])
+        continue
+      }
       expect(rebuilt.nodes.map((n) => n.id).sort()).toEqual(original.nodes.map((n) => n.id).sort())
     }
   })
