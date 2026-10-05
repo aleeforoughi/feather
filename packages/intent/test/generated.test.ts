@@ -2,7 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 import { Ajv2020 } from "ajv/dist/2020.js"
 import { describe, expect, it } from "vitest"
-import { DOCS_PATH, PY_NODES_PATH, PY_SPEC_PATH, SCHEMA_PATH, UPDATE_SCHEMA_PATH, buildDocs, buildPythonNodes, buildPythonSpec, buildSchema, buildUpdateSchema } from "../scripts/generate.ts"
+import { CLIENT_NODES_PATH, DOCS_PATH, PY_NODES_PATH, PY_SPEC_PATH, SCHEMA_PATH, UPDATE_SCHEMA_PATH, buildClientNodes, buildDocs, buildPythonNodes, buildPythonSpec, buildSchema, buildUpdateSchema } from "../scripts/generate.ts"
 
 const VALIDATOR_ONLY = [
   "duplicate-id", "dangling-reference", "self-reference", "wrong-reference-type", "out-of-order", "ambiguous-alternative", "unneeded-confirmation",
@@ -30,6 +30,9 @@ describe("generated files", () => {
   })
   it("packages/python/feather_sdk/nodes.py is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
     expect(fs.readFileSync(PY_NODES_PATH, "utf8")).toBe(buildPythonNodes())
+  })
+  it("packages/client/src/nodes.ts is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
+    expect(fs.readFileSync(CLIENT_NODES_PATH, "utf8")).toBe(buildClientNodes())
   })
 })
 

@@ -198,6 +198,44 @@ done = apply_update(current, update("plan_trip", current.get("revision", 0) + 1,
 collapses to the summary and artifact, takes no more updates (`already-resolved`) and no more replies
 (`validate_reply` answers `resolved`). `experience(..., revision=3, resolved={...})` builds one that is already over.
 
+## TypeScript and JavaScript
+
+`@aleeforoughi/feather-client` is the same caller API for Node servers and browsers (its one dependency is the IR
+package; it calls no model and logs nothing). Install it from GitHub Packages and pin an exact version. Pair it with
+`@aleeforoughi/feather-embed` on the page, as the Python SDK pairs with the bundle.
+
+```ts
+import { createServer } from "node:http"
+import { add, applyUpdate, createReplyHandler, experience, formatIssues, nodes, patch, resolve, update, validate } from "@aleeforoughi/feather-client"
+
+let current = experience("approve_campaign", [
+  nodes.Recommendation({ id: "rec", intent: "launch the recommended test", importance: "high", summary: "7 days, purchase objective",
+                         expandable: { why: "Enough to test three creative directions." } }),
+  nodes.Price({ id: "cap", amount: 1050, currency: "AED", label: "Maximum spend" }),
+  nodes.IrreversibleAction({ id: "go", intent: "confirm spend", importance: "critical", consequence: { spend: { amount: 1050, currency: "AED" } } }),
+])
+const checked = validate(current)
+if (!checked.ok) throw new Error(formatIssues(checked.issues))   // every problem at once, each with a code and a path
+
+// Receive the reply: 200 when valid, 400 with the issues when not, 409 once the experience is resolved.
+const onReply = createReplyHandler({ experience: () => current, onReply: (reply) => console.log(reply.node, reply.act) })
+createServer((req, res) => (req.url === "/api/reply" ? onReply(req, res) : res.writeHead(404).end())).listen(8765)
+// Fetch runtimes (Next.js, Hono, Deno, Bun, Workers): export const POST = (request: Request) => onReply(request)
+
+// The work moves: change it in place, then end it. applyUpdate is pure; keep what it returns.
+for (const ops of [[patch("cap", { amount: 900 }), add(nodes.Text({ id: "note", text: "Budget lowered." }))], [resolve("done", "Campaign launched.")]]) {
+  const result = applyUpdate(current, update(current.experience, (current.revision ?? 0) + 1, ops))
+  if (!result.ok) throw new Error(formatIssues(result.issues))   // a stale revision: send the whole experience again
+  current = result.experience
+}
+```
+
+The builders (`nodes.*`) take one object and have the names, fields and docs of the [node reference](ir/nodes.md); a
+missing required field is a type error. They do not validate: `validate`, `applyUpdate` and `validateReply` do, with
+the same words as Python. `parseReply(experience, body)` checks a reply you read yourself (an object, or JSON text)
+and returns `validateReply`'s result. The ops are `add`, `replace`, `patch`, `remove` and `resolve`, as in
+[lifecycle.md](lifecycle.md).
+
 ## Reference integration
 
 `examples/python-caller` is a complete caller in one file of standard-library Python: it serves a page, sends
