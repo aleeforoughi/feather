@@ -10,6 +10,8 @@ const dir = path.resolve(import.meta.dirname, "../ir/valid")
 export interface Fixture {
   name: string
   ir: Experience
+  /** The person's side of the render context, when a scenario composes the plan for one (the capabilities stay each body's). */
+  persona?: NonNullable<RenderContext["persona"]>
 }
 
 export const FIXTURES: Fixture[] = fs
@@ -30,8 +32,8 @@ export const CONTEXTS: Record<Body, RenderContext> = {
 }
 
 /** The plan of a fixture for a body; throws when it does not compose or the composer routes it to another body. */
-export function planFor(ir: Experience, body: Body): LayoutPlan {
-  const result = compose(ir, CONTEXTS[body])
+export function planFor(ir: Experience, body: Body, persona?: Fixture["persona"]): LayoutPlan {
+  const result = compose(ir, persona ? { ...CONTEXTS[body], persona } : CONTEXTS[body])
   if (!result.ok) throw new Error(`${ir.experience} does not compose for ${body}: ${result.issues.map((i) => i.message).join("; ")}`)
   if (result.plan.manifestation !== body) throw new Error(`${ir.experience} composed for ${body} came out as ${result.plan.manifestation}`)
   return result.plan

@@ -2,9 +2,9 @@
 import * as React from "react"
 import { validateReply, type Experience, type ReplyEvent, type ReplyIssue } from "@aleeforoughi/feather-intent"
 import type { LayoutPlan, PlanNode } from "@aleeforoughi/feather-liquid"
-import { Card, CardContent, MotionPreference } from "@aleeforoughi/feather-react"
+import { Button, Card, CardContent, MotionPreference } from "@aleeforoughi/feather-react"
 import { DENSITY } from "@aleeforoughi/feather-tokens"
-import { directionOf } from "@aleeforoughi/feather-dialog"
+import { directionOf, OTHER_OPTIONS_LABEL } from "@aleeforoughi/feather-dialog"
 import { NodeView } from "./nodes"
 import { experienceCurrency, experienceOf, firstControl, nodeIndex } from "./plan-utils"
 import { RenderingContext, type Emit, type Rendering } from "./rendering"
@@ -27,6 +27,30 @@ export interface PlanViewProps {
    */
   autoFocus?: boolean
   className?: string
+}
+
+/**
+ * The collapsed secondary nodes, behind one disclosure after the rest of the region. Closed at first render, and its
+ * contents are not rendered until it is opened, so nothing inside is focusable or scanned. Opening emits no reply, and
+ * once open it stays open (docs/composer.md, "Rendering on the web").
+ */
+function OtherOptions({ nodes }: { nodes: PlanNode[] }) {
+  const [open, setOpen] = React.useState(false)
+  const id = React.useId()
+  return (
+    <div data-slot="experience-other" data-variant={open ? "open" : "closed"} className="flex flex-col gap-4">
+      <Button type="button" variant="outline" data-slot="experience-other-options" aria-expanded={open} aria-controls={id} onClick={() => setOpen(true)} className="self-start">
+        {OTHER_OPTIONS_LABEL}
+      </Button>
+      {open && (
+        <div id={id} data-slot="experience-other-content" className="flex flex-col gap-4">
+          {nodes.map((node) => (
+            <NodeView key={node.id} node={node} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 /**
@@ -74,15 +98,20 @@ export function PlanView({ plan, onReply, experience, onRejectedReply, autoFocus
     <PlainSummary plan={plan} />
   ) : (
     <div data-slot="experience-regions" className="flex flex-col gap-4">
-      {plan.regions.map((region) =>
-        region.nodes.length === 0 ? null : (
-          <div key={region.id} data-slot="experience-region" data-variant={region.id} role={region.id === "secondary" ? "group" : undefined} aria-label={region.id === "secondary" ? "Other ways to go" : undefined} className="flex flex-col gap-4">
-            {region.nodes.map((node: PlanNode) => (
+      {plan.regions.map((region) => {
+        if (region.nodes.length === 0) return null
+        const secondary = region.id === "secondary"
+        const shown = region.nodes.filter((node) => node.collapsed !== true)
+        const folded = region.nodes.filter((node) => node.collapsed === true)
+        return (
+          <div key={region.id} data-slot="experience-region" data-variant={region.id} role={secondary ? "group" : undefined} aria-label={secondary ? "Other ways to go" : undefined} className="flex flex-col gap-4">
+            {shown.map((node: PlanNode) => (
               <NodeView key={node.id} node={node} />
             ))}
+            {secondary && folded.length > 0 && <OtherOptions nodes={folded} />}
           </div>
-        ),
-      )}
+        )
+      })}
     </div>
   )
 

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 import type { ReplyEvent } from "@aleeforoughi/feather-intent"
 import { PlanView } from "@aleeforoughi/feather-manifest-web"
 import { planFor, type Fixture } from "../fixtures.ts"
-import { irNodesOf, type Scenario } from "../scenarios.ts"
+import { irNodesOf, isCollapsed, type Scenario } from "../scenarios.ts"
 import { scriptFor, type Step } from "./script.ts"
 import type { Result } from "./types.ts"
 
@@ -14,8 +14,15 @@ export function hostOf(container: HTMLElement, node: string): HTMLElement {
   return host
 }
 
+/** The "Other options" button of the web body, when the plan has collapsed nodes. */
+export function otherOptions(container: HTMLElement): HTMLElement {
+  const button = container.querySelector<HTMLElement>('[data-slot="experience-other-options"]')
+  if (!button) throw new Error('no element with data-slot="experience-other-options" in what was rendered')
+  return button
+}
+
 export function scriptOf(fx: Fixture, body: "web" | "switch", s: Scenario) {
-  const plan = planFor(fx.ir, body)
+  const plan = planFor(fx.ir, body, fx.persona)
   const irs = irNodesOf(plan)
   const ir = irs.get(s.node)!
   const predicted = ir.type === "PredictedChoice" ? irs.get(ir.of) : undefined
@@ -29,6 +36,8 @@ export async function driveWeb(fx: Fixture, s: Scenario): Promise<Result> {
   const replies: ReplyEvent[] = []
   const { container, unmount } = render(<PlanView plan={plan} experience={fx.ir} onReply={(r) => void replies.push(r)} />)
   try {
+    // A node inside a collapsed group is reached by opening the web's documented "Other options" disclosure first.
+    if (isCollapsed(plan, s.node)) await user.click(await waitFor(() => otherOptions(container)))
     const run = async (step: Step) => {
       // A control may appear a moment after the act that opens it (a menu), so it is waited for.
       const el = await waitFor(() => {

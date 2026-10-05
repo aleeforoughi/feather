@@ -5,7 +5,7 @@ import { createDialog, type Turn } from "@aleeforoughi/feather-dialog"
 import type { IRNode, ReplyEvent } from "@aleeforoughi/feather-intent"
 import type { LayoutPlan } from "@aleeforoughi/feather-liquid"
 import { planFor, type Fixture } from "../fixtures.ts"
-import { currencyOf, irNodesOf, planNodeOf, type Scenario } from "../scenarios.ts"
+import { currencyOf, irNodesOf, isCollapsed, planNodeOf, type Scenario } from "../scenarios.ts"
 import type { Result } from "./types.ts"
 
 export interface Talker {
@@ -86,6 +86,12 @@ export function driveTalk(talker: Talker, plan: LayoutPlan, s: Scenario, style: 
 
   // 1. The act, from the browse turn's choices.
   const offered = s.backOut ? "confirm" : s.act
+  // A node inside a collapsed group is reached by choosing the browse turn's "Other options" first.
+  if (isCollapsed(plan, s.node)) {
+    const others = talker.turn.choices.find((c) => c.label === "Other options")
+    if (!others) throw new Error(`${style}: the first turn offers no "Other options" (it offers ${talker.turn.choices.map((c) => c.label).join(", ")})`)
+    if (talker.say(numberPhrase(others.n, style)).length > 0) throw new Error(`${style}: opening "Other options" must emit nothing`)
+  }
   const choice = talker.turn.choices.find((c) => c.node === s.node && c.act === offered)
   if (!choice) throw new Error(`${style}: the first turn offers no "${offered}" on "${s.node}" (it offers ${talker.turn.choices.map((c) => `${c.node}.${c.act}`).join(", ") || "nothing"})`)
   say(numberPhrase(choice.n, style))
@@ -128,7 +134,7 @@ export function driveTalk(talker: Talker, plan: LayoutPlan, s: Scenario, style: 
 }
 
 export function textTalker(fx: Fixture): { plan: LayoutPlan; talker: Talker } {
-  const plan = planFor(fx.ir, "text")
+  const plan = planFor(fx.ir, "text", fx.persona)
   const dialog = createDialog(plan, { experience: fx.ir })
   return {
     plan,

@@ -6,8 +6,8 @@ import userEvent from "@testing-library/user-event"
 import type { ReplyEvent } from "@aleeforoughi/feather-intent"
 import { SwitchExperience } from "@aleeforoughi/feather-manifest-switch"
 import type { Fixture } from "../fixtures.ts"
-import type { Scenario } from "../scenarios.ts"
-import { hostOf, scriptOf } from "./web.tsx"
+import { isCollapsed, type Scenario } from "../scenarios.ts"
+import { hostOf, otherOptions, scriptOf } from "./web.tsx"
 import type { Step } from "./script.ts"
 import type { Result } from "./types.ts"
 
@@ -38,6 +38,11 @@ export async function driveSwitch(fx: Fixture, s: Scenario): Promise<Result> {
   // A switch user starts by focusing the scanner: keys are heard only inside the experience (manifestations.md §4).
   container.querySelector<HTMLElement>("[data-slot=switch-scanner]")?.focus()
   try {
+    // The disclosure is one target; it is reached with next presses and opened with the select key.
+    if (isCollapsed(plan, s.node)) {
+      reach(() => otherOptions(container), "the Other options button")
+      key("Enter")
+    }
     const run = async (step: Step) => {
       const find = () => step.find(hostOf(container, s.node))
       await waitFor(() => {
