@@ -92,7 +92,8 @@ The caller applies each update (`applyUpdate`), and hands the body the new exper
    - Text and voice: a `problem` part says it changed, then browse.
    - Switch: the armed control is no longer a target.
 
-   An act on a node already replied to is not offered again unless the update replaced that node.
+   An act on a node already replied to is not offered again unless an update changed that node's content. A
+   patched or replaced node is a new question.
 4. **Changes are told, once, politely.** For each new revision, a body tells the person what is new in one sentence,
    naming each act node that was added by its intent: "New: approve the booking." It says nothing when nothing they
    can act on was added. Progress speaks for itself (a progressbar, or the spoken value in voice), and is never
@@ -106,9 +107,14 @@ The caller applies each update (`applyUpdate`), and hands the body the new exper
      `href` is http(s), else as its label (`experience-resolution-artifact`). No card, no controls.
    - **Text and voice:** the `done` turn. Its parts are the summary, then "{label}: {href}", or the label alone. There
      are no choices.
-   - **Switch:** no targets. Scanning stops.
+   - **Switch:** the artifact link, when there is one, is the only target, so the person can still open what the
+     experience left. Otherwise there are no targets, and scanning stops.
 6. **Updates that arrive out of order are not applied.** That is the caller's `stale-revision`. A body handed a plan
-   whose revision is not higher than the one it shows keeps what it shows.
+   whose revision is lower than the one it shows keeps what it shows. The same revision replaces it: the caller
+   re-sent it, or the context changed.
+7. **An open experience with nothing to act on is not over.** A progress-only experience waits for its next update.
+   The dialog's `done` turn means only that nothing is left to act on now. `Dialog.resolved` is true only for a
+   collapsed plan, and a text or voice run ends only then.
 
 ## 3. Conformance
 

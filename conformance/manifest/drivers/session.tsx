@@ -171,10 +171,11 @@ export function switchSession(first: Experience): Session {
       return replies.slice(before)
     },
     resolved: () => {
-      // Scanning has nothing to go to: pressing "next" highlights nothing.
+      // Nothing is left to act on: pressing "next" highlights no act. The artifact link may be highlighted (it is the
+      // only target, docs/lifecycle.md 2.5); opening it sends no reply, so it is not an act.
       act(() => void fireEvent.keyDown(container.querySelector("[data-slot=switch-scanner]") ?? document.body, { key: "Tab" }))
       const r = domResolved(container)
-      return { ...r, controls: r.controls + container.querySelectorAll("[data-scanned]").length }
+      return { ...r, controls: r.controls + container.querySelectorAll('[data-scanned]:not([data-slot="experience-resolution-artifact"])').length }
     },
     unmount,
   }

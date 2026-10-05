@@ -21,7 +21,7 @@ function hiddenOrDisabled(el: HTMLElement): boolean {
 export function targetsIn(root: HTMLElement): HTMLElement[] {
   // A collapsed experience has no targets (docs/lifecycle.md section 2.5): the artifact link it leaves is for reading and
   // following by other means, and scanning stops.
-  return Array.from(root.querySelectorAll<HTMLElement>(CONTROLS)).filter((el) => !hiddenOrDisabled(el) && !el.matches('[data-slot="experience-resolution-artifact"]'))
+  return Array.from(root.querySelectorAll<HTMLElement>(CONTROLS)).filter((el) => !hiddenOrDisabled(el))
 }
 
 /** What identifies a target across an update that remounts it: the plan node it is in, its slot, and its place among those. */

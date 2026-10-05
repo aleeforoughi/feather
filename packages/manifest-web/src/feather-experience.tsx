@@ -29,9 +29,8 @@ export interface ShownPlan {
 
 /**
  * Composes `experience` for `context` and returns what to show, reporting an invalid IR to `onIssues`. A plan whose
- * revision is not higher than the one shown keeps what is shown (docs/lifecycle.md section 2.6): the caller's updates are in
- * order, so a lower revision is stale. The same revision is stale too once the experience has been updated (revision above
- * 0), unless only the context changed: the same experience composed for a new person or device is a new plan.
+ * revision is lower than the one shown keeps what is shown (docs/lifecycle.md section 2.6): the caller's updates are in
+ * order, so a lower revision is stale. The same revision replaces it: the caller re-sent it, or the context changed.
  * Returns `null` while the IR is invalid.
  */
 export function useShownPlan(experience: unknown, context: RenderContext, onIssues?: (issues: Issue[]) => void): ShownPlan | null {
@@ -47,7 +46,7 @@ export function useShownPlan(experience: unknown, context: RenderContext, onIssu
   // What is shown is state derived while rendering: a plan that is not newer is simply not taken.
   const [shown, setShown] = React.useState<(ShownPlan & { context: RenderContext }) | undefined>(undefined)
   if (!result.ok) return null
-  const stale = shown !== undefined && shown.plan.experience === result.plan.experience && (result.plan.revision < shown.plan.revision || (result.plan.revision === shown.plan.revision && result.plan.revision > 0 && context === shown.context))
+  const stale = shown !== undefined && shown.plan.experience === result.plan.experience && result.plan.revision < shown.plan.revision
   if (stale) return shown
   if (shown?.plan !== result.plan || shown.experience !== experience || shown.context !== context) setShown({ plan: result.plan, experience: experience as Experience, context })
   return { plan: result.plan, experience: experience as Experience }

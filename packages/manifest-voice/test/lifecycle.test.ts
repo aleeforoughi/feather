@@ -32,10 +32,10 @@ describe("voice: updates", () => {
     expect(out.speech[0]).toMatchObject({ kind: "update", text: "New: take the recommended flight, approve the booking." })
   })
 
-  it("ignores a plan whose revision is not higher: nothing is said", () => {
+  it("ignores a plan whose revision is lower: nothing is said; the same revision announces nothing new", () => {
     const d = createVoiceDialog(plan(at(2)), { experience: at(2) })
     expect(d.hearUpdate(plan(at(1)), { experience: at(1) }).speech).toEqual([])
-    expect(d.hearUpdate(plan(at(2)), { experience: at(2) }).speech).toEqual([])
+    expect(said(d.hearUpdate(plan(at(2)), { experience: at(2) }).speech).join(" ")).not.toMatch(/New:/)
   })
 
   it("disarms an armed act whose node changed: it says so, and the keyword commits nothing", () => {

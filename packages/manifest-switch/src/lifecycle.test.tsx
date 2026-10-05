@@ -102,16 +102,27 @@ describe("a switch over an experience that changes", () => {
     expect(document.activeElement).not.toBe(first)
   })
 
-  it("has no targets once collapsed, and scanning stops", () => {
+  it("once collapsed, the artifact link is the only target: the person can still open what the experience left", () => {
+    const { container, show } = mount(at(2))
+    show(at(3))
+    expect(container.querySelector('[data-slot="experience-resolution"]')).not.toBeNull()
+    expect(screen.queryAllByRole("button")).toHaveLength(0)
+    press("Tab")
+    expect(scanned().map((el) => el.getAttribute("data-slot"))).toEqual(["experience-resolution-artifact"])
+    press("Tab")
+    expect(scanned().map((el) => el.getAttribute("data-slot"))).toEqual(["experience-resolution-artifact"])
+  })
+
+  it("has no targets once collapsed without a link, and scanning stops", () => {
     const { clock, running } = manualClock()
+    const noLink = after(at(2), [{ op: "remove", id: "work" }, { op: "remove", id: "rec" }, { op: "remove", id: "ok" }, { op: "resolve", outcome: "done", summary: "Booked." }])
     const { container, show } = mount(at(2), "auto", clock)
     press(" ")
     expect(running()).toBe(true)
-    show(at(3))
+    show(noLink)
     expect(running()).toBe(false)
     expect(scanned()).toHaveLength(0)
     expect(container.querySelector('[data-slot="experience-resolution"]')).not.toBeNull()
-    expect(screen.queryAllByRole("button")).toHaveLength(0)
     press(" ")
     // With nothing to scan to, a press starts nothing.
     expect(running()).toBe(false)

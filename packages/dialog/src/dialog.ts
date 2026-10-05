@@ -62,8 +62,8 @@ export interface Dialog {
   answer(input: string): Outcome
   /**
    * The experience changed (docs/lifecycle.md section 2): takes the plan composed from the updated experience and returns the
-   * next turn, which leads with what is new. A plan whose revision is not higher than the one the dialog has is ignored (the
-   * current turn is returned). Never throws.
+   * next turn, which leads with what is new. A plan whose revision is lower than the one the dialog has is ignored (the
+   * current turn is returned); the same revision replaces it. Never throws.
    */
   update(plan: LayoutPlan, options?: UpdateOptions): Turn
 }
@@ -912,7 +912,7 @@ export function createDialog(firstPlan: LayoutPlan, options: DialogOptions = {})
     },
     update(next: LayoutPlan, opts: UpdateOptions = {}): Turn {
       try {
-        if (!next || next.experience !== plan.experience || !(next.revision > plan.revision)) return turn
+        if (!next || next.experience !== plan.experience || next.revision < plan.revision) return turn
         turn = applyUpdate(next, opts.experience ?? experienceOf(next))
       } catch {
         // Never throws: whatever went wrong, the dialog keeps what it had.

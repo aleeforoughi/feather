@@ -41,12 +41,14 @@ describe("dialog update", () => {
     expect(texts(turn, "update")).toEqual(["New: do more."])
   })
 
-  it("ignores a plan whose revision is not higher", () => {
+  it("ignores a plan whose revision is lower; the same revision replaces it, with nothing new to tell", () => {
     const d = createDialog(planOf(at(2)), { experience: at(2) })
     const before = d.turn
     expect(feed(d, at(1))).toBe(before)
-    expect(feed(d, at(2))).toBe(before)
     expect(d.turn).toBe(before)
+    const again = feed(d, at(2))
+    expect(again.parts.some((p) => p.kind === "update")).toBe(false)
+    expect(again.choices.map((c) => [c.node, c.act])).toEqual(before.choices.map((c) => [c.node, c.act]))
   })
 
   it("disarms an armed act whose node changed: says so, and confirming commits nothing", () => {
