@@ -1,7 +1,7 @@
 import fs from "node:fs"
 import path from "node:path"
 import { describe, expect, it } from "vitest"
-import { NODES, formatIssues, validate } from "../src/index.ts"
+import { NODES, applyUpdate, formatIssues, validate, type Experience } from "../src/index.ts"
 
 // The IR fixtures in conformance/ir: every valid one validates, every invalid one fails with exactly the issues it
 // expects (code and path). Later milestones compose the same fixtures into layout plans.
@@ -48,3 +48,34 @@ describe("invalid fixtures", () => {
 })
 
 const byKey = (a: { code: string; path: string }, b: { code: string; path: string }) => `${a.path} ${a.code}`.localeCompare(`${b.path} ${b.code}`)
+
+// The update fixtures in conformance/update (L6): every valid stream applies update by update and stays valid, and
+// every invalid update is refused with exactly the issues it expects.
+const updateRoot = path.resolve(import.meta.dirname, "../../../conformance/update")
+const loadUpdates = <T,>(dir: string) =>
+  fs
+    .readdirSync(path.join(updateRoot, dir))
+    .filter((f) => f.endsWith(".json"))
+    .sort()
+    .map((f) => [f, JSON.parse(fs.readFileSync(path.join(updateRoot, dir, f), "utf8")) as T] as const)
+
+describe("update streams", () => {
+  it.each(loadUpdates<{ description: string; experience: Experience; updates: unknown[] }>("valid"))("%s applies, update by update", (_, fixture) => {
+    expect(fixture.description).toBeTruthy()
+    let experience = fixture.experience
+    for (const [i, update] of fixture.updates.entries()) {
+      const result = applyUpdate(experience, update)
+      if (!result.ok) expect.fail(`update ${i}: ${formatIssues(result.issues)}`)
+      experience = result.experience
+    }
+    expect(experience.resolved, "a stream ends resolved").toBeDefined()
+  })
+})
+
+describe("invalid updates", () => {
+  it.each(loadUpdates<{ description: string; experience: Experience; update: unknown; expect: Array<{ code: string; path: string }> }>("invalid"))("%s is refused with exactly the expected issues", (_, fixture) => {
+    expect(fixture.description).toBeTruthy()
+    const result = applyUpdate(fixture.experience, fixture.update)
+    expect(result.ok ? [] : result.issues.map(({ code, path }) => ({ code, path }))).toEqual(fixture.expect)
+  })
+})

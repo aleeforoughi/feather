@@ -1,0 +1,18 @@
+{
+  "description": "A resolved experience (L6): its interface has gone, leaving a one-line summary and the booking it made.",
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "plan_trip",
+    "revision": 3,
+    "resolved": {
+      "outcome": "done",
+      "summary": "Booked: direct flight, 9:40, 1,240 AED.",
+      "artifact": {
+        "label": "Booking confirmation",
+        "href": "https://example.com/booking/42",
+        "kind": "document"
+      }
+    },
+    "nodes": []
+  }
+}

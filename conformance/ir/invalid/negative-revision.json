@@ -1,0 +1,21 @@
+{
+  "description": "A revision below zero: revisions count the updates applied.",
+  "expect": [
+    {
+      "code": "invalid-value",
+      "path": "/revision"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "x",
+    "revision": -1,
+    "nodes": [
+      {
+        "type": "Text",
+        "id": "t",
+        "text": "Hi."
+      }
+    ]
+  }
+}

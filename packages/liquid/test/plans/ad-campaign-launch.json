@@ -2,6 +2,7 @@
   "phone": {
     "plan": "feather.plan/0",
     "experience": "approve_campaign",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -251,12 +252,21 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"go\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "desktop-detailed": {
     "plan": "feather.plan/0",
     "experience": "approve_campaign",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -513,12 +523,21 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"go\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "low-vision-low-precision": {
     "plan": "feather.plan/0",
     "experience": "approve_campaign",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -789,12 +808,21 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"go\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "screenless": {
     "plan": "feather.plan/0",
     "experience": "approve_campaign",
+    "revision": 0,
     "locale": "en",
     "manifestation": "voice",
     "chrome": "card",
@@ -1059,7 +1087,15 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"go\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   }
 }

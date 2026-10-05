@@ -60,6 +60,14 @@ describe.each(fixtures)("%s", (_file, ir) => {
     const p = result.plan
     const byId = new Map(ir.nodes.map((n) => [n.id, n]))
 
+    // A resolved experience collapses (L6): nothing of the interaction remains to read, act on or focus.
+    if (ir.resolved) {
+      expect([p.lifecycle, p.order, p.primary, p.focus, p.chrome]).toEqual(["collapsed", [], null, null, "none"])
+      expect(everyNode(p)).toEqual([])
+      expect(p.resolution).toEqual(ir.resolved)
+      return
+    }
+    expect(p.lifecycle).toBe("open")
     // Every IR node renders, and is read once.
     expect([...p.order].sort()).toEqual(ir.nodes.map((n) => n.id).sort())
     expect(new Set(everyNode(p).filter((n) => !n.id.startsWith("~")).map((n) => n.id))).toEqual(new Set(p.order))

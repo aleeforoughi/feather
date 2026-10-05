@@ -1,7 +1,7 @@
 // The layout plan: what compose() decides, for every manifestation to render. Plain JSON, so it can be logged,
 // diffed, snapshot-tested and sent across a process boundary.
 import type { Density } from "@aleeforoughi/feather-context"
-import type { IRNode, NodeType } from "@aleeforoughi/feather-intent"
+import type { IRNode, NodeType, Resolution } from "@aleeforoughi/feather-intent"
 import type { Level } from "./priority.ts"
 
 export const PLAN_VERSION = "feather.plan/0"
@@ -107,12 +107,19 @@ export type RuleId =
   | "importance"
   | "structure"
   | "autonomy"
+  | "lifecycle"
   | "reading"
   | "defaults"
 
 export interface LayoutPlan {
   plan: typeof PLAN_VERSION
   experience: string
+  /** The experience's revision (0 when opened). A body that sees it grow knows the experience was updated (L6). */
+  revision: number
+  /** "open": render the interaction. "collapsed": the experience is resolved; render only `resolution` (L6). */
+  lifecycle: "open" | "collapsed"
+  /** How the experience ended, when it has: a one-line summary and what it left behind. */
+  resolution?: Resolution
   locale: string
   manifestation: Manifestation
   /** "none": the experience renders as plain text, with no card around it (composer rule 9). */

@@ -1,0 +1,19 @@
+{
+  "description": "A resolution's summary runs over two lines; it is all that stays on screen, so it is one line.",
+  "expect": [
+    {
+      "code": "too-long",
+      "path": "/resolved/summary"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "x",
+    "revision": 2,
+    "nodes": [],
+    "resolved": {
+      "outcome": "done",
+      "summary": "Booked.\nSee your email."
+    }
+  }
+}

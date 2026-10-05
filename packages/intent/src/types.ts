@@ -386,8 +386,54 @@ export interface Experience {
   experience: string
   /** BCP 47 language of the words in it ("en", "ar-AE"). */
   locale?: string
+  /** The caller's version of the experience: 0 (or absent) when opened, one more with each update (L6). */
+  revision?: number
+  /** Set when the experience is over: it collapses to its summary and artifact, and takes no more replies (L6). */
+  resolved?: Resolution
+  /** The interaction, as meaning. May be empty once the experience is resolved. */
   nodes: IRNode[]
 }
+
+/** How an experience ended (L6): open → update → resolve → collapse. */
+export interface Resolution {
+  outcome: "done" | "cancelled" | "failed"
+  /** What happened, in one line (at most 120 code points). */
+  summary: string
+  /** What the experience leaves behind, if anything. */
+  artifact?: Artifact
+}
+
+/** The thing an experience leaves behind once its interface has gone. */
+export interface Artifact {
+  /** What it is, in a few words. */
+  label: string
+  /** Where it is. Rendered only when it is an http(s) URL. */
+  href?: string
+  kind?: "document" | "image" | "video" | "audio" | "link" | "data"
+}
+
+export const UPDATE_VERSION = "feather.update/0"
+
+/** One change to an open experience (L6). Applied with applyUpdate(); every op in it lands, or none does. */
+export interface ExperienceUpdate {
+  update: typeof UPDATE_VERSION
+  /** The experience it changes. */
+  experience: string
+  /** The experience's revision once this update is applied: exactly one more than before. */
+  revision: number
+  ops: UpdateOp[]
+}
+
+export type UpdateOp =
+  /** A new node, after the node named (or at the end). */
+  | { op: "add"; node: IRNode; after?: string }
+  /** A node, whole, in place of the node with its id. */
+  | { op: "replace"; node: IRNode }
+  /** Fields of one node changed in place; a field set to null is removed. Never its id or type. */
+  | { op: "patch"; id: string; set: Record<string, unknown> }
+  | { op: "remove"; id: string }
+  /** The experience is over. Always the last op. */
+  | ({ op: "resolve" } & Resolution)
 
 /** What the person did, sent back to the caller. */
 export interface ReplyEvent {

@@ -1,0 +1,18 @@
+{
+  "description": "A resolution says what happened but not how it ended.",
+  "expect": [
+    {
+      "code": "missing-field",
+      "path": "/resolved/outcome"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "x",
+    "revision": 2,
+    "nodes": [],
+    "resolved": {
+      "summary": "Booked."
+    }
+  }
+}

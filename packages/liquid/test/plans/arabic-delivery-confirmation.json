@@ -2,6 +2,7 @@
   "phone": {
     "plan": "feather.plan/0",
     "experience": "confirm_cod_order",
+    "revision": 0,
     "locale": "ar-AE",
     "manifestation": "web",
     "chrome": "card",
@@ -250,12 +251,21 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"place_order\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "desktop-detailed": {
     "plan": "feather.plan/0",
     "experience": "confirm_cod_order",
+    "revision": 0,
     "locale": "ar-AE",
     "manifestation": "web",
     "chrome": "card",
@@ -504,12 +514,21 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"place_order\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "low-vision-low-precision": {
     "plan": "feather.plan/0",
     "experience": "confirm_cod_order",
+    "revision": 0,
     "locale": "ar-AE",
     "manifestation": "web",
     "chrome": "card",
@@ -779,12 +798,21 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"place_order\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "screenless": {
     "plan": "feather.plan/0",
     "experience": "confirm_cod_order",
+    "revision": 0,
     "locale": "ar-AE",
     "manifestation": "voice",
     "chrome": "card",
@@ -1055,7 +1083,15 @@
         "subject": "node ~alternatives.collapsed",
         "value": false,
         "because": "the primary act \"place_order\" cannot be undone: every other way stays in view"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   }
 }

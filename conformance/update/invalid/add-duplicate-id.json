@@ -1,0 +1,37 @@
+{
+  "description": "An add whose id is already taken.",
+  "expect": [
+    {
+      "code": "duplicate-id",
+      "path": "/ops/0/node/id"
+    }
+  ],
+  "experience": {
+    "ir": "feather.ir/0",
+    "experience": "plan_trip",
+    "revision": 1,
+    "nodes": [
+      {
+        "type": "Progress",
+        "id": "work",
+        "label": "Finding flights",
+        "value": 0.5
+      }
+    ]
+  },
+  "update": {
+    "update": "feather.update/0",
+    "experience": "plan_trip",
+    "revision": 2,
+    "ops": [
+      {
+        "op": "add",
+        "node": {
+          "type": "Text",
+          "id": "work",
+          "text": "Hi."
+        }
+      }
+    ]
+  }
+}

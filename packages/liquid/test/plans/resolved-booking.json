@@ -1,0 +1,511 @@
+{
+  "phone": {
+    "plan": "feather.plan/0",
+    "experience": "plan_trip",
+    "revision": 3,
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "none",
+    "density": "comfortable",
+    "minTarget": 44,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": null,
+    "focus": null,
+    "order": [],
+    "regions": [
+      {
+        "id": "main",
+        "nodes": []
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "a screen is available and nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "level": "default",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "density-and-targets",
+        "level": "task",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "a phone is used by touch",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "level": "default",
+        "subject": "plan.primary",
+        "value": null,
+        "because": "the experience has no act that can be primary"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "no act to start on"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision, more than one node, or more than a line"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "task",
+        "subject": "plan.lifecycle",
+        "value": "collapsed",
+        "because": "resolved (done): only the summary and what it left behind remain",
+        "overrode": [
+          {
+            "rule": "lifecycle",
+            "value": "open",
+            "because": "the experience is open"
+          }
+        ]
+      }
+    ],
+    "lifecycle": "collapsed",
+    "resolution": {
+      "outcome": "done",
+      "summary": "Booked: direct flight, 9:40, 1,240 AED.",
+      "artifact": {
+        "label": "Booking confirmation",
+        "href": "https://example.com/booking/42",
+        "kind": "document"
+      }
+    }
+  },
+  "desktop-detailed": {
+    "plan": "feather.plan/0",
+    "experience": "plan_trip",
+    "revision": 3,
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "none",
+    "density": "compact",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": null,
+    "focus": null,
+    "order": [],
+    "regions": [
+      {
+        "id": "main",
+        "nodes": []
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "a screen is available and nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "level": "default",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "density-and-targets",
+        "level": "user-setting",
+        "subject": "plan.density",
+        "value": "compact",
+        "because": "the person's density (compact)",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "level": "default",
+        "subject": "plan.primary",
+        "value": null,
+        "because": "the experience has no act that can be primary"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "no act to start on"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision, more than one node, or more than a line"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "task",
+        "subject": "plan.lifecycle",
+        "value": "collapsed",
+        "because": "resolved (done): only the summary and what it left behind remain",
+        "overrode": [
+          {
+            "rule": "lifecycle",
+            "value": "open",
+            "because": "the experience is open"
+          }
+        ]
+      }
+    ],
+    "lifecycle": "collapsed",
+    "resolution": {
+      "outcome": "done",
+      "summary": "Booked: direct flight, 9:40, 1,240 AED.",
+      "artifact": {
+        "label": "Booking confirmation",
+        "href": "https://example.com/booking/42",
+        "kind": "document"
+      }
+    }
+  },
+  "low-vision-low-precision": {
+    "plan": "feather.plan/0",
+    "experience": "plan_trip",
+    "revision": 3,
+    "locale": "en",
+    "manifestation": "web",
+    "chrome": "none",
+    "density": "spacious",
+    "minTarget": 44,
+    "motion": "reduced",
+    "contrast": "AAA",
+    "cues": "audio-and-text",
+    "primary": null,
+    "focus": null,
+    "order": [],
+    "regions": [
+      {
+        "id": "main",
+        "nodes": []
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.manifestation",
+        "value": "web",
+        "because": "a screen is available and nothing asks for another body"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "level": "accessibility",
+        "subject": "plan.contrast",
+        "value": "AAA",
+        "because": "low vision: WCAG AAA contrast",
+        "overrode": [
+          {
+            "rule": "contrast",
+            "value": "AA",
+            "because": "WCAG 2.2 AA in every theme"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "level": "accessibility",
+        "subject": "plan.density",
+        "value": "spacious",
+        "because": "low motor precision: room between targets",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "comfortable",
+            "because": "no density asked for"
+          }
+        ]
+      },
+      {
+        "rule": "density-and-targets",
+        "level": "accessibility",
+        "subject": "plan.minTarget",
+        "value": 44,
+        "because": "low motor precision: targets of at least 44 px",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": 24,
+            "because": "WCAG 2.2 AA minimum target"
+          }
+        ]
+      },
+      {
+        "rule": "reduced-motion",
+        "level": "accessibility",
+        "subject": "plan.motion",
+        "value": "reduced",
+        "because": "the operating system asks for reduced motion",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "full",
+            "because": "nothing asks to reduce motion"
+          }
+        ]
+      },
+      {
+        "rule": "one-primary",
+        "level": "default",
+        "subject": "plan.primary",
+        "value": null,
+        "because": "the experience has no act that can be primary"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "no act to start on"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision, more than one node, or more than a line"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "task",
+        "subject": "plan.lifecycle",
+        "value": "collapsed",
+        "because": "resolved (done): only the summary and what it left behind remain",
+        "overrode": [
+          {
+            "rule": "lifecycle",
+            "value": "open",
+            "because": "the experience is open"
+          }
+        ]
+      }
+    ],
+    "lifecycle": "collapsed",
+    "resolution": {
+      "outcome": "done",
+      "summary": "Booked: direct flight, 9:40, 1,240 AED.",
+      "artifact": {
+        "label": "Booking confirmation",
+        "href": "https://example.com/booking/42",
+        "kind": "document"
+      }
+    }
+  },
+  "screenless": {
+    "plan": "feather.plan/0",
+    "experience": "plan_trip",
+    "revision": 3,
+    "locale": "en",
+    "manifestation": "voice",
+    "chrome": "none",
+    "density": "comfortable",
+    "minTarget": 24,
+    "motion": "full",
+    "contrast": "AA",
+    "cues": "audio-and-text",
+    "primary": null,
+    "focus": null,
+    "order": [],
+    "regions": [
+      {
+        "id": "main",
+        "nodes": []
+      },
+      {
+        "id": "secondary",
+        "nodes": []
+      }
+    ],
+    "trace": [
+      {
+        "rule": "output-routing",
+        "level": "accessibility",
+        "subject": "plan.manifestation",
+        "value": "voice",
+        "because": "no visual output: the experience is spoken",
+        "overrode": [
+          {
+            "rule": "defaults",
+            "value": "web",
+            "because": "a screen is available and nothing asks for another body"
+          }
+        ]
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.cues",
+        "value": "audio-and-text",
+        "because": "audio output is available or unstated"
+      },
+      {
+        "rule": "contrast",
+        "level": "default",
+        "subject": "plan.contrast",
+        "value": "AA",
+        "because": "WCAG 2.2 AA in every theme"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.density",
+        "value": "comfortable",
+        "because": "no density asked for"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.minTarget",
+        "value": 24,
+        "because": "WCAG 2.2 AA minimum target"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.motion",
+        "value": "full",
+        "because": "nothing asks to reduce motion"
+      },
+      {
+        "rule": "one-primary",
+        "level": "default",
+        "subject": "plan.primary",
+        "value": null,
+        "because": "the experience has no act that can be primary"
+      },
+      {
+        "rule": "output-routing",
+        "level": "task",
+        "subject": "plan.focus",
+        "value": null,
+        "because": "a voice manifestation has no focus"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "plan.chrome",
+        "value": "card",
+        "because": "the experience has a decision, more than one node, or more than a line"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "task",
+        "subject": "plan.lifecycle",
+        "value": "collapsed",
+        "because": "resolved (done): only the summary and what it left behind remain",
+        "overrode": [
+          {
+            "rule": "lifecycle",
+            "value": "open",
+            "because": "the experience is open"
+          }
+        ]
+      }
+    ],
+    "lifecycle": "collapsed",
+    "resolution": {
+      "outcome": "done",
+      "summary": "Booked: direct flight, 9:40, 1,240 AED.",
+      "artifact": {
+        "label": "Booking confirmation",
+        "href": "https://example.com/booking/42",
+        "kind": "document"
+      }
+    }
+  }
+}

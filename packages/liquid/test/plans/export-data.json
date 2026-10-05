@@ -2,6 +2,7 @@
   "phone": {
     "plan": "feather.plan/0",
     "experience": "export_account_data",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -178,12 +179,21 @@
         "subject": "node export.confirm",
         "value": "confirm",
         "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "desktop-detailed": {
     "plan": "feather.plan/0",
     "experience": "export_account_data",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -360,12 +370,21 @@
         "subject": "node export.confirm",
         "value": "confirm",
         "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "low-vision-low-precision": {
     "plan": "feather.plan/0",
     "experience": "export_account_data",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -563,12 +582,21 @@
         "subject": "node export.confirm",
         "value": "confirm",
         "because": "two deliberate acts: arm, then confirm"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "screenless": {
     "plan": "feather.plan/0",
     "experience": "export_account_data",
+    "revision": 0,
     "locale": "en",
     "manifestation": "voice",
     "chrome": "card",
@@ -760,7 +788,15 @@
         "subject": "plan.keyword",
         "value": "confirm",
         "because": "the confirm keyword in en"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   }
 }

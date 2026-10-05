@@ -2,7 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 import { Ajv2020 } from "ajv/dist/2020.js"
 import { describe, expect, it } from "vitest"
-import { DOCS_PATH, PY_NODES_PATH, PY_SPEC_PATH, SCHEMA_PATH, buildDocs, buildPythonNodes, buildPythonSpec, buildSchema } from "../scripts/generate.ts"
+import { DOCS_PATH, PY_NODES_PATH, PY_SPEC_PATH, SCHEMA_PATH, UPDATE_SCHEMA_PATH, buildDocs, buildPythonNodes, buildPythonSpec, buildSchema, buildUpdateSchema } from "../scripts/generate.ts"
 
 const VALIDATOR_ONLY = [
   "duplicate-id", "dangling-reference", "self-reference", "wrong-reference-type", "out-of-order", "ambiguous-alternative", "unneeded-confirmation",
@@ -18,6 +18,9 @@ const fixtures = (dir: string) => {
 describe("generated files", () => {
   it("schema/feather.ir-0.json is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
     expect(fs.readFileSync(SCHEMA_PATH, "utf8")).toBe(`${JSON.stringify(buildSchema(), null, 2)}\n`)
+  })
+  it("schema/feather.update-0.json is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
+    expect(fs.readFileSync(UPDATE_SCHEMA_PATH, "utf8")).toBe(`${JSON.stringify(buildUpdateSchema(), null, 2)}\n`)
   })
   it("docs/ir/nodes.md is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
     expect(fs.readFileSync(DOCS_PATH, "utf8")).toBe(buildDocs())
@@ -44,5 +47,23 @@ describe("the JSON Schema", () => {
   })
   it.each(fixtures("invalid").filter(([, f]) => f.expect.every((e: { code: string }) => !semantic.has(e.code))))("rejects %s", (_, fixture) => {
     expect(check(fixture.ir)).toBe(false)
+  })
+})
+
+describe("the update JSON Schema", () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true, allowUnionTypes: true })
+  ajv.addSchema(buildSchema())
+  const check = ajv.compile(buildUpdateSchema())
+  const root = path.resolve(import.meta.dirname, "../../../conformance/update")
+  const streams = fs.readdirSync(path.join(root, "valid")).map((f) => [f, JSON.parse(fs.readFileSync(path.join(root, "valid", f), "utf8"))] as const)
+  it.each(streams)("accepts every update in %s", (_, fixture) => {
+    for (const update of fixture.updates) expect(check(update), JSON.stringify(check.errors)).toBe(true)
+  })
+  it("rejects what its structure alone rules out", () => {
+    const base = { update: "feather.update/0", experience: "x", revision: 1 }
+    expect(check({ ...base, ops: [] })).toBe(false)
+    expect(check({ ...base, ops: [{ op: "move", id: "a" }] })).toBe(false)
+    expect(check({ ...base, ops: [{ op: "patch", id: "a", set: { type: "Text" } }] })).toBe(false)
+    expect(check({ ...base, ops: [{ op: "resolve", outcome: "done", summary: "Two\nlines" }] })).toBe(false)
   })
 })

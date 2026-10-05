@@ -1,0 +1,143 @@
+{
+  "description": "The L6 exit scenario: progress, then a recommendation and an approval, then done, leaving only the artifact and a one-line summary. Each update applies to the experience the one before it made; `replies` says which reply the caller acts on between updates.",
+  "experience": {
+    "ir": "feather.ir/0",
+    "experience": "plan_trip",
+    "nodes": [
+      {
+        "type": "Progress",
+        "id": "work",
+        "label": "Finding flights",
+        "steps": [
+          {
+            "id": "search",
+            "label": "Search",
+            "state": "active"
+          },
+          {
+            "id": "rank",
+            "label": "Rank",
+            "state": "pending"
+          }
+        ]
+      }
+    ]
+  },
+  "updates": [
+    {
+      "update": "feather.update/0",
+      "experience": "plan_trip",
+      "revision": 1,
+      "ops": [
+        {
+          "op": "patch",
+          "id": "work",
+          "set": {
+            "value": 0.5,
+            "steps": [
+              {
+                "id": "search",
+                "label": "Search",
+                "state": "done"
+              },
+              {
+                "id": "rank",
+                "label": "Rank",
+                "state": "active"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "update": "feather.update/0",
+      "experience": "plan_trip",
+      "revision": 2,
+      "ops": [
+        {
+          "op": "patch",
+          "id": "work",
+          "set": {
+            "value": 1,
+            "steps": [
+              {
+                "id": "search",
+                "label": "Search",
+                "state": "done"
+              },
+              {
+                "id": "rank",
+                "label": "Rank",
+                "state": "done"
+              }
+            ]
+          }
+        },
+        {
+          "op": "add",
+          "node": {
+            "type": "Recommendation",
+            "id": "rec",
+            "intent": "take the recommended flight",
+            "summary": "Direct, 9:40, 1,240 AED",
+            "expandable": {
+              "why": "The only direct flight under your budget."
+            }
+          }
+        },
+        {
+          "op": "add",
+          "node": {
+            "type": "Approval",
+            "id": "ok",
+            "intent": "approve the booking",
+            "request": "Book it for 1,240 AED?",
+            "consequence": {
+              "spend": {
+                "amount": 1240,
+                "currency": "AED"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "update": "feather.update/0",
+      "experience": "plan_trip",
+      "revision": 3,
+      "ops": [
+        {
+          "op": "remove",
+          "id": "work"
+        },
+        {
+          "op": "remove",
+          "id": "rec"
+        },
+        {
+          "op": "remove",
+          "id": "ok"
+        },
+        {
+          "op": "resolve",
+          "outcome": "done",
+          "summary": "Booked: direct flight, 9:40, 1,240 AED.",
+          "artifact": {
+            "label": "Booking confirmation",
+            "href": "https://example.com/booking/42",
+            "kind": "document"
+          }
+        }
+      ]
+    }
+  ],
+  "replies": {
+    "2": {
+      "experience": "plan_trip",
+      "node": "ok",
+      "act": "approve"
+    }
+  }
+}

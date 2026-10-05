@@ -82,6 +82,19 @@ type LearnableField = "density" | "explanation" | "motion" | "inputMode" | "auto
 function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
   const trace: TraceEntry[] = []
   const context = normalizeContext(rawContext, trace)
+  const plan = composeOpen(experience, context, trace)
+  // ── Rule lifecycle (L6): open → update → resolve → collapse ─────────────────────────────────────────────────────
+  // The body still follows the person (a collapsed plan is spoken, typed or shown like any other), but nothing else of
+  // the interaction remains: the purpose is done, so the interface dissolves (mission, principle 3).
+  const lifecycle = decide<LayoutPlan["lifecycle"]>(trace, "plan.lifecycle", [
+    experience.resolved !== undefined && { rule: "lifecycle", level: "task", value: "collapsed", because: `resolved (${experience.resolved.outcome}): only the summary and what it left behind remain` },
+    { rule: "lifecycle", level: "default", value: "open", because: "the experience is open" },
+  ])
+  if (lifecycle === "open") return { ...plan, lifecycle }
+  return { ...plan, lifecycle, resolution: experience.resolved, chrome: "none", primary: null, focus: null, order: [], regions: [{ id: "main", nodes: [] }, { id: "secondary", nodes: [] }] }
+}
+
+function composeOpen(experience: Experience, context: RenderContext, trace: TraceEntry[]): Omit<LayoutPlan, "lifecycle"> {
   const persona = context.persona ?? {}
   const capability = context.capability ?? {}
   const device = context.device ?? {}
@@ -379,6 +392,7 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
   return {
     plan: PLAN_VERSION,
     experience: experience.experience,
+    revision: experience.revision ?? 0,
     locale,
     manifestation,
     chrome,

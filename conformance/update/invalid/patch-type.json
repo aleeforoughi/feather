@@ -1,0 +1,36 @@
+{
+  "description": "A patch that tries to turn a node into another type.",
+  "expect": [
+    {
+      "code": "invalid-value",
+      "path": "/ops/0/set/type"
+    }
+  ],
+  "experience": {
+    "ir": "feather.ir/0",
+    "experience": "plan_trip",
+    "revision": 1,
+    "nodes": [
+      {
+        "type": "Progress",
+        "id": "work",
+        "label": "Finding flights",
+        "value": 0.5
+      }
+    ]
+  },
+  "update": {
+    "update": "feather.update/0",
+    "experience": "plan_trip",
+    "revision": 2,
+    "ops": [
+      {
+        "op": "patch",
+        "id": "work",
+        "set": {
+          "type": "Status"
+        }
+      }
+    ]
+  }
+}

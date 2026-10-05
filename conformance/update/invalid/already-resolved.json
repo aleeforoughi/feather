@@ -1,0 +1,37 @@
+{
+  "description": "An update to an experience that is already over.",
+  "expect": [
+    {
+      "code": "already-resolved",
+      "path": ""
+    }
+  ],
+  "experience": {
+    "ir": "feather.ir/0",
+    "experience": "plan_trip",
+    "revision": 2,
+    "nodes": [
+      {
+        "type": "Progress",
+        "id": "work",
+        "label": "Finding flights",
+        "value": 0.5
+      }
+    ],
+    "resolved": {
+      "outcome": "done",
+      "summary": "Done."
+    }
+  },
+  "update": {
+    "update": "feather.update/0",
+    "experience": "plan_trip",
+    "revision": 3,
+    "ops": [
+      {
+        "op": "remove",
+        "id": "work"
+      }
+    ]
+  }
+}

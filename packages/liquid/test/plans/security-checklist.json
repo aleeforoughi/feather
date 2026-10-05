@@ -2,6 +2,7 @@
   "phone": {
     "plan": "feather.plan/0",
     "experience": "security_setup",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -191,12 +192,21 @@
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "desktop-detailed": {
     "plan": "feather.plan/0",
     "experience": "security_setup",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -386,12 +396,21 @@
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "low-vision-low-precision": {
     "plan": "feather.plan/0",
     "experience": "security_setup",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -602,12 +621,21 @@
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "screenless": {
     "plan": "feather.plan/0",
     "experience": "security_setup",
+    "revision": 0,
     "locale": "en",
     "manifestation": "voice",
     "chrome": "card",
@@ -797,7 +825,15 @@
         "subject": "node change_password.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   }
 }

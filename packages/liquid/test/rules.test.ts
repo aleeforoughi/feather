@@ -272,6 +272,28 @@ rule("autonomy", () => {
   })
 })
 
+rule("lifecycle", () => {
+  const resolved = { ...doc(rec, spend), revision: 3, resolved: { outcome: "done", summary: "Launched: 7-day test, 1,050 AED.", artifact: { label: "Campaign", href: "https://example.com/c/1" } } }
+  it("collapses a resolved experience to its summary and artifact: nothing to act on, nothing focused, no card", () => {
+    const p = plan(resolved)
+    expect(p.lifecycle).toBe("collapsed")
+    expect(p.resolution).toEqual(resolved.resolved)
+    expect([p.primary, p.focus, p.chrome, p.order]).toEqual([null, null, "none", []])
+    expect(p.regions.every((r) => r.nodes.length === 0)).toBe(true)
+  })
+  it("still follows the person: a collapsed experience is spoken where the person needs speech", () => {
+    expect(plan(resolved, { capability: { output: { visual: "unavailable" } } }).manifestation).toBe("voice")
+  })
+  it("collapses with no nodes left, and carries the revision", () => {
+    const p = plan({ ir: "feather.ir/0", experience: "e", revision: 5, resolved: { outcome: "cancelled", summary: "Stopped." }, nodes: [] })
+    expect([p.lifecycle, p.revision]).toEqual(["collapsed", 5])
+  })
+  it("leaves an open experience open, at revision 0 unless it says", () => {
+    expect([plan(doc(rec)).lifecycle, plan(doc(rec)).revision]).toEqual(["open", 0])
+    expect(plan({ ...doc(rec), revision: 2 }).revision).toBe(2)
+  })
+})
+
 rule("reading", () => {
   it("keeps detail closed for plain reading, even for a person who asks for detail, but never critical detail", () => {
     expect(find(plan(doc(rec), { capability: { reading: "plain" }, persona: { explanation: "detailed" } }), "rec").expanded).toBe(false)

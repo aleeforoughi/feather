@@ -1,0 +1,38 @@
+{
+  "description": "An op after the resolve; resolve is always last.",
+  "expect": [
+    {
+      "code": "after-resolve",
+      "path": "/ops/1"
+    }
+  ],
+  "experience": {
+    "ir": "feather.ir/0",
+    "experience": "plan_trip",
+    "revision": 1,
+    "nodes": [
+      {
+        "type": "Progress",
+        "id": "work",
+        "label": "Finding flights",
+        "value": 0.5
+      }
+    ]
+  },
+  "update": {
+    "update": "feather.update/0",
+    "experience": "plan_trip",
+    "revision": 2,
+    "ops": [
+      {
+        "op": "resolve",
+        "outcome": "done",
+        "summary": "Done."
+      },
+      {
+        "op": "remove",
+        "id": "work"
+      }
+    ]
+  }
+}

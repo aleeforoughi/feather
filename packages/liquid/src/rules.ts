@@ -22,6 +22,7 @@ export const RULES: RuleInfo[] = [
   { id: "contrast", source: "section 7, rule 10", summary: "WCAG 2.2 AA in every theme; AAA where vision is low." },
   { id: "importance", source: "composer; principle 5", summary: "Importance, with the IR's defaults, sets emphasis: high stands out, low is quiet. A group of alternatives stands out as much as its strongest member." },
   { id: "structure", source: "composer", summary: "A PredictedChoice merges into its reversible Choice; a Tradeoff attaches to the option it describes; the requester attaches to every Approval it asks for; alternatives group into one list per node they are alternatives to." },
+  { id: "lifecycle", source: "L6; principle 3", summary: "A resolved experience collapses: no regions, no primary act, no focus and no card; only its one-line summary and its artifact remain, and it takes no replies. An open one renders its nodes." },
   { id: "autonomy", source: "L5; principle 8", summary: "How much the person hands over. Ask: a reversible prediction shows as a note, nothing is preselected for them, and every option stays in view. Delegate: other ways to go fold behind one disclosure. Never beside an irreversible primary act, never over a critical node." },
   { id: "reading", source: "L5; principle 7", summary: "Plain reading asks for less to read at once: expandable detail stays closed (critical detail still shows) and other ways to go fold behind one disclosure." },
   { id: "defaults", source: "composer", summary: "What the composer assumes when no rule applies, said out loud in the trace." },

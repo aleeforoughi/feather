@@ -8,6 +8,7 @@ import { chars, isScalar, parseDate, validate } from "./validate.ts"
 export interface ReplyIssue {
   code:
     | "invalid-experience"
+    | "resolved"
     | "not-an-object"
     | "unknown-field"
     | "wrong-experience"
@@ -43,6 +44,7 @@ export function actsFor(node: IRNode): string[] {
 export function validateReply(experience: Experience, input: unknown): ReplyResult {
   const checked = validate(experience)
   if (!checked.ok) return fail("invalid-experience", `The experience is not valid feather.ir/0 (${checked.issues.length} problem${checked.issues.length === 1 ? "" : "s"}, first: ${checked.issues[0].message}); validate it before taking replies.`)
+  if (experience.resolved) return fail("resolved", `"${experience.experience}" is resolved (${experience.resolved.outcome}); it takes no more replies.`)
   if (typeof input !== "object" || input === null || Array.isArray(input)) return fail("not-an-object", "A reply is a JSON object: { experience, node, act, value? }.")
 
   const issues: ReplyIssue[] = []

@@ -1,4 +1,4 @@
-# The liquid composer (milestones L3 and L5)
+# The liquid composer (milestones L3, L5 and L6)
 
 ```text
 compose(experience, context) → LayoutPlan
@@ -87,6 +87,7 @@ and a Warning `high` unless they say otherwise.
 | `contrast` (7.10) | `plan.contrast` is `AAA` where vision is low, otherwise `AA`. The theme delivers it: its AAA block raises every text color to 7:1 under `data-contrast="AAA"`, and the a11y suite checks each AAA story with axe's enhanced contrast rule. |
 | `importance` | High importance gives emphasis `high`, low gives `quiet`. A group of alternatives stands out as much as its strongest member. |
 | `structure` | A PredictedChoice merges into its reversible Choice (organism `PredictedChoice`), composed as a plan node. A Tradeoff attaches to the option it describes, and the requester attaches to every Approval it asks for. |
+| `lifecycle` (L6) | `plan.lifecycle` is `collapsed` for a resolved experience: `plan.resolution` carries its outcome, summary and artifact, regions are empty, `primary` and `focus` are null, `order` is empty and `chrome` is `none`. Otherwise `open`. See [`lifecycle.md`](lifecycle.md). |
 | `autonomy` (L5) | `ask`: a reversible prediction shows as a `PredictionNote` and nothing is preselected (the caller's own selection stays), and secondary nodes stay in view. `delegate`: each secondary node gets `collapsed: true`. At the person's level (explicit or learned). Never folds a critical node, nor anything beside an irreversible primary act (both at safety level), and never changes an irreversible Choice. |
 | `reading` (L5) | Plain reading closes expandable detail (critical detail still shows) and collapses secondary nodes, at accessibility level: above the person's own `explanation` or `autonomy`. |
 | `defaults` | What the composer assumes when no rule applies, stated in the trace. |
@@ -108,6 +109,9 @@ reference contexts and 60 generated ones:
 interface LayoutPlan {
   plan: "feather.plan/0"
   experience: string
+  revision: number                // the experience's revision (0 when opened)
+  lifecycle: "open" | "collapsed" // collapsed: the experience is resolved; render only resolution (L6)
+  resolution?: Resolution         // { outcome, summary, artifact? }
   locale: string
   manifestation: "web" | "switch" | "voice" | "text"
   chrome: "card" | "none"

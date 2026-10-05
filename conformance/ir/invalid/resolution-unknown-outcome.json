@@ -1,0 +1,19 @@
+{
+  "description": "A resolution's outcome is not done, cancelled or failed.",
+  "expect": [
+    {
+      "code": "invalid-value",
+      "path": "/resolved/outcome"
+    }
+  ],
+  "ir": {
+    "ir": "feather.ir/0",
+    "experience": "x",
+    "revision": 2,
+    "nodes": [],
+    "resolved": {
+      "outcome": "won",
+      "summary": "Booked."
+    }
+  }
+}

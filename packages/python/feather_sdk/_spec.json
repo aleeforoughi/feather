@@ -48,6 +48,7 @@
   ],
   "replyIssueCodes": [
     "invalid-experience",
+    "resolved",
     "not-an-object",
     "unknown-field",
     "wrong-experience",
@@ -56,6 +57,31 @@
     "missing-value",
     "unexpected-value",
     "invalid-value"
+  ],
+  "updateVersion": "feather.update/0",
+  "updateIssueCodes": [
+    "invalid-experience",
+    "wrong-experience",
+    "stale-revision",
+    "empty-update",
+    "unknown-op",
+    "unknown-node",
+    "already-resolved",
+    "after-resolve"
+  ],
+  "summaryMax": 120,
+  "outcomes": [
+    "done",
+    "cancelled",
+    "failed"
+  ],
+  "artifactKinds": [
+    "document",
+    "image",
+    "video",
+    "audio",
+    "link",
+    "data"
   ],
   "presentationalFields": [
     "color",

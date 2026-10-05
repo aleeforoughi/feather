@@ -66,24 +66,29 @@ export const ID = /^[A-Za-z][A-Za-z0-9_.-]{0,63}$/
 const LOCALE = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/
 const CURRENCY = /^[A-Z]{3}$/
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/
-const TOP_LEVEL = new Set(["ir", "experience", "locale", "nodes"])
+const TOP_LEVEL = new Set(["ir", "experience", "locale", "revision", "resolved", "nodes"])
+/** A resolution's summary is one line: rule 9's measure (composer), in code points. */
+export const SUMMARY_MAX = 120
+const OUTCOMES = ["done", "cancelled", "failed"]
+const ARTIFACT_KINDS = ["document", "image", "video", "audio", "link", "data"]
+const ARTIFACT_FIELDS = ["label", "href", "kind"]
 const IMPORTANCE = ["low", "normal", "high", "critical"]
 
 type Json = Record<string, unknown>
-type Add = (code: IssueCode, path: string, message: string, node?: string) => void
+export type Add = (code: IssueCode, path: string, message: string, node?: string) => void
 type Entry = { node: Json; spec: NodeSpec; index: number; id?: string; name: string; at: string }
 
-const isObject = (v: unknown): v is Json => typeof v === "object" && v !== null && !Array.isArray(v)
+export const isObject = (v: unknown): v is Json => typeof v === "object" && v !== null && !Array.isArray(v)
 export const isScalar = (v: unknown) => typeof v === "string" || (typeof v === "number" && Number.isFinite(v)) || typeof v === "boolean"
 const has = (o: object, k: string) => Object.hasOwn(o, k)
 /** One JSON Pointer segment, escaped (RFC 6901). */
 export const seg = (p: string | number) => (typeof p === "number" || !/[~/]/.test(p) ? `/${p}` : `/${p.replace(/~/g, "~0").replace(/\//g, "~1")}`)
 const pointer = (...parts: Array<string | number>) => parts.map(seg).join("")
-const describe = (v: unknown) =>
+export const describe = (v: unknown) =>
   Array.isArray(v) ? "an array" : v === null ? "null" : typeof v === "object" ? "an object" : typeof v === "number" && !Number.isFinite(v) ? String(v) : `a ${typeof v}`
 /** Length in Unicode code points, not UTF-16 units. */
 export const chars = (s: string) => [...s].length
-const quote = (v: unknown) => {
+export const quote = (v: unknown) => {
   let s: string
   try {
     s = JSON.stringify(v) ?? String(v)
@@ -139,6 +144,11 @@ function run(input: unknown, add: Add) {
   if (input.locale !== undefined && (typeof input.locale !== "string" || !LOCALE.test(input.locale))) {
     add("invalid-value", "/locale", `locale must be a BCP 47 language tag such as "en" or "ar-AE"; got ${quote(input.locale)}.`)
   }
+  if (input.revision !== undefined && (typeof input.revision !== "number" || !Number.isInteger(input.revision) || input.revision < 0)) {
+    add("invalid-value", "/revision", `revision counts the updates applied: a whole number from 0; got ${quote(input.revision)}.`)
+  }
+  const resolved = input.resolved !== undefined
+  if (resolved) checkResolution(add, input.resolved, "/resolved", "The resolution")
   if (input.nodes === undefined) {
     add("missing-field", "/nodes", "An experience needs its nodes: the interaction, as meaning.")
     return
@@ -147,7 +157,7 @@ function run(input: unknown, add: Add) {
     add("wrong-type", "/nodes", `nodes must be an array; got ${describe(input.nodes)}.`)
     return
   }
-  if (input.nodes.length === 0) add("empty-experience", "/nodes", "An experience with no nodes renders nothing; send at least one node, or no experience.")
+  if (input.nodes.length === 0 && !resolved) add("empty-experience", "/nodes", "An experience with no nodes renders nothing; send at least one node, or no experience.")
 
   // ── Each node, on its own ─────────────────────────────────────────────────────────────────────────────────────
   const entries: Entry[] = []
@@ -238,6 +248,40 @@ function run(input: unknown, add: Add) {
   }
 }
 
+/** A resolution (L6): an outcome, a one-line summary, and what the experience leaves behind. Shared with updates. */
+export function checkResolution(add: Add, value: unknown, at: string, what: string, skip: readonly string[] = []) {
+  if (!isObject(value)) {
+    add("wrong-type", at, `${what} is an object with an outcome and a summary; got ${describe(value)}.`)
+    return
+  }
+  const known = ["outcome", "summary", "artifact", ...skip]
+  for (const key of Object.keys(value)) if (!known.includes(key)) unknownField(add, `${at}${seg(key)}`, key, what.toLowerCase(), known)
+  if (value.outcome === undefined) add("missing-field", `${at}/outcome`, `${what} needs an outcome: ${OUTCOMES.join(", ")}.`)
+  else if (typeof value.outcome !== "string" || !OUTCOMES.includes(value.outcome)) add("invalid-value", `${at}/outcome`, `outcome is one of ${OUTCOMES.join(", ")}; got ${quote(value.outcome)}.`)
+  if (value.summary === undefined) add("missing-field", `${at}/summary`, `${what} needs a summary: what happened, in one line. It is all that stays on screen.`)
+  else if (typeof value.summary !== "string") add("wrong-type", `${at}/summary`, `summary must be a string; got ${describe(value.summary)}.`)
+  else if (value.summary.trim() === "") add("empty-text", `${at}/summary`, "summary is empty; say what happened, in one line.")
+  else if (chars(value.summary) > SUMMARY_MAX || value.summary.includes("\n")) add("too-long", `${at}/summary`, `summary is one line of at most ${SUMMARY_MAX} characters; got ${chars(value.summary)}${value.summary.includes("\n") ? " over several lines" : ""}.`)
+  if (value.artifact === undefined) return
+  const artifact = value.artifact
+  const where = `${at}/artifact`
+  if (!isObject(artifact)) {
+    add("wrong-type", where, `artifact is an object with a label; got ${describe(artifact)}.`)
+    return
+  }
+  for (const key of Object.keys(artifact)) if (!ARTIFACT_FIELDS.includes(key)) unknownField(add, `${where}${seg(key)}`, key, "the artifact", ARTIFACT_FIELDS)
+  if (artifact.label === undefined) add("missing-field", `${where}/label`, "The artifact needs a label: what it is, in a few words.")
+  else if (typeof artifact.label !== "string") add("wrong-type", `${where}/label`, `label must be a string; got ${describe(artifact.label)}.`)
+  else if (artifact.label.trim() === "") add("empty-text", `${where}/label`, "label is empty; say what the artifact is.")
+  else if (chars(artifact.label) > SUMMARY_MAX) add("too-long", `${where}/label`, `label is at most ${SUMMARY_MAX} characters; got ${chars(artifact.label)}.`)
+  if (artifact.href !== undefined) {
+    if (typeof artifact.href !== "string") add("wrong-type", `${where}/href`, `href must be a string; got ${describe(artifact.href)}.`)
+    else if (artifact.href.trim() === "") add("empty-text", `${where}/href`, "href is empty; give where the artifact is, or leave href out.")
+    else if (chars(artifact.href) > DEFAULT_MAX_LENGTH) add("too-long", `${where}/href`, `href is at most ${DEFAULT_MAX_LENGTH} characters; got ${chars(artifact.href)}.`)
+  }
+  if (artifact.kind !== undefined && (typeof artifact.kind !== "string" || !ARTIFACT_KINDS.includes(artifact.kind))) add("invalid-value", `${where}/kind`, `kind is one of ${ARTIFACT_KINDS.join(", ")}; got ${quote(artifact.kind)}.`)
+}
+
 const FIELDS = new Map<NodeSpec, Record<string, Field>>()
 /** Every field a node of this type may have. Computed once per type. */
 function fieldsOf(spec: NodeSpec): Record<string, Field> {
@@ -250,7 +294,7 @@ function allFields(spec: NodeSpec): Record<string, Field> {
   return Object.assign(Object.create(null) as Record<string, Field>, commonFields, spec.primaryCapable ? { primary: primaryField } : {}, spec.fields)
 }
 
-function unknownField(add: Add, path: string, key: string, where: string, known: string[], node?: string) {
+export function unknownField(add: Add, path: string, key: string, where: string, known: string[], node?: string) {
   if (PRESENTATIONAL_FIELDS.has(key)) {
     add("presentational-field", path, `"${key}" describes presentation; ${where} carries meaning only, and Feather decides how it looks (principle 1: semantics, not pixels).`, node)
   } else {

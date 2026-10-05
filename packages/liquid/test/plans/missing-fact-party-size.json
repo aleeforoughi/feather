@@ -2,6 +2,7 @@
   "phone": {
     "plan": "feather.plan/0",
     "experience": "book_table_party_size",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -180,12 +181,21 @@
         "subject": "node party_size.expanded",
         "value": false,
         "because": "detail on demand, behind \"Why?\" (principle 5)"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "desktop-detailed": {
     "plan": "feather.plan/0",
     "experience": "book_table_party_size",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -371,12 +381,21 @@
             "because": "detail on demand, behind \"Why?\" (principle 5)"
           }
         ]
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "low-vision-low-precision": {
     "plan": "feather.plan/0",
     "experience": "book_table_party_size",
+    "revision": 0,
     "locale": "en",
     "manifestation": "web",
     "chrome": "card",
@@ -576,12 +595,21 @@
         "subject": "node party_size.expanded",
         "value": false,
         "because": "the person wants brief explanations"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   },
   "screenless": {
     "plan": "feather.plan/0",
     "experience": "book_table_party_size",
+    "revision": 0,
     "locale": "en",
     "manifestation": "voice",
     "chrome": "card",
@@ -760,7 +788,15 @@
         "subject": "node party_size.expanded",
         "value": false,
         "because": "detail on demand, behind \"Why?\" (principle 5)"
+      },
+      {
+        "rule": "lifecycle",
+        "level": "default",
+        "subject": "plan.lifecycle",
+        "value": "open",
+        "because": "the experience is open"
       }
-    ]
+    ],
+    "lifecycle": "open"
   }
 }
