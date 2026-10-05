@@ -6,7 +6,7 @@ import type { Emphasis, LayoutPlan, PlanNode } from "@aleeforoughi/feather-liqui
 import { formatDate, formatMoney, plainProblem } from "./format.ts"
 import { normalize, type Normalized } from "./normalize.ts"
 import { experienceCurrency, experienceOf, nodeIndex, planNodes } from "./plan-utils.ts"
-import { consequenceSentences, questionCount, SEND_WORD, sentences, show, SKIP_ALL_WORDS, SKIP_WORD } from "./words.ts"
+import { consequenceSentences, OTHER_OPTIONS_LABEL, questionCount, SEND_WORD, sentences, show, SKIP_ALL_WORDS, SKIP_WORD } from "./words.ts"
 
 export interface DialogOptions {
   /** The experience the plan came from; replies are checked against it. Default: rebuilt from the plan's nodes. */
@@ -135,6 +135,18 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
     for (const m of pn.merged ?? []) mergedIds.add(m.id)
   }
 
+  // Collapsed nodes (docs/manifestations.md section 1, browse): hidden, with everything composed into them, until the
+  // person picks "Other options"; then they stay open for the rest of the experience.
+  const collapsedIds = new Set<string>()
+  for (const region of plan.regions) {
+    for (const top of region.nodes) {
+      if (top.collapsed !== true) continue
+      for (const pn of planNodes({ ...plan, regions: [{ ...region, nodes: [top] }] })) if (pn.node) collapsedIds.add(pn.node.id)
+    }
+  }
+  let othersOpen = false
+  const hidden = (id: string) => !othersOpen && collapsedIds.has(id)
+
   const answered = new Set<string>()
   const outcomes: Part[] = []
   let mode: Mode = { kind: "browse" }
@@ -181,9 +193,10 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   }
 
   /** The acts on offer, in plan order, the primary's first (docs/manifestations.md section 1, browse). */
-  function offers(): Offer[] {
+  function offers(includeHidden = false): Offer[] {
     const list: Offer[] = []
     for (const id of plan.order) {
+      if (!includeHidden && hidden(id)) continue
       const host = index.get(id)
       if (!host?.node || mergedIds.has(id) || host.organism === "PredictionNote") continue
       if (answered.has(id) && host.node.type !== "ExploreMore") continue
@@ -200,7 +213,10 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   function choicesOf(list: Offer[]): Choice[] {
     const count = new Map<string, number>()
     for (const o of list) count.set(o.act, (count.get(o.act) ?? 0) + 1)
-    return list.map((o, i) => ({ n: i + 1, label: o.label, words: count.get(o.act) === 1 ? [o.act] : [], node: o.ir.id, act: o.act }))
+    const choices: Choice[] = list.map((o, i) => ({ n: i + 1, label: o.label, words: count.get(o.act) === 1 ? [o.act] : [], node: o.ir.id, act: o.act }))
+    // Collapsed nodes still closed: one more choice after every act.
+    if (!othersOpen && collapsedIds.size > 0) choices.push({ n: choices.length + 1, label: OTHER_OPTIONS_LABEL, words: [] })
+    return choices
   }
 
   const confirmOf = (o: Offer) => (NO_REPLY_TO_ARM.has(o.act) ? undefined : o.target.confirm ?? o.host.confirm)
@@ -465,6 +481,7 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   function contentParts(): Part[] {
     const out: Part[] = []
     for (const id of plan.order) {
+      if (hidden(id)) continue
       const pn = index.get(id)
       if (!pn?.node) continue
       const lines = sentences(pn, plan)
@@ -480,9 +497,9 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
     const hint = o.hint ? [part("hint", o.hint)] : []
     switch (mode.kind) {
       case "browse": {
-        const list = offers()
+        const choices = choicesOf(offers())
         const full = o.full === true
-        return { state: "browse", parts: [...lead, ...(full ? contentParts() : []), ...problem, ...hint, part("question", `What would you like to do? Pick a number from 1 to ${list.length}.`)], choices: choicesOf(list) }
+        return { state: "browse", parts: [...lead, ...(full ? contentParts() : []), ...problem, ...hint, part("question", `What would you like to do? Pick a number from 1 to ${choices.length}.`)], choices }
       }
       case "value": {
         const offer = mode.offer
@@ -536,13 +553,13 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
   }
 
   let turn: Turn = (() => {
-    if (offers().length === 0) mode = { kind: "done" }
+    if (offers(true).length === 0) mode = { kind: "done" }
     return turnFor({ full: true })
   })()
 
   /** After a step: the next turn is browse (or done), with what just happened first. */
   function settle(o: TurnOptions = {}): Turn {
-    mode = offers().length === 0 ? { kind: "done" } : { kind: "browse" }
+    mode = offers(true).length === 0 ? { kind: "done" } : { kind: "browse" }
     return turnFor(o)
   }
 
@@ -720,9 +737,14 @@ export function createDialog(plan: LayoutPlan, options: DialogOptions = {}): Dia
         const list = offers()
         const choices = choicesOf(list)
         const i = matchChoice(n.text, choices)
+        if (i >= list.length && i < choices.length) {
+          // "Other options": nothing is sent; the collapsed nodes open, and stay open.
+          othersOpen = true
+          return turnFor({ full: true })
+        }
         if (i >= 0) return pick(list[i]!)
         return turnFor({
-          problem: i === -2 ? `There is no option ${clip(n.text)}. Pick a number from 1 to ${list.length}.` : `I did not understand "${clip(n.raw)}". Pick a number from 1 to ${list.length}, or say one of: ${wordsList(choices.map((c) => c.label))}.`,
+          problem: i === -2 ? `There is no option ${clip(n.text)}. Pick a number from 1 to ${choices.length}.` : `I did not understand "${clip(n.raw)}". Pick a number from 1 to ${choices.length}, or say one of: ${wordsList(choices.map((c) => c.label))}.`,
         })
       }
       case "value":

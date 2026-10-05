@@ -49,6 +49,11 @@ export function irNodesOf(plan: LayoutPlan): Map<string, IRNode> {
   return map
 }
 
+/** Whether an IR node sits inside a collapsed secondary node: its acts are behind the "Other options" disclosure. */
+export function isCollapsed(plan: LayoutPlan, irId: string): boolean {
+  return plan.regions.some((r) => r.nodes.some((top) => top.collapsed === true && allPlanNodes({ ...plan, regions: [{ ...r, nodes: [top] }] }).some((n) => n.node?.id === irId)))
+}
+
 /** The plan node that renders an IR node. */
 export function planNodeOf(plan: LayoutPlan, irId: string): PlanNode | undefined {
   return allPlanNodes(plan).find((n) => n.node?.id === irId)

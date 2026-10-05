@@ -66,6 +66,19 @@ export const PredictedChoice: Story = { args: { experience: predictedNewsTopic.i
 /** A recommendation, alternatives with their tradeoffs, and a choice. */
 export const FlightSearchTradeoff: Story = { args: { experience: flightSearch.ir } }
 
+/** For a person who delegates, the other ways to go fold behind one "Other options" button, closed at first. Opening it replies with nothing. */
+export const FlightSearchDelegate: Story = {
+  args: { experience: flightSearch.ir, context: { ...REFERENCE_CONTEXTS.phone.context, persona: { autonomy: "delegate" } } },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const other = canvas.getByRole("button", { name: "Other options" })
+    await expect(other).toHaveAttribute("aria-expanded", "false")
+    await userEvent.click(other)
+    await expect(other).toHaveAttribute("aria-expanded", "true")
+    await expect(args.onReply).not.toHaveBeenCalled()
+  },
+}
+
 /** A recommendation, a comparison table and a choice among the plans. */
 export const CompareSubscriptionPlans: Story = { args: { experience: compareSubscriptionPlans.ir } }
 

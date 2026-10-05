@@ -142,3 +142,6 @@ function linesOf(ir: IRNode, locale: string, nodes: ReadonlyMap<string, IRNode>)
       return [`More is available${ir.topics?.length ? ` about: ${ir.topics.join(", ")}` : ""}.`]
   }
 }
+
+/** The one choice (and the web button) that opens the collapsed nodes of a plan. */
+export const OTHER_OPTIONS_LABEL = "Other options"

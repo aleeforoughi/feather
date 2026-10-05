@@ -14,7 +14,7 @@ export const voiceExists = voice !== null
 
 export function voiceTalker(fx: Fixture): { plan: LayoutPlan; talker: Talker } {
   if (!voice) throw new Error("@aleeforoughi/feather-manifest-voice does not exist")
-  const plan = planFor(fx.ir, "voice")
+  const plan = planFor(fx.ir, "voice", fx.persona)
   const dialog = voice.createVoiceDialog(plan, { experience: fx.ir })
   return {
     plan,
