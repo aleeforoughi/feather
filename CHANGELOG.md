@@ -1,5 +1,50 @@
 # Feather — changelog
 
+## 1.16.0 — 2026-10-05
+
+**Person-shaped (milestone L5).** The same experience now follows how a person likes to work and what they can do
+right now, in every body, without Feather keeping anything about them.
+
+- **Context** (`@aleeforoughi/feather-context`):
+  - `persona.autonomy`: `ask`, `suggest` (the default) or `delegate`, and it can be `learned`;
+  - `capability.reading`: `plain`;
+  - `capability.temporary`: `eyesBusy`, `handsBusy` and `noisy`. These are needs that hold for now, as binding as
+    lasting ones while they hold.
+- **Composer** (`@aleeforoughi/feather-liquid`), two new rules and three routing cases:
+  - **autonomy.** With `ask`, a reversible prediction shows as a note and nothing is preselected for the person.
+    With `delegate`, other ways to go fold behind one "Other options" disclosure (`PlanNode.collapsed`). It never
+    folds anything beside an irreversible primary act or a critical node, and never touches an irreversible Choice.
+  - **reading.** Plain reading keeps detail closed (critical detail still shows) and folds other ways to go, above
+    the person's own settings.
+  - A person who cannot speak is never routed to voice: with no screen they get text, and confirm by typing.
+  - Busy eyes or hands route to voice when speech works both ways.
+  - A noisy room makes every cue text.
+- **Reference personas and capability profiles.** `REFERENCE_PERSONAS` has five: delegator, deliberate,
+  touch-first, calm and switch-preferred. `REFERENCE_CAPABILITIES` has six: low-vision, low-precision,
+  no-screen-speaking, no-screen-typing, plain-reading and hands-busy. Each is proven to change the plan:
+  - fewer acts in view;
+  - larger targets;
+  - a voice or text route;
+  - AAA contrast.
+- **Privacy.** Tests prove that composing never changes the context, writes no globals, logs nothing, carries
+  nothing from one render to the next, and keeps no persona object in the plan.
+- **Every body folds the same way:**
+  - **Web:** one "Other options" button, whose contents are not rendered until it is opened.
+  - **Text and voice:** one "Other options" choice after every act.
+  - **Switch:** that button is one target.
+  - **Conformance:** a folded Alternative reaches the same reply in all four bodies.
+- **AAA contrast is delivered.** Every theme ships a `[data-contrast="AAA"]` block (`AAA_FLOORS`), and a low-vision
+  plan now gets 7:1 text instead of a hint:
+  - secondary text, the destructive red and the primary move toward the text color until they reach 7:1;
+  - the a11y suite checks every story that renders an AAA plan with axe's enhanced contrast rule.
+- **Playground:** a "By person" tab. Pick a reference persona, a capability profile and a device; the plan renders
+  live in its body, with what each one changes and the trace filtered to the rules a person shapes. The choice is
+  never stored or put in the URL, and an end-to-end test proves it.
+- **Stories:** Experiences/Person-shaped (low vision on five fixtures, deliberate, touch-first) and a delegate flight
+  search.
+- **Docs:** `docs/composer.md` (context, rules, `collapsed`, AAA on the web), `docs/manifestations.md` (collapsed
+  nodes in every body) and `docs/visual-system.md` (AAA contrast).
+
 ## 1.15.2 — 2026-10-05
 
 **Destructive text reads on its tint, at rest and on hover.** The destructive Button and Badge laid their red text on
