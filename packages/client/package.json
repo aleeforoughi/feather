@@ -1,0 +1,27 @@
+{
+  "name": "@aleeforoughi/feather-client",
+  "version": "1.17.0",
+  "description": "Call Feather from TypeScript and JavaScript: build Experience IR (feather.ir/1) with one typed builder per node, validate it, send updates, and receive checked replies. Runs in Node and the browser.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/aleeforoughi/feather.git", "directory": "packages/client" },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "src", "!src/**/*.test.ts"],
+  "sideEffects": false,
+  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aleeforoughi/feather-intent": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "vitest": "5.0.3"
+  }
+}
