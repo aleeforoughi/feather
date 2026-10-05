@@ -116,6 +116,9 @@ test("a: the host page's elements and custom properties are identical before, af
 
   await page.keyboard.press("Escape")
   await expect(page.locator('[data-slot="explore-more-menu"]')).toHaveCount(0)
+  // Base UI releases its scroll lock just after the menu leaves the DOM: wait for the page to be given back, then
+  // prove it is exactly as it was.
+  await expect.poll(async () => (await hostState(page)).htmlAttrs + (await hostState(page)).bodyAttrs).toBe(before.htmlAttrs + before.bodyAttrs)
   expectHostUntouched(before, await hostState(page))
 })
 
