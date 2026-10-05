@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-intent",
-  "version": "1.15.1",
+  "version": "1.15.2",
   "description": "The Experience IR (feather.ir/0): what a caller asks Feather to render, as JSON Schema, TypeScript types and a validator with readable errors.",
   "license": "UNLICENSED",
   "type": "module",

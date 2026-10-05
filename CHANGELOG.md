@@ -1,5 +1,26 @@
 # Feather — changelog
 
+## 1.15.2 — 2026-10-05
+
+**Destructive text reads on its tint, at rest and on hover.** The destructive Button and Badge laid their red text on
+`bg-destructive/10` and hovered on `bg-destructive/20`, opacities outside the visual system; on the 20% tint the
+light default red fell to 4.4:1 (the gap 1.15.1 left open). Normalized, not redesigned: the same red on the same
+kind of tint, now from tokens.
+
+- **Tokens:**
+  - a new `--destructive-muted-hover` (Tailwind `bg-destructive-muted-hover`): the strongest mix of the red into
+    `--card`, from 20% down to 14%, that keeps `--destructive` at 4.5:1;
+  - the rest tint is `--destructive-muted` (12%, unchanged).
+- **Engine:** `CONTRAST_FLOORS.destructive` now checks `--destructive` on `--background`, `--card`, and both tints
+  laid on either. A red that misses it at rest is still refused; one that holds at rest but not at 20% hovers on a
+  lighter tint instead (rich-brand's `#B91C1C` hovers at 19%, as it reaches 4.49:1 at 20%). New exports:
+  `DESTRUCTIVE_TINTS` and `oklabMix`.
+- **Components:**
+  - Button and Badge (destructive): `bg-destructive-muted`, with `bg-destructive-muted-hover` on hover.
+  - DropdownMenu's destructive item focuses on `bg-destructive-muted`, not `bg-destructive/10`.
+- **Docs:** the floor and the tints are in `docs/visual-system.md` section 5.
+- The destructive stories change, so their visual baselines are re-recorded.
+
 ## 1.15.1 — 2026-10-04
 
 **The 1.7.0 accessibility debt is paid, and the size target is a gate.**
@@ -18,8 +39,8 @@
 - **Size gate:** `pnpm size` (in CI after hygiene) bundles `liquid` and `manifest-web` as a product would, minified
   and gzipped, with React and the component library left out. Budget: 60 KB (PLAN.md section 9). Today: 29.7 KB.
   It also prints the figure with the component library bundled in, 176 KB, which is not gated.
-- Visual change: paper-sharp and void-pill render their destructive parts in the new reds. The visual baselines
-  (feather and feather-dark, which name their own reds) do not change.
+- Visual change: paper-sharp and void-pill render their destructive parts in the new reds, and their baselines are
+  re-recorded. feather and feather-dark name their own reds and do not change.
 
 ## 1.15.0 — 2026-10-04
 
