@@ -1,7 +1,7 @@
 {
   "description": "A form whose answers belong together: a shipping address with required fields, so it cannot be skipped.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "shipping_address",
     "locale": "en",
     "nodes": [

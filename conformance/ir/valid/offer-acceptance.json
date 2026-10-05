@@ -1,7 +1,7 @@
 {
   "description": "A special offer with expiration and decline option.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "special_offer",
     "nodes": [
       {"type": "Text", "id": "msg", "text": "Special offer just for you!"},

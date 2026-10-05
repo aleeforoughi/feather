@@ -25,7 +25,7 @@ class Version(unittest.TestCase):
         self.assertEqual(project["tool"]["setuptools"]["dynamic"]["version"], {"attr": "feather_sdk._version.__version__"})
 
     def test_ir_version(self):
-        self.assertEqual(feather_sdk.IR_VERSION, "feather.ir/0")
+        self.assertEqual(feather_sdk.IR_VERSION, "feather.ir/1")
 
 
 class NoDependencies(unittest.TestCase):
@@ -51,7 +51,7 @@ class NoDependencies(unittest.TestCase):
 
 
 class Reading(unittest.TestCase):
-    DOC = {"ir": "feather.ir/0", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": "hi"}]}
+    DOC = {"ir": "feather.ir/1", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": "hi"}]}
 
     def test_a_json_string_is_read(self):
         result = validate(json.dumps(self.DOC))
@@ -74,7 +74,7 @@ class Reading(unittest.TestCase):
     def test_it_never_raises(self):
         loop: dict = {}
         loop["me"] = loop
-        weird = [None, 1, 2.5, True, object(), {1: 2}, {"ir": object()}, {"ir": "feather.ir/0", "experience": "e", "nodes": [object()]}, {"ir": "feather.ir/0", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": {1, 2}}]}, loop, {"ir": "feather.ir/0", "experience": "e", "nodes": [loop]}, b"\xff", float("nan")]
+        weird = [None, 1, 2.5, True, object(), {1: 2}, {"ir": object()}, {"ir": "feather.ir/1", "experience": "e", "nodes": [object()]}, {"ir": "feather.ir/1", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": {1, 2}}]}, loop, {"ir": "feather.ir/1", "experience": "e", "nodes": [loop]}, b"\xff", float("nan")]
         for value in weird:
             with self.subTest(repr(value)[:40]):
                 result = validate(value)
@@ -84,7 +84,7 @@ class Reading(unittest.TestCase):
                 validate_reply(self.DOC, value)
 
     def test_tuples_are_arrays(self):
-        doc = {"ir": "feather.ir/0", "experience": "e", "nodes": ({"type": "Text", "id": "t", "text": "hi"},)}
+        doc = {"ir": "feather.ir/1", "experience": "e", "nodes": ({"type": "Text", "id": "t", "text": "hi"},)}
         self.assertTrue(validate(doc).ok)
 
     def test_issues_are_frozen(self):
@@ -93,7 +93,7 @@ class Reading(unittest.TestCase):
             issue.code = "x"  # type: ignore[misc]
 
     def test_the_issue_limit(self):
-        doc = {"ir": "feather.ir/0", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": ""}] * 150}
+        doc = {"ir": "feather.ir/1", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": ""}] * 150}
         issues = validate(doc).issues
         self.assertEqual(len(issues), MAX_ISSUES + 1)
         self.assertEqual(issues[-1].code, "too-many-issues")
@@ -105,14 +105,14 @@ class Reading(unittest.TestCase):
         self.assertIn("invalid-experience", REPLY_ISSUE_CODES)
 
     def test_issue_dataclass_fields(self):
-        issue = validate({"ir": "feather.ir/0", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": ""}]}).issues[0]
+        issue = validate({"ir": "feather.ir/1", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": ""}]}).issues[0]
         self.assertEqual((issue.code, issue.path, issue.node), ("empty-text", "/nodes/0/text", "t"))
         self.assertIsNone(validate(5).issues[0].node)
 
 
 class Formatting(unittest.TestCase):
     def test_format_issues(self):
-        issues = validate({"ir": "feather.ir/0", "experience": "e", "nodes": []}).issues
+        issues = validate({"ir": "feather.ir/1", "experience": "e", "nodes": []}).issues
         self.assertEqual(
             format_issues(issues),
             "- /nodes: An experience with no nodes renders nothing; send at least one node, or no experience. [empty-experience]",

@@ -33,7 +33,7 @@ def experience(
 
 
 def update(experience_id: str, revision: int, ops: Iterable[dict[str, Any]]) -> dict[str, Any]:
-    """A `feather.update/0`: one change to an open experience, for `apply_update()`.
+    """A `feather.update/1`: one change to an open experience, for `apply_update()`.
 
     `experience_id` names the experience it changes, `revision` is the revision the experience has once the update is
     applied (exactly one more than before), and `ops` are the dicts `feather_sdk.ops` returns: `add`, `replace`,

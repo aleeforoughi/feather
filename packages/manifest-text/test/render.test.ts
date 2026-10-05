@@ -73,7 +73,7 @@ describe("renderTurn", () => {
   })
 
   it("drops control characters from a plan's text, so it cannot drive the terminal", () => {
-    const result = compose({ ir: "feather.ir/0", experience: "x", nodes: [{ type: "Text", id: "t", text: "Hello\u001b[2J\u001b]0;pwned\u0007 there\u0000" }, { type: "Action", id: "a", intent: "go" }] }, { device: { surface: "terminal" } })
+    const result = compose({ ir: "feather.ir/1", experience: "x", nodes: [{ type: "Text", id: "t", text: "Hello\u001b[2J\u001b]0;pwned\u0007 there\u0000" }, { type: "Action", id: "a", intent: "go" }] }, { device: { surface: "terminal" } })
     if (!result.ok) throw new Error("invalid")
     const text = renderTurn(createDialog(result.plan).turn, { color: true })
     expect(text).not.toContain("\u001b[2J")
@@ -87,7 +87,7 @@ describe("renderTurn", () => {
     d.answer("1")
     expect(renderTurn(d.turn)).toBe(['Confirm spend. This cannot be undone.', "Spends AED 1,050", "", 'Type "confirm" to go ahead, or "cancel".', "> "].join("\n"))
     expect(renderTurn(d.answer("yes").turn)).toContain("Nothing was done.")
-    const done = createDialog(plan({ ir: "feather.ir/0", experience: "x", nodes: [{ type: "Text", id: "t", text: "Saved." }, { type: "Status", id: "s", state: "done", label: "All" }] }))
+    const done = createDialog(plan({ ir: "feather.ir/1", experience: "x", nodes: [{ type: "Text", id: "t", text: "Saved." }, { type: "Status", id: "s", state: "done", label: "All" }] }))
     expect(renderTurn(done.turn)).toBe("Saved.\n\nAll: done.\n")
     expect(renderTurn({ state: "done", parts: [], choices: [] })).toBe("")
   })

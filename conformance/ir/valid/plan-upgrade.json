@@ -1,7 +1,7 @@
 {
   "description": "Recommend a plan upgrade with non-reversible recommendation and consequence, plus alternatives.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "upgrade_recommendation",
     "nodes": [
       {"type": "Text", "id": "msg", "text": "You've outgrown your current plan. Here's what we recommend."},

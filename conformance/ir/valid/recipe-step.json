@@ -1,7 +1,7 @@
 {
   "description": "A recipe step with audio instructions, video, and a quantity input.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "cooking_step_three",
     "nodes": [
       {"type": "Text", "id": "step", "text": "Step 3: Prepare the sauce"},

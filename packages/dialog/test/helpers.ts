@@ -13,7 +13,7 @@ export const fixtureNames = fs.readdirSync(fixturesDir).filter((f) => f.endsWith
 export const fixture = (name: string): Experience => JSON.parse(fs.readFileSync(path.join(fixturesDir, name), "utf8")).ir
 
 export function experience(nodes: IRNode[], extra: Partial<Experience> = {}): Experience {
-  return { ir: "feather.ir/0", experience: "test", nodes, ...extra }
+  return { ir: "feather.ir/1", experience: "test", nodes, ...extra }
 }
 
 export function planOf(ir: Experience, context: RenderContext = TEXT): LayoutPlan {

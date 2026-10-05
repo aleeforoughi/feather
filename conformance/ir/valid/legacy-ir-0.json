@@ -1,13 +1,7 @@
 {
-  "description": "The spend confirmation says it confirms the recommendation, which is marked reversible.",
-  "expect": [
-    {
-      "code": "unneeded-confirmation",
-      "path": "/nodes/2/confirms"
-    }
-  ],
+  "description": "The canonical campaign launch under the IR's name before the freeze (feather.ir/0): read exactly as feather.ir/1.",
   "ir": {
-    "ir": "feather.ir/1",
+    "ir": "feather.ir/0",
     "experience": "approve_campaign",
     "nodes": [
       {
@@ -15,7 +9,7 @@
         "id": "rec",
         "intent": "launch the recommended test",
         "importance": "high",
-        "reversible": true,
+        "reversible": false,
         "summary": "Recommended test: 7 days, purchase objective",
         "expandable": {
           "why": "Enough to test three creative directions without overspending."
@@ -39,8 +33,7 @@
             "amount": 1050,
             "currency": "AED"
           }
-        },
-        "confirms": "rec"
+        }
       },
       {
         "type": "Alternative",

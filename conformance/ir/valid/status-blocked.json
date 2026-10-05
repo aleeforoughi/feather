@@ -1,7 +1,7 @@
 {
   "description": "A blocked status with explanation and action.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "payment_status",
     "nodes": [
       {"type": "Status", "id": "stat", "state": "blocked", "label": "Payment is blocked and requires verification"},

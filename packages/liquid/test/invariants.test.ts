@@ -119,7 +119,7 @@ describe("speed", () => {
       nodes.push({ type: "Tradeoff", id: `t${i}`, of: `a${i}`, gains: ["Cheaper"] })
       nodes.push({ type: "Text", id: `x${i}`, text: `Line ${i}` })
     }
-    const ir = { ir: "feather.ir/0", experience: "large", nodes }
+    const ir = { ir: "feather.ir/1", experience: "large", nodes }
     expect(compose(ir).ok).toBe(true)
     const context = REFERENCE_CONTEXTS["desktop-detailed"].context
     for (let i = 0; i < 5; i++) compose(ir, context)

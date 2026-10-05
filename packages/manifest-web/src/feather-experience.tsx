@@ -6,7 +6,7 @@ import { compose, type LayoutPlan } from "@aleeforoughi/feather-liquid"
 import { PlanView } from "./plan-view"
 
 export interface FeatherExperienceProps {
-  /** The Experience IR (`feather.ir/0`), as the caller sent it. It is validated; it need not be trusted. */
+  /** The Experience IR (`feather.ir/1`), as the caller sent it. It is validated; it need not be trusted. */
   experience: unknown
   /** Who it is rendered for, and where. The host passes it per render; nothing is stored. */
   context: RenderContext

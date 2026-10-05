@@ -2,7 +2,7 @@
 // feather-text: composes an experience and talks it through in the terminal. The conversation goes to stderr and every
 // reply to stdout as one JSON line, so `feather-text exp.json > replies.jsonl` captures exactly the replies.
 //
-// Exit codes: 0 the conversation ran (finished, or the input closed); 1 the experience is not valid feather.ir/0;
+// Exit codes: 0 the conversation ran (finished, or the input closed); 1 the experience is not valid feather.ir/1;
 // 2 the command line or a file could not be read.
 import fs from "node:fs"
 import process from "node:process"

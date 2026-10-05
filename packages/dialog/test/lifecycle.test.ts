@@ -31,10 +31,10 @@ describe("dialog update", () => {
   })
 
   it("keeps a node answered, and does not offer it again", () => {
-    const base = { ir: "feather.ir/0", experience: "ask", nodes: [{ type: "Action", id: "go", intent: "go on", label: "Go" }, { type: "Action", id: "stay", intent: "stay", label: "Stay" }] } as unknown as Experience
+    const base = { ir: "feather.ir/1", experience: "ask", nodes: [{ type: "Action", id: "go", intent: "go on", label: "Go" }, { type: "Action", id: "stay", intent: "stay", label: "Stay" }] } as unknown as Experience
     const d = createDialog(planOf(base), { experience: base })
     expect(d.answer(String(d.turn.choices.find((c) => c.node === "go")!.n)).replies).toHaveLength(1)
-    const added = applyUpdate(base, { update: "feather.update/0", experience: "ask", revision: 1, ops: [{ op: "add", node: { type: "Action", id: "more", intent: "do more", label: "More" } }] })
+    const added = applyUpdate(base, { update: "feather.update/1", experience: "ask", revision: 1, ops: [{ op: "add", node: { type: "Action", id: "more", intent: "do more", label: "More" } }] })
     if (!added.ok) throw new Error(JSON.stringify(added.issues))
     const turn = feed(d, added.experience)
     expect(turn.choices.map((c) => c.node).sort()).toEqual(["more", "stay"])
@@ -56,7 +56,7 @@ describe("dialog update", () => {
     const d = createDialog(planOf(ex2), { experience: ex2 })
     const ok = d.turn.choices.find((c) => c.node === "ok" && c.act === "approve")!
     expect(d.answer(String(ok.n)).turn.state).toBe("confirm")
-    const patched = applyUpdate(ex2, { update: "feather.update/0", experience: "plan_trip", revision: 3, ops: [{ op: "patch", id: "ok", set: { consequence: { spend: { amount: 2480, currency: "AED" } } } }] })
+    const patched = applyUpdate(ex2, { update: "feather.update/1", experience: "plan_trip", revision: 3, ops: [{ op: "patch", id: "ok", set: { consequence: { spend: { amount: 2480, currency: "AED" } } } }] })
     if (!patched.ok) throw new Error("update refused")
     const turn = feed(d, patched.experience)
     expect(turn.state).toBe("browse")
@@ -74,7 +74,7 @@ describe("dialog update", () => {
     const ex2 = at(2)
     const d = createDialog(planOf(ex2), { experience: ex2 })
     d.answer(String(d.turn.choices.find((c) => c.node === "ok" && c.act === "approve")!.n))
-    const removed = applyUpdate(ex2, { update: "feather.update/0", experience: "plan_trip", revision: 3, ops: [{ op: "remove", id: "ok" }] })
+    const removed = applyUpdate(ex2, { update: "feather.update/1", experience: "plan_trip", revision: 3, ops: [{ op: "remove", id: "ok" }] })
     if (!removed.ok) throw new Error("update refused")
     const turn = feed(d, removed.experience)
     expect(texts(turn, "problem").join(" ")).toMatch(/no longer there/)
@@ -82,11 +82,11 @@ describe("dialog update", () => {
   })
 
   it("keeps a pending value step whose node is unchanged", () => {
-    const base = { ir: "feather.ir/0", experience: "ask", nodes: [{ type: "Input", id: "name", intent: "name it", prompt: "Name?", kind: "text" }] } as unknown as Experience
+    const base = { ir: "feather.ir/1", experience: "ask", nodes: [{ type: "Input", id: "name", intent: "name it", prompt: "Name?", kind: "text" }] } as unknown as Experience
     const d = createDialog(planOf(base), { experience: base })
     d.answer("1")
     expect(d.turn.state).toBe("value")
-    const added = applyUpdate(base, { update: "feather.update/0", experience: "ask", revision: 1, ops: [{ op: "add", node: { type: "Text", id: "note", text: "Hello" } }] })
+    const added = applyUpdate(base, { update: "feather.update/1", experience: "ask", revision: 1, ops: [{ op: "add", node: { type: "Text", id: "note", text: "Hello" } }] })
     if (!added.ok) throw new Error(JSON.stringify(added.issues))
     const turn = feed(d, added.experience)
     expect(turn.state).toBe("value")
@@ -95,10 +95,10 @@ describe("dialog update", () => {
   })
 
   it("cancels a pending value step whose node changed", () => {
-    const base = { ir: "feather.ir/0", experience: "ask", nodes: [{ type: "Input", id: "name", intent: "name it", prompt: "Name?", kind: "text" }] } as unknown as Experience
+    const base = { ir: "feather.ir/1", experience: "ask", nodes: [{ type: "Input", id: "name", intent: "name it", prompt: "Name?", kind: "text" }] } as unknown as Experience
     const d = createDialog(planOf(base), { experience: base })
     d.answer("1")
-    const patched = applyUpdate(base, { update: "feather.update/0", experience: "ask", revision: 1, ops: [{ op: "patch", id: "name", set: { prompt: "Full name?" } }] })
+    const patched = applyUpdate(base, { update: "feather.update/1", experience: "ask", revision: 1, ops: [{ op: "patch", id: "name", set: { prompt: "Full name?" } }] })
     if (!patched.ok) throw new Error(JSON.stringify(patched.issues))
     const turn = feed(d, patched.experience)
     expect(turn.state).toBe("browse")
@@ -118,7 +118,7 @@ describe("dialog update", () => {
 
   it("says the label alone for an artifact without an http(s) href, and only the summary for none", () => {
     const resolve = (artifact?: unknown) => {
-      const r = applyUpdate(at(2), { update: "feather.update/0", experience: "plan_trip", revision: 3, ops: [{ op: "remove", id: "work" }, { op: "remove", id: "rec" }, { op: "remove", id: "ok" }, { op: "resolve", outcome: "failed", summary: "Could not book.", ...(artifact ? { artifact } : {}) }] })
+      const r = applyUpdate(at(2), { update: "feather.update/1", experience: "plan_trip", revision: 3, ops: [{ op: "remove", id: "work" }, { op: "remove", id: "rec" }, { op: "remove", id: "ok" }, { op: "resolve", outcome: "failed", summary: "Could not book.", ...(artifact ? { artifact } : {}) }] })
       if (!r.ok) throw new Error(JSON.stringify(r.issues))
       return createDialog(planOf(at(2)), { experience: at(2) }).update(planOf(r.experience), { experience: r.experience })
     }

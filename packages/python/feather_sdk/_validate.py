@@ -110,7 +110,7 @@ def _range(lo: Any, hi: Any) -> str:
 
 
 def validate(document: Any) -> ValidationResult:
-    """Validates a feather.ir/0 document (a dict, or a JSON string). Never raises."""
+    """Validates a feather.ir/1 document (a dict, or a JSON string). Never raises."""
     if isinstance(document, (str, bytes, bytearray)):
         try:
             text = document.decode("utf-8") if not isinstance(document, str) else document
@@ -197,7 +197,7 @@ def _run(doc: Any, add: Add) -> None:
         spec = spec_for(node["type"])
         if spec is None:
             guess = _closest(node["type"], list(NODE_SPECS)) if isinstance(node["type"], str) else None
-            add("unknown-node-type", f"{at}/type", f'{quote(node["type"])} is not a feather.ir/0 node type{f"; did you mean {guess}?" if guess else "."}', nid)
+            add("unknown-node-type", f"{at}/type", f'{quote(node["type"])} is not a feather.ir/1 node type{f"; did you mean {guess}?" if guess else "."}', nid)
             continue
         name = f'{spec["type"]} "{nid}"' if nid else f'{spec["type"]} at {at}'
         entry = _Entry(node, spec, index, nid, name, at)

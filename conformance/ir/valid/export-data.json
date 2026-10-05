@@ -1,7 +1,7 @@
 {
   "description": "Export data action with custom statement consequence.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "export_account_data",
     "nodes": [
       {"type": "Text", "id": "intro", "text": "Download all your account data in a single archive."},

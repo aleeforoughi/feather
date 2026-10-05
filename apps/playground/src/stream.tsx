@@ -305,7 +305,7 @@ export function StreamView({ onReply }: { onReply: (reply: ReplyEvent, body: str
       )}
 
       <div className="flex flex-col gap-label">
-        <Label htmlFor={pasteId}>Your own update (JSON, feather.update/0)</Label>
+        <Label htmlFor={pasteId}>Your own update (JSON, feather.update/1)</Label>
         <Textarea id={pasteId} data-testid="stream-editor" spellCheck={false} value={pasted} onChange={(e) => setPasted(e.target.value)} className="min-h-40 font-mono type-caption" />
         <div className="flex items-center gap-3">
           <Button variant="outline" data-testid="stream-apply" onClick={applyPasted}>

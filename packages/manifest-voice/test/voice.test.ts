@@ -7,7 +7,7 @@ import { campaign, fixtures, plan } from "./helpers.ts"
 
 const VISUAL = /\b(click|clicks|clicking|see|below|above|button|buttons|tap|taps|screen)\b/i
 const said = (speech: Speech[]) => speech.map((s) => s.text).join(" ")
-const exp = (nodes: unknown[]) => ({ ir: "feather.ir/0", experience: "x", nodes })
+const exp = (nodes: unknown[]) => ({ ir: "feather.ir/1", experience: "x", nodes })
 const GO = { experience: "approve_campaign", node: "go", act: "confirm" }
 
 describe("speechFor", () => {
@@ -58,7 +58,7 @@ describe("speechFor", () => {
 
 describe("the caller's words", () => {
   it("are said verbatim, never reworded for the ear", () => {
-    const ir = { ir: "feather.ir/0", experience: "e", nodes: [{ type: "Text", id: "t", text: "See you tomorrow. Prices above 5 AED stay on screen." }] }
+    const ir = { ir: "feather.ir/1", experience: "e", nodes: [{ type: "Text", id: "t", text: "See you tomorrow. Prices above 5 AED stay on screen." }] }
     const result = compose(ir, REFERENCE_CONTEXTS.screenless.context)
     if (!result.ok) throw new Error("does not compose")
     expect(said(speechFor(createVoiceDialog(result.plan).turn, result.plan))).toContain("See you tomorrow. Prices above 5 AED stay on screen.")

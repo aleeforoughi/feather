@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { actsFor, validate, validateReply, type Experience } from "../src/index.ts"
 
 const result = validate({
-  ir: "feather.ir/0",
+  ir: "feather.ir/1",
   experience: "pick_plan",
   nodes: [
     { type: "Choice", id: "plan", intent: "pick a plan", prompt: "Which plan?", options: [{ id: "basic", label: "Basic" }, { id: "pro", label: "Pro" }] },

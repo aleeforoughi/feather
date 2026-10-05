@@ -1,7 +1,7 @@
 # @aleeforoughi/feather-embed
 
 Feather in any web page, with one script import. No React, no npm and no bundler on the page: the bundle carries
-React, Base UI and Feather, and renders an Experience IR (`feather.ir/0`) inside an element you choose. It hands the
+React, Base UI and Feather, and renders an Experience IR (`feather.ir/1`) inside an element you choose. It hands the
 person's reply back as a validated event.
 
 ```html

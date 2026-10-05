@@ -3,7 +3,7 @@
 // alternatives follow what they are alternatives to). Every problem is reported at once, up to a limit, each with a
 // stable code, a JSON Pointer to where it is, and a sentence saying what to change. It never throws.
 import { DEFAULT_MAX_LENGTH, NODE_SPECS, PRESENTATIONAL_FIELDS, commonFields, primaryField, specFor, type Field, type NodeSpec } from "./spec.ts"
-import { IR_VERSION, type Experience } from "./types.ts"
+import { IR_VERSION, IR_VERSIONS, type Experience } from "./types.ts"
 
 export type IssueCode =
   | "not-an-object"
@@ -100,7 +100,7 @@ export const quote = (v: unknown) => {
 
 class Overflow extends Error {}
 
-/** Validates a feather.ir/0 document. Never throws. */
+/** Validates a feather.ir/1 (or feather.ir/0) document. Never throws. */
 export function validate(input: unknown): ValidationResult {
   const issues: Issue[] = []
   const add: Add = (code, path, message, node) => {
@@ -133,8 +133,8 @@ function run(input: unknown, add: Add) {
   else if (typeof input.ir !== "string") {
     add("wrong-type", "/ir", `ir must be the string "${IR_VERSION}"; got ${describe(input.ir)}.`)
     return
-  } else if (input.ir !== IR_VERSION) {
-    add("unsupported-version", "/ir", `This Feather reads ${IR_VERSION}; the document is ${quote(input.ir)}.`)
+  } else if (!(IR_VERSIONS as readonly string[]).includes(input.ir)) {
+    add("unsupported-version", "/ir", `This Feather reads ${IR_VERSION} (and ${IR_VERSIONS.slice(1).join(", ")}, its name before the freeze); the document is ${quote(input.ir)}.`)
     return
   }
   if (input.experience === undefined) add("missing-field", "/experience", 'Name the experience ("experience": "approve_campaign"); replies carry the name back.')
@@ -177,7 +177,7 @@ function run(input: unknown, add: Add) {
     const spec = specFor(node.type)
     if (!spec) {
       const guess = typeof node.type === "string" ? closest(node.type, Object.keys(NODE_SPECS)) : undefined
-      add("unknown-node-type", `${at}/type`, `${quote(node.type)} is not a feather.ir/0 node type${guess ? `; did you mean ${guess}?` : "."}`, id)
+      add("unknown-node-type", `${at}/type`, `${quote(node.type)} is not a feather.ir/1 node type${guess ? `; did you mean ${guess}?` : "."}`, id)
       return
     }
     const name = `${spec.type}${id ? ` "${id}"` : ` at ${at}`}`

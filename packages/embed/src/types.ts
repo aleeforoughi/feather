@@ -24,7 +24,7 @@ export interface FeatherView {
   /** Renders a new experience (and optionally a new context) in place of the current one. */
   update(experience: unknown, context?: RenderContext): void
   /**
-   * Applies a `feather.update/0` to the experience being shown (`applyUpdate`, docs/lifecycle.md). On success the new
+   * Applies a `feather.update/1` to the experience being shown (`applyUpdate`, docs/lifecycle.md). On success the new
    * experience is rendered in place, as `update(experience)` does, and the result carries it. On refusal (for example
    * `stale-revision`) `onIssues` gets the issues, what is shown stays, and the result says why.
    */

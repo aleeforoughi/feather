@@ -1,7 +1,7 @@
 {
   "description": "A choice among three mutually exclusive options with one preselected.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "pick_delivery_speed",
     "nodes": [
       {"type": "Text", "id": "ctx", "text": "How quickly do you need your order?"},

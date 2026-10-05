@@ -1,7 +1,7 @@
 {
   "description": "A task in waiting state.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "task_status",
     "nodes": [
       {"type": "Text", "id": "task_name", "text": "Your content review is pending"},

@@ -1,7 +1,7 @@
 {
   "description": "Book an appointment with date-time, location, and person (agent).",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "book_consultation",
     "nodes": [
       {"type": "Text", "id": "intro", "text": "Schedule your consultation with Dr. Patel."},

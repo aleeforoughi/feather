@@ -22,7 +22,7 @@ function at(n: number): Experience {
   return ex
 }
 function after(ex: Experience, ops: unknown[]): Experience {
-  const r = applyUpdate(ex, { update: "feather.update/0", experience: ex.experience, revision: (ex.revision ?? 0) + 1, ops })
+  const r = applyUpdate(ex, { update: "feather.update/1", experience: ex.experience, revision: (ex.revision ?? 0) + 1, ops })
   if (!r.ok) throw new Error(JSON.stringify(r.issues))
   return r.experience
 }

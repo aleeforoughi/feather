@@ -18,7 +18,7 @@ function at(n: number): Experience {
   return ex
 }
 const patchOk = (ex: Experience) => {
-  const r = applyUpdate(ex, { update: "feather.update/0", experience: "plan_trip", revision: (ex.revision ?? 0) + 1, ops: [{ op: "patch", id: "ok", set: { consequence: { spend: { amount: 2480, currency: "AED" } } } }] })
+  const r = applyUpdate(ex, { update: "feather.update/1", experience: "plan_trip", revision: (ex.revision ?? 0) + 1, ops: [{ op: "patch", id: "ok", set: { consequence: { spend: { amount: 2480, currency: "AED" } } } }] })
   if (!r.ok) throw new Error(JSON.stringify(r.issues))
   return r.experience
 }

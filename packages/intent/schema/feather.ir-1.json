@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/aleeforoughi/feather/schema/feather.ir-0.json",
-  "title": "Feather Experience IR (feather.ir/0)",
+  "$id": "https://github.com/aleeforoughi/feather/schema/feather.ir-1.json",
+  "title": "Feather Experience IR (feather.ir/1)",
   "description": "One experience: the next necessary interaction, as meaning. Generated from packages/intent/src/spec.ts. This schema checks structure; rules across nodes (one primary act, irreversible acts state their consequence, references resolve) are checked by validate() in @aleeforoughi/feather-intent.",
   "type": "object",
   "required": [
@@ -12,7 +12,11 @@
   "additionalProperties": false,
   "properties": {
     "ir": {
-      "const": "feather.ir/0"
+      "description": "feather.ir/1; feather.ir/0 is the same contract under its name before the freeze.",
+      "enum": [
+        "feather.ir/1",
+        "feather.ir/0"
+      ]
     },
     "experience": {
       "description": "Names the experience; replies carry it back.",

@@ -1,7 +1,7 @@
 {
   "description": "The paid campaign launch from docs/PLAN.md section 6, verbatim: the canonical example of the IR.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "approve_campaign",
     "nodes": [
       {

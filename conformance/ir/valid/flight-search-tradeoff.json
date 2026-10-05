@@ -1,7 +1,7 @@
 {
   "description": "Flight choice with tradeoffs shown for alternatives.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "book_flight",
     "nodes": [
       {"type": "Text", "id": "trip", "text": "Flights from Dubai to New York on October 15"},

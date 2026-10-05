@@ -1,7 +1,7 @@
 {
   "description": "An assistant booking a dinner table has every fact but one: how many people. It asks only for that.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "book_table_party_size",
     "locale": "en",
     "nodes": [

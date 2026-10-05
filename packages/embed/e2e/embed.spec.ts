@@ -283,7 +283,7 @@ test("f: invalid IR reports issues and renders nothing; update swaps the experie
   await remember(page)
   const before = await hostState(page)
 
-  await mount(page, "slot-a", { ir: "feather.ir/0", experience: "x", nodes: [{ type: "Nope", id: "a" }] })
+  await mount(page, "slot-a", { ir: "feather.ir/1", experience: "x", nodes: [{ type: "Nope", id: "a" }] })
   await expect.poll(() => page.evaluate(() => window.__feather.issues.length)).toBeGreaterThan(0)
   const issues = await page.evaluate(() => window.__feather.issues[0])
   expect(issues.slot).toBe("slot-a")
@@ -451,7 +451,7 @@ test("i: a Form in the host sends one reply with only the filled fields, and Ent
   expect((await page.evaluate(() => window.__feather.replies))[1]).toStrictEqual({ slot: "slot-b", reply: { experience: "poster_details", node: "details", act: "submit", value: { contact: "market@example.com" } } })
 })
 
-test("h: apply() takes a feather.update/0 in the foreign page, refuses a stale one, and collapses on resolve", async ({ page }) => {
+test("h: apply() takes a feather.update/1 in the foreign page, refuses a stale one, and collapses on resolve", async ({ page }) => {
   await remember(page)
   const before = await hostState(page)
   await mount(page, "slot-a", STREAM.experience)

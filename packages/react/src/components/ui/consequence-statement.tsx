@@ -1,6 +1,6 @@
 import { cn } from "../../lib/cn"
 
-/** What an act does, as the IR states it (`feather.ir/0` consequence). Mirrored by convention, not imported. */
+/** What an act does, as the IR states it (`feather.ir/1` consequence). Mirrored by convention, not imported. */
 export type Consequence = {
   spend?: { amount: number; currency: string }
   publish?: { audience: string }

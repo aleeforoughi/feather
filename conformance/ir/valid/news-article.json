@@ -1,7 +1,7 @@
 {
   "description": "Reading a news article with explore more options.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "read_article",
     "nodes": [
       {"type": "Text", "id": "headline", "text": "New AI Model Shows Promise in Medical Diagnosis"},

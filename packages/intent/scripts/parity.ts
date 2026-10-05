@@ -394,7 +394,7 @@ export function buildIrCorpus(): IrCase[] {
     const result = validate(doc)
     cases.push({ name, ir: doc, issues: result.ok ? [] : (JSON.parse(JSON.stringify(result.issues)) as IssueOut[]) })
   }
-  for (const [value, label] of [[null, "null"], [42, "a number"], ["text", "a string"], [[], "an array"], [true, "true"], [{}, "an empty object"], [[{ ir: "feather.ir/0" }], "an array with an object in it"]] as Array<[Json, string]>) {
+  for (const [value, label] of [[null, "null"], [42, "a number"], ["text", "a string"], [[], "an array"], [true, "true"], [{}, "an empty object"], [[{ ir: "feather.ir/1" }], "an array with an object in it"]] as Array<[Json, string]>) {
     push(`document: ${label}`, value)
   }
   load("valid").forEach(([fixture, { ir }], f) => {
@@ -420,7 +420,7 @@ const DONE: Obj = { outcome: "done", summary: "Booked: direct flight, 9:40." }
 function lifecycleDocuments(): Array<[string, Json]> {
   const out: Array<[string, Json]> = []
   const doc = (label: string, extra: Obj, nodes: Json | undefined = [TEXT]) => {
-    const d: Obj = { ir: "feather.ir/0", experience: "plan_trip", ...clone(extra) }
+    const d: Obj = { ir: "feather.ir/1", experience: "plan_trip", ...clone(extra) }
     if (nodes !== undefined) d.nodes = clone(nodes)
     out.push([`lifecycle: ${label}`, d])
   }
@@ -637,9 +637,9 @@ export function buildReplyCorpus(): ReplyCorpus {
   })
   // A resolved experience takes no replies, whatever they are (L6): the ones that would have fit, and ones that never would.
   const ended: Array<[string, Json]> = [
-    ["no nodes", { ir: "feather.ir/0", experience: "plan_trip", revision: 2, resolved: { outcome: "done", summary: "Booked." }, nodes: [] }],
-    ["cancelled, with its history", { ir: "feather.ir/0", experience: "plan_trip", resolved: { outcome: "cancelled", summary: "Cancelled.", artifact: { label: "Receipt" } }, nodes: [{ type: "Approval", id: "ok", intent: "approve", request: "Book it?" }, { type: "Text", id: "t", text: "Done." }] }],
-    ["failed", { ir: "feather.ir/0", experience: "plan_trip", revision: 5, resolved: { outcome: "failed", summary: "Sold out." }, nodes: [{ type: "Action", id: "go", intent: "go" }] }],
+    ["no nodes", { ir: "feather.ir/1", experience: "plan_trip", revision: 2, resolved: { outcome: "done", summary: "Booked." }, nodes: [] }],
+    ["cancelled, with its history", { ir: "feather.ir/1", experience: "plan_trip", resolved: { outcome: "cancelled", summary: "Cancelled.", artifact: { label: "Receipt" } }, nodes: [{ type: "Approval", id: "ok", intent: "approve", request: "Book it?" }, { type: "Text", id: "t", text: "Done." }] }],
+    ["failed", { ir: "feather.ir/1", experience: "plan_trip", revision: 5, resolved: { outcome: "failed", summary: "Sold out." }, nodes: [{ type: "Action", id: "go", intent: "go" }] }],
   ]
   for (const [label, ir] of ended) {
     const key = `resolved/${label}`
@@ -654,8 +654,8 @@ export function buildReplyCorpus(): ReplyCorpus {
     push(key, "a reply with an extra field", { experience: "plan_trip", node: nodeId, act: "activate", extra: 1 })
   }
   // The same for the resolved fixtures, and for a resolution that is not valid: the experience is judged first.
-  experiences["resolved/invalid resolution"] = { ir: "feather.ir/0", experience: "plan_trip", resolved: { outcome: "finished", summary: "" }, nodes: [] }
-  experiences["resolved/invalid revision"] = { ir: "feather.ir/0", experience: "plan_trip", revision: -1, resolved: { outcome: "done", summary: "x" }, nodes: [] }
+  experiences["resolved/invalid resolution"] = { ir: "feather.ir/1", experience: "plan_trip", resolved: { outcome: "finished", summary: "" }, nodes: [] }
+  experiences["resolved/invalid revision"] = { ir: "feather.ir/1", experience: "plan_trip", revision: -1, resolved: { outcome: "done", summary: "x" }, nodes: [] }
   for (const key of ["resolved/invalid resolution", "resolved/invalid revision"]) push(key, "any reply", { experience: "plan_trip", node: "y", act: "z" })
   // An experience that is not valid: nothing can be replied to.
   for (const [fixture, { ir }] of load("invalid").slice(0, 8)) {
@@ -675,7 +675,7 @@ const updateFixtures = (dir: string) =>
     .map((f) => [f.replace(/\.json$/, ""), JSON.parse(fs.readFileSync(path.join(root, "update", dir, f), "utf8")) as Obj] as const)
 
 const TRIP: Obj = {
-  ir: "feather.ir/0",
+  ir: "feather.ir/1",
   experience: "plan_trip",
   locale: "en",
   revision: 4,
@@ -726,15 +726,15 @@ export function buildUpdateCorpus(): UpdateCorpus {
   const noRevision = clone(TRIP)
   delete noRevision.revision
   experiences["trip without a revision"] = noRevision
-  experiences.single = { ir: "feather.ir/0", experience: "plan_trip", revision: 1, nodes: [{ type: "Text", id: "only", text: "Only." }] }
+  experiences.single = { ir: "feather.ir/1", experience: "plan_trip", revision: 1, nodes: [{ type: "Text", id: "only", text: "Only." }] }
   experiences.resolved = load("valid").find(([n]) => n === "resolved-booking")![1].ir
   experiences["resolved with history"] = load("valid").find(([n]) => n === "resolved-cancelled-with-history")![1].ir
-  experiences["not valid"] = { ir: "feather.ir/0", experience: "plan_trip", nodes: [] }
+  experiences["not valid"] = { ir: "feather.ir/1", experience: "plan_trip", nodes: [] }
   experiences["not an experience"] = 5
-  experiences["with a primary"] = { ir: "feather.ir/0", experience: "plan_trip", revision: 0, nodes: [{ type: "Action", id: "a", intent: "go", primary: true }, { type: "Text", id: "t", text: "x" }] }
-  experiences["revision 2.0"] = { ir: "feather.ir/0", experience: "plan_trip", revision: 2.0, nodes: [{ type: "Text", id: "t", text: "x" }] }
+  experiences["with a primary"] = { ir: "feather.ir/1", experience: "plan_trip", revision: 0, nodes: [{ type: "Action", id: "a", intent: "go", primary: true }, { type: "Text", id: "t", text: "x" }] }
+  experiences["revision 2.0"] = { ir: "feather.ir/1", experience: "plan_trip", revision: 2.0, nodes: [{ type: "Text", id: "t", text: "x" }] }
 
-  const u = (revision: unknown, ops: unknown, extra: Obj = {}): Obj => ({ update: "feather.update/0", experience: "plan_trip", revision, ops, ...extra }) as Obj
+  const u = (revision: unknown, ops: unknown, extra: Obj = {}): Obj => ({ update: "feather.update/1", experience: "plan_trip", revision, ops, ...extra }) as Obj
   const text = (id: string, body = "Hi."): Obj => ({ type: "Text", id, text: body })
   const run = (label: string, update: unknown, key = "trip") => push(`${key}: ${label}`, key, update)
   const next: Record<string, number> = { trip: 5, single: 2, "trip without a revision": 1, "with a primary": 1 }
@@ -749,7 +749,7 @@ export function buildUpdateCorpus(): UpdateCorpus {
   const noUpdate = u(5, [{ op: "remove", id: "go" }])
   delete noUpdate.update
   run("no update version", noUpdate)
-  for (const [label, value] of [["another version", "feather.update/1"], ["a number", 0], ["null", null], ["an ir version", "feather.ir/0"], ["an empty string", ""], ["a long string", "😀".repeat(60)]] as Array<[string, Json]>) run(`update version is ${label}`, u(5, [{ op: "remove", id: "go" }], { update: value }))
+  for (const [label, value] of [["another version", "feather.update/1"], ["a number", 0], ["null", null], ["an ir version", "feather.ir/1"], ["an empty string", ""], ["a long string", "😀".repeat(60)]] as Array<[string, Json]>) run(`update version is ${label}`, u(5, [{ op: "remove", id: "go" }], { update: value }))
   run("an unsupported version and a wrong experience", u(5, [], { update: "x", experience: "other" }))
   const noExperience = u(5, [{ op: "remove", id: "go" }])
   delete noExperience.experience
@@ -768,14 +768,14 @@ export function buildUpdateCorpus(): UpdateCorpus {
   run("the first update, from revision 0", u(1, [{ op: "remove", id: "a" }]), "with a primary")
   run("a revision written 2.0 on the experience", u(3, [{ op: "remove", id: "t" }, { op: "add", node: text("u") }]), "revision 2.0")
   run("a stale revision on a revision written 2.0", u(2, [{ op: "remove", id: "t" }]), "revision 2.0")
-  run("a missing revision on a revision written 2.0", { update: "feather.update/0", experience: "plan_trip", ops: [] }, "revision 2.0")
+  run("a missing revision on a revision written 2.0", { update: "feather.update/1", experience: "plan_trip", ops: [] }, "revision 2.0")
 
   // The experience it applies to.
   run("an experience that is not valid", u(1, [{ op: "add", node: text("t") }]), "not valid")
   run("an experience that is not an object", u(1, [{ op: "add", node: text("t") }]), "not an experience")
   run("a resolved experience", u(4, [{ op: "add", node: text("t") }]), "resolved")
   run("a resolved experience and a stale revision", u(9, [{ op: "add", node: text("t") }]), "resolved")
-  run("a resolved experience and no ops", { update: "feather.update/0", experience: "plan_trip", revision: 4 }, "resolved")
+  run("a resolved experience and no ops", { update: "feather.update/1", experience: "plan_trip", revision: 4 }, "resolved")
   run("a resolved experience, wrong experience", u(4, [], { experience: "x" }), "resolved")
   run("a resolved experience with history", u(1, [{ op: "remove", id: "t" }]), "resolved with history")
 

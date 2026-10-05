@@ -1,7 +1,7 @@
 {
   "description": "Confirmation after submitting a form.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "form_submitted",
     "nodes": [
       {"type": "Action", "id": "submit", "intent": "submit form"},

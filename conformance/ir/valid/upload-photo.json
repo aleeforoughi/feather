@@ -1,7 +1,7 @@
 {
   "description": "Upload a photo with preview and crop options.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "upload_profile_photo",
     "nodes": [
       {"type": "Text", "id": "intro", "text": "Upload a profile photo."},

@@ -1,4 +1,4 @@
-// @aleeforoughi/feather-intent: the Experience IR (feather.ir/0), the one contract callers use to ask Feather for
+// @aleeforoughi/feather-intent: the Experience IR (feather.ir/1), the one contract callers use to ask Feather for
 // an interaction. No dependencies; runs in Node and the browser.
 export * from "./types.ts"
 export { validate, formatIssues, parseDate, MAX_ISSUES, SUMMARY_MAX, type Issue, type IssueCode, type ValidationResult } from "./validate.ts"

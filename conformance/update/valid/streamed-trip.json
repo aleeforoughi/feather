@@ -1,7 +1,7 @@
 {
   "description": "The L6 exit scenario: progress, then a recommendation and an approval, then done, leaving only the artifact and a one-line summary. Each update applies to the experience the one before it made; `replies` says which reply the caller acts on between updates.",
   "experience": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "plan_trip",
     "nodes": [
       {
@@ -25,7 +25,7 @@
   },
   "updates": [
     {
-      "update": "feather.update/0",
+      "update": "feather.update/1",
       "experience": "plan_trip",
       "revision": 1,
       "ops": [
@@ -51,7 +51,7 @@
       ]
     },
     {
-      "update": "feather.update/0",
+      "update": "feather.update/1",
       "experience": "plan_trip",
       "revision": 2,
       "ops": [
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "update": "feather.update/0",
+      "update": "feather.update/1",
       "experience": "plan_trip",
       "revision": 3,
       "ops": [

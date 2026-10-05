@@ -1,5 +1,5 @@
 {
-  "description": "A caller built for a future IR sends feather.ir/1 to a Feather that reads feather.ir/0.",
+  "description": "A document in an IR this Feather does not read (feather.ir/2). feather.ir/1 is frozen; feather.ir/0 is read as its earlier name.",
   "expect": [
     {
       "code": "unsupported-version",
@@ -7,7 +7,7 @@
     }
   ],
   "ir": {
-    "ir": "feather.ir/1",
+    "ir": "feather.ir/2",
     "experience": "purchase_approval",
     "nodes": [
       {

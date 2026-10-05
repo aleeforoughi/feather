@@ -69,7 +69,7 @@ describe("feather-text", () => {
   it("accepts a bare experience as well as a fixture", async () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "feather-text-"))
     const file = path.join(dir, "exp.json")
-    fs.writeFileSync(file, JSON.stringify({ ir: "feather.ir/0", experience: "x", nodes: [{ type: "Action", id: "a", intent: "save it" }] }))
+    fs.writeFileSync(file, JSON.stringify({ ir: "feather.ir/1", experience: "x", nodes: [{ type: "Action", id: "a", intent: "save it" }] }))
     const { code, stdout } = await run([file], "1\n")
     expect(code).toBe(0)
     expect(stdout).toBe('{"experience":"x","node":"a","act":"activate"}\n')
@@ -78,7 +78,7 @@ describe("feather-text", () => {
   it("prints the issues and exits 1 for an invalid experience, with nothing on stdout", async () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "feather-text-"))
     const file = path.join(dir, "bad.json")
-    fs.writeFileSync(file, JSON.stringify({ ir: "feather.ir/0", experience: "x", nodes: [{ type: "Choice", id: "c", intent: "pick", prompt: "?", options: [] }] }))
+    fs.writeFileSync(file, JSON.stringify({ ir: "feather.ir/1", experience: "x", nodes: [{ type: "Choice", id: "c", intent: "pick", prompt: "?", options: [] }] }))
     const { code, stdout, stderr } = await run([file], "1\n")
     expect(code).toBe(1)
     expect(stdout).toBe("")

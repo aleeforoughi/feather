@@ -1,7 +1,7 @@
 {
   "description": "Compare subscription plans using Recommendation and Alternatives with Comparison.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "compare_plans",
     "nodes": [
       {"type": "Text", "id": "intro", "text": "Choose the right plan for your needs."},

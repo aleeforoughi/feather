@@ -1,7 +1,7 @@
 {
   "description": "The campaign launch from docs/PLAN.md with its links made explicit: the spend is the primary act and both alternatives point at the recommendation.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "approve_campaign_linked",
     "nodes": [
       {

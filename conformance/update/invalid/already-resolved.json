@@ -7,7 +7,7 @@
     }
   ],
   "experience": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "plan_trip",
     "revision": 2,
     "nodes": [
@@ -24,7 +24,7 @@
     }
   },
   "update": {
-    "update": "feather.update/0",
+    "update": "feather.update/1",
     "experience": "plan_trip",
     "revision": 3,
     "ops": [

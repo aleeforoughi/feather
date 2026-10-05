@@ -3,7 +3,7 @@ import { formatIssues, validate, type IssueCode } from "../src/index.ts"
 
 // The rules, one at a time, on a small valid experience. The conformance fixtures exercise them on realistic ones.
 const base = () => ({
-  ir: "feather.ir/0",
+  ir: "feather.ir/1",
   experience: "approve_campaign",
   nodes: [
     { type: "Recommendation", id: "rec", intent: "launch the recommended test", importance: "high", reversible: false, summary: "Recommended test: 7 days, purchase objective", expandable: { why: "Enough to test three creative directions without overspending." } },
@@ -29,14 +29,14 @@ describe("validate", () => {
   })
 
   it("never throws, whatever it is given", () => {
-    for (const input of [null, undefined, 42, "x", [], { nodes: "x" }, { ir: "feather.ir/0", experience: "e", nodes: [null, 3, { type: 1 }] }]) {
+    for (const input of [null, undefined, 42, "x", [], { nodes: "x" }, { ir: "feather.ir/1", experience: "e", nodes: [null, 3, { type: 1 }] }]) {
       expect(() => validate(input)).not.toThrow()
       expect(validate(input).ok).toBe(false)
     }
   })
 
   it.each<[string, (d: ReturnType<typeof base>) => void, string[]]>([
-    ["a newer IR", (d) => void (d.ir = "feather.ir/1"), only("unsupported-version", "/ir")],
+    ["a newer IR", (d) => void (d.ir = "feather.ir/2"), only("unsupported-version", "/ir")],
     ["no nodes", (d) => void (d.nodes = []), only("empty-experience", "/nodes")],
     ["a bad experience name", (d) => void (d.experience = "approve campaign"), only("invalid-id", "/experience")],
     ["an unknown top-level field", (d) => void ((d as Record<string, unknown>).nodez = []), only("unknown-field", "/nodez")],
@@ -69,7 +69,7 @@ describe("validate", () => {
   })
 
   it("checks node-specific rules", () => {
-    const doc = (...nodes: Record<string, unknown>[]) => ({ ir: "feather.ir/0", experience: "e", nodes })
+    const doc = (...nodes: Record<string, unknown>[]) => ({ ir: "feather.ir/1", experience: "e", nodes })
     const codes = (d: unknown) => {
       const r = validate(d)
       return r.ok ? [] : r.issues.map((i) => i.code)
@@ -116,7 +116,7 @@ describe("validate", () => {
   it("suggests the name a typo meant", () => {
     const r = validate({ ...base(), nodes: [{ type: "Recomendation", id: "r", intent: "x", summary: "y" }, { type: "Text", id: "t", txt: "hi" }] })
     expect(r.ok ? [] : r.issues.map((i) => i.message)).toEqual([
-      '"Recomendation" is not a feather.ir/0 node type; did you mean Recommendation?',
+      '"Recomendation" is not a feather.ir/1 node type; did you mean Recommendation?',
       'Text "t" has no field "txt"; did you mean "text"?',
       'Text "t" needs "text": the words.',
     ])

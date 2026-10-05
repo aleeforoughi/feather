@@ -8,7 +8,7 @@ export interface Args {
 
 export const USAGE = `Usage: feather-text <experience.json> [--context <context.json>] [--width N]
 
-Composes the experience (feather.ir/0) and talks it through in the terminal.
+Composes the experience (feather.ir/1) and talks it through in the terminal.
   The conversation goes to stderr; every reply goes to stdout as one JSON line.
   An invalid experience prints its problems and exits 1.
 

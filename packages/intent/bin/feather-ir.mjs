@@ -25,7 +25,7 @@ for (const file of files) {
   }
   if (doc && typeof doc.ir === "object" && doc.ir !== null) doc = doc.ir
   const result = validate(doc)
-  if (result.ok) console.log(`${file}: valid feather.ir/0 (${result.experience.nodes.length} nodes)`)
+  if (result.ok) console.log(`${file}: valid feather.ir/1 (${result.experience.nodes.length} nodes)`)
   else {
     failed = true
     console.error(`${file}: ${result.issues.length} problem${result.issues.length === 1 ? "" : "s"}\n${formatIssues(result.issues)}`)

@@ -1,7 +1,7 @@
 {
   "description": "Watch a video tutorial with progress tracking.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "watch_tutorial",
     "nodes": [
       {"type": "Text", "id": "title", "text": "Getting started with the editor: Advanced techniques"},

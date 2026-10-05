@@ -1,7 +1,7 @@
 # Calling Feather
 
 A caller is any system that decides what a person needs to do, and leaves how it looks, sounds and behaves to
-Feather. Godpip is the first. A caller sends an **experience** (the [Experience IR](ir/README.md), `feather.ir/0`)
+Feather. Godpip is the first. A caller sends an **experience** (the [Experience IR](ir/README.md), `feather.ir/1`)
 and receives a **reply**: the person's decision, already checked.
 
 ```text
@@ -94,11 +94,11 @@ to itself) on the first mount.
 ```
 
 An experience can change while the work behind it moves ([lifecycle](lifecycle.md)). Send small updates to `apply()`:
-it applies each `feather.update/0` to what is shown and renders the result in place, keeping the person's place.
+it applies each `feather.update/1` to what is shown and renders the result in place, keeping the person's place.
 
 ```js
 const result = view.apply({
-  update: "feather.update/0", experience: "plan_trip", revision: 1,
+  update: "feather.update/1", experience: "plan_trip", revision: 1,
   ops: [{ op: "patch", id: "work", set: { value: 0.5 } }],
 })
 if (!result.ok) console.warn(result.issues)   // also passed to onIssues; what is shown stays
@@ -210,6 +210,6 @@ python3 examples/python-caller/server.py   # then open http://localhost:8765
 
 ## Versions
 
-The IR is `feather.ir/0` until milestone L7, where it freezes as `feather.ir/1` and stops changing. Until then a
+The IR is `feather.ir/1` until milestone L7, where it freezes as `feather.ir/1` and stops changing. Until then a
 minor Feather release may change it, and the changelog says how. Pin the wheel to an exact release, and upgrade
 the server and the page together (one wheel holds both).

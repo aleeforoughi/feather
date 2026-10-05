@@ -58,7 +58,7 @@ describe("runText", () => {
   it("ends when the dialog is done, without waiting for the input to close", async () => {
     const { input, output, text } = streams()
     const replies: ReplyEvent[] = []
-    const ir = { ir: "feather.ir/0", experience: "x", nodes: [{ type: "Action", id: "a", intent: "save it" }] }
+    const ir = { ir: "feather.ir/1", experience: "x", nodes: [{ type: "Action", id: "a", intent: "save it" }] }
     input.write("1\n") // never ended
     const result = await runText(plan(ir), { input, output, onReply: (r) => void replies.push(r) })
     expect(result.done).toBe(true)
@@ -68,7 +68,7 @@ describe("runText", () => {
 
   it("returns at once for an experience with nothing to act on", async () => {
     const { input, output, text } = streams()
-    const ir = { ir: "feather.ir/0", experience: "x", nodes: [{ type: "Text", id: "t", text: "Hello" }] }
+    const ir = { ir: "feather.ir/1", experience: "x", nodes: [{ type: "Text", id: "t", text: "Hello" }] }
     const result = await runText(plan(ir), { input, output, onReply: () => {} })
     expect(result).toEqual({ done: true, replies: [] })
     expect(text()).toBe("Hello\n")

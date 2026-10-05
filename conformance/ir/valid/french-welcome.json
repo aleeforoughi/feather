@@ -1,7 +1,7 @@
 {
   "description": "Welcome message in French (fr locale).",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "bienvenue",
     "locale": "fr",
     "nodes": [

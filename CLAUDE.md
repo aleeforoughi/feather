@@ -13,9 +13,9 @@ section 12.
 - `packages/react` (`@aleeforoughi/feather-react`): components in `src/components/ui` (stories and tests next
   to them), the `src/index.ts` entry, `styles.css`, and `foundation.json` (generated). Atoms, molecules and
   organisms; an organism renders one IR node and follows the contract in `docs/organisms.md`.
-- `packages/intent` (`@aleeforoughi/feather-intent`): the Experience IR `feather.ir/0`. `src/spec.ts` is the
+- `packages/intent` (`@aleeforoughi/feather-intent`): the Experience IR `feather.ir/1`. `src/spec.ts` is the
   single table of node types; `validate.ts` and `reply.ts` read it; `scripts/generate.ts` writes
-  `schema/feather.ir-0.json` and `docs/ir/nodes.md` from it (run `pnpm --filter @aleeforoughi/feather-intent
+  `schema/feather.ir-1.json` and `docs/ir/nodes.md` from it (run `pnpm --filter @aleeforoughi/feather-intent
   generate` after changing it). `src/types.ts` mirrors it by hand. No dependencies.
 - `conformance/ir`: valid and invalid IR fixtures; every invalid one lists exactly the issues it must produce.
 - `packages/context` (`@aleeforoughi/feather-context`): the render context types (persona, capability, device,

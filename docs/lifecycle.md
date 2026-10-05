@@ -17,7 +17,7 @@ losing the person's place.
 
 ### The experience
 
-Two optional top-level fields (`packages/intent/src/types.ts`, schema `schema/feather.ir-0.json`):
+Two optional top-level fields (`packages/intent/src/types.ts`, schema `schema/feather.ir-1.json`):
 
 | field | meaning |
 |---|---|
@@ -31,10 +31,10 @@ Two optional top-level fields (`packages/intent/src/types.ts`, schema `schema/fe
 
 A resolved experience may have no nodes. It takes no replies: `validateReply` answers `resolved`.
 
-### The update (`feather.update/0`)
+### The update (`feather.update/1`)
 
 ```json
-{ "update": "feather.update/0", "experience": "plan_trip", "revision": 2,
+{ "update": "feather.update/1", "experience": "plan_trip", "revision": 2,
   "ops": [
     { "op": "patch", "id": "work", "set": { "value": 1 } },
     { "op": "add", "node": { "type": "Recommendation", "id": "rec", "intent": "take the recommended flight", "summary": "Direct, 9:40" } },
@@ -53,7 +53,7 @@ A resolved experience may have no nodes. It takes no replies: `validateReply` an
 `applyUpdate(experience, update)` (`packages/intent/src/update.ts`) is pure:
 - it never changes the experience it is given;
 - every op lands, or none does;
-- the result is valid `feather.ir/0`, or the update is refused with every reason.
+- the result is valid `feather.ir/1`, or the update is refused with every reason.
 
 Each issue has a code and a JSON Pointer. Problems in the experience the update would make are under `/result`.
 
@@ -63,7 +63,7 @@ Each issue has a code and a JSON Pointer. Problems in the experience the update 
 | `wrong-experience`, `unsupported-version`, `empty-update`, `unknown-op` | The update itself is wrong. |
 | `unknown-node`, `duplicate-id`, `invalid-value` | An op names a node that is not there, adds an id that is, or patches `id` or `type`. |
 | `already-resolved`, `after-resolve` | An update to an ended experience, or an op after `resolve`. |
-| any `feather.ir/0` code under `/result` | Each op was fine, but what they make together is not valid. |
+| any `feather.ir/1` code under `/result` | Each op was fine, but what they make together is not valid. |
 
 The fixtures are in `conformance/update`. `valid/streamed-trip.json` is the exit scenario of L6: progress, then a
 recommendation and an approval, then done, leaving only the artifact and a one-line summary.

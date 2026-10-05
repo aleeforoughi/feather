@@ -1,7 +1,7 @@
 {
   "description": "Idle status waiting for user action.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "service_waiting",
     "nodes": [
       {"type": "Status", "id": "stat", "state": "idle", "label": "Service ready, waiting for your input"},

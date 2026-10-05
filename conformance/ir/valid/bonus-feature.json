@@ -1,7 +1,7 @@
 {
   "description": "A bonus feature recommendation with alternatives.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "premium_feature_offer",
     "nodes": [
       {"type": "Text", "id": "intro", "text": "Unlock premium features"},

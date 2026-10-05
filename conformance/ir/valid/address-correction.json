@@ -1,7 +1,7 @@
 {
   "description": "Correct a misunderstood address during checkout.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "verify_shipping_address",
     "nodes": [
       {"type": "Text", "id": "context", "text": "We understood your shipping address as:"},

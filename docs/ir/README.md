@@ -1,4 +1,4 @@
-# The Experience IR (`feather.ir/0`)
+# The Experience IR (`feather.ir/1`)
 
 The Experience IR is the one contract between Feather and the systems that use it. A caller says what must
 happen, how much it matters and whether it can be undone. Feather decides how that becomes an interface, for
@@ -14,7 +14,7 @@ pieces fit, and what the validator checks.
 
 ```json
 {
-  "ir": "feather.ir/0",
+  "ir": "feather.ir/1",
   "experience": "approve_campaign",
   "locale": "en",
   "nodes": [
@@ -31,7 +31,7 @@ pieces fit, and what the validator checks.
 }
 ```
 
-- `ir`: the IR version. This Feather reads exactly `feather.ir/0`.
+- `ir`: the IR version. This Feather reads exactly `feather.ir/1`.
 - `experience`: names the interaction. Replies carry the name back.
 - `locale`: optional. The BCP 47 language of the words in it.
 - `nodes`: the interaction, in order of meaning. Order is meaning, not layout: a Recommendation comes before its
@@ -134,7 +134,7 @@ Some rules belong to the composer and are documented here so callers can rely on
 `critical` node is never hidden behind expansion: if it has `expandable` detail, Feather shows that detail
 (composer rule 4).
 
-The structure is also published as a JSON Schema, `@aleeforoughi/feather-intent/schema/feather.ir-0.json`,
+The structure is also published as a JSON Schema, `@aleeforoughi/feather-intent/schema/feather.ir-1.json`,
 for editors and for callers in other languages. The schema checks the shape of every node. It cannot check
 rules that span several nodes or fields, so these codes come only from `validate()`: `duplicate-id`,
 `dangling-reference`, `self-reference`, `wrong-reference-type`, `out-of-order`, `ambiguous-alternative`,
@@ -172,7 +172,7 @@ says what to change. `validate()` never throws, and reports at most 100 issues; 
 | Code | Meaning |
 |---|---|
 | `not-an-object`, `wrong-type`, `missing-field`, `empty-text`, `too-long` | The shape of a value. |
-| `unsupported-version` | `ir` is not `feather.ir/0`. |
+| `unsupported-version` | `ir` is not `feather.ir/1`. |
 | `unknown-node-type`, `unknown-field` | Not part of the IR (with a suggestion for likely typos). |
 | `presentational-field` | Presentation, not meaning. |
 | `invalid-id`, `duplicate-id` | Ids start with a letter and are unique. |
@@ -196,6 +196,6 @@ in every manifestation.
 
 ## Versioning
 
-`feather.ir/0` is the working version. It may still change, and every change is recorded in `CHANGELOG.md`. At
+`feather.ir/1` is the working version. It may still change, and every change is recorded in `CHANGELOG.md`. At
 milestone L7 it freezes as `feather.ir/1`. From then on a version never changes, and a new one is added beside
 it. A Feather reads the versions it names and rejects others with `unsupported-version`, never by guessing.

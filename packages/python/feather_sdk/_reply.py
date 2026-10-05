@@ -84,7 +84,7 @@ def _validate_reply(experience: Any, reply: Any) -> ReplyResult:
         n = len(checked.issues)
         return _fail(
             "invalid-experience",
-            f"The experience is not valid feather.ir/0 ({n} problem{'' if n == 1 else 's'}, first: {checked.issues[0].message}); validate it before taking replies.",
+            f"The experience is not valid feather.ir/1 ({n} problem{'' if n == 1 else 's'}, first: {checked.issues[0].message}); validate it before taking replies.",
         )
     exp = checked.experience
     assert exp is not None

@@ -1,7 +1,7 @@
 {
   "description": "Order status update with delivery tracking and person.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "order_tracking",
     "nodes": [
       {"type": "Text", "id": "order_id", "text": "Order #ORD-2026-001234 - Your package is on its way"},

@@ -1,7 +1,7 @@
 // Updates (milestone L6): an open experience changes in place, op by op, and ends with a resolution:
 // open → update → resolve → collapse. applyUpdate() is pure: it never changes the experience it is given, it lands
-// every op or none, and the experience it returns is valid feather.ir/0, or it reports why not. It never throws.
-import { UPDATE_VERSION, type Experience, type IRNode } from "./types.ts"
+// every op or none, and the experience it returns is valid feather.ir/1, or it reports why not. It never throws.
+import { UPDATE_VERSION, UPDATE_VERSIONS, type Experience, type IRNode } from "./types.ts"
 import { MAX_ISSUES, checkResolution, describe, isObject, quote, seg, unknownField, validate, type Add, type IssueCode } from "./validate.ts"
 
 export type UpdateIssueCode =
@@ -35,7 +35,7 @@ const OP_FIELDS: Record<string, string[]> = {
 
 class Overflow extends Error {}
 
-/** Applies a feather.update/0 to an experience. Returns the new experience, or every reason it cannot. */
+/** Applies a feather.update/1 (or /0) to an experience. Returns the new experience, or every reason it cannot. */
 export function applyUpdate(experience: Experience, update: unknown): UpdateResult {
   const issues: UpdateIssue[] = []
   const add = (code: UpdateIssueCode, path: string, message: string) => {
@@ -57,7 +57,7 @@ export function applyUpdate(experience: Experience, update: unknown): UpdateResu
 function run(experience: Experience, update: unknown, add: (code: UpdateIssueCode, path: string, message: string) => void, issues: readonly UpdateIssue[]): Experience | undefined {
   const checked = validate(experience)
   if (!checked.ok) {
-    add("invalid-experience", "", `The experience is not valid feather.ir/0 (first: ${checked.issues[0].message}); an update applies to a valid experience.`)
+    add("invalid-experience", "", `The experience is not valid feather.ir/1 (first: ${checked.issues[0].message}); an update applies to a valid experience.`)
     return
   }
   if (!isObject(update)) {
@@ -66,8 +66,8 @@ function run(experience: Experience, update: unknown, add: (code: UpdateIssueCod
   }
   for (const key of Object.keys(update)) if (!UPDATE_FIELDS.includes(key)) unknownField(add as Add, seg(key), key, "the update", UPDATE_FIELDS)
   if (update.update === undefined) add("missing-field", "/update", `Say which format this is: "update": "${UPDATE_VERSION}".`)
-  else if (update.update !== UPDATE_VERSION) {
-    add("unsupported-version", "/update", `This Feather reads ${UPDATE_VERSION}; the update is ${quote(update.update)}.`)
+  else if (!(UPDATE_VERSIONS as readonly unknown[]).includes(update.update)) {
+    add("unsupported-version", "/update", `This Feather reads ${UPDATE_VERSION} (and ${UPDATE_VERSIONS.slice(1).join(", ")}, its name before the freeze); the update is ${quote(update.update)}.`)
     return
   }
   if (update.experience !== experience.experience) add("wrong-experience", "/experience", `The update is for ${quote(update.experience)}, not "${experience.experience}".`)

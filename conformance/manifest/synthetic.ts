@@ -4,7 +4,7 @@
 import { validate, type Experience } from "@aleeforoughi/feather-intent"
 import type { Fixture } from "./fixtures.ts"
 
-const ir = (experience: string, nodes: unknown[]): Experience => ({ ir: "feather.ir/0", experience, nodes }) as Experience
+const ir = (experience: string, nodes: unknown[]): Experience => ({ ir: "feather.ir/1", experience, nodes }) as Experience
 
 const SYNTHETIC: Fixture[] = [
   {

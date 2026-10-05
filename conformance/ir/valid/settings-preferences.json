@@ -1,7 +1,7 @@
 {
   "description": "User settings with multiple preference toggles.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "update_preferences",
     "nodes": [
       {"type": "Text", "id": "header", "text": "Customize your experience"},

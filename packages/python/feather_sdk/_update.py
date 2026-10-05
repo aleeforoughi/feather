@@ -56,9 +56,9 @@ Add = Callable[..., None]
 
 
 def apply_update(experience: Any, update: Any) -> UpdateResult:
-    """Applies a `feather.update/0` (a dict) to an experience (a dict). Returns the new experience, or every reason it
+    """Applies a `feather.update/1` (a dict) to an experience (a dict). Returns the new experience, or every reason it
     cannot be applied. Pure: neither argument is changed, and the experience returned shares nothing with them. Every
-    op lands or none does, and the result is valid `feather.ir/0`. Never raises."""
+    op lands or none does, and the result is valid `feather.ir/1`. Never raises."""
     issues: list[UpdateIssue] = []
 
     def add(code: str, path: str, message: str, node: str | None = None) -> None:
@@ -88,7 +88,7 @@ def _run(experience: Any, update: Any, add: Add, issues: list[UpdateIssue]) -> d
         add(
             "invalid-experience",
             "",
-            f"The experience is not valid feather.ir/0 (first: {checked.issues[0].message}); an update applies to a valid experience.",
+            f"The experience is not valid feather.ir/1 (first: {checked.issues[0].message}); an update applies to a valid experience.",
         )
         return None
     if not is_object(update):

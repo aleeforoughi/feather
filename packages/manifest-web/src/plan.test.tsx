@@ -251,7 +251,7 @@ describe("voice and text plans", () => {
 
   it("a summary says the label of a predicted option, not its id", () => {
     const ir = {
-      ir: "feather.ir/0",
+      ir: "feather.ir/1",
       experience: "pick_once",
       nodes: [
         { type: "Choice", id: "c", intent: "pick one", prompt: "Which one?", reversible: false, options: [{ id: "a", label: "Option A" }, { id: "b", label: "Option B" }] },
@@ -277,7 +277,7 @@ describe("an invalid experience", () => {
 
   it("renders nothing and reports the issues", () => {
     const onIssues = vi.fn()
-    const broken = { ir: "feather.ir/0", experience: "x", nodes: [{ type: "Text", id: "a", text: "hi", color: "red" }] }
+    const broken = { ir: "feather.ir/1", experience: "x", nodes: [{ type: "Text", id: "a", text: "hi", color: "red" }] }
     const { container } = render(<FeatherExperience experience={broken} context={phone} onReply={vi.fn()} onIssues={onIssues} />)
     expect(container.innerHTML).toBe("")
     expect(onIssues).toHaveBeenCalledTimes(1)
@@ -326,7 +326,7 @@ describe("what the composer folds together", () => {
 
   it("a prediction beside an irreversible Choice is a note, and nothing is preselected", () => {
     const ir = {
-      ir: "feather.ir/0",
+      ir: "feather.ir/1",
       experience: "pick_once",
       nodes: [
         { type: "Choice", id: "c", intent: "pick one", prompt: "Which one?", reversible: false, options: [{ id: "a", label: "Option A" }, { id: "b", label: "Option B" }] },

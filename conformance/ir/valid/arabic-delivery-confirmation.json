@@ -1,7 +1,7 @@
 {
   "description": "An Arabic-speaking customer approves a cash-on-delivery order; every word is Arabic and the layout will run right to left.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "confirm_cod_order",
     "locale": "ar-AE",
     "nodes": [

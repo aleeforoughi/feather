@@ -1,7 +1,7 @@
 {
   "description": "Setting a budget with input, reference prices, and comparison.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "set_marketing_budget",
     "nodes": [
       {"type": "Text", "id": "intro", "text": "Set your marketing budget for this quarter."},

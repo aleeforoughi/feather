@@ -1,7 +1,7 @@
 {
   "description": "System automatically saved draft with undo option (autopick with 'of').",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "draft_autosave",
     "nodes": [
       {"type": "Choice", "id": "versions", "intent": "select version", "prompt": "Which version do you want to restore?", "options": [

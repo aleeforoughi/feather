@@ -1,7 +1,7 @@
 {
   "description": "Security checklist with multiple action items.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "security_setup",
     "nodes": [
       {"type": "Text", "id": "heading", "text": "Secure your account"},

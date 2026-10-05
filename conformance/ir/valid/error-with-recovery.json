@@ -1,7 +1,7 @@
 {
   "description": "An error state with status, warning, and recovery action.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "payment_failed",
     "nodes": [
       {"type": "Status", "id": "stat", "state": "failed", "label": "Payment processing"},

@@ -1,6 +1,6 @@
 # feather-sdk
 
-Call Feather from Python: build and check Experience IR (`feather.ir/0`), check the replies, and serve the browser
+Call Feather from Python: build and check Experience IR (`feather.ir/1`), check the replies, and serve the browser
 bundle that renders experiences (`static_dir()`). Python 3.11 or later, no dependencies. The full guide is
 [docs/callers.md](../../docs/callers.md).
 

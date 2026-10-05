@@ -10,7 +10,7 @@ const rule = (id: RuleId, fn: () => void) => {
   describe(id, fn)
 }
 
-const doc = (...nodes: unknown[]) => ({ ir: "feather.ir/0", experience: "e", nodes })
+const doc = (...nodes: unknown[]) => ({ ir: "feather.ir/1", experience: "e", nodes })
 function plan(experience: unknown, context: RenderContext = {}): LayoutPlan {
   const result = compose(experience, context)
   if (!result.ok) throw new Error(JSON.stringify(result.issues))
@@ -285,7 +285,7 @@ rule("lifecycle", () => {
     expect(plan(resolved, { capability: { output: { visual: "unavailable" } } }).manifestation).toBe("voice")
   })
   it("collapses with no nodes left, and carries the revision", () => {
-    const p = plan({ ir: "feather.ir/0", experience: "e", revision: 5, resolved: { outcome: "cancelled", summary: "Stopped." }, nodes: [] })
+    const p = plan({ ir: "feather.ir/1", experience: "e", revision: 5, resolved: { outcome: "cancelled", summary: "Stopped." }, nodes: [] })
     expect([p.lifecycle, p.revision]).toEqual(["collapsed", 5])
   })
   it("leaves an open experience open, at revision 0 unless it says", () => {
@@ -394,7 +394,7 @@ rule("defaults", () => {
 
 describe("compose", () => {
   it("refuses an invalid experience and lists why, never throws", () => {
-    const r = compose({ ir: "feather.ir/0", experience: "e", nodes: [{ type: "IrreversibleAction", id: "go", intent: "pay" }] })
+    const r = compose({ ir: "feather.ir/1", experience: "e", nodes: [{ type: "IrreversibleAction", id: "go", intent: "pay" }] })
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.issues.map((i) => i.code)).toEqual(["irreversible-without-consequence"])
     expect(() => compose(null)).not.toThrow()

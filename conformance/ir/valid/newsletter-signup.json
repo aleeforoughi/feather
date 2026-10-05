@@ -1,7 +1,7 @@
 {
   "description": "Newsletter signup with email and frequency preference.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "newsletter_subscription",
     "nodes": [
       {"type": "Text", "id": "intro", "text": "Stay updated with our weekly digest"},

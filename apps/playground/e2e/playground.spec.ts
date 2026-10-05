@@ -264,7 +264,7 @@ test("a stale update from the paste box is refused with its issues, and nothing 
   await page.getByTestId("stream-editor").fill("{ nope")
   await page.getByTestId("stream-apply").click()
   await expect(page.getByTestId("stream-paste-problem")).toContainText("not valid JSON")
-  await page.getByTestId("stream-editor").fill(JSON.stringify({ update: "feather.update/0", experience: "plan_trip", revision: 2, ops: [{ op: "resolve", outcome: "cancelled", summary: "Stopped." }] }))
+  await page.getByTestId("stream-editor").fill(JSON.stringify({ update: "feather.update/1", experience: "plan_trip", revision: 2, ops: [{ op: "resolve", outcome: "cancelled", summary: "Stopped." }] }))
   await page.getByTestId("stream-apply").click()
   await revision(page, 2)
   await expect(page.getByTestId("stream-issues")).toHaveCount(0)

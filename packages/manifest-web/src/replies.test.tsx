@@ -253,7 +253,7 @@ describe("the reply flow", () => {
     const user = userEvent.setup()
     const onReply = vi.fn()
     const ir = {
-      ir: "feather.ir/0",
+      ir: "feather.ir/1",
       experience: "book_venue",
       nodes: [{ type: "Recommendation", id: "rec", intent: "book the venue", summary: "Book the Marina hall.", consequence: { spend: { amount: 1050, currency: "AED" } } }],
     }
@@ -273,7 +273,7 @@ describe("the reply flow", () => {
     const user = userEvent.setup()
     const onReply = vi.fn()
     const ir = {
-      ir: "feather.ir/0",
+      ir: "feather.ir/1",
       experience: "pay_deposit",
       nodes: [
         { type: "Approval", id: "ok", intent: "approve the payment", request: "Pay the venue deposit", consequence: { spend: { amount: 1050, currency: "AED" } } },

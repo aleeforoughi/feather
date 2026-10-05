@@ -29,7 +29,7 @@ What is built so far:
 | Package | What it is |
 |---|---|
 | [`@aleeforoughi/feather-tokens`](packages/tokens) | Token schema `feather-tokens/2`, the theme engine and `feather-brand` CLI, the foundation CSS, the reference themes and fonts. |
-| [`@aleeforoughi/feather-intent`](packages/intent) | The Experience IR `feather.ir/0`: TypeScript types, JSON Schema, `validate()`, `validateReply()` and the `feather-ir` CLI. No dependencies. |
+| [`@aleeforoughi/feather-intent`](packages/intent) | The Experience IR `feather.ir/1`: TypeScript types, JSON Schema, `validate()`, `validateReply()` and the `feather-ir` CLI. No dependencies. |
 | [`@aleeforoughi/feather-context`](packages/context) | Who an experience is rendered for, and where: persona, capability, device and brand types. Types only. |
 | [`@aleeforoughi/feather-liquid`](packages/liquid) | The composer: `compose(experience, context)` gives a layout plan, by named rules, with a trace. Pure and deterministic. |
 | [`@aleeforoughi/feather-manifest-web`](packages/manifest-web) | The web manifestation: `<FeatherExperience>` and `<PlanView>` render a plan with Feather's components, and turn every act into a validated reply. |
@@ -51,13 +51,13 @@ What is built so far:
 
 From Python (Godpip), or from a page without React: see [Calling Feather](docs/callers.md).
 
-Callers describe the interaction as meaning, in `feather.ir/0`, and validate it before sending:
+Callers describe the interaction as meaning, in `feather.ir/1`, and validate it before sending:
 
 ```ts
 import { validate, formatIssues } from "@aleeforoughi/feather-intent"
 
 const result = validate({
-  ir: "feather.ir/0",
+  ir: "feather.ir/1",
   experience: "approve_campaign",
   nodes: [
     { type: "Recommendation", id: "rec", intent: "launch the recommended test", summary: "7 days, purchase objective" },

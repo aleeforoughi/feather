@@ -7,7 +7,7 @@ import fs from "node:fs"
 const load = (name: string) => JSON.parse(fs.readFileSync(fixtureFile(name), "utf8")).ir
 const said = (speech: Speech[]) => speech.map((s) => s.text).join(" ")
 const form = () => ({
-    ir: "feather.ir/0",
+    ir: "feather.ir/1",
     experience: "event",
     nodes: [
       {

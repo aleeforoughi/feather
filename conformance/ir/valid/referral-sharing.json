@@ -1,7 +1,7 @@
 {
   "description": "Share a referral link with friends.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "share_referral",
     "nodes": [
       {"type": "Text", "id": "heading", "text": "Earn rewards by inviting friends!"},

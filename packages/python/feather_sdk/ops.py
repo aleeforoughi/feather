@@ -1,4 +1,4 @@
-"""Builders for the ops of an update (`feather.update/0`), for `feather_sdk.update()`. Like `feather_sdk.nodes`, they
+"""Builders for the ops of an update (`feather.update/1`), for `feather_sdk.update()`. Like `feather_sdk.nodes`, they
 return plain dicts, drop `None`, and validate nothing; `apply_update()` does that.
 
     from feather_sdk import nodes, ops, update

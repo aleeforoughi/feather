@@ -80,7 +80,7 @@ function valuePhrase(ir: IRNode, s: Scenario, turn: Turn, irs: Map<string, IRNod
 export function driveTalk(talker: Talker, plan: LayoutPlan, s: Scenario, style: Style): Result {
   const irs = irNodesOf(plan)
   const ir = irs.get(s.node)!
-  const currencyKnown = currencyOf({ ir: "feather.ir/0", experience: plan.experience, nodes: [...irs.values()] }) !== undefined
+  const currencyKnown = currencyOf({ ir: "feather.ir/1", experience: plan.experience, nodes: [...irs.values()] }) !== undefined
   const replies: ReplyEvent[] = []
   const say = (phrase: string) => void replies.push(...talker.say(phrase))
 

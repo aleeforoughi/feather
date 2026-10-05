@@ -4,11 +4,11 @@ import { applyUpdate, validate, validateReply, type Experience, type ExperienceU
 // L6: open → update → resolve → collapse. A streamed experience, step by step: progress, then a recommendation, then
 // an approval, then done, leaving only a summary and an artifact.
 const open: Experience = {
-  ir: "feather.ir/0",
+  ir: "feather.ir/1",
   experience: "plan_trip",
   nodes: [{ type: "Progress", id: "work", label: "Finding flights", steps: [{ id: "search", label: "Search", state: "active" }, { id: "rank", label: "Rank", state: "pending" }] }],
 }
-const update = (revision: number, ops: unknown[]): ExperienceUpdate => ({ update: "feather.update/0", experience: "plan_trip", revision, ops }) as ExperienceUpdate
+const update = (revision: number, ops: unknown[]): ExperienceUpdate => ({ update: "feather.update/1", experience: "plan_trip", revision, ops }) as ExperienceUpdate
 const apply = (experience: Experience, u: unknown) => {
   const result = applyUpdate(experience, u)
   if (!result.ok) throw new Error(JSON.stringify(result.issues))
@@ -106,7 +106,7 @@ describe("applyUpdate: what it refuses", () => {
     expect(codes(open, update(1, [{ op: "resolve", outcome: "done", summary: "Line one\nline two" }]))).toEqual(["too-long"])
     expect(codes(open, update(1, [{ op: "resolve", outcome: "won", summary: "Done." }]))).toEqual(["invalid-value"])
   })
-  it("a result that is not valid feather.ir/0, reported under /result", () => {
+  it("a result that is not valid feather.ir/1, reported under /result", () => {
     expect(paths(open, update(1, [{ op: "patch", id: "work", set: { value: 2 } }]))).toEqual(["/result/nodes/0/value"])
     expect(codes(open, update(1, [{ op: "remove", id: "work" }]))).toEqual(["empty-experience"])
   })
@@ -118,13 +118,13 @@ describe("applyUpdate: what it refuses", () => {
 })
 
 describe("validate: the resolution", () => {
-  const resolved = (resolution: unknown, nodes: unknown[] = []) => validate({ ir: "feather.ir/0", experience: "x", revision: 2, resolved: resolution, nodes })
+  const resolved = (resolution: unknown, nodes: unknown[] = []) => validate({ ir: "feather.ir/1", experience: "x", revision: 2, resolved: resolution, nodes })
   const issueCodes = (r: ReturnType<typeof validate>) => (r.ok ? [] : r.issues.map((i) => `${i.code} ${i.path}`))
   it("accepts a resolved experience with no nodes", () => {
     expect(resolved({ outcome: "failed", summary: "The card was declined." }).ok).toBe(true)
   })
   it("still needs nodes while open", () => {
-    expect(issueCodes(validate({ ir: "feather.ir/0", experience: "x", nodes: [] }))).toEqual(["empty-experience /nodes"])
+    expect(issueCodes(validate({ ir: "feather.ir/1", experience: "x", nodes: [] }))).toEqual(["empty-experience /nodes"])
   })
   it("checks the outcome, the summary, the artifact and the revision", () => {
     expect(issueCodes(resolved({ outcome: "done", summary: "x".repeat(121) }))).toEqual(["too-long /resolved/summary"])
@@ -132,6 +132,19 @@ describe("validate: the resolution", () => {
     expect(issueCodes(resolved({ outcome: "done", summary: "Done.", artifact: { href: "https://x.y" } }))).toEqual(["missing-field /resolved/artifact/label"])
     expect(issueCodes(resolved({ outcome: "done", summary: "Done.", artifact: { label: "File", kind: "zip" } }))).toEqual(["invalid-value /resolved/artifact/kind"])
     expect(issueCodes(resolved({ outcome: "done", summary: "Done.", note: "x" }))).toEqual(["unknown-field /resolved/note"])
-    expect(issueCodes(validate({ ir: "feather.ir/0", experience: "x", revision: -1, nodes: [{ type: "Text", id: "t", text: "Hi." }] }))).toEqual(["invalid-value /revision"])
+    expect(issueCodes(validate({ ir: "feather.ir/1", experience: "x", revision: -1, nodes: [{ type: "Text", id: "t", text: "Hi." }] }))).toEqual(["invalid-value /revision"])
+  })
+})
+
+describe("the freeze (feather.ir/1)", () => {
+  it("reads feather.ir/0 and feather.update/0 as their earlier names, unchanged", () => {
+    const legacy = { ...open, ir: "feather.ir/0" } as Experience
+    expect(validate(legacy).ok).toBe(true)
+    const e = apply(legacy, { ...update(1, [{ op: "patch", id: "work", set: { value: 0.2 } }]), update: "feather.update/0" })
+    expect(e.ir).toBe("feather.ir/0")
+  })
+  it("refuses a version it does not know", () => {
+    expect(validate({ ...open, ir: "feather.ir/2" }).ok).toBe(false)
+    expect(codes(open, { ...update(1, [{ op: "remove", id: "work" }]), update: "feather.update/2" })).toEqual(["unsupported-version"])
   })
 })

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { MAX_ISSUES, validate, validateReply, type Experience } from "../src/index.ts"
 
-// Regression tests for the adversarial review of feather.ir/0 (bugs B1–B11, drift D1, design X1–X8).
-const doc = (...nodes: unknown[]) => ({ ir: "feather.ir/0", experience: "e", nodes })
+// Regression tests for the adversarial review of feather.ir/1 (bugs B1–B11, drift D1, design X1–X8).
+const doc = (...nodes: unknown[]) => ({ ir: "feather.ir/1", experience: "e", nodes })
 const issues = (input: unknown) => {
   const r = validate(input)
   return r.ok ? [] : r.issues.map((i) => `${i.code} ${i.path}`)
@@ -16,7 +16,7 @@ describe("hostile input (B1–B3)", () => {
   })
   it("rejects fields named after Object.prototype members, nested ones too", () => {
     expect(issues(doc({ ...text, constructor: "x", toString: 5 }))).toEqual(["unknown-field /nodes/0/constructor", "unknown-field /nodes/0/toString"])
-    expect(issues(JSON.parse('{"ir":"feather.ir/0","experience":"e","nodes":[{"type":"Text","id":"t","text":"x","__proto__":{"color":"red"}}]}'))).toEqual(["unknown-field /nodes/0/__proto__"])
+    expect(issues(JSON.parse('{"ir":"feather.ir/1","experience":"e","nodes":[{"type":"Text","id":"t","text":"x","__proto__":{"color":"red"}}]}'))).toEqual(["unknown-field /nodes/0/__proto__"])
     const choice = { type: "Choice", id: "c", intent: "pick", prompt: "?", options: [{ id: "a", label: "A", valueOf: 1 }, { id: "b", label: "B" }] as unknown[] }
     expect(issues(doc(choice))).toEqual(["unknown-field /nodes/0/options/0/valueOf"])
   })
@@ -180,14 +180,14 @@ describe("replies (B10, B11, X7)", () => {
 
 describe("composer review (L3)", () => {
   it("reports an unreadable document instead of throwing", () => {
-    const circular: Record<string, unknown> = { ir: "feather.ir/0", nodes: [] }
+    const circular: Record<string, unknown> = { ir: "feather.ir/1", nodes: [] }
     circular.experience = circular
-    for (const input of [{ ir: "feather.ir/0", experience: 1n, nodes: [] }, circular, Object.defineProperty({ ir: "feather.ir/0", experience: "e" }, "nodes", { get: () => { throw new Error("boom") }, enumerable: true })]) {
+    for (const input of [{ ir: "feather.ir/1", experience: 1n, nodes: [] }, circular, Object.defineProperty({ ir: "feather.ir/1", experience: "e" }, "nodes", { get: () => { throw new Error("boom") }, enumerable: true })]) {
       expect(() => validate(input)).not.toThrow()
       const r = validate(input)
       expect(r.ok).toBe(false)
     }
-    const r = validate(Object.defineProperty({ ir: "feather.ir/0", experience: "e" }, "nodes", { get: () => { throw new Error("boom") }, enumerable: true }))
+    const r = validate(Object.defineProperty({ ir: "feather.ir/1", experience: "e" }, "nodes", { get: () => { throw new Error("boom") }, enumerable: true }))
     expect(r.ok ? [] : r.issues.map((i) => i.code)).toEqual(["unreadable"])
   })
   it("treats an act that states a consequence as irreversible", () => {
@@ -209,7 +209,7 @@ describe("composer review (L3)", () => {
     expect(fastest).toBeLessThan(20)
   })
   it("lets an IrreversibleAction confirm an act made irreversible by its consequence", () => {
-    const r = validate({ ir: "feather.ir/0", experience: "e", nodes: [
+    const r = validate({ ir: "feather.ir/1", experience: "e", nodes: [
       { type: "Approval", id: "ok", intent: "approve", request: "Share your calendar?", consequence: { consent: { to: "Acme", scope: "your calendar" } } },
       { type: "IrreversibleAction", id: "go", intent: "confirm sharing", consequence: { consent: { to: "Acme", scope: "your calendar" } }, confirms: "ok" },
     ] })

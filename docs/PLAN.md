@@ -96,7 +96,7 @@ LayoutPlan = ordered regions → nodes → manifestation hints (density, depth, 
 
 ## 6. Experience IR v0 (the public contract)
 
-The contract Godpip, QOOE and others will emit. Version it from day one (`feather.ir/0`).
+The contract Godpip, QOOE and others will emit. Version it from day one (`feather.ir/1`).
 
 **Content nodes:** `Action`, `Choice`, `Input`, `Price`, `Person`, `Date`, `Location`, `Status`, `Progress`, `Media`, `Confirmation`, `Warning`, `Approval`, `Text`, `Form` (added in 1.15.0). The generated reference is `docs/ir/nodes.md`.
 
@@ -116,7 +116,7 @@ Example: a paid campaign launch.
 
 ```json
 {
-  "ir": "feather.ir/0",
+  "ir": "feather.ir/1",
   "experience": "approve_campaign",
   "nodes": [
     {"type": "Recommendation", "id": "rec", "intent": "launch the recommended test",
@@ -275,6 +275,14 @@ review, and every delegated task names its files and its exit test.
    - The rules are a frame that brand themes live inside. A brand axis selects among compliant value sets.
    - There is one canonical easing curve; the motion axis scales durations only.
    - Default control height is 44px (tight 36, spacious 52).
+
+**Decided 2026-10-05 (L7, with the owner):**
+
+8. The IR is frozen as it is, as `feather.ir/1`, together with `feather.update/1`. No node is added first:
+   Godpip's authority approvals map onto IrreversibleAction and Approval with an exact consequence. `feather.ir/0`
+   is read as its earlier name. What the freeze promises is in `docs/ir/FREEZE.md`.
+9. The packages keep the scope `@aleeforoughi/feather-*`; there is no rename at the freeze. GitHub Packages needs the
+   repo owner's scope. The caller SDK `@feather/client` from section 8 is `@aleeforoughi/feather-client`.
 
 The original questions:
 

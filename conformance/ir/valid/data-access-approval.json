@@ -1,7 +1,7 @@
 {
   "description": "Approval for data access with a consent consequence.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "approve_data_access",
     "nodes": [
       {"type": "Person", "id": "requester", "name": "Analytics Team", "role": "data analyst", "kind": "agent"},

@@ -16,10 +16,10 @@ const fixtures = (dir: string) => {
 }
 
 describe("generated files", () => {
-  it("schema/feather.ir-0.json is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
+  it("schema/feather.ir-1.json is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
     expect(fs.readFileSync(SCHEMA_PATH, "utf8")).toBe(`${JSON.stringify(buildSchema(), null, 2)}\n`)
   })
-  it("schema/feather.update-0.json is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
+  it("schema/feather.update-1.json is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
     expect(fs.readFileSync(UPDATE_SCHEMA_PATH, "utf8")).toBe(`${JSON.stringify(buildUpdateSchema(), null, 2)}\n`)
   })
   it("docs/ir/nodes.md is up to date (pnpm --filter @aleeforoughi/feather-intent generate)", () => {
@@ -60,7 +60,7 @@ describe("the update JSON Schema", () => {
     for (const update of fixture.updates) expect(check(update), JSON.stringify(check.errors)).toBe(true)
   })
   it("rejects what its structure alone rules out", () => {
-    const base = { update: "feather.update/0", experience: "x", revision: 1 }
+    const base = { update: "feather.update/1", experience: "x", revision: 1 }
     expect(check({ ...base, ops: [] })).toBe(false)
     expect(check({ ...base, ops: [{ op: "move", id: "a" }] })).toBe(false)
     expect(check({ ...base, ops: [{ op: "patch", id: "a", set: { type: "Text" } }] })).toBe(false)

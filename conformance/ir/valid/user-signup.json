@@ -1,7 +1,7 @@
 {
   "description": "A signup form collecting email and phone with confirmation.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "user_signup",
     "nodes": [
       {"type": "Text", "id": "welcome", "text": "Create your account in two steps."},

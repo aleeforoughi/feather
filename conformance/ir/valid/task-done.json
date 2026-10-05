@@ -1,7 +1,7 @@
 {
   "description": "A completed task status.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "task_completed",
     "nodes": [
       {"type": "Status", "id": "stat", "state": "done", "label": "Export completed"},

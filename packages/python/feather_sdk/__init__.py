@@ -1,5 +1,5 @@
-"""feather-sdk: call Feather from Python. Build and check Experience IR (feather.ir/0), check replies, change an open
-experience with updates (feather.update/0, apply_update()), and serve the browser bundle that renders experiences
+"""feather-sdk: call Feather from Python. Build and check Experience IR (feather.ir/1), check replies, change an open
+experience with updates (feather.update/1, apply_update()), and serve the browser bundle that renders experiences
 (static_dir()). No dependencies.
 
     from feather_sdk import experience, nodes, validate

@@ -1,7 +1,7 @@
 {
   "description": "A help article with expandable details (detail only, no why).",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "help_password_reset",
     "nodes": [
       {"type": "Text", "id": "title", "text": "How to reset your password"},

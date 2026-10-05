@@ -1,7 +1,7 @@
 {
   "description": "Age verification with date input.",
   "ir": {
-    "ir": "feather.ir/0",
+    "ir": "feather.ir/1",
     "experience": "verify_age",
     "nodes": [
       {"type": "Text", "id": "msg", "text": "Please verify your age to continue."},

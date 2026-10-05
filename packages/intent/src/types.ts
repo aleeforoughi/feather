@@ -1,10 +1,12 @@
-// The Experience IR, feather.ir/0: what a caller asks Feather to render.
+// The Experience IR, feather.ir/1 (frozen; docs/ir/FREEZE.md): what a caller asks Feather to render.
 //
 // A caller describes meaning: what must happen, how much it matters, whether it can be undone. It never names a
 // component, a color or a position (principle 1); Feather decides how each node manifests for this person, on this
 // device. These types mirror src/spec.ts, which the validator, the JSON Schema and the reference docs are built from.
 
-export const IR_VERSION = "feather.ir/0"
+export const IR_VERSION = "feather.ir/1"
+/** Every IR version this Feather reads. feather.ir/0 is the same contract under its pre-freeze name; it is read as is. */
+export const IR_VERSIONS = ["feather.ir/1", "feather.ir/0"] as const
 
 /** How much a node matters. `critical` is never hidden behind expansion. */
 export type Importance = "low" | "normal" | "high" | "critical"
@@ -381,7 +383,7 @@ export type NodeType = IRNode["type"]
 
 /** One experience: the next necessary interaction, as meaning. */
 export interface Experience {
-  ir: typeof IR_VERSION
+  ir: (typeof IR_VERSIONS)[number]
   /** Names the experience; replies carry it back. */
   experience: string
   /** BCP 47 language of the words in it ("en", "ar-AE"). */
@@ -412,11 +414,13 @@ export interface Artifact {
   kind?: "document" | "image" | "video" | "audio" | "link" | "data"
 }
 
-export const UPDATE_VERSION = "feather.update/0"
+export const UPDATE_VERSION = "feather.update/1"
+/** Every update version this Feather reads; feather.update/0 is read as is. */
+export const UPDATE_VERSIONS = ["feather.update/1", "feather.update/0"] as const
 
 /** One change to an open experience (L6). Applied with applyUpdate(); every op in it lands, or none does. */
 export interface ExperienceUpdate {
-  update: typeof UPDATE_VERSION
+  update: (typeof UPDATE_VERSIONS)[number]
   /** The experience it changes. */
   experience: string
   /** The experience's revision once this update is applied: exactly one more than before. */
