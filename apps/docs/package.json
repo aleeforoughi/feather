@@ -1,0 +1,35 @@
+{
+  "name": "@feather-apps/docs",
+  "private": true,
+  "version": "1.17.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@aleeforoughi/feather-context": "workspace:*",
+    "@aleeforoughi/feather-intent": "workspace:*",
+    "@aleeforoughi/feather-liquid": "workspace:*",
+    "@aleeforoughi/feather-manifest-web": "workspace:*",
+    "@aleeforoughi/feather-react": "workspace:*",
+    "@aleeforoughi/feather-tokens": "workspace:*",
+    "lucide-react": "^1.49.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "axe-core": "4.13.0",
+    "marked": "18.0.14",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.1"
+  }
+}
