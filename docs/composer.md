@@ -84,7 +84,7 @@ and a Warning `high` unless they say otherwise.
 | `explanation-depth` (7.7) | `expanded` on nodes with detail: brief closes it, detailed opens it. |
 | `reduced-motion` (7.8) | `plan.motion` is `reduced` when the OS or the person asks, over any brand motion. |
 | `text-without-decision` (7.9) | `plan.chrome` is `none` (plain text, no card) for a single Text, Confirmation or Status with no expandable detail, at most 120 code points and one line. |
-| `contrast` (7.10) | `plan.contrast` is `AAA` where vision is low, otherwise `AA`. |
+| `contrast` (7.10) | `plan.contrast` is `AAA` where vision is low, otherwise `AA`. The theme delivers it: its AAA block raises every text color to 7:1 under `data-contrast="AAA"`, and the a11y suite checks each AAA story with axe's enhanced contrast rule. |
 | `importance` | High importance gives emphasis `high`, low gives `quiet`. A group of alternatives stands out as much as its strongest member. |
 | `structure` | A PredictedChoice merges into its reversible Choice (organism `PredictedChoice`), composed as a plan node. A Tradeoff attaches to the option it describes, and the requester attaches to every Approval it asks for. |
 | `autonomy` (L5) | `ask`: a reversible prediction shows as a `PredictionNote` and nothing is preselected (the caller's own selection stays), and secondary nodes stay in view. `delegate`: each secondary node gets `collapsed: true`. At the person's level (explicit or learned). Never folds a critical node, nor anything beside an irreversible primary act (both at safety level), and never changes an irreversible Choice. |
@@ -153,7 +153,8 @@ The web manifestation renders a plan with Feather's organisms and atoms. It must
   - `density` sets the theme's spacing for the experience.
   - `minTarget` 44 makes every control at least 44 px.
   - `motion` `reduced` makes every organism move as if the OS asked for reduced motion.
-  - `contrast` is exposed as `data-contrast`, a hint until themes can promise AAA (L5).
+  - `contrast` is set as `data-contrast` on the experience's root. Every theme ships an AAA block under
+    `[data-contrast="AAA"]` (see `docs/visual-system.md` section 5), so a low-vision plan gets 7:1 text.
   - `expanded` opens or closes "Why?" at first render.
   - `confirm` chooses the confirm mode of whatever commits. An Approval or Recommendation with `confirm` arms
     first, like an IrreversibleAction. An act with no `confirm` never commits by itself.

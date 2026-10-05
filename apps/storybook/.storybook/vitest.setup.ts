@@ -55,6 +55,14 @@ setProjectAnnotations([
       config.rules = [...(config.rules ?? []), ...rules.map((id) => ({ id, enabled: false }))]
     },
     async afterEach(context: Context) {
+      // A plan that asks for AAA contrast (low vision, composer rule 10) must get it: the theme's AAA block is checked
+      // with axe's enhanced contrast rule (WCAG 1.4.6, 7:1) wherever a story renders one.
+      const aaa = Array.from(document.querySelectorAll('[data-contrast="AAA"]'))
+      if (aaa.length > 0) {
+        const enhanced = await axe.run(aaa, { runOnly: { type: "rule", values: ["color-contrast-enhanced"] } })
+        const failures = enhanced.violations.flatMap((v) => v.nodes.map((n) => `${n.target.join(" ")}: ${n.failureSummary?.split("\n").slice(1).join(" ")}`))
+        if (failures.length > 0) throw new Error(`${context.id} asks for AAA contrast but misses 7:1 in ${theme}:\n${failures.join("\n")}`)
+      }
       const rules = debt[context.id]
       if (!rules) return
       // The main check disables these rules through axe's global configuration, which this shared axe instance

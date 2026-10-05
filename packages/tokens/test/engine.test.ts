@@ -3,6 +3,7 @@ import path from "node:path"
 import { describe, expect, it } from "vitest"
 import type { BrandTokens } from "../src/index.mjs"
 import {
+  AAA_FLOORS,
   CONTRAST_FLOORS,
   DENSITIES,
   DESTRUCTIVE_TINTS,
@@ -395,6 +396,49 @@ describe("emphasis", () => {
       const built = buildTheme({ ...paper(), colors: { ...paper().colors, destructive: "#e5484d" } })
       expect(built.ok).toBe(false)
       if (!built.ok) expect(built.problems.join("\n")).toMatch(/colors\.destructive reaches \d\.\d\d:1.*--destructive needs 4\.5:1/)
+    })
+  })
+
+  describe("AAA contrast (composer rule 10: low vision)", () => {
+    const pct = (value: string) => Number(/ (\d+)%,/.exec(value)?.[1])
+    const aaa = (tokens: BrandTokens) => {
+      const built = build(tokens)
+      const base = declarations(built.css)
+      const block = declarations(built.css, ':root:root[data-contrast="AAA"]')
+      const vars = { ...base, ...block }
+      return { base, block, vars, hex: (name: string) => resolve(vars, name) }
+    }
+    const allThemes: [string, () => BrandTokens][] = [...references, ["feather", () => json("../themes/feather.json").tokens], ["feather-dark", () => json("../themes/feather-dark.json").tokens]]
+
+    it.each(allThemes)("%s: under data-contrast=AAA every text color reaches 7:1", (_name, tokens) => {
+      const { vars, hex } = aaa(tokens())
+      const on = [hex("--background"), hex("--card")]
+      for (const name of ["--text-primary", "--text-secondary", "--text-tertiary", "--muted-foreground", "--primary", "--destructive"]) {
+        for (const surface of on) expect(contrastRatio(hex(name), surface), name).toBeGreaterThanOrEqual(AAA_FLOORS.text)
+      }
+      expect(contrastRatio(hex("--primary"), hex("--primary-foreground"))).toBeGreaterThanOrEqual(AAA_FLOORS.text)
+      const red = hex("--destructive")
+      for (const surface of on) {
+        for (const tint of ["--destructive-muted", "--destructive-muted-hover"]) expect(contrastRatio(red, oklabMix(red, surface, pct(vars[tint]))), tint).toBeGreaterThanOrEqual(AAA_FLOORS.text)
+      }
+    })
+
+    it("changes only what misses AAA, and redeclares every alias of what it changes", () => {
+      const { base, block } = aaa(paper())
+      for (const [k, v] of Object.entries(block)) if (!String(v).startsWith("var(") && !String(v).startsWith("color-mix(")) expect(v, k).not.toBe(base[k])
+      expect(block["--muted-foreground"]).toBe("var(--text-secondary)")
+      expect(block["--destructive-muted"]).toContain("var(--destructive)")
+      // feather's primary is its text, already far past 7:1: it is left alone.
+      expect(aaa(json("../themes/feather.json").tokens).block["--primary"]).toBeUndefined()
+    })
+
+    it("moves a color only as far toward the text as it must: one percent less would miss", () => {
+      const { base, block } = aaa(paper())
+      const text = base["--text-primary"]
+      const on = [base["--background"], base["--card"]]
+      // The secondary text is the lightest mix of text into the background that reaches 7:1.
+      expect(Math.min(...on.map((s) => contrastRatio(block["--text-secondary"], s) as number))).toBeLessThan(AAA_FLOORS.text + 0.35)
+      expect(text).not.toBe(block["--text-secondary"])
     })
   })
 

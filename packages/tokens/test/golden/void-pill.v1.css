@@ -193,3 +193,15 @@
   --gap-label: 0.5rem;
   --gap-field: 1.25rem;
 }
+
+/* Contrast: a plan that asks for AAA (low vision) sets data-contrast="AAA" on its root. */
+[data-contrast="AAA"],
+:root:root[data-contrast="AAA"] {
+  --text-secondary: #a3a29e;
+  --text-tertiary: #a3a29e;
+  --destructive: #ffab9f;
+  --muted-foreground: var(--text-secondary);
+  --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+  --destructive-muted-hover: color-mix(in oklab, var(--destructive) 20%, var(--card));
+  --ring-danger: var(--destructive);
+}

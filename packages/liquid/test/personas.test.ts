@@ -22,7 +22,8 @@ const find = (p: LayoutPlan, id: string) => p.regions.flatMap((r) => r.nodes.fla
 /** The acts a person sees without opening anything: every act node outside a folded one. */
 const actsInView = (p: LayoutPlan) =>
   p.regions.flatMap((r) => r.nodes.filter((n) => !n.collapsed).flatMap(deep)).filter((n) => n.node !== undefined && specFor(n.node.type)?.act === true).length
-const decisions = ({ trace: _trace, ...rest }: LayoutPlan) => rest
+/** The plan without its trace: what was decided, not how it was explained. */
+const decisions = (p: LayoutPlan) => JSON.stringify({ ...p, trace: undefined })
 
 describe("reference personas", () => {
   it("defines five", () => expect(Object.keys(REFERENCE_PERSONAS)).toHaveLength(5))
@@ -93,7 +94,7 @@ describe("reference capability profiles", () => {
 
 describe("every reference slice changes the plan", () => {
   const fixtures = ["flight-search-tradeoff.json", "predicted-news-topic.json", "help-article.json", "delete-account.json"]
-  const changes = (context: RenderContext) => fixtures.some((f) => JSON.stringify(decisions(plan(f, context))) !== JSON.stringify(decisions(plan(f, desk))))
+  const changes = (context: RenderContext) => fixtures.some((f) => decisions(plan(f, context)) !== decisions(plan(f, desk)))
   it.each(Object.keys(REFERENCE_PERSONAS) as Array<keyof typeof REFERENCE_PERSONAS>)("persona %s", (name) => expect(changes(withPersona(name))).toBe(true))
   it.each(Object.keys(REFERENCE_CAPABILITIES) as Array<keyof typeof REFERENCE_CAPABILITIES>)("capability %s", (name) => expect(changes(withCapability(name))).toBe(true))
 })

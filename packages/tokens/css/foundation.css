@@ -277,6 +277,27 @@
     --brand-font-body: "JetBrains Mono Variable", monospace;
     --brand-font-display: "JetBrains Mono Variable", monospace;
 }
+
+[data-contrast="AAA"] {
+    --text-secondary: #545456;
+    --text-tertiary: #545456;
+    --destructive: #692620;
+    --muted-foreground: var(--text-secondary);
+    --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+    --destructive-muted-hover: color-mix(in oklab, var(--destructive) 20%, var(--card));
+    --ring-danger: var(--destructive);
+}
+
+.dark [data-contrast="AAA"],
+.dark[data-contrast="AAA"] {
+    --text-secondary: #a3a3a5;
+    --text-tertiary: #a3a3a5;
+    --destructive: #fdafa7;
+    --muted-foreground: var(--text-secondary);
+    --destructive-muted: color-mix(in oklab, var(--destructive) 12%, var(--card));
+    --destructive-muted-hover: color-mix(in oklab, var(--destructive) 20%, var(--card));
+    --ring-danger: var(--destructive);
+}
 /* default-theme:end */
 
 /* Density defaults (section 3): "default" (the brand axis "comfortable"). feather-brand writes the brand's own at

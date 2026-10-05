@@ -283,6 +283,17 @@ A red that misses the floor at rest is refused. A red that holds it at rest but 
 instead: rich-brand's `#B91C1C` reaches 4.49:1 at 20% on `#FAF7F2`, so it hovers at 19%. The floor is
 `CONTRAST_FLOORS.destructive`; the percentages are `DESTRUCTIVE_TINTS` in `packages/tokens/src/engine.mjs`.
 
+**AAA contrast** (composer rule 10). A plan for low vision sets `data-contrast="AAA"` on the experience's root, and
+every theme ships a block for it (`AAA_FLOORS` in the engine; generated into `foundation.css` for the default theme):
+
+- secondary and tertiary text become one level, the lightest mix of text into the background that reaches 7:1;
+- the destructive red and the primary each move toward the brand's text by the smallest whole percentage that
+  reaches 7:1 where they are text: on `--background` and `--card`, the red also on both of its tints, the primary
+  also under its own label;
+- a color that already reaches 7:1 is left alone, and every alias of a changed variable is redeclared in the block.
+
+The a11y suite runs axe's `color-contrast-enhanced` rule on every story that renders an AAA plan.
+
 ## 6. Surfaces
 
 The surface tokens are:
