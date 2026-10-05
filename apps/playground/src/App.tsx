@@ -1,11 +1,13 @@
 import * as React from "react"
 import type { ReplyEvent } from "@aleeforoughi/feather-intent"
 import { compose, type LayoutPlan } from "@aleeforoughi/feather-liquid"
-import { Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, Textarea } from "@aleeforoughi/feather-react"
+import { Label, Tabs, TabsContent, TabsList, TabsTrigger, Textarea } from "@aleeforoughi/feather-react"
 import { Body } from "./bodies"
 import { composeText, RUNS, type Problem } from "./compose"
 import { FOUR_CONTEXTS, PRESET_CONTEXTS } from "./contexts"
 import { Choice, ContextControls, DEFAULT_CONTROLS, toContext, type Controls } from "./controls"
+import { PersonView } from "./person"
+import { Trace } from "./trace"
 import { applyTheme, THEME_NAMES, type ThemeName } from "./theme"
 
 // Every valid conformance fixture, by file name.
@@ -26,48 +28,6 @@ function Issues({ problems }: { problems: Problem[] }) {
         ))}
       </ul>
     </div>
-  )
-}
-
-function Trace({ plan }: { plan: LayoutPlan }) {
-  const show = (v: unknown) => (typeof v === "string" ? v : JSON.stringify(v))
-  return (
-    <Table data-testid="trace">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Rule</TableHead>
-          <TableHead>Level</TableHead>
-          <TableHead>Subject</TableHead>
-          <TableHead>Value</TableHead>
-          <TableHead>Because</TableHead>
-          <TableHead>Overrode</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {plan.trace.map((t, i) => (
-          <TableRow key={i}>
-            <TableCell className="font-mono type-caption">{t.rule}</TableCell>
-            <TableCell>{t.level}</TableCell>
-            <TableCell className="font-mono type-caption">{t.subject}</TableCell>
-            <TableCell className="font-mono type-caption">{show(t.value)}</TableCell>
-            <TableCell className="whitespace-normal">{t.because}</TableCell>
-            <TableCell className="whitespace-normal">
-              {t.overrode?.length ? (
-                <ul>
-                  {t.overrode.map((o, j) => (
-                    <li key={j}>
-                      <span className="font-mono type-caption">{o.rule}</span> = {show(o.value)}: {o.because}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                "-"
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
   )
 }
 
@@ -144,6 +104,7 @@ export default function App() {
             <TabsList className="h-auto flex-wrap">
               <TabsTrigger value="rendered">Rendered</TabsTrigger>
               <TabsTrigger value="contexts">Four contexts</TabsTrigger>
+              <TabsTrigger value="person">By person</TabsTrigger>
               <TabsTrigger value="plan">Plan</TabsTrigger>
               <TabsTrigger value="trace">Trace</TabsTrigger>
             </TabsList>
@@ -177,6 +138,10 @@ export default function App() {
               ) : (
                 <p className="type-body-sm text-fg-secondary">Nothing to render until the IR is valid.</p>
               )}
+              <LastReply reply={reply} />
+            </TabsContent>
+            <TabsContent value="person" className="pt-3">
+              {composed.ok ? <PersonView experience={composed.experience} onReply={onReply} /> : <p className="type-body-sm text-fg-secondary">Nothing to render until the IR is valid.</p>}
               <LastReply reply={reply} />
             </TabsContent>
             <TabsContent value="plan" className="pt-3">
