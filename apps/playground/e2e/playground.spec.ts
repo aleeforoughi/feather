@@ -188,3 +188,130 @@ test("by person: nothing about the chosen person is stored or put in the URL", a
   expect(stored).not.toMatch(/deliberate|low-vision|persona|capab/i)
   expect(new URL(page.url()).search + new URL(page.url()).hash).toBe("")
 })
+
+// L6: an experience over time (docs/lifecycle.md). The playground is the caller; the Stream view plays
+// conformance/update/valid/streamed-trip.json.
+const SUMMARY = "Booked: direct flight, 9:40, 1,240 AED."
+const APPROVE = '{"experience":"plan_trip","node":"ok","act":"approve"}'
+
+async function streamView(page: Page) {
+  await page.getByRole("tab", { name: "Stream" }).click()
+  await expect(page.getByTestId("stream-revision")).toHaveAttribute("data-revision", "0")
+  return page.getByTestId("stream-rendered")
+}
+const next = (page: Page) => page.getByTestId("stream-next").click()
+const revision = (page: Page, n: number) => expect(page.getByTestId("stream-revision")).toHaveAttribute("data-revision", String(n))
+
+test("L6 exit: a streamed experience runs end to end and leaves only the artifact and a one-line summary", async ({ page }) => {
+  const view = await streamView(page)
+  await expect(view).toContainText("Finding flights")
+  await expect(page.getByTestId("stream-last-update")).toHaveText("none yet")
+
+  await next(page)
+  await revision(page, 1)
+  await expect(view.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50")
+  await expect(page.getByTestId("stream-last-update")).toContainText('"revision": 1')
+
+  await next(page)
+  await revision(page, 2)
+  await expect(view).toContainText("Direct, 9:40, 1,240 AED")
+  await expect(view.getByRole("button", { name: /^Approve/ })).toBeVisible()
+
+  // The person approves in the body; the reply reaches the log. The caller then goes on.
+  await view.getByRole("button", { name: /^Approve/ }).click()
+  // Spending money is armed first and committed by a second, deliberate act: nothing is sent yet.
+  await expect(page.getByTestId("last-reply")).toHaveText("none yet")
+  await view.getByRole("button", { name: /^Yes/ }).click()
+  await expect(page.getByTestId("last-reply")).toHaveText(APPROVE)
+  await expect(page.getByTestId("last-reply")).toHaveAttribute("data-body", "web")
+
+  await next(page)
+  await revision(page, 3)
+  await expect(view.locator('[data-slot="experience-resolution-summary"]')).toHaveText(SUMMARY)
+  await expect(view.getByRole("link", { name: "Booking confirmation" })).toHaveAttribute("href", "https://example.com/booking/42")
+  await expect(view.getByRole("button")).toHaveCount(0)
+  await expect(view.getByRole("progressbar")).toHaveCount(0)
+  await expect(page.getByTestId("stream-next")).toBeDisabled()
+  await expect(page.getByTestId("last-reply")).toHaveText(APPROVE) // still the one reply
+
+  // Restart begins again from the first experience.
+  await page.getByTestId("stream-restart").click()
+  await revision(page, 0)
+  await expect(view).toContainText("Finding flights")
+})
+
+test("the stream can go on without approving: the caller decides", async ({ page }) => {
+  const view = await streamView(page)
+  await next(page)
+  await next(page)
+  await expect(view.getByRole("button", { name: /^Approve/ })).toBeVisible()
+  await next(page)
+  await expect(view).toContainText(SUMMARY)
+  await expect(page.getByTestId("last-reply")).toHaveText("none yet")
+})
+
+test("a stale update from the paste box is refused with its issues, and nothing changes", async ({ page }) => {
+  const view = await streamView(page)
+  await next(page)
+  await revision(page, 1)
+  // The editor starts with the revision 1 update, which is now stale.
+  await page.getByTestId("stream-apply").click()
+  await expect(page.getByTestId("stream-issues")).toContainText("stale-revision")
+  await revision(page, 1)
+  await expect(view.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50")
+
+  // A broken paste says so, and a good one (the next revision) is applied.
+  await page.getByTestId("stream-editor").fill("{ nope")
+  await page.getByTestId("stream-apply").click()
+  await expect(page.getByTestId("stream-paste-problem")).toContainText("not valid JSON")
+  await page.getByTestId("stream-editor").fill(JSON.stringify({ update: "feather.update/0", experience: "plan_trip", revision: 2, ops: [{ op: "resolve", outcome: "cancelled", summary: "Stopped." }] }))
+  await page.getByTestId("stream-apply").click()
+  await revision(page, 2)
+  await expect(page.getByTestId("stream-issues")).toHaveCount(0)
+  await expect(view).toContainText("Stopped.")
+})
+
+test("auto-play never starts by itself, and waits at the approval", async ({ page }) => {
+  await streamView(page)
+  await page.waitForTimeout(2600)
+  await revision(page, 0)
+  await page.getByTestId("stream-play").click()
+  await expect(page.getByTestId("stream-play")).toHaveText("Pause")
+  await revision(page, 2)
+  await expect(page.getByTestId("stream-play")).toHaveText("Play")
+  await page.waitForTimeout(2600)
+  await revision(page, 2)
+})
+
+test("with reduced motion there is no auto-play", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" })
+  await streamView(page)
+  await expect(page.getByTestId("stream-play")).toHaveCount(0)
+  await next(page)
+  await revision(page, 1)
+})
+
+test("voice body: the same stream is spoken to the same summary", async ({ page }) => {
+  await streamView(page)
+  await choose(page, "Body", "voice")
+  const log = page.getByTestId("stream-rendered").getByRole("log", { name: "Transcript" })
+  await next(page)
+  await next(page)
+  await next(page)
+  await revision(page, 3)
+  await expect(log).toContainText(SUMMARY)
+})
+
+test("text body: the same stream reaches the same summary", async ({ page }) => {
+  await streamView(page)
+  await choose(page, "Body", "text")
+  const log = page.getByTestId("stream-rendered").getByRole("log", { name: "Conversation" })
+  await expect(log).toContainText("Finding flights")
+  await next(page)
+  await next(page)
+  await expect(log).toContainText("approve the booking")
+  await next(page)
+  await revision(page, 3)
+  await expect(log).toContainText(SUMMARY)
+  await expect(log).toContainText("Booking confirmation: https://example.com/booking/42")
+})

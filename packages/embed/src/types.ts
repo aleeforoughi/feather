@@ -1,5 +1,5 @@
 import type { RenderContext } from "@aleeforoughi/feather-context"
-import type { Issue, ReplyEvent } from "@aleeforoughi/feather-intent"
+import type { Issue, ReplyEvent, UpdateIssue, UpdateResult } from "@aleeforoughi/feather-intent"
 import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 
 /** A reference theme by name, or a brand's `feather-tokens/2` tokens. */
@@ -13,7 +13,7 @@ export interface MountOptions {
   /** Receives the validated reply `{ experience, node, act, value? }` each time the person acts. */
   onReply?: (reply: ReplyEvent) => void
   /** Called with the validator's issues when the IR is invalid. Nothing is rendered then. */
-  onIssues?: (issues: Issue[]) => void
+  onIssues?: (issues: Array<Issue | UpdateIssue>) => void
   /** Move focus to the experience's focus node when it appears (default false: an embed never takes focus from the page). */
   autoFocus?: boolean
   /** Where the stylesheet is: a URL, or `false` when the page links `feather-embed.css` itself. Default: next to the script. */
@@ -23,6 +23,12 @@ export interface MountOptions {
 export interface FeatherView {
   /** Renders a new experience (and optionally a new context) in place of the current one. */
   update(experience: unknown, context?: RenderContext): void
+  /**
+   * Applies a `feather.update/0` to the experience being shown (`applyUpdate`, docs/lifecycle.md). On success the new
+   * experience is rendered in place, as `update(experience)` does, and the result carries it. On refusal (for example
+   * `stale-revision`) `onIssues` gets the issues, what is shown stays, and the result says why.
+   */
+  apply(update: unknown): UpdateResult
   /** Removes everything this view added to the page. Safe to call twice. */
   unmount(): void
   /** The element Feather renders in (a `.feather-root` inside the host element). */

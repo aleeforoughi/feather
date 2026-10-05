@@ -4,6 +4,7 @@ import { validate, validateReply } from "@aleeforoughi/feather-intent"
 import { FeatherExperience } from "@aleeforoughi/feather-manifest-web"
 import { FeatherPortalProvider, TooltipProvider } from "@aleeforoughi/feather-react"
 import { acquireThemeStyle, releaseThemeStyle, resolveTheme, type ResolvedTheme } from "./theme.ts"
+import { applyToCurrent } from "./apply.ts"
 import type { FeatherView, MountOptions } from "./types.ts"
 
 export { validate, validateReply }
@@ -128,6 +129,19 @@ export function mount(element: HTMLElement, experience: unknown, options: MountO
       current = next
       if (nextContext !== undefined) context = nextContext
       void ready.then(render)
+    },
+    apply(update) {
+      if (!live) {
+        const issues = [{ code: "invalid-experience" as const, path: "", message: "This view was unmounted; there is nothing to apply the update to." }]
+        options.onIssues?.(issues)
+        return { ok: false, issues }
+      }
+      const step = applyToCurrent(current, update, options.onIssues)
+      if (step.result.ok) {
+        current = step.current
+        void ready.then(render)
+      }
+      return step.result
     },
     unmount() {
       if (!live) return

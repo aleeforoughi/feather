@@ -7,6 +7,7 @@ import { composeText, RUNS, type Problem } from "./compose"
 import { FOUR_CONTEXTS, PRESET_CONTEXTS } from "./contexts"
 import { Choice, ContextControls, DEFAULT_CONTROLS, toContext, type Controls } from "./controls"
 import { PersonView } from "./person"
+import { StreamView } from "./stream"
 import { Trace } from "./trace"
 import { applyTheme, THEME_NAMES, type ThemeName } from "./theme"
 
@@ -105,6 +106,7 @@ export default function App() {
               <TabsTrigger value="rendered">Rendered</TabsTrigger>
               <TabsTrigger value="contexts">Four contexts</TabsTrigger>
               <TabsTrigger value="person">By person</TabsTrigger>
+              <TabsTrigger value="stream">Stream</TabsTrigger>
               <TabsTrigger value="plan">Plan</TabsTrigger>
               <TabsTrigger value="trace">Trace</TabsTrigger>
             </TabsList>
@@ -142,6 +144,10 @@ export default function App() {
             </TabsContent>
             <TabsContent value="person" className="pt-3">
               {composed.ok ? <PersonView experience={composed.experience} onReply={onReply} /> : <p className="type-body-sm text-fg-secondary">Nothing to render until the IR is valid.</p>}
+              <LastReply reply={reply} />
+            </TabsContent>
+            <TabsContent value="stream" className="pt-3">
+              <StreamView onReply={onReply} />
               <LastReply reply={reply} />
             </TabsContent>
             <TabsContent value="plan" className="pt-3">

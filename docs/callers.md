@@ -93,6 +93,19 @@ to itself) on the first mount.
 </script>
 ```
 
+An experience can change while the work behind it moves ([lifecycle](lifecycle.md)). Send small updates to `apply()`:
+it applies each `feather.update/0` to what is shown and renders the result in place, keeping the person's place.
+
+```js
+const result = view.apply({
+  update: "feather.update/0", experience: "plan_trip", revision: 1,
+  ops: [{ op: "patch", id: "work", set: { value: 0.5 } }],
+})
+if (!result.ok) console.warn(result.issues)   // also passed to onIssues; what is shown stays
+// result.experience is the new experience. A "resolve" op collapses the view to its summary and artifact.
+// A "stale-revision" issue means the page and the caller have drifted: send the whole experience with view.update().
+```
+
 | `mount` option | |
 |---|---|
 | `context` | Who the experience is for, and where (below). |

@@ -17,7 +17,7 @@ export interface BodyProps {
   onReply: (reply: ReplyEvent, body: string) => void
 }
 
-const LOG = "max-h-96 min-h-24 overflow-auto rounded-card border border-line-secondary bg-muted inset-utility type-body-sm text-fg-primary"
+export const LOG = "max-h-96 min-h-24 overflow-auto rounded-card border border-line-secondary bg-muted inset-utility type-body-sm text-fg-primary"
 
 /** Derived state that starts over when the plan does, without an effect. */
 function useSession<T>(plan: LayoutPlan, experience: Experience, make: () => T): T {
@@ -30,7 +30,7 @@ function useSession<T>(plan: LayoutPlan, experience: Experience, make: () => T):
   return session.value
 }
 
-function Line({ id, label, hint, value, onChange, onSubmit }: { id: string; label: string; hint?: string; value: string; onChange: (v: string) => void; onSubmit: () => void }) {
+export function Line({ id, label, hint, value, onChange, onSubmit }: { id: string; label: string; hint?: string; value: string; onChange: (v: string) => void; onSubmit: () => void }) {
   return (
     <form
       className="flex flex-col gap-label"

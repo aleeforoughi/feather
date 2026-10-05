@@ -8,6 +8,7 @@ import { expect, test, type Page } from "@playwright/test"
 const fixture = (name: string) => JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "../../../conformance/ir/valid", `${name}.json`), "utf8")).ir
 const AD = fixture("ad-campaign-launch")
 const NEWS = fixture("news-article")
+const STREAM = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "../../../conformance/update/valid/streamed-trip.json"), "utf8"))
 const SPEND = { experience: "approve_campaign", node: "go", act: "confirm" }
 
 declare global {
@@ -15,7 +16,7 @@ declare global {
     __featherReady?: boolean
     __feather: {
       embed: { version: string; validate: (x: unknown) => { ok: boolean }; validateReply: (e: unknown, x: unknown) => { ok: boolean } }
-      views: Record<string, { update(e: unknown, c?: unknown): void; unmount(): void; ready: Promise<void>; root: HTMLElement }>
+      views: Record<string, { update(e: unknown, c?: unknown): void; apply(u: unknown): { ok: boolean; issues?: Array<{ code: string }> }; unmount(): void; ready: Promise<void>; root: HTMLElement }>
       replies: Array<{ slot: string; reply: unknown }>
       issues: Array<{ slot: string; issues: Array<{ code: string }> }>
       mount(slot: string, experience: unknown, options?: Record<string, unknown>): { ready: Promise<void> }
@@ -445,4 +446,28 @@ test("i: a Form in the host sends one reply with only the filled fields, and Ent
   await second.getByLabel("Contact email").press("Enter")
   await expect.poll(() => page.evaluate(() => window.__feather.replies.length)).toBe(2)
   expect((await page.evaluate(() => window.__feather.replies))[1]).toStrictEqual({ slot: "slot-b", reply: { experience: "poster_details", node: "details", act: "submit", value: { contact: "market@example.com" } } })
+})
+
+test("h: apply() takes a feather.update/0 in the foreign page, refuses a stale one, and collapses on resolve", async ({ page }) => {
+  await remember(page)
+  const before = await hostState(page)
+  await mount(page, "slot-a", STREAM.experience)
+  await expect(page.locator("#slot-a")).toContainText("Finding flights")
+  const apply = (u: unknown) => page.evaluate((u) => window.__feather.views["slot-a"].apply(u), u)
+
+  expect((await apply(STREAM.updates[0])).ok).toBe(true)
+  await expect(page.locator("#slot-a").getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50")
+
+  // A stale update is refused: the issues reach the page's onIssues and what is shown stays.
+  const stale = await apply(STREAM.updates[0])
+  expect(stale.ok).toBe(false)
+  expect(stale.issues!.map((i) => i.code)).toContain("stale-revision")
+  expect((await page.evaluate(() => window.__feather.issues)).at(-1)!.issues.map((i) => i.code)).toContain("stale-revision")
+  await expect(page.locator("#slot-a").getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50")
+
+  for (const u of STREAM.updates.slice(1)) expect((await apply(u)).ok).toBe(true)
+  await expect(page.locator("#slot-a")).toContainText("Booked: direct flight, 9:40, 1,240 AED.")
+  await expect(page.locator("#slot-a").getByRole("link", { name: "Booking confirmation" })).toBeVisible()
+  await expect(page.locator("#slot-a button")).toHaveCount(0)
+  expectHostUntouched(before, await hostState(page))
 })
