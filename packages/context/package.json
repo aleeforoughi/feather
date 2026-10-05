@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-context",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Who Feather renders for, and where: the persona slice, capability profile and device a host passes per render. Types only; Feather stores none of it.",
   "license": "UNLICENSED",
   "type": "module",

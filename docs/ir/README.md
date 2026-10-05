@@ -172,7 +172,7 @@ says what to change. `validate()` never throws, and reports at most 100 issues; 
 | Code | Meaning |
 |---|---|
 | `not-an-object`, `wrong-type`, `missing-field`, `empty-text`, `too-long` | The shape of a value. |
-| `unsupported-version` | `ir` is not `feather.ir/1`. |
+| `unsupported-version` | `ir` is neither `feather.ir/1` nor `feather.ir/0`. |
 | `unknown-node-type`, `unknown-field` | Not part of the IR (with a suggestion for likely typos). |
 | `presentational-field` | Presentation, not meaning. |
 | `invalid-id`, `duplicate-id` | Ids start with a letter and are unique. |
@@ -187,6 +187,18 @@ says what to change. `validate()` never throws, and reports at most 100 issues; 
 | `duplicate-option`, `unknown-option`, `too-many-selected`, `duplicate-step`, `duplicate-field`, `comparison-mismatch` | Rules of single node types. |
 | `too-many-issues` | More than 100 problems; the rest are not listed. |
 
+`validateReply` (`validate_reply` in Python) answers with its own codes, each with a message:
+
+| Code | The reply… |
+|---|---|
+| `invalid-experience` | was checked against an experience that is not valid itself. |
+| `resolved` | answers an experience that is over (see [lifecycle](../lifecycle.md)); a server answers 409. |
+| `not-an-object`, `unknown-field` | is not `{ experience, node, act, value? }`. |
+| `wrong-experience`, `unknown-node`, `unknown-act` | names another experience, a node that is not there, or an act that node does not take. |
+| `missing-value`, `unexpected-value`, `invalid-value` | carries no value where the act needs one, one where it takes none, or one of the wrong shape. |
+
+Updates (`applyUpdate`) have theirs too, listed in [lifecycle](../lifecycle.md).
+
 ## Fixtures
 
 `conformance/ir/valid` holds at least 40 realistic experiences, covering every node type.
@@ -196,6 +208,7 @@ in every manifestation.
 
 ## Versioning
 
-`feather.ir/1` is the working version. It may still change, and every change is recorded in `CHANGELOG.md`. At
-milestone L7 it freezes as `feather.ir/1`. From then on a version never changes, and a new one is added beside
-it. A Feather reads the versions it names and rejects others with `unsupported-version`, never by guessing.
+`feather.ir/1` is frozen, and so is `feather.update/1`. A document valid today stays valid, keeps its issue codes and
+its meaning, and nothing is added inside the version: a new node, field, act or value would be `feather.ir/2`, read
+beside `/1`, never instead of it. `feather.ir/0` is the same contract under its name before the freeze, and is still
+read as is. The promises are in [the freeze](FREEZE.md).

@@ -21,17 +21,19 @@ Two pieces do the work, and one install brings both:
 | `feather-embed.js` + `.css` | the caller's page | renders an experience for this person and device, and hands back the reply |
 
 `@aleeforoughi/feather-embed` is the same bundle for JavaScript callers, and a React product can use
-`<FeatherExperience>` from `@aleeforoughi/feather-manifest-web` directly (see the [README](../README.md)).
+`<FeatherExperience>` from `@aleeforoughi/feather-manifest-web` directly (see [Rendering on the web](composer.md#rendering-on-the-web-aleeforoughifeather-manifest-web)).
 
 ## 1. Install
 
-The SDK is a wheel attached to each Feather release (the repository is private, so use a token that can read
-it), and a caller pins an exact version:
+The SDK is a wheel attached to each Feather release, and a caller pins an exact version. Replace `X.Y.Z` with
+the release you use. The repository is private, so use a token that can read it:
 
 ```bash
-gh release download v1.14.0 --repo aleeforoughi/feather --pattern 'feather_sdk-*.whl' --dir vendor/
-pip install vendor/feather_sdk-1.14.0-py3-none-any.whl
+gh release download vX.Y.Z --repo aleeforoughi/feather --pattern 'feather_sdk-*.whl' --dir vendor/
+pip install vendor/feather_sdk-X.Y.Z-py3-none-any.whl
 ```
+
+If you were handed the wheel file, `pip install path/to/feather_sdk-X.Y.Z-py3-none-any.whl` is all it takes.
 
 It has no dependencies and needs Python 3.11 or later. The wheel holds the browser bundle too, so the server and
 the page always speak the same version.
@@ -57,6 +59,32 @@ if not result.ok:
     raise ValueError(format_issues(result.issues))   # every problem at once, each with a code and a path
 ```
 
+**Which node do I use?** Say what the person must do, not how it looks:
+
+| The person must… | Use |
+|---|---|
+| approve or reject something someone asked for (a purchase request, an access request) | `Approval`, with `requester` pointing at a `Person`, and a `consequence` when approving spends, sends, publishes, deletes or grants consent |
+| take your recommendation, or pick another way | `Recommendation`, then `Alternative`s with `for` |
+| confirm one permanent act (spend, publish, send, delete, consent) | `IrreversibleAction` with its exact `consequence` |
+| pick one option, or several | `Choice` (with a `PredictedChoice` when you can guess) |
+| give you one fact | `Input`; for several facts at once, one `Form` |
+| just be told something | `Text`, `Status`, `Progress`, `Warning`, `Confirmation` |
+
+Anything with a `consequence` cannot be undone. Feather shows the consequence verbatim and makes the person act
+deliberately (arm, then confirm, or a keyword by voice and text) before the reply is sent. You never add that
+yourself. An approval request:
+
+```python
+request = experience("approve_license", [
+    nodes.Person(id="maya", name="Maya", role="Finance"),
+    nodes.Approval(id="buy", intent="approve the purchase", request="Buy an annual Acme Notes license for 49 USD",
+                   requester="maya", scope="Acme Notes, 1 year",
+                   consequence={"spend": {"amount": 49, "currency": "USD"}}),
+])
+```
+
+It replies `{"node": "buy", "act": "approve"}`, or `"reject"`, with an optional reason as `value`.
+
 `validate` is the same validator Feather runs, rule for rule. A conformance suite checks the Python and
 TypeScript versions against each other on every fixture and several hundred generated cases, so an experience
 that passes here renders in the browser. Every node type and field is in the [node reference](ir/nodes.md); the
@@ -64,7 +92,8 @@ builders in `feather_sdk.nodes` have the same names and arguments, with their do
 
 ## 3. Render it (page)
 
-Serve the bundle from the wheel. With FastAPI:
+Serve the whole of `feather_sdk.static_dir()` under one path: the bundle loads its stylesheet and fonts from next
+to itself. With FastAPI:
 
 ```python
 from fastapi.staticfiles import StaticFiles
@@ -72,6 +101,11 @@ import feather_sdk
 
 app.mount("/feather", StaticFiles(directory=feather_sdk.static_dir()), name="feather")
 ```
+
+Any other server works the same way, if it sends the right types: `.js` as `text/javascript` (a module will not
+load otherwise), `.css` as `text/css` and `.woff2` as `font/woff2`. With only the standard library, map
+`/feather/<file>` to `static_dir() / <file>`, and take the type from `mimetypes.guess_type`, after adding
+`mimetypes.add_type("text/javascript", ".js")`.
 
 Then, in plain JavaScript, with no build step. One import is enough: the bundle links its stylesheet (from next
 to itself) on the first mount.
@@ -88,7 +122,7 @@ to itself) on the first mount.
     onReply: (reply) => fetch("/api/reply", { method: "POST", body: JSON.stringify(reply) }),
     onIssues: (issues) => console.error(issues),   // the experience was invalid; nothing renders
   })
-  await view.ready                                 // styled and rendered
+  await view.ready                                 // styled and rendered: a .feather-root is now inside #decision
   // view.update(nextExperience, nextContext) to change it; view.unmount() when it is done.
 </script>
 ```
@@ -106,7 +140,7 @@ if (!result.ok) console.warn(result.issues)   // also passed to onIssues; what i
 // A "stale-revision" issue means the page and the caller have drifted: send the whole experience with view.update().
 ```
 
-| `mount` option | |
+| `mount` option | What it does |
 |---|---|
 | `context` | Who the experience is for, and where (below). |
 | `theme` | `"feather"` (default), `"feather-dark"`, or a `feather-tokens/2` brand object. |
@@ -146,12 +180,27 @@ from feather_sdk import format_issues, validate_reply
 async def reply(request: Request):
     result = validate_reply(approve, await request.json())
     if not result.ok:
-        raise HTTPException(422, format_issues(result.issues))
+        status = 409 if result.issues[0].code == "resolved" else 400
+        raise HTTPException(status, format_issues(result.issues))
+    if not claim_once(approve["experience"], result.reply["node"]):   # your store: an atomic "first answer wins"
+        raise HTTPException(409, "already answered")
     decide(result.reply)   # {"experience": "approve_campaign", "node": "go", "act": "confirm"}
 ```
 
 Never act on a reply without `validate_reply`: it checks that the node exists, the act is one that node takes, and
 the value has the right shape. The browser already checked it once; the server is where it counts.
+
+- **The result:** `result.ok`, and then either `result.reply` (the checked reply) or `result.issues`, each with a
+  `code` and a `message`. The codes are `invalid-experience`, `resolved`, `not-an-object`, `unknown-field`,
+  `wrong-experience`, `unknown-node`, `unknown-act`, `missing-value`, `unexpected-value` and `invalid-value`.
+- **Status codes:** 400 for an invalid reply and 409 once the experience is resolved or the act was already
+  answered. The TypeScript `createReplyHandler` answers 400 and 409 (resolved) the same way. Claiming each act once
+  is up to your `onReply`, as it is here.
+- **Accept each act once.** A reply is a decision, and Feather keeps no state. Validate first, so a bad reply
+  always gets its issues. Then claim the act atomically in your own store, and only then act on it. A second copy
+  of the same reply, whether retried, double-sent or from another tab, gets 409.
+- **Then end it.** Once you have acted on the decision, resolve the experience (section 5) with a one-line summary.
+  The page collapses to it, and any late reply gets `resolved`.
 
 Every act a node can reply with is listed in the [node reference](ir/nodes.md). An irreversible act (anything with
 a `consequence`) only ever replies after a deliberate confirmation, in every body.
@@ -248,6 +297,7 @@ python3 examples/python-caller/server.py   # then open http://localhost:8765
 
 ## Versions
 
-The IR is `feather.ir/1` until milestone L7, where it freezes as `feather.ir/1` and stops changing. Until then a
-minor Feather release may change it, and the changelog says how. Pin the wheel to an exact release, and upgrade
-the server and the page together (one wheel holds both).
+The IR is frozen as `feather.ir/1` (updates as `feather.update/1`). A document that is valid today stays valid, and
+keeps its meaning, in every later Feather. What that promises is in [the freeze](ir/FREEZE.md). `feather.ir/0`,
+the name before the freeze, is still read. How an experience looks and is composed keeps improving. Pin the wheel
+to an exact release, and upgrade the server and the page together, since one wheel holds both.

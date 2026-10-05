@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-client",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Call Feather from TypeScript and JavaScript: build Experience IR (feather.ir/1) with one typed builder per node, validate it, send updates, and receive checked replies. Runs in Node and the browser.",
   "license": "UNLICENSED",
   "type": "module",

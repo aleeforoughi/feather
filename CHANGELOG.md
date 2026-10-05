@@ -1,5 +1,49 @@
 # Feather — changelog
 
+## 1.18.0 — 2026-10-05
+
+**Ready for callers (milestone L7). The IR is frozen as `feather.ir/1`.** A caller can now build on Feather's
+contract and expect it to hold. There's a TypeScript client to go with the Python one, and a documentation site to
+start from.
+
+- **The freeze** ([docs/ir/FREEZE.md](docs/ir/FREEZE.md)), decided with the owner. The node set is frozen as it is.
+  - The IR is `feather.ir/1`, and updates are `feather.update/1`.
+  - A valid document stays valid, and an invalid one keeps its issue codes and paths.
+  - No field changes meaning, and nothing is added inside the version: additions are `/2`.
+  - TypeScript and Python keep agreeing case for case.
+  - Plans, composer rules, organisms, themes and bodies are free to improve.
+  - `feather.ir/0` and `feather.update/0` are read as is, as the same contract under its earlier name, so callers on
+    1.15–1.17 keep working. The builders now emit `/1`.
+  - The schemas are renamed `schema/feather.ir-1.json` and `schema/feather.update-1.json`.
+- **`@aleeforoughi/feather-client`**, the caller API for TypeScript and JavaScript, on Node and in browsers.
+  - `experience()`, and one typed builder per node type, generated from the spec with the field docs.
+  - `update()` with the op helpers.
+  - `parseReply()`, and `createReplyHandler()` for Node's http or the Fetch API. It answers 200, 400 with issues,
+    409 once resolved, and 404, 405 or 413 for no experience, a wrong method or an oversized body. It answers 500
+    when the caller's own `onReply` throws (`not-handled`), and nothing is logged or leaked.
+  - The package name stays under the owner's scope (decision 9).
+- **The documentation site** (`apps/docs`, `pnpm docs:build`):
+  - generated at build time from the docs (the caller guide, the node reference, lifecycle, the freeze, how Feather
+    decides, the bodies), so nothing is copied by hand;
+  - search, an in-page table of contents, copy buttons, the schemas to download, and a live example, styled with
+    Feather and in dark mode;
+  - its end-to-end suite crawls every link and runs axe on every page in light and dark;
+  - CI builds it as an artifact. Publishing it is the owner's decision.
+- **Python:** reads both IR and update versions exactly as TypeScript does. The parity corpus now has 2740 IR cases,
+  3793 replies and 279 updates.
+- **The first-experience test.** An agent new to Feather was given only the docs and the wheel, and none of the code.
+  It built a purchase approval and served it from its own standard-library server. It accepted the reply once,
+  refused a duplicate and an invalid one, then resolved the experience, in about two minutes. The page was then
+  checked in a real browser. Its friction log reshaped the caller guide:
+  - a "Which node do I use?" table and an Approval example;
+  - installing from a local wheel;
+  - serving the bundle from any server, with the content types it needs;
+  - reply results and their codes, with one set of status codes in Python and TypeScript;
+  - accepting each act once, and resolving after acting;
+  - the reply codes in the IR reference.
+
+  A person new to Feather has not yet been timed against the 30-minute target.
+
 ## 1.17.0 — 2026-10-05
 
 **The experience lifecycle (milestone L6).** An experience now lives as long as its purpose: it opens, changes in

@@ -1,7 +1,7 @@
 {
   "name": "feather",
   "private": true,
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Feather, the first liquid design system: semantics in, the right experience out.",
   "license": "UNLICENSED",
   "type": "module",
