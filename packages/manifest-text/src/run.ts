@@ -25,6 +25,17 @@ export interface RunTextOptions {
   color?: boolean
   /** Write each line the person typed after the prompt. Default: when the input is not a TTY (a pipe has no echo). */
   echo?: boolean
+  /**
+   * Newer plans, composed from the experience as the caller updates it (docs/lifecycle.md). Each is applied as it arrives:
+   * what is new is written, and a collapsed plan writes its summary and ends the conversation.
+   */
+  updates?: AsyncIterable<TextUpdate>
+}
+
+/** A newer plan, with the experience it was composed from so replies are checked against it. */
+export interface TextUpdate {
+  plan: LayoutPlan
+  experience?: Experience
 }
 
 export interface RunTextResult {
@@ -50,9 +61,28 @@ export async function runText(plan: LayoutPlan, options: RunTextOptions): Promis
   const replies: ReplyEvent[] = []
 
   output.write(renderTurn(dialog.turn, render))
-  if (dialog.done) return { done: true, replies }
+  // With updates coming, nothing to act on yet is not the end: it waits until the experience collapses.
+  const over = () => (options.updates ? dialog.resolved : dialog.done)
+  if (over()) return { done: true, replies }
 
   const rl = createInterface({ input, crlfDelay: Infinity, terminal: false })
+  const watcher = options.updates?.[Symbol.asyncIterator]()
+  let stopped = false
+  const watching = (async () => {
+    if (!watcher) return
+    while (!stopped) {
+      const next = await watcher.next()
+      if (next.done || stopped) return
+      const before = dialog.turn
+      const turn = dialog.update(next.value.plan, { experience: next.value.experience })
+      if (turn === before) continue
+      output.write(`\n${renderTurn(turn, render)}`)
+      if (dialog.resolved) {
+        rl.close()
+        return
+      }
+    }
+  })()
   try {
     for await (const line of rl) {
       if (echo) output.write(`${line}\n`)
@@ -62,10 +92,13 @@ export async function runText(plan: LayoutPlan, options: RunTextOptions): Promis
         await onReply(reply)
       }
       output.write(renderTurn(result.turn, render))
-      if (dialog.done) break
+      if (over()) break
     }
   } finally {
+    stopped = true
     rl.close()
+    void watcher?.return?.()
+    void watching.catch(() => undefined)
   }
   if (!dialog.done) output.write("\n")
   return { done: dialog.done, replies }

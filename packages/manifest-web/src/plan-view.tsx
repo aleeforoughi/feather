@@ -8,6 +8,8 @@ import { directionOf, OTHER_OPTIONS_LABEL } from "@aleeforoughi/feather-dialog"
 import { NodeView } from "./nodes"
 import { experienceCurrency, experienceOf, firstControl, nodeIndex } from "./plan-utils"
 import { RenderingContext, type Emit, type Rendering } from "./rendering"
+import { useLifecycle } from "./lifecycle"
+import { ExperienceResolution } from "./resolution"
 import { PlainSummary } from "./summary"
 
 export interface PlanViewProps {
@@ -34,7 +36,7 @@ export interface PlanViewProps {
  * contents are not rendered until it is opened, so nothing inside is focusable or scanned. Opening emits no reply, and
  * once open it stays open (docs/composer.md, "Rendering on the web").
  */
-function OtherOptions({ nodes }: { nodes: PlanNode[] }) {
+function OtherOptions({ nodes, keyOf }: { nodes: PlanNode[]; keyOf: (node: PlanNode) => string }) {
   const [open, setOpen] = React.useState(false)
   const id = React.useId()
   return (
@@ -45,7 +47,7 @@ function OtherOptions({ nodes }: { nodes: PlanNode[] }) {
       {open && (
         <div id={id} data-slot="experience-other-content" className="flex flex-col gap-4">
           {nodes.map((node) => (
-            <NodeView key={node.id} node={node} />
+            <NodeView key={keyOf(node)} node={node} />
           ))}
         </div>
       )}
@@ -63,7 +65,13 @@ function OtherOptions({ nodes }: { nodes: PlanNode[] }) {
  * A voice or text plan has no screen to draw on, so it renders a plain, accessible summary instead.
  */
 export function PlanView({ plan, onReply, experience, onRejectedReply, autoFocus = true, className }: PlanViewProps) {
-  const root = React.useRef<HTMLDivElement>(null)
+  const root = React.useRef<HTMLDivElement | null>(null)
+  const [host, setHost] = React.useState<HTMLDivElement | null>(null)
+  const rootRef = React.useCallback((el: HTMLDivElement | null) => {
+    root.current = el
+    setHost(el)
+  }, [])
+  const { keyOf, message, summaryRef, rootProps } = useLifecycle(plan, root, host)
   const checked = React.useMemo(() => experience ?? experienceOf(plan), [experience, plan])
   const emit = React.useCallback<Emit>(
     (node, act, value) => {
@@ -94,7 +102,11 @@ export function PlanView({ plan, onReply, experience, onRejectedReply, autoFocus
   }, [])
 
   const spoken = plan.manifestation === "voice" || plan.manifestation === "text"
-  const content = spoken ? (
+  // A collapsed experience shows its resolution and nothing else, whatever the body: one line, no card, no controls.
+  const collapsed = plan.lifecycle === "collapsed"
+  const content = collapsed ? (
+    plan.resolution && <ExperienceResolution ref={summaryRef} resolution={plan.resolution} />
+  ) : spoken ? (
     <PlainSummary plan={plan} />
   ) : (
     <div data-slot="experience-regions" className="flex flex-col gap-4">
@@ -106,21 +118,24 @@ export function PlanView({ plan, onReply, experience, onRejectedReply, autoFocus
         return (
           <div key={region.id} data-slot="experience-region" data-variant={region.id} role={secondary ? "group" : undefined} aria-label={secondary ? "Other ways to go" : undefined} className="flex flex-col gap-4">
             {shown.map((node: PlanNode) => (
-              <NodeView key={node.id} node={node} />
+              <NodeView key={keyOf(node)} node={node} />
             ))}
-            {secondary && folded.length > 0 && <OtherOptions nodes={folded} />}
+            {secondary && folded.length > 0 && <OtherOptions nodes={folded} keyOf={keyOf} />}
           </div>
         )
       })}
     </div>
   )
 
-  const classes = ["text-fg-primary", className ?? ""].filter(Boolean).join(" ")
+  const classes = ["text-fg-primary outline-none", className ?? ""].filter(Boolean).join(" ")
   return (
     <MotionPreference.Provider value={plan.motion}>
       <RenderingContext.Provider value={rendering}>
         <div
-          ref={root}
+          ref={rootRef}
+          // Focusable by script only: it takes focus when the element that had it is removed by an update.
+          tabIndex={-1}
+          {...rootProps}
           data-slot="experience"
           data-variant={plan.manifestation}
           data-feather-experience={plan.experience}
@@ -135,7 +150,10 @@ export function PlanView({ plan, onReply, experience, onRejectedReply, autoFocus
           dir={directionOf(plan.locale)}
           className={classes}
         >
-          {plan.chrome === "card" ? (
+          <div data-slot="experience-updates" aria-live="polite" aria-atomic="true" className="sr-only">
+            {message}
+          </div>
+          {plan.chrome === "card" && !collapsed ? (
             <Card data-slot="experience-card">
               <CardContent>{content}</CardContent>
             </Card>

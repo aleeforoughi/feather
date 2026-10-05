@@ -11,14 +11,14 @@ import { hostOf, otherOptions, scriptOf } from "./web.tsx"
 import type { Step } from "./script.ts"
 import type { Result } from "./types.ts"
 
-const key = (k: string) => act(() => void fireEvent.keyDown(document.activeElement ?? document.body, { key: k }))
-const isField = (el: Element | null) => el instanceof HTMLTextAreaElement || (el instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit", "reset"].includes(el.type))
+export const key = (k: string) => act(() => void fireEvent.keyDown(document.activeElement ?? document.body, { key: k }))
+export const isField =(el: Element | null) => el instanceof HTMLTextAreaElement || (el instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit", "reset"].includes(el.type))
 
 /**
  * Presses "next" until the highlight rests on `el`. When the highlight rests on a text field, scanning is paused and
  * "next" does nothing; Escape resumes it (the contract), and the next "next" carries on.
  */
-function reach(el: () => HTMLElement | null, what: string) {
+export function reach(el: () => HTMLElement | null, what: string) {
   for (let i = 0; i < 80; i++) {
     const target = el()
     if (!target) throw new Error(`switch: ${what} is not in the page`)

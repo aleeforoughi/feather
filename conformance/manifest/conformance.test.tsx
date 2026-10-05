@@ -54,7 +54,8 @@ describe("rendering: every fixture, every body, every node", () => {
       it.skipIf(skipped(body))(`${fx.name} in ${body}`, () => {
         tally.tests++
         const plan = planFor(fx.ir, body)
-        truth(plan.order.length > 0, `${fx.name}: the plan has nodes`)
+        // A collapsed plan (L6) has no nodes: it is the resolution, checked in lifecycle.test.tsx.
+        truth(plan.lifecycle === "collapsed" || plan.order.length > 0, `${fx.name}: the plan has nodes`)
         if (body === "web" || body === "switch") {
           const view = body === "web" ? <PlanView plan={plan} experience={fx.ir} onReply={() => {}} /> : <SwitchExperience plan={plan} experience={fx.ir} scan="step" onReply={() => {}} />
           const { container, unmount } = render(view)

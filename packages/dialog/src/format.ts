@@ -80,6 +80,12 @@ export function directionOf(locale: string): "ltr" | "rtl" {
   }
 }
 
+/** The URL when it is absolute http or https, else undefined: the only links a collapsed experience renders (docs/lifecycle.md). */
+export function httpUrl(url: string): string | undefined {
+  const trimmed = url.trim()
+  return /^https?:\/\/\S+$/i.test(trimmed) ? trimmed : undefined
+}
+
 /** The first letter upper-cased. */
 export function upperFirst(s: string): string {
   return s.length > 0 ? s[0]!.toUpperCase() + s.slice(1) : s

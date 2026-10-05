@@ -11,9 +11,9 @@
 import * as React from "react"
 import type { RenderContext } from "@aleeforoughi/feather-context"
 import type { Experience, Issue, ReplyEvent, ReplyIssue } from "@aleeforoughi/feather-intent"
-import { compose, type LayoutPlan } from "@aleeforoughi/feather-liquid"
-import { PlanView } from "@aleeforoughi/feather-manifest-web"
-import { isCommitting, isTextEntry, scopeOf, targetAt, targetsIn } from "./targets"
+import type { LayoutPlan } from "@aleeforoughi/feather-liquid"
+import { PlanView, useShownPlan } from "@aleeforoughi/feather-manifest-web"
+import { findBySignature, isCommitting, isTextEntry, scopeOf, signatureOf, targetAt, targetsIn, type TargetSignature } from "./targets"
 
 export interface SwitchKeys {
   /** Keys (KeyboardEvent.key) that select the highlighted target. */
@@ -92,11 +92,18 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
     live.current = { scan, scanMs, dwellMs, keys: keys ?? DEFAULT_KEYS[scan], clock, listen }
   })
 
+  // What scanning keeps when the plan changes under it (an update, docs/lifecycle.md section 2): whether it has begun, and
+  // which target the highlight was on.
+  const carry = React.useRef<{ scan: string; started: boolean; el: HTMLElement | null; sig: TargetSignature | null } | null>(null)
+
   React.useEffect(() => {
     const host = root.current
     if (!host) return
     const doc = host.ownerDocument
+    const saved = carry.current
+    carry.current = null
     let current: HTMLElement | null = null
+    let currentSig: TargetSignature | null = null
     let started = false // auto mode: the first press has happened
     let paused = false
     let interval: unknown = null
@@ -113,6 +120,7 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
     const mark = (el: HTMLElement) => {
       if (current && current !== el) unmark()
       current = el
+      currentSig = signatureOf(el, targets())
       el.setAttribute("data-scanned", "true")
       addDescribedBy(el, hintId)
       // Real focus is how assistive technology announces the target. Where the highlight sits is never scrolled to
@@ -291,7 +299,25 @@ export function SwitchExperience({ plan, onReply, experience, onRejectedReply, s
     host.addEventListener("pointerover", onEnter)
     host.addEventListener("pointerleave", onLeave, true)
     host.addEventListener("pointerout", onLeave)
+
+    // After an update: rescan. The highlight stays on the same target if it is still there, else it goes to the first.
+    // Scanning that had begun goes on; scanning that had not is never started here. A collapsed plan has no targets, so
+    // scanning stops.
+    if (saved && saved.scan === scan) {
+      const list = targets()
+      if (list.length === 0) {
+        started = false
+      } else {
+        started = saved.started
+        if (saved.sig) {
+          const same = saved.el && list.includes(saved.el) ? saved.el : findBySignature(saved.sig, list)
+          mark(same ?? list[0]!)
+        }
+        startTimer()
+      }
+    }
     return () => {
+      carry.current = { scan, started, el: current, sig: currentSig }
       doc.removeEventListener("keydown", onKeyDown, true)
       doc.removeEventListener("keyup", onKeyUp, true)
       host.removeEventListener("focusin", onFocusIn)
@@ -332,14 +358,8 @@ export interface FeatherSwitchExperienceProps extends Omit<SwitchExperienceProps
 
 /** Composes `experience` for `context` and renders it for switch access. An invalid IR renders nothing. */
 export function FeatherSwitchExperience({ experience, context, onIssues, ...rest }: FeatherSwitchExperienceProps) {
-  const result = React.useMemo(() => compose(experience, context), [experience, context])
-  const report = React.useRef(onIssues)
-  React.useEffect(() => {
-    report.current = onIssues
-  })
-  React.useEffect(() => {
-    if (!result.ok) report.current?.(result.issues)
-  }, [result])
-  if (!result.ok) return null
-  return <SwitchExperience plan={result.plan} experience={experience as Experience} {...rest} />
+  // A plan whose revision is not higher than the one shown is ignored (docs/lifecycle.md section 2.6).
+  const shown = useShownPlan(experience, context, onIssues)
+  if (!shown) return null
+  return <SwitchExperience plan={shown.plan} experience={shown.experience} {...rest} />
 }
