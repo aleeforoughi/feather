@@ -8,6 +8,25 @@ connect to it later through one public contract: the **Experience IR**.
 
 ---
 
+## 0. Where things stand (2026-10-05)
+
+All milestones L0–L7 and V1 are built. Released on `main`: 1.15.1, 1.15.2, 1.16.0 (L5 person-shaped) and 1.17.0
+(L6 lifecycle). 1.18.0 (L7 ready for callers; the IR frozen as `feather.ir/1`) is on `claude/l7-ready-for-callers`;
+release it by fast-forwarding `main` to that branch's head once its CI is green. `CHANGELOG.md` says what each
+release did. `docs/HANDOFF.md` is the prompt to start a new session with.
+
+Open:
+- **Release 1.18.0** (above). Its CI adds a docs-site job that has not passed on CI yet.
+- **Godpip PR aleeforoughi/godpip#83** (a Feather Form for missing input): mergeable, waiting for the owner. One Godpip
+  test, `test_a_failed_compile_logs_why_without_the_task`, failed locally on both the PR and Godpip's main.
+- **A person timed against the 30-minute first-experience target** (L7 exit). An agent with only the docs did it in
+  about two minutes; a human has not been timed.
+- **Publishing the docs site**: where, if anywhere, is the owner's decision.
+- From the Godpip side: a real-model check of the Form loop, and wiring Godpip's authority approvals (spend, payment,
+  publish, send, legal) to IrreversibleAction/Approval. Ask the owner first.
+- Known follow-ups: Sonner toasts ignore the portal container; the embed's JS motion reads `--duration-*` from
+  `<html>`; command words (and "Other options") are English only; the warm budget-bar tint.
+
 ## 1. Mission
 
 > **Feather renders the next necessary human interaction, shaped to this person, on this device, right now, and dissolves it when its purpose is done.**
