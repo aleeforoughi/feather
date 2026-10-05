@@ -88,6 +88,8 @@ def _validate_reply(experience: Any, reply: Any) -> ReplyResult:
         )
     exp = checked.experience
     assert exp is not None
+    if get(exp, "resolved") is not UNDEF:
+        return _fail("resolved", f'"{exp["experience"]}" is resolved ({exp["resolved"]["outcome"]}); it takes no more replies.')
     if not is_object(reply):
         return _fail("not-an-object", "A reply is a JSON object: { experience, node, act, value? }.")
 

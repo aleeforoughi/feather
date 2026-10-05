@@ -28,11 +28,14 @@ from ._js import (
     u16,
 )
 from ._spec import (
+    ARTIFACT_KINDS,
     DEFAULT_MAX_LENGTH,
     IR_VERSION,
     MAX_ISSUES,
     NODE_SPECS,
+    OUTCOMES,
     PRESENTATIONAL_FIELDS,
+    SUMMARY_MAX,
     fields_of,
     spec_for,
 )
@@ -41,7 +44,8 @@ _ID = re.compile(r"[A-Za-z][A-Za-z0-9_.-]{0,63}")
 _LOCALE = re.compile(r"[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*")
 _CURRENCY = re.compile(r"[A-Z]{3}")
 _ISO_DATE = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})(?:T([0-9]{2}):([0-9]{2})(?::([0-9]{2})(?:\.[0-9]+)?)?(Z|[+-][0-9]{2}:[0-9]{2})?)?")
-_TOP_LEVEL = ["ir", "experience", "locale", "nodes"]
+_TOP_LEVEL = ["ir", "experience", "locale", "revision", "resolved", "nodes"]
+_ARTIFACT_FIELDS = ["label", "href", "kind"]
 _IMPORTANCE = ["low", "normal", "high", "critical"]
 
 
@@ -161,6 +165,12 @@ def _run(doc: Any, add: Add) -> None:
     locale = get(doc, "locale")
     if locale is not UNDEF and (not isinstance(locale, str) or not _LOCALE.fullmatch(locale)):
         add("invalid-value", "/locale", f'locale must be a BCP 47 language tag such as "en" or "ar-AE"; got {quote(locale)}.')
+    revision = get(doc, "revision")
+    if revision is not UNDEF and (not is_number(revision) or not is_integer(revision) or num(revision) < 0):
+        add("invalid-value", "/revision", f"revision counts the updates applied: a whole number from 0; got {quote(revision)}.")
+    resolved = get(doc, "resolved") is not UNDEF
+    if resolved:
+        check_resolution(add, doc["resolved"], "/resolved", "The resolution")
     nodes = get(doc, "nodes")
     if nodes is UNDEF:
         add("missing-field", "/nodes", "An experience needs its nodes: the interaction, as meaning.")
@@ -168,7 +178,7 @@ def _run(doc: Any, add: Add) -> None:
     if not is_array(nodes):
         add("wrong-type", "/nodes", f"nodes must be an array; got {describe(nodes)}.")
         return
-    if len(nodes) == 0:
+    if len(nodes) == 0 and not resolved:
         add("empty-experience", "/nodes", "An experience with no nodes renders nothing; send at least one node, or no experience.")
 
     entries: list[_Entry] = []
@@ -266,6 +276,62 @@ def _run(doc: Any, add: Add) -> None:
             f'{e.name} cannot be undone, but nothing states what it does. {how} with an IrreversibleAction whose "confirms" is "{e.id if e.id is not None else "its id"}" (principle 6: irreversible means explicit).',
             e.id,
         )
+
+
+def check_resolution(add: Add, value: Any, at: str, what: str, skip: tuple[str, ...] = ()) -> None:
+    """A resolution (L6): an outcome, a one-line summary, and what the experience leaves behind. Shared with updates."""
+    if not is_object(value):
+        add("wrong-type", at, f"{what} is an object with an outcome and a summary; got {describe(value)}.")
+        return
+    known = ["outcome", "summary", "artifact", *skip]
+    for key in js_keys(value):
+        if key not in known:
+            _unknown_field(add, f"{at}{seg(key)}", key, what.lower(), known)
+    outcome = get(value, "outcome")
+    if outcome is UNDEF:
+        add("missing-field", f"{at}/outcome", f"{what} needs an outcome: {', '.join(OUTCOMES)}.")
+    elif not isinstance(outcome, str) or outcome not in OUTCOMES:
+        add("invalid-value", f"{at}/outcome", f"outcome is one of {', '.join(OUTCOMES)}; got {quote(outcome)}.")
+    summary = get(value, "summary")
+    if summary is UNDEF:
+        add("missing-field", f"{at}/summary", f"{what} needs a summary: what happened, in one line. It is all that stays on screen.")
+    elif not isinstance(summary, str):
+        add("wrong-type", f"{at}/summary", f"summary must be a string; got {describe(summary)}.")
+    elif trim(summary) == "":
+        add("empty-text", f"{at}/summary", "summary is empty; say what happened, in one line.")
+    elif chars(summary) > SUMMARY_MAX or "\n" in summary:
+        several = " over several lines" if "\n" in summary else ""
+        add("too-long", f"{at}/summary", f"summary is one line of at most {SUMMARY_MAX} characters; got {chars(summary)}{several}.")
+    artifact = get(value, "artifact")
+    if artifact is UNDEF:
+        return
+    where = f"{at}/artifact"
+    if not is_object(artifact):
+        add("wrong-type", where, f"artifact is an object with a label; got {describe(artifact)}.")
+        return
+    for key in js_keys(artifact):
+        if key not in _ARTIFACT_FIELDS:
+            _unknown_field(add, f"{where}{seg(key)}", key, "the artifact", list(_ARTIFACT_FIELDS))
+    label = get(artifact, "label")
+    if label is UNDEF:
+        add("missing-field", f"{where}/label", "The artifact needs a label: what it is, in a few words.")
+    elif not isinstance(label, str):
+        add("wrong-type", f"{where}/label", f"label must be a string; got {describe(label)}.")
+    elif trim(label) == "":
+        add("empty-text", f"{where}/label", "label is empty; say what the artifact is.")
+    elif chars(label) > SUMMARY_MAX:
+        add("too-long", f"{where}/label", f"label is at most {SUMMARY_MAX} characters; got {chars(label)}.")
+    href = get(artifact, "href")
+    if href is not UNDEF:
+        if not isinstance(href, str):
+            add("wrong-type", f"{where}/href", f"href must be a string; got {describe(href)}.")
+        elif trim(href) == "":
+            add("empty-text", f"{where}/href", "href is empty; give where the artifact is, or leave href out.")
+        elif chars(href) > DEFAULT_MAX_LENGTH:
+            add("too-long", f"{where}/href", f"href is at most {DEFAULT_MAX_LENGTH} characters; got {chars(href)}.")
+    kind = get(artifact, "kind")
+    if kind is not UNDEF and (not isinstance(kind, str) or kind not in ARTIFACT_KINDS):
+        add("invalid-value", f"{where}/kind", f"kind is one of {', '.join(ARTIFACT_KINDS)}; got {quote(kind)}.")
 
 
 def _unknown_field(add: Add, path: str, key: str, where: str, known: list[str], node: str | None = None) -> None:

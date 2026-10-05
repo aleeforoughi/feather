@@ -143,6 +143,48 @@ the value has the right shape. The browser already checked it once; the server i
 Every act a node can reply with is listed in the [node reference](ir/nodes.md). An irreversible act (anything with
 a `consequence`) only ever replies after a deliberate confirmation, in every body.
 
+## 5. Updating an experience
+
+The caller owns time. When the work behind an experience moves, send a small update instead of the whole experience;
+each body changes in place and keeps the person's place. `apply_update` is pure (it changes neither argument and holds
+no state), so you keep the current experience and replace it with what comes back. The contract is
+[lifecycle.md](lifecycle.md).
+
+```python
+from feather_sdk import apply_update, nodes, ops, update
+
+change = update("plan_trip", current.get("revision", 0) + 1, [
+    ops.patch("work", value=0.5),                       # change fields in place; None removes one
+    ops.add(nodes.Recommendation(id="rec", intent="take the recommended flight", summary="Direct, 9:40")),
+])
+result = apply_update(current, change)
+if result.ok:
+    current = result.experience          # revision is now one more; send it to the page as you did the first
+else:
+    ...                                   # nothing was applied: every op lands, or none does
+```
+
+The ops are `add`, `replace`, `patch`, `remove` and `resolve` (always last). Refusals carry every reason, each with a
+JSON Pointer into the update; problems in the experience the update would make are under `/result`.
+
+**Stale revision.** An update must carry exactly one more than the experience's `revision` (`0` when it has none).
+If it does not, `result.stale` is true and the issue code is `stale-revision`: the caller and Feather have drifted,
+for example after a restart or a lost update. This is the 409 of the lifecycle. Do not retry the update; send the whole
+experience again (with its current `revision`) and continue from there.
+
+**Resolving.** When the work is over, end the experience with a one-line summary, and an artifact if it leaves
+something behind:
+
+```python
+done = apply_update(current, update("plan_trip", current.get("revision", 0) + 1, [
+    ops.resolve("done", "Booked: direct flight, 9:40.", artifact={"label": "Booking", "href": "https://example.com/b/42", "kind": "document"}),
+]))
+```
+
+`outcome` is `done`, `cancelled` or `failed`; the summary is one line of at most 120 characters. A resolved experience
+collapses to the summary and artifact, takes no more updates (`already-resolved`) and no more replies
+(`validate_reply` answers `resolved`). `experience(..., revision=3, resolved={...})` builds one that is already over.
+
 ## Reference integration
 
 `examples/python-caller` is a complete caller in one file of standard-library Python: it serves a page, sends

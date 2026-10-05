@@ -81,7 +81,13 @@ class Builders(unittest.TestCase):
                 for node in fixture["ir"]["nodes"]:
                     kwargs = {("for_" if k == "for" else k): v for k, v in node.items() if k != "type"}
                     rebuilt.append(getattr(nodes, node["type"])(**kwargs))
-                doc = experience(fixture["ir"]["experience"], rebuilt, locale=fixture["ir"].get("locale"))
+                doc = experience(
+                    fixture["ir"]["experience"],
+                    rebuilt,
+                    locale=fixture["ir"].get("locale"),
+                    revision=fixture["ir"].get("revision"),
+                    resolved=fixture["ir"].get("resolved"),
+                )
                 self.assertEqual(doc, fixture["ir"])
                 self.assertTrue(validate(doc).ok)
 

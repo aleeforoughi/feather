@@ -6,12 +6,13 @@
 // The cases are deterministic: mutations of every valid fixture in conformance/ir/valid, thinned by a fixed stride.
 import fs from "node:fs"
 import path from "node:path"
-import { NODE_SPECS, actsFor, validate, validateReply } from "../src/index.ts"
+import { NODE_SPECS, actsFor, applyUpdate, validate, validateReply } from "../src/index.ts"
 import type { Experience, IRNode } from "../src/index.ts"
 
 const root = path.resolve(import.meta.dirname, "../../../conformance")
 export const IR_CORPUS_PATH = path.join(root, "parity/ir.json")
 export const REPLY_CORPUS_PATH = path.join(root, "parity/reply.json")
+export const UPDATE_CORPUS_PATH = path.join(root, "parity/update.json")
 export const URL_CORPUS_PATH = path.join(root, "parity/url.json")
 
 type Json = null | boolean | number | string | Json[] | { [k: string]: Json }
@@ -20,7 +21,10 @@ type Loc = Array<string | number>
 type IssueOut = { code: string; path: string; message: string; node?: string }
 export type IrCase = { name: string; ir: Json; issues: IssueOut[] }
 export type ReplyCase = { name: string; experience: string; reply: Json | null; issues: Array<{ code: string; message: string }> }
-export type ReplyCorpus = { experiences: Record<string, Json>; cases: ReplyCase[] }
+/** An update, the experience it is applied to (a key into `experiences`), and what applyUpdate() answers: the experience it makes, or its issues. */
+export type UpdateCase = { name: string; experience: string; update: Json; ok: boolean; result?: Json; issues?: Array<{ code: string; path: string; message: string }> }
+export type UpdateCorpus = { experiences: Record<string, Json>; cases: UpdateCase[] }
+export type ReplyCorpus ={ experiences: Record<string, Json>; cases: ReplyCase[] }
 
 export const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T
 const isObj = (v: Json | undefined): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v)
@@ -402,9 +406,79 @@ export function buildIrCorpus(): IrCase[] {
     for (const [name, doc] of thin(generic, 10, f)) push(name, doc)
     for (const [label, doc] of thin(targeted(ir), 60, f)) push(`${fixture}: ${label}`, doc)
   })
+  // L6: revision and resolution, branch by branch.
+  for (const [name, doc] of lifecycleDocuments()) push(name, doc)
   // The invalid fixtures too: their expected issues are checked separately, but the words are checked here.
   for (const [fixture, { ir }] of load("invalid")) push(`invalid/${fixture}`, ir)
   return cases
+}
+
+const TEXT: Obj = { type: "Text", id: "intro", text: "Hello." }
+const DONE: Obj = { outcome: "done", summary: "Booked: direct flight, 9:40." }
+
+/** Documents that exercise `revision`, `resolved` and the nodes rule that depends on it, one branch each. */
+function lifecycleDocuments(): Array<[string, Json]> {
+  const out: Array<[string, Json]> = []
+  const doc = (label: string, extra: Obj, nodes: Json | undefined = [TEXT]) => {
+    const d: Obj = { ir: "feather.ir/0", experience: "plan_trip", ...clone(extra) }
+    if (nodes !== undefined) d.nodes = clone(nodes)
+    out.push([`lifecycle: ${label}`, d])
+  }
+  for (const [label, revision] of [
+    ["0", 0], ["1", 1], ["7", 7], ["-1", -1], ["1.5", 1.5], ["1e21", 1e21], ["2.0 as an integer", 2], ["a string", "1"], ["null", null], ["true", true], ["an array", []], ["an object", {}], ["huge", 123456789012345680000],
+  ] as Array<[string, Json]>) doc(`revision ${label}`, { revision })
+  doc("no revision", {})
+  // Resolutions, valid.
+  doc("resolved with no nodes", { resolved: DONE }, [])
+  doc("resolved with nodes", { resolved: DONE })
+  doc("resolved, revision and no nodes", { revision: 3, resolved: DONE }, [])
+  doc("resolved cancelled", { resolved: { outcome: "cancelled", summary: "Cancelled." } }, [])
+  doc("resolved failed", { resolved: { outcome: "failed", summary: "The flight sold out." } }, [])
+  doc("resolved with a minimal artifact", { resolved: { ...DONE, artifact: { label: "Receipt" } } }, [])
+  for (const kind of ["document", "image", "video", "audio", "link", "data"]) doc(`artifact of kind ${kind}`, { resolved: { ...DONE, artifact: { label: "Thing", href: "https://example.com/x", kind } } }, [])
+  doc("artifact with a non-http href", { resolved: { ...DONE, artifact: { label: "Thing", href: "javascript:alert(1)" } } }, [])
+  doc("summary of exactly 120 code points", { resolved: { outcome: "done", summary: "😀".repeat(120) } }, [])
+  doc("summary of 121 code points", { resolved: { outcome: "done", summary: "😀".repeat(121) } }, [])
+  doc("summary of 120 letters", { resolved: { outcome: "done", summary: "é".repeat(120) } }, [])
+  doc("artifact label of 121 code points", { resolved: { ...DONE, artifact: { label: "x".repeat(121) } } }, [])
+  doc("artifact label of 120 code points", { resolved: { ...DONE, artifact: { label: "x".repeat(120) } } }, [])
+  doc("artifact href of 4001 code points", { resolved: { ...DONE, artifact: { label: "x", href: "h".repeat(4001) } } }, [])
+  doc("artifact href of 4000 code points", { resolved: { ...DONE, artifact: { label: "x", href: "h".repeat(4000) } } }, [])
+  // Resolutions, invalid: each branch of the check.
+  for (const [label, resolved] of [
+    ["null", null], ["a string", "done"], ["an array", []], ["a number", 3], ["an empty object", {}], ["a boolean", false],
+    ["no outcome", { summary: "x" }], ["an outcome that is a number", { outcome: 1, summary: "x" }], ["an unknown outcome", { outcome: "finished", summary: "x" }], ["an outcome in capitals", { outcome: "DONE", summary: "x" }],
+    ["a null outcome", { outcome: null, summary: "x" }],
+    ["no summary", { outcome: "done" }], ["a summary that is a number", { outcome: "done", summary: 5 }], ["a null summary", { outcome: "done", summary: null }], ["an empty summary", { outcome: "done", summary: "" }], ["a blank summary", { outcome: "done", summary: "  \t " }],
+    ["a summary over several lines", { outcome: "done", summary: "One.\nTwo." }], ["a summary ending in a newline", { outcome: "done", summary: "One.\n" }], ["a summary that is too long", { outcome: "done", summary: "x".repeat(121) }],
+    ["a long summary over several lines", { outcome: "done", summary: `${"x".repeat(130)}\ny` }], ["a summary with a carriage return", { outcome: "done", summary: "One.\rTwo." }],
+    ["a presentational field", { ...DONE, color: "green" }], ["an unknown field", { ...DONE, reason: "x" }], ["a misspelled field", { ...DONE, sumary: "x" }], ["a field with a slash", { ...DONE, "a/b~c": 1 }],
+    ["an op field", { ...DONE, op: "resolve" }], ["an integer-like key", { ...DONE, 7: 1 }],
+    ["an artifact that is null", { ...DONE, artifact: null }], ["an artifact that is a string", { ...DONE, artifact: "x" }], ["an artifact that is an array", { ...DONE, artifact: [] }], ["an empty artifact", { ...DONE, artifact: {} }],
+    ["an artifact without a label", { ...DONE, artifact: { href: "https://example.com" } }], ["an artifact label that is a number", { ...DONE, artifact: { label: 5 } }], ["an empty artifact label", { ...DONE, artifact: { label: "" } }], ["a blank artifact label", { ...DONE, artifact: { label: "   " } }],
+    ["a too long artifact label", { ...DONE, artifact: { label: "x".repeat(200) } }], ["an artifact href that is a number", { ...DONE, artifact: { label: "x", href: 5 } }], ["an empty artifact href", { ...DONE, artifact: { label: "x", href: "" } }],
+    ["a blank artifact href", { ...DONE, artifact: { label: "x", href: " " } }], ["a too long artifact href", { ...DONE, artifact: { label: "x", href: "h".repeat(5000) } }], ["an unknown artifact kind", { ...DONE, artifact: { label: "x", kind: "archive" } }],
+    ["an artifact kind that is a number", { ...DONE, artifact: { label: "x", kind: 1 } }], ["a null artifact kind", { ...DONE, artifact: { label: "x", kind: null } }], ["an artifact with a presentational field", { ...DONE, artifact: { label: "x", icon: "file" } }],
+    ["an artifact with an unknown field", { ...DONE, artifact: { label: "x", size: 1, mime: "x" } }], ["an artifact with a misspelled field", { ...DONE, artifact: { lable: "x" } }],
+    ["everything wrong", { outcome: "x", summary: "", artifact: { label: 1, href: 2, kind: 3, zzz: 4 }, color: "red" }],
+  ] as Array<[string, Json]>) {
+    doc(`resolution is ${label}`, { resolved }, [])
+    doc(`resolution is ${label}, with nodes`, { resolved })
+  }
+  // Nodes, open and resolved.
+  doc("open with empty nodes", {}, [])
+  doc("open with revision and empty nodes", { revision: 2 }, [])
+  doc("resolved with no nodes field", { resolved: DONE }, undefined)
+  doc("resolved with nodes that are not an array", { resolved: DONE }, { 0: TEXT })
+  doc("resolved with a null node", { resolved: DONE }, [null])
+  doc("resolved with a broken node", { resolved: DONE }, [{ type: "Text", id: "t", text: "" }])
+  doc("resolved with duplicate nodes", { resolved: DONE }, [TEXT, TEXT])
+  doc("resolved with two primaries", { resolved: DONE }, [{ type: "Action", id: "a", intent: "go", primary: true }, { type: "Action", id: "b", intent: "go on", primary: true }])
+  doc("a broken resolution and a broken revision and empty nodes", { revision: -2, resolved: { outcome: "x" } }, [])
+  doc("a broken revision, open, with empty nodes", { revision: "x" }, [])
+  doc("a top-level resolved typo", { resolvd: DONE }, [])
+  doc("resolved in a document with a locale", { locale: "ar-AE", revision: 1, resolved: DONE }, [])
+  return out
 }
 
 // ── Replies ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -559,13 +633,329 @@ export function buildReplyCorpus(): ReplyCorpus {
     push(fixture, "a reply that is a string", "activate")
     push(fixture, "a reply that is an array", [])
     push(fixture, "a reply that is a number", 5)
-    push(fixture, "an integer-like key", { experience: name, node: ns[0].id, act: "x", 7: 1 })
+    push(fixture, "an integer-like key", { experience: name, node: ns[0]?.id ?? "ghost", act: "x", 7: 1 })
   })
+  // A resolved experience takes no replies, whatever they are (L6): the ones that would have fit, and ones that never would.
+  const ended: Array<[string, Json]> = [
+    ["no nodes", { ir: "feather.ir/0", experience: "plan_trip", revision: 2, resolved: { outcome: "done", summary: "Booked." }, nodes: [] }],
+    ["cancelled, with its history", { ir: "feather.ir/0", experience: "plan_trip", resolved: { outcome: "cancelled", summary: "Cancelled.", artifact: { label: "Receipt" } }, nodes: [{ type: "Approval", id: "ok", intent: "approve", request: "Book it?" }, { type: "Text", id: "t", text: "Done." }] }],
+    ["failed", { ir: "feather.ir/0", experience: "plan_trip", revision: 5, resolved: { outcome: "failed", summary: "Sold out." }, nodes: [{ type: "Action", id: "go", intent: "go" }] }],
+  ]
+  for (const [label, ir] of ended) {
+    const key = `resolved/${label}`
+    experiences[key] = ir
+    const nodeId = ((ir as Obj).nodes as Obj[])[0]?.id ?? "ghost"
+    push(key, "an act on a node", { experience: "plan_trip", node: nodeId, act: "approve" })
+    push(key, "an act on a node that is not there", { experience: "plan_trip", node: "ghost", act: "activate" })
+    push(key, "the wrong experience", { experience: "other", node: nodeId, act: "activate" })
+    push(key, "an empty reply", {})
+    push(key, "a reply that is null", null)
+    push(key, "a reply that is a number", 5)
+    push(key, "a reply with an extra field", { experience: "plan_trip", node: nodeId, act: "activate", extra: 1 })
+  }
+  // The same for the resolved fixtures, and for a resolution that is not valid: the experience is judged first.
+  experiences["resolved/invalid resolution"] = { ir: "feather.ir/0", experience: "plan_trip", resolved: { outcome: "finished", summary: "" }, nodes: [] }
+  experiences["resolved/invalid revision"] = { ir: "feather.ir/0", experience: "plan_trip", revision: -1, resolved: { outcome: "done", summary: "x" }, nodes: [] }
+  for (const key of ["resolved/invalid resolution", "resolved/invalid revision"]) push(key, "any reply", { experience: "plan_trip", node: "y", act: "z" })
   // An experience that is not valid: nothing can be replied to.
   for (const [fixture, { ir }] of load("invalid").slice(0, 8)) {
     experiences[`invalid/${fixture}`] = ir
     push(`invalid/${fixture}`, "any reply", { experience: "x", node: "y", act: "z" })
   }
+  return { experiences, cases }
+}
+
+// ── Updates (L6) ──────────────────────────────────────────────────────────────────────────────────────────────
+
+const updateFixtures = (dir: string) =>
+  fs
+    .readdirSync(path.join(root, "update", dir))
+    .filter((f) => f.endsWith(".json"))
+    .sort()
+    .map((f) => [f.replace(/\.json$/, ""), JSON.parse(fs.readFileSync(path.join(root, "update", dir, f), "utf8")) as Obj] as const)
+
+const TRIP: Obj = {
+  ir: "feather.ir/0",
+  experience: "plan_trip",
+  locale: "en",
+  revision: 4,
+  nodes: [
+    { type: "Progress", id: "work", label: "Finding flights", value: 0.5, steps: [{ id: "search", label: "Search", state: "done" }, { id: "rank", label: "Rank", state: "active" }] },
+    { type: "Text", id: "intro", text: "Hello." },
+    { type: "Recommendation", id: "rec", intent: "take the flight", summary: "Direct, 9:40", confidence: 0.8 },
+    { type: "Action", id: "go", intent: "see more" },
+  ],
+}
+
+/** What applyUpdate() answers for the updates the conformance fixtures hold, and for ones that reach every branch of it. */
+export function buildUpdateCorpus(): UpdateCorpus {
+  const experiences: Record<string, Json> = {}
+  const cases: UpdateCase[] = []
+  const seen = new Set<string>()
+  const push = (name: string, key: string, update: unknown) => {
+    if (seen.has(name)) return
+    seen.add(name)
+    const sent = JSON.parse(JSON.stringify(update ?? null)) as Json
+    const result = applyUpdate(experiences[key] as unknown as Experience, sent)
+    cases.push(
+      result.ok
+        ? { name, experience: key, update: sent, ok: true, result: JSON.parse(JSON.stringify(result.experience)) as Json }
+        : { name, experience: key, update: sent, ok: false, issues: result.issues.map((i) => ({ code: i.code, path: i.path, message: i.message })) },
+    )
+  }
+
+  for (const [name, fixture] of updateFixtures("valid")) {
+    // A stream: each update applies to what the one before it made.
+    let current = fixture.experience as Json
+    ;(fixture.updates as Json[]).forEach((u, i) => {
+      const key = `valid/${name}@${i}`
+      experiences[key] = current
+      push(`valid/${name}: update ${i + 1}`, key, u)
+      const result = applyUpdate(current as unknown as Experience, u)
+      if (!result.ok) throw new Error(`valid update fixture ${name} (${i + 1}) is refused: ${JSON.stringify(result.issues)}`)
+      current = JSON.parse(JSON.stringify(result.experience)) as Json
+    })
+  }
+  for (const [name, fixture] of updateFixtures("invalid")) {
+    const key = `invalid/${name}`
+    experiences[key] = fixture.experience as Json
+    push(key, key, fixture.update)
+  }
+
+  experiences.trip = TRIP
+  const noRevision = clone(TRIP)
+  delete noRevision.revision
+  experiences["trip without a revision"] = noRevision
+  experiences.single = { ir: "feather.ir/0", experience: "plan_trip", revision: 1, nodes: [{ type: "Text", id: "only", text: "Only." }] }
+  experiences.resolved = load("valid").find(([n]) => n === "resolved-booking")![1].ir
+  experiences["resolved with history"] = load("valid").find(([n]) => n === "resolved-cancelled-with-history")![1].ir
+  experiences["not valid"] = { ir: "feather.ir/0", experience: "plan_trip", nodes: [] }
+  experiences["not an experience"] = 5
+  experiences["with a primary"] = { ir: "feather.ir/0", experience: "plan_trip", revision: 0, nodes: [{ type: "Action", id: "a", intent: "go", primary: true }, { type: "Text", id: "t", text: "x" }] }
+  experiences["revision 2.0"] = { ir: "feather.ir/0", experience: "plan_trip", revision: 2.0, nodes: [{ type: "Text", id: "t", text: "x" }] }
+
+  const u = (revision: unknown, ops: unknown, extra: Obj = {}): Obj => ({ update: "feather.update/0", experience: "plan_trip", revision, ops, ...extra }) as Obj
+  const text = (id: string, body = "Hi."): Obj => ({ type: "Text", id, text: body })
+  const run = (label: string, update: unknown, key = "trip") => push(`${key}: ${label}`, key, update)
+  const next: Record<string, number> = { trip: 5, single: 2, "trip without a revision": 1, "with a primary": 1 }
+  const ops = (label: string, list: unknown, key = "trip", revision: number = next[key]) => run(label, u(revision, list), key)
+
+  // The update itself.
+  for (const [label, value] of [["null", null], ["a number", 5], ["a string", "x"], ["an array", []], ["true", true], ["an empty object", {}]] as Array<[string, Json]>) run(`the update is ${label}`, value)
+  run("an extra field", u(5, [{ op: "remove", id: "go" }], { extra: 1 }))
+  run("a presentational field", u(5, [{ op: "remove", id: "go" }], { theme: "dark" }))
+  run("a misspelled field", u(5, [{ op: "remove", id: "go" }], { opps: [] }))
+  run("an integer-like key and a slash key", u(5, [{ op: "remove", id: "go" }], { 7: 1, "a/b": 2 }))
+  const noUpdate = u(5, [{ op: "remove", id: "go" }])
+  delete noUpdate.update
+  run("no update version", noUpdate)
+  for (const [label, value] of [["another version", "feather.update/1"], ["a number", 0], ["null", null], ["an ir version", "feather.ir/0"], ["an empty string", ""], ["a long string", "😀".repeat(60)]] as Array<[string, Json]>) run(`update version is ${label}`, u(5, [{ op: "remove", id: "go" }], { update: value }))
+  run("an unsupported version and a wrong experience", u(5, [], { update: "x", experience: "other" }))
+  const noExperience = u(5, [{ op: "remove", id: "go" }])
+  delete noExperience.experience
+  run("no experience", noExperience)
+  for (const [label, value] of [["another", "other_trip"], ["a number", 5], ["null", null], ["an empty string", ""], ["a long string", "x".repeat(100)]] as Array<[string, Json]>) run(`the experience is ${label}`, u(5, [{ op: "remove", id: "go" }], { experience: value }))
+  const noRev = u(5, [{ op: "remove", id: "go" }])
+  delete noRev.revision
+  run("no revision", noRev)
+  for (const [label, value] of [["the same", 4], ["behind", 3], ["zero", 0], ["negative", -1], ["two ahead", 6], ["far ahead", 1000], ["a fraction", 5.5], ["a string", "5"], ["null", null], ["true", true], ["an array", [5]], ["an object", {}], ["huge", 1e21]] as Array<[string, Json]>) {
+    run(`revision is ${label}`, u(value, [{ op: "remove", id: "go" }]))
+  }
+  run("a stale revision and a bad op", u(9, [{ op: "nope" }]))
+  run("a stale revision and an empty update", u(9, []))
+  run("a stale revision on an experience with no revision", u(2, [{ op: "remove", id: "go" }]), "trip without a revision")
+  run("the first update", u(1, [{ op: "remove", id: "go" }]), "trip without a revision")
+  run("the first update, from revision 0", u(1, [{ op: "remove", id: "a" }]), "with a primary")
+  run("a revision written 2.0 on the experience", u(3, [{ op: "remove", id: "t" }, { op: "add", node: text("u") }]), "revision 2.0")
+  run("a stale revision on a revision written 2.0", u(2, [{ op: "remove", id: "t" }]), "revision 2.0")
+  run("a missing revision on a revision written 2.0", { update: "feather.update/0", experience: "plan_trip", ops: [] }, "revision 2.0")
+
+  // The experience it applies to.
+  run("an experience that is not valid", u(1, [{ op: "add", node: text("t") }]), "not valid")
+  run("an experience that is not an object", u(1, [{ op: "add", node: text("t") }]), "not an experience")
+  run("a resolved experience", u(4, [{ op: "add", node: text("t") }]), "resolved")
+  run("a resolved experience and a stale revision", u(9, [{ op: "add", node: text("t") }]), "resolved")
+  run("a resolved experience and no ops", { update: "feather.update/0", experience: "plan_trip", revision: 4 }, "resolved")
+  run("a resolved experience, wrong experience", u(4, [], { experience: "x" }), "resolved")
+  run("a resolved experience with history", u(1, [{ op: "remove", id: "t" }]), "resolved with history")
+
+  // Ops, as a list.
+  run("no ops", u(5, undefined))
+  for (const [label, value] of [["an object", { op: "remove" }], ["a string", "remove"], ["null", null], ["a number", 3]] as Array<[string, Json]>) run(`ops is ${label}`, u(5, value))
+  ops("an empty list", [])
+  for (const [label, value] of [["null", null], ["a number", 5], ["a string", "remove"], ["an array", []], ["true", true]] as Array<[string, Json]>) ops(`an op that is ${label}`, [value])
+  ops("an op with no name", [{ id: "go" }])
+  for (const [label, value] of [["unknown", "destroy"], ["a number", 5], ["null", null], ["in capitals", "REMOVE"], ["empty", ""], ["a prototype key", "toString"], ["__proto__", "__proto__"], ["an array", ["add"]], ["constructor", "constructor"]] as Array<[string, Json]>) ops(`an op that is ${label}`, [{ op: value, id: "go" }])
+  ops("a good op, then a bad one", [{ op: "remove", id: "go" }, { op: "destroy" }])
+  ops("a bad op, then a good one", [{ op: "destroy" }, { op: "remove", id: "go" }])
+  ops("several bad ops", [null, { op: "x" }, { id: "go" }, { op: "remove" }, { op: "patch", id: "ghost", set: { a: 1 } }])
+
+  // add
+  ops("add at the end", [{ op: "add", node: text("t") }])
+  ops("add after a node", [{ op: "add", node: text("t"), after: "work" }])
+  ops("add after the last node", [{ op: "add", node: text("t"), after: "go" }])
+  ops("add several, in order", [{ op: "add", node: text("a"), after: "work" }, { op: "add", node: text("b"), after: "a" }, { op: "add", node: text("c") }])
+  ops("add after a node an earlier op added", [{ op: "add", node: text("a") }, { op: "add", node: text("b"), after: "a" }])
+  ops("add after a node an earlier op removed", [{ op: "remove", id: "intro" }, { op: "add", node: text("b"), after: "intro" }])
+  ops("add with an id an earlier op removed", [{ op: "remove", id: "intro" }, { op: "add", node: text("intro", "Again.") }])
+  ops("add an id that is there", [{ op: "add", node: text("intro") }])
+  ops("add an id an earlier op added", [{ op: "add", node: text("a") }, { op: "add", node: text("a") }])
+  ops("add after a node that is not there", [{ op: "add", node: text("t"), after: "ghost" }])
+  for (const [label, value] of [["a number", 5], ["null", null], ["an object", {}], ["an array", ["intro"]], ["an empty string", ""]] as Array<[string, Json]>) ops(`add after ${label}`, [{ op: "add", node: text("t"), after: value }])
+  ops("add with no node", [{ op: "add" }])
+  for (const [label, value] of [["null", null], ["a string", "x"], ["a number", 5], ["an array", [text("t")]]] as Array<[string, Json]>) ops(`add a node that is ${label}`, [{ op: "add", node: value }])
+  ops("add a node with no id", [{ op: "add", node: { type: "Text", text: "x" } }])
+  for (const [label, value] of [["a number", 5], ["null", null], ["an object", {}]] as Array<[string, Json]>) ops(`add a node whose id is ${label}`, [{ op: "add", node: { type: "Text", id: value, text: "x" } }])
+  ops("add a node with a bad id", [{ op: "add", node: text("1 bad id") }])
+  ops("add a node with no type", [{ op: "add", node: { id: "t", text: "x" } }])
+  ops("add a node of an unknown type", [{ op: "add", node: { type: "Recomendation", id: "t" } }])
+  ops("add a node with an empty text", [{ op: "add", node: text("t", "") }])
+  ops("add a node with a presentational field", [{ op: "add", node: { ...text("t"), color: "red" } }])
+  ops("add a second primary", [{ op: "add", node: { type: "Action", id: "b", intent: "go on", primary: true } }], "with a primary")
+  ops("add a second primary after unsetting the first", [{ op: "add", node: { type: "Action", id: "b", intent: "go on", primary: true } }, { op: "patch", id: "a", set: { primary: null } }], "with a primary")
+  ops("add an irreversible act with nothing confirming it", [{ op: "add", node: { type: "Action", id: "b", intent: "pay", reversible: false } }])
+  ops("add a node that refers to one that is not there", [{ op: "add", node: { type: "Alternative", id: "alt", intent: "other", for: "ghost" } }])
+  ops("add a node that refers to one that is there", [{ op: "add", node: { type: "Alternative", id: "alt", intent: "other", for: "rec" }, after: "rec" }])
+  ops("add an alternative before its target", [{ op: "add", node: { type: "Alternative", id: "alt", intent: "other", for: "rec" }, after: "work" }])
+  ops("add with an unknown field", [{ op: "add", node: text("t"), where: "end" }])
+  ops("add with a presentational field", [{ op: "add", node: text("t"), color: "red" }])
+  ops("add with a misspelled field", [{ op: "add", nod: text("t") }])
+  ops("add with a slash in a field name", [{ op: "add", node: text("t"), "a/b~c": 1 }])
+  ops("add with fields of other ops", [{ op: "add", node: text("t"), id: "x", set: {} }])
+  ops("add a form", [{ op: "add", node: { type: "Form", id: "f", intent: "answer", fields: [{ id: "a", prompt: "A?", kind: "text" }] } }])
+  ops("add the same node twice, in two places", [{ op: "add", node: text("t"), after: "work" }, { op: "add", node: text("t"), after: "go" }])
+  ops("add many nodes", Array.from({ length: 30 }, (_, i) => ({ op: "add", node: text(`n${i}`) })))
+
+  // replace
+  ops("replace a node", [{ op: "replace", node: { type: "Text", id: "intro", text: "New words." } }])
+  ops("replace with a node of another type", [{ op: "replace", node: { type: "Action", id: "intro", intent: "do it" } }])
+  ops("replace a node that is not there", [{ op: "replace", node: text("ghost") }])
+  ops("replace with no node", [{ op: "replace" }])
+  ops("replace with a node that is not an object", [{ op: "replace", node: "x" }])
+  ops("replace with a node with no id", [{ op: "replace", node: { type: "Text", text: "x" } }])
+  ops("replace with a node whose id is a number", [{ op: "replace", node: { type: "Text", id: 7, text: "x" } }])
+  ops("replace with an invalid node", [{ op: "replace", node: { type: "Text", id: "intro", text: "" } }])
+  ops("replace with an unknown type", [{ op: "replace", node: { type: "Spaceship", id: "intro" } }])
+  ops("replace a node an earlier op removed", [{ op: "remove", id: "intro" }, { op: "replace", node: text("intro") }])
+  ops("replace a node an earlier op added", [{ op: "add", node: text("t") }, { op: "replace", node: text("t", "Changed.") }])
+  ops("replace with fields of other ops", [{ op: "replace", node: text("intro"), after: "work", id: "intro" }])
+  ops("replace the target of a reference with a node of the wrong type", [{ op: "add", node: { type: "Alternative", id: "alt", intent: "other", for: "rec" } }, { op: "replace", node: text("rec") }])
+
+  // patch
+  ops("patch a field", [{ op: "patch", id: "work", set: { value: 0.75 } }])
+  ops("patch several fields", [{ op: "patch", id: "rec", set: { summary: "Direct, 10:40", confidence: 0.9, intent: "take it" } }])
+  ops("patch a field that was not there", [{ op: "patch", id: "intro", set: { importance: "high" } }])
+  ops("patch a field to null", [{ op: "patch", id: "rec", set: { confidence: null } }])
+  ops("patch a field that is not there to null", [{ op: "patch", id: "intro", set: { importance: null } }])
+  ops("patch a required field to null", [{ op: "patch", id: "intro", set: { text: null } }])
+  ops("patch every field to null", [{ op: "patch", id: "rec", set: { intent: null, summary: null, confidence: null } }])
+  ops("patch with a nested value", [{ op: "patch", id: "work", set: { steps: [{ id: "a", label: "A", state: "done" }] } }])
+  ops("patch the same node twice", [{ op: "patch", id: "work", set: { value: 0.6 } }, { op: "patch", id: "work", set: { value: 0.7, label: "Booking" } }])
+  ops("patch a node an earlier op added", [{ op: "add", node: text("t") }, { op: "patch", id: "t", set: { text: "Patched." } }])
+  ops("patch a node an earlier op replaced", [{ op: "replace", node: { type: "Text", id: "intro", text: "Replaced." } }, { op: "patch", id: "intro", set: { text: "Patched." } }])
+  ops("patch a node an earlier op removed", [{ op: "remove", id: "intro" }, { op: "patch", id: "intro", set: { text: "x" } }])
+  ops("patch a node that is not there", [{ op: "patch", id: "ghost", set: { a: 1 } }])
+  ops("patch with no id", [{ op: "patch", set: { a: 1 } }])
+  for (const [label, value] of [["a number", 5], ["null", null], ["an object", {}], ["an array", ["go"]]] as Array<[string, Json]>) ops(`patch an id that is ${label}`, [{ op: "patch", id: value, set: { a: 1 } }])
+  ops("patch with no set", [{ op: "patch", id: "work" }])
+  for (const [label, value] of [["null", null], ["an array", [1]], ["a string", "x"], ["a number", 5], ["true", true]] as Array<[string, Json]>) ops(`patch with a set that is ${label}`, [{ op: "patch", id: "work", set: value }])
+  ops("patch with an empty set", [{ op: "patch", id: "work", set: {} }])
+  ops("patch the id", [{ op: "patch", id: "work", set: { id: "other" } }])
+  ops("patch the type", [{ op: "patch", id: "work", set: { type: "Text" } }])
+  ops("patch the id and the type", [{ op: "patch", id: "work", set: { id: "x", type: "Text", value: 1 } }])
+  ops("patch the id of a node that is not there", [{ op: "patch", id: "ghost", set: { id: "x" } }])
+  ops("patch with no node and an empty set", [{ op: "patch", set: {} }])
+  ops("patch to a value of the wrong type", [{ op: "patch", id: "work", set: { value: "half" } }])
+  ops("patch to an out-of-range value", [{ op: "patch", id: "work", set: { value: 1.5 } }])
+  ops("patch in an unknown field", [{ op: "patch", id: "work", set: { zzz: 1 } }])
+  ops("patch in a presentational field", [{ op: "patch", id: "work", set: { color: "red" } }])
+  ops("patch in a misspelled field", [{ op: "patch", id: "work", set: { lable: "x" } }])
+  ops("patch in a field name with a slash", [{ op: "patch", id: "work", set: { "a/b~c": 1 } }])
+  ops("patch with an integer-like field name", [{ op: "patch", id: "work", set: { 7: 1 } }])
+  ops("patch with an unknown field on the op", [{ op: "patch", id: "work", set: { value: 1 }, node: text("x") }])
+  ops("patch in a primary that makes two", [{ op: "patch", id: "t", set: { primary: true } }], "with a primary")
+  ops("patch reversible false onto an act", [{ op: "patch", id: "go", set: { reversible: false } }])
+  ops("patch an expandable", [{ op: "patch", id: "rec", set: { expandable: { why: "Because." } } }])
+  ops("patch a text that is too long", [{ op: "patch", id: "intro", set: { text: "x".repeat(4001) } }])
+  ops("patch nulls into fields that are not there and are", [{ op: "patch", id: "rec", set: { expandable: null, confidence: null } }])
+
+  // remove
+  ops("remove a node", [{ op: "remove", id: "go" }])
+  ops("remove the first node", [{ op: "remove", id: "work" }])
+  ops("remove two nodes", [{ op: "remove", id: "work" }, { op: "remove", id: "rec" }])
+  ops("remove a node that is not there", [{ op: "remove", id: "ghost" }])
+  ops("remove a node twice", [{ op: "remove", id: "go" }, { op: "remove", id: "go" }])
+  ops("remove with no id", [{ op: "remove" }])
+  for (const [label, value] of [["a number", 5], ["null", null], ["an object", {}]] as Array<[string, Json]>) ops(`remove an id that is ${label}`, [{ op: "remove", id: value }])
+  ops("remove everything", [{ op: "remove", id: "work" }, { op: "remove", id: "intro" }, { op: "remove", id: "rec" }, { op: "remove", id: "go" }])
+  ops("remove the only node", [{ op: "remove", id: "only" }], "single")
+  ops("remove the only node and add another", [{ op: "remove", id: "only" }, { op: "add", node: text("t") }], "single")
+  ops("remove the target of a reference", [{ op: "add", node: { type: "Alternative", id: "alt", intent: "other", for: "rec" }, after: "rec" }, { op: "remove", id: "rec" }])
+  ops("remove the target of a reference an op later adds", [{ op: "remove", id: "rec" }, { op: "add", node: { type: "Alternative", id: "alt", intent: "other", for: "rec" } }])
+  ops("remove with an unknown field on the op", [{ op: "remove", id: "go", why: "x" }])
+  ops("remove with a presentational field on the op", [{ op: "remove", id: "go", style: "x" }])
+  ops("remove and add the same id", [{ op: "remove", id: "go" }, { op: "add", node: { type: "Action", id: "go", intent: "see all" } }])
+
+  // resolve
+  const resolve = (extra: Obj) => ({ op: "resolve", ...extra })
+  ops("resolve", [resolve(DONE)])
+  ops("resolve, cancelled", [resolve({ outcome: "cancelled", summary: "Cancelled." })])
+  ops("resolve, failed", [resolve({ outcome: "failed", summary: "Sold out." })])
+  ops("resolve with an artifact", [resolve({ ...DONE, artifact: { label: "Booking", href: "https://example.com/b/1", kind: "document" } })])
+  ops("resolve with a minimal artifact", [resolve({ ...DONE, artifact: { label: "Booking" } })])
+  ops("resolve and remove everything", [{ op: "remove", id: "work" }, { op: "remove", id: "intro" }, { op: "remove", id: "rec" }, { op: "remove", id: "go" }, resolve(DONE)])
+  ops("resolve after patching and adding", [{ op: "patch", id: "work", set: { value: 1 } }, { op: "add", node: text("t") }, resolve(DONE)])
+  ops("resolve the only node away", [{ op: "remove", id: "only" }, resolve(DONE)], "single")
+  ops("resolve with an invalid node left in", [{ op: "add", node: text("t", "") }, resolve(DONE)])
+  ops("resolve with no outcome", [resolve({ summary: "x" })])
+  ops("resolve with no summary", [resolve({ outcome: "done" })])
+  ops("resolve with nothing", [resolve({})])
+  ops("resolve with an unknown outcome", [resolve({ outcome: "finished", summary: "x" })])
+  ops("resolve with an outcome that is a number", [resolve({ outcome: 1, summary: "x" })])
+  ops("resolve with a summary that is a number", [resolve({ outcome: "done", summary: 1 })])
+  ops("resolve with an empty summary", [resolve({ outcome: "done", summary: "" })])
+  ops("resolve with a blank summary", [resolve({ outcome: "done", summary: "   " })])
+  ops("resolve with a summary over two lines", [resolve({ outcome: "done", summary: "One.\nTwo." })])
+  ops("resolve with a summary that is too long", [resolve({ outcome: "done", summary: "x".repeat(121) })])
+  ops("resolve with a summary of 120 code points", [resolve({ outcome: "done", summary: "😀".repeat(120) })])
+  ops("resolve with a summary of 121 code points", [resolve({ outcome: "done", summary: "😀".repeat(121) })])
+  ops("resolve with an unknown field", [resolve({ ...DONE, reason: "x" })])
+  ops("resolve with a presentational field", [resolve({ ...DONE, color: "green" })])
+  ops("resolve with a misspelled field", [resolve({ ...DONE, sumary: "x" })])
+  ops("resolve with fields of other ops", [resolve({ ...DONE, id: "go", node: text("t") })])
+  for (const [label, artifact] of [
+    ["null", null], ["a string", "x"], ["an array", []], ["empty", {}], ["with no label", { href: "https://example.com" }], ["with a label that is a number", { label: 5 }], ["with an empty label", { label: "" }],
+    ["with a blank label", { label: " " }], ["with a long label", { label: "x".repeat(121) }], ["with an href that is a number", { label: "x", href: 5 }], ["with an empty href", { label: "x", href: "" }],
+    ["with a long href", { label: "x", href: "h".repeat(4001) }], ["with an unknown kind", { label: "x", kind: "archive" }], ["with a kind that is a number", { label: "x", kind: 3 }],
+    ["with an unknown field", { label: "x", mime: "x" }], ["with a presentational field", { label: "x", icon: "f" }], ["with a misspelled field", { lable: "x" }],
+  ] as Array<[string, Json]>) ops(`resolve with an artifact ${label}`, [resolve({ ...DONE, artifact })])
+  ops("resolve with everything wrong", [resolve({ outcome: "x", summary: "", artifact: { label: 1, href: 2, kind: 3, zzz: 4 }, color: "red", id: "go" })])
+  ops("an op after resolve", [resolve(DONE), { op: "remove", id: "go" }])
+  ops("two resolves", [resolve(DONE), resolve({ outcome: "failed", summary: "Again." })])
+  ops("several ops after resolve", [resolve(DONE), { op: "add", node: text("t") }, null, { op: "nope" }, { op: "remove", id: "go" }])
+  ops("a bad resolve and an op after it", [resolve({ outcome: "x" }), { op: "remove", id: "go" }])
+  ops("resolve, then an unknown op", [resolve(DONE), { op: "destroy" }])
+  ops("resolve, then an op with no name", [resolve(DONE), { id: "go" }])
+  ops("resolve, then an op that is not an object", [resolve(DONE), 5])
+  ops("resolve after a bad add", [{ op: "add", node: text("intro") }, resolve(DONE)])
+
+  // All or nothing, and the result.
+  ops("a good op and a bad one, so none lands", [{ op: "patch", id: "work", set: { value: 1 } }, { op: "remove", id: "ghost" }])
+  ops("a good op and one whose result is invalid", [{ op: "patch", id: "work", set: { value: 1 } }, { op: "add", node: text("t", "") }])
+  ops("an invalid result, one problem", [{ op: "add", node: text("t", "") }])
+  ops("an invalid result, several problems", [{ op: "add", node: text("t", "") }, { op: "add", node: { type: "Spaceship", id: "s" } }, { op: "patch", id: "work", set: { value: 7 } }])
+  ops("an invalid result across nodes", [{ op: "patch", id: "go", set: { primary: true } }, { op: "patch", id: "rec", set: { primary: true } }])
+  ops("many invalid nodes in the result", Array.from({ length: 150 }, (_, i) => ({ op: "add", node: text(`n${i}`, "") })))
+  ops("exactly the issue limit in the result", Array.from({ length: 100 }, (_, i) => ({ op: "add", node: text(`n${i}`, "") })))
+  ops("one past the issue limit in the result", Array.from({ length: 101 }, (_, i) => ({ op: "add", node: text(`n${i}`, "") })))
+  ops("99 problems in the result", Array.from({ length: 99 }, (_, i) => ({ op: "add", node: text(`n${i}`, "") })))
+  ops("exactly the issue limit in ops", Array.from({ length: 100 }, () => ({ op: "remove", id: "ghost" })))
+  ops("one past the issue limit in ops", Array.from({ length: 101 }, () => ({ op: "remove", id: "ghost" })))
+  ops("many more than the issue limit in ops", Array.from({ length: 300 }, () => ({ op: "remove", id: "ghost" })))
+  ops("99 problems in ops", Array.from({ length: 99 }, () => ({ op: "remove", id: "ghost" })))
+  ops("a stale revision, then the issue limit", Array.from({ length: 101 }, () => null), "trip", 9)
+  ops("unicode ids and names", [{ op: "add", node: { type: "Text", id: "é", text: "Héllo" } }, { op: "patch", id: "é", set: { zébra: 1 } }])
+  ops("an emoji summary and label", [resolve({ outcome: "done", summary: "✈️ Booked", artifact: { label: "🎫 Ticket", href: "https://example.com/é" } })])
   return { experiences, cases }
 }
 
@@ -594,9 +984,11 @@ if (isMain) {
   const check = process.argv.includes("--check")
   const ir = buildIrCorpus()
   const replies = buildReplyCorpus()
+  const updates = buildUpdateCorpus()
   const outputs: Array<[string, string, number]> = [
     [IR_CORPUS_PATH, `${JSON.stringify(ir)}\n`, ir.length],
     [REPLY_CORPUS_PATH, `${JSON.stringify(replies)}\n`, replies.cases.length],
+    [UPDATE_CORPUS_PATH, `${JSON.stringify(updates)}\n`, updates.cases.length],
     [URL_CORPUS_PATH, `${JSON.stringify(buildUrlCorpus())}\n`, buildUrlCorpus().length],
   ]
   let stale = false

@@ -1,6 +1,6 @@
 import fs from "node:fs"
 import { describe, expect, it } from "vitest"
-import { IR_CORPUS_PATH, REPLY_CORPUS_PATH, URL_CORPUS_PATH, buildIrCorpus, buildReplyCorpus, buildUrlCorpus } from "../scripts/parity.ts"
+import { IR_CORPUS_PATH, REPLY_CORPUS_PATH, UPDATE_CORPUS_PATH, URL_CORPUS_PATH, buildIrCorpus, buildReplyCorpus, buildUpdateCorpus, buildUrlCorpus } from "../scripts/parity.ts"
 import { NODE_SPECS } from "../src/index.ts"
 
 // conformance/parity is what the Python package (packages/python) is tested against. It is generated from this
@@ -13,6 +13,9 @@ describe("the parity corpus", () => {
   })
   it(`conformance/parity/reply.json ${stale}`, () => {
     expect(fs.readFileSync(REPLY_CORPUS_PATH, "utf8")).toBe(`${JSON.stringify(buildReplyCorpus())}\n`)
+  })
+  it(`conformance/parity/update.json ${stale}`, () => {
+    expect(fs.readFileSync(UPDATE_CORPUS_PATH, "utf8")).toBe(`${JSON.stringify(buildUpdateCorpus())}\n`)
   })
   it(`conformance/parity/url.json ${stale}`, () => {
     expect(fs.readFileSync(URL_CORPUS_PATH, "utf8")).toBe(`${JSON.stringify(buildUrlCorpus())}\n`)
@@ -35,5 +38,25 @@ describe("the parity corpus", () => {
     expect(Object.keys(NODE_SPECS).filter((t) => !types.has(t))).toEqual([])
     expect(ir.some((c) => c.issues.length === 0)).toBe(true)
     expect(replies.cases.some((c) => c.issues.length === 0)).toBe(true)
+  })
+  it("has update cases for every update issue code and every op, plus the all-or-nothing and issue-limit cases", () => {
+    const updates = buildUpdateCorpus()
+    expect(updates.cases.length).toBeGreaterThanOrEqual(250)
+    const codes = new Set(updates.cases.flatMap((c) => (c.issues ?? []).map((i) => i.code)))
+    const source = fs.readFileSync(new URL("../src/update.ts", import.meta.url), "utf8")
+    const own = [...source.slice(source.indexOf("export type UpdateIssueCode"), source.indexOf("export interface UpdateIssue")).matchAll(/\| "([a-z-]+)"/g)].map((m) => m[1])
+    // The codes an update raises from the validator's list, and the ones an invalid result carries under /result.
+    const shared = ["not-an-object", "unsupported-version", "missing-field", "wrong-type", "empty-text", "too-long", "unknown-field", "presentational-field", "duplicate-id", "invalid-value", "empty-experience", "multiple-primary", "too-many-issues"]
+    expect([...own, ...shared].filter((c) => !codes.has(c))).toEqual([])
+    expect(updates.cases.some((c) => (c.issues ?? []).some((i) => i.path.startsWith("/result/")))).toBe(true)
+    const okOps = new Set(updates.cases.filter((c) => c.ok).flatMap((c) => ((c.update as { ops?: Array<{ op: string }> }).ops ?? []).map((o) => o.op)))
+    expect(["add", "replace", "patch", "remove", "resolve"].filter((o) => !okOps.has(o))).toEqual([])
+    expect(updates.cases.filter((c) => c.ok).length).toBeGreaterThanOrEqual(30)
+    expect(updates.cases.filter((c) => c.name.startsWith("valid/streamed-trip: ")).map((c) => c.ok)).toEqual([true, true, true])
+    // Resolutions: resolved and open experiences with no nodes, and replies to a resolved experience.
+    const ir = buildIrCorpus()
+    expect(ir.some((c) => c.name === "lifecycle: resolved with no nodes" && c.issues.length === 0)).toBe(true)
+    expect(ir.some((c) => c.name === "lifecycle: open with empty nodes" && c.issues.some((i) => i.code === "empty-experience"))).toBe(true)
+    expect(buildReplyCorpus().cases.some((c) => c.issues.some((i) => i.code === "resolved"))).toBe(true)
   })
 })
