@@ -73,7 +73,9 @@ export const FlightSearchDelegate: Story = {
     const canvas = within(canvasElement)
     const other = canvas.getByRole("button", { name: "Other options" })
     await expect(other).toHaveAttribute("aria-expanded", "false")
-    await userEvent.click(other)
+    // By keyboard, as the other play stories: a pointer would leave a hover state the visual suite cannot hold still.
+    other.focus()
+    await userEvent.keyboard("{Enter}")
     await expect(other).toHaveAttribute("aria-expanded", "true")
     await expect(args.onReply).not.toHaveBeenCalled()
   },
