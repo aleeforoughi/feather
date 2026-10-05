@@ -217,6 +217,71 @@ rule("output-routing", () => {
     expect(plan(doc(text), { capability: { output: { audio: "unavailable" } } }).cues).toBe("text-only")
     expect(plan(doc(text)).cues).toBe("audio-and-text")
   })
+  it("never asks a person who does not speak to speak: without a screen they get text, confirmed by typing", () => {
+    const p = plan(doc(spend), { capability: { output: { visual: "unavailable" }, input: { voice: false } } })
+    expect(p.manifestation).toBe("text")
+    expect(find(p, "go").confirm).toBe("typed-keyword")
+    expect(plan(doc(text), { device: { surface: "speaker" }, capability: { input: { voice: false } } }).manifestation).toBe("text")
+  })
+  it("speaks while the person's eyes or hands are busy, when speech works both ways", () => {
+    expect(plan(doc(text), { capability: { temporary: { eyesBusy: true } } }).manifestation).toBe("voice")
+    expect(plan(doc(text), { capability: { temporary: { handsBusy: true } } }).manifestation).toBe("voice")
+    expect(plan(doc(text), { capability: { temporary: { handsBusy: true }, input: { voice: false } } }).manifestation).toBe("web")
+    expect(plan(doc(text), { capability: { temporary: { eyesBusy: true }, output: { audio: "unavailable" } } }).manifestation).toBe("web")
+  })
+  it("treats a loud room as no reliable sound: cues become text, and speech is not chosen", () => {
+    const p = plan(doc(text), { capability: { temporary: { noisy: true, handsBusy: true } } })
+    expect(p.cues).toBe("text-only")
+    expect(p.manifestation).toBe("web")
+  })
+})
+
+rule("autonomy", () => {
+  const options = doc({ ...rec, expandable: undefined }, alt, { type: "ExploreMore", id: "more", intent: "see more", label: "More ideas" })
+  it("shows a reversible prediction as a note and preselects nothing for a person who picks for themselves", () => {
+    const p = plan(doc(choice, predicted), { persona: { autonomy: "ask" } })
+    expect(find(p, "c").preselected).toBeUndefined()
+    expect(find(p, "c").organism).toBe("Choice")
+    expect(find(p, "c").attached?.map((n) => n.organism)).toEqual(["PredictionNote"])
+    expect(find(plan(doc(choice, predicted)), "c").preselected).toBe("m")
+  })
+  it("keeps the caller's own selection when the person picks for themselves", () => {
+    // A prediction always agrees with a selection (the validator refuses otherwise); the selection is state, so it stays.
+    const p = plan(doc({ ...choice, selected: ["m"] }, predicted), { persona: { autonomy: "ask" } })
+    expect(find(p, "c").preselected).toBe("m")
+    expect(decided(p, "node c.preselected").rule).toBe("autonomy")
+  })
+  it("folds the other ways to go behind one disclosure for a person who delegates", () => {
+    const p = plan(options, { persona: { autonomy: "delegate" } })
+    expect(p.regions[1].nodes.map((n) => n.collapsed)).toEqual([true, true])
+    expect(plan(options).regions[1].nodes.every((n) => n.collapsed === undefined)).toBe(true)
+    // The acts stay reachable: every node is still in the plan, in the same order.
+    expect(p.order).toEqual(plan(options).order)
+  })
+  it("never folds anything beside an irreversible primary act, nor a critical option", () => {
+    expect(plan(doc({ ...rec, reversible: false }, alt, spend), { persona: { autonomy: "delegate" } }).regions[1].nodes[0].collapsed).toBeUndefined()
+    expect(plan(doc(rec, { ...alt, importance: "critical" }), { persona: { autonomy: "delegate" } }).regions[1].nodes[0].collapsed).toBeUndefined()
+  })
+  it("never touches an irreversible choice: it stays unselected whatever the autonomy", () => {
+    const confirm = { type: "IrreversibleAction", id: "go", intent: "confirm the size", confirms: "c", consequence: { statement: "The order ships." } }
+    expect(find(plan(doc({ ...choice, reversible: false }, predicted, confirm), { persona: { autonomy: "delegate" } }), "c").preselected).toBeUndefined()
+  })
+  it("ranks a learned autonomy below the task and an explicit one above it", () => {
+    expect(decided(plan(options, { persona: { autonomy: "delegate", learned: ["autonomy"] } }), "node ~alternatives:rec.collapsed").level).toBe("learned")
+    expect(decided(plan(options, { persona: { autonomy: "delegate" } }), "node ~alternatives:rec.collapsed").level).toBe("user-setting")
+  })
+})
+
+rule("reading", () => {
+  it("keeps detail closed for plain reading, even for a person who asks for detail, but never critical detail", () => {
+    expect(find(plan(doc(rec), { capability: { reading: "plain" }, persona: { explanation: "detailed" } }), "rec").expanded).toBe(false)
+    expect(find(plan(doc({ ...rec, importance: "critical" }), { capability: { reading: "plain" } }), "rec").expanded).toBe(true)
+  })
+  it("folds other ways to go behind one disclosure, above a person's wish to see them all", () => {
+    const p = plan(doc(rec, alt), { capability: { reading: "plain" }, persona: { autonomy: "ask" } })
+    expect(p.regions[1].nodes[0].collapsed).toBe(true)
+    expect(decided(p, "node ~alternatives:rec.collapsed").rule).toBe("reading")
+  })
 })
 
 rule("explanation-depth", () => {

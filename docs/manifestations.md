@@ -85,6 +85,10 @@ interface Choice {
   - and a `PredictionNote`, which offers nothing. The primary act is listed first, and the others keep their order. An
   IrreversibleAction's `cancel` is not listed; it is reached by backing out of its confirm turn (see below), as
   on the web.
+  - **Collapsed nodes** (`collapsed: true`, secondary only): their content is not read and their acts are not
+    listed. In their place browse offers one choice, `Other options`, after every other act. Picking it emits
+    nothing; it opens them, and browse is shown again with their content and acts in plan order, as if they were
+    never collapsed. They stay open for the rest of the experience.
 - **value.** An act that needs a value asks for it with one `question` part, and options as choices when they
   exist:
   - Choice: its options. A `multiple` Choice takes several numbers or labels separated by commas.
@@ -246,6 +250,8 @@ Switch access on the web, built on `manifest-web` (`PlanView`).
     on its own.
   - It stops when the experience is done.
 - **Irreversible acts** keep the organism's two deliberate acts: arm, then confirm. Each is a separate selection.
+- **Collapsed nodes** render inside the web's "Other options" disclosure. Its button is one target; once it is
+  selected, the nodes inside become targets in plan order.
 - **A Form** is operated as any other fields and buttons: each field is a text target (typing pauses scanning, Escape
   resumes it), then the submit control, and the skip control when it exists. All answers go with the one selection of
   the submit control.

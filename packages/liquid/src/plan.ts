@@ -70,6 +70,9 @@ export interface PlanNode {
   node?: IRNode
   /** Nodes folded into this one, composed like any other: the PredictedChoice of a reversible Choice. */
   merged?: PlanNode[]
+  /** A secondary node shown folded behind one disclosure ("Other options"), opened by one act. Its acts are unchanged
+   * and stay reachable; only what is in view by default changes (rules autonomy and reading). */
+  collapsed?: true
 }
 
 export interface Region {
@@ -103,6 +106,8 @@ export type RuleId =
   | "contrast"
   | "importance"
   | "structure"
+  | "autonomy"
+  | "reading"
   | "defaults"
 
 export interface LayoutPlan {

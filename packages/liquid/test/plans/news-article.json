@@ -152,6 +152,13 @@
         "subject": "node explore.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node explore.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   },
@@ -308,6 +315,13 @@
         "subject": "node explore.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node explore.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   },
@@ -485,6 +499,13 @@
         "subject": "node explore.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node explore.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   },
@@ -641,6 +662,13 @@
         "subject": "node explore.emphasis",
         "value": "default",
         "because": "normal importance"
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node explore.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   }

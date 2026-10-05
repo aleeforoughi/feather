@@ -77,7 +77,7 @@ const KEYWORDS: Record<string, string> = {
 
 const STRENGTH: Record<Emphasis, number> = { critical: 0, primary: 1, high: 2, default: 3, quiet: 4 }
 
-type LearnableField = "density" | "explanation" | "motion" | "inputMode"
+type LearnableField = "density" | "explanation" | "motion" | "inputMode" | "autonomy"
 
 function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
   const trace: TraceEntry[] = []
@@ -111,23 +111,36 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
 
   // ── Rule 6: output routing ──────────────────────────────────────────────────────────────────────────────────────
   // The body follows what the person can perceive first; how they prefer to give input never removes a screen.
+  // A person who cannot speak is never asked to: without a screen they get text (read aloud by their screen reader,
+  // answered by typing). A temporary state binds like a lasting one while it holds (L5).
   const noVisual = capability.output?.visual === "unavailable"
   const noSound = capability.output?.audio === "unavailable"
+  const cannotSpeak = capability.input?.voice === false
+  const temporary = capability.temporary ?? {}
+  const noisy = temporary.noisy === true
   const speaker = device.surface === "speaker"
   const screenBody = !noVisual && !speaker && device.surface !== "terminal"
+  /** Speech both ways works: the person can hear, can speak, and the room lets them. */
+  const speechWorks = !noSound && !cannotSpeak && !noisy
   const manifestation = decide<Manifestation>(trace, "plan.manifestation", [
     noVisual && {
       rule: "output-routing",
       level: "accessibility",
-      value: noSound ? "text" : "voice",
-      because: noSound ? "no visual and no audio output: plain text, for a braille display" : "no visual output: the experience is spoken",
+      value: noSound || cannotSpeak ? "text" : "voice",
+      because: noSound
+        ? "no visual and no audio output: plain text, for a braille display"
+        : cannotSpeak
+          ? "no visual output and no speech input: text, read aloud by the screen reader and answered by typing"
+          : "no visual output: the experience is spoken",
     },
     speaker && {
       rule: "output-routing",
       level: "task",
-      value: noSound ? "text" : "voice",
-      because: noSound ? "a speaker with no audio output: plain text" : "a speaker has no screen: the experience is spoken",
+      value: noSound || cannotSpeak ? "text" : "voice",
+      because: noSound ? "a speaker with no audio output: plain text" : cannotSpeak ? "a speaker, and the person does not speak: text" : "a speaker has no screen: the experience is spoken",
     },
+    screenBody && temporary.eyesBusy === true && speechWorks && { rule: "output-routing", level: "accessibility", value: "voice", because: "the person's eyes are busy for now: the experience is spoken" },
+    screenBody && temporary.handsBusy === true && speechWorks && { rule: "output-routing", level: "accessibility", value: "voice", because: "the person's hands are busy for now: the experience is spoken" },
     device.surface === "terminal" && { rule: "output-routing", level: "task", value: "text", because: "a terminal shows text" },
     screenBody && capability.input?.switch === true && { rule: "output-routing", level: "accessibility", value: "switch", because: "the person uses switch access: scanning order and dwell" },
     screenBody && persona.inputMode === "switch" && { rule: "output-routing", level: preference("inputMode"), value: "switch", because: "the person prefers switch access" },
@@ -135,6 +148,7 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
   ])
   const cues = decide<LayoutPlan["cues"]>(trace, "plan.cues", [
     noSound && { rule: "output-routing", level: "accessibility", value: "text-only", because: "no audio output: every audio-only cue becomes text" },
+    noisy && { rule: "output-routing", level: "accessibility", value: "text-only", because: "sound cannot be relied on for now: every audio-only cue becomes text" },
     { rule: "defaults", level: "default", value: "audio-and-text", because: "audio output is available or unstated" },
   ])
 
@@ -208,6 +222,8 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
     ]))
 
   // ── Structure: what renders as part of what ─────────────────────────────────────────────────────────────────────
+  // Rule autonomy: a person who picks for themselves sees the caller's prediction as a note, not preselected.
+  const asks = persona.autonomy === "ask"
   const consumed = new Set<string>()
   const attachments = new Map<string, IRNode[]>()
   const predictions = new Map<string, IRNode>()
@@ -225,7 +241,9 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
       trace.push(
         isIrreversible(choice)
           ? { rule: "structure", level: "safety", subject: `node ${node.id}`, value: `a note on ${choice.id}`, because: "an irreversible choice is never preselected: the prediction shows beside it as a note" }
-          : { rule: "structure", level: "task", subject: `node ${node.id}`, value: `merged into ${choice.id}`, because: "a prediction renders with its Choice, preselected" }
+          : asks
+            ? { rule: "autonomy", level: preference("autonomy"), subject: `node ${node.id}`, value: `a note on ${choice.id}`, because: "the person picks for themselves: the prediction shows beside the choice as a note" }
+            : { rule: "structure", level: "task", subject: `node ${node.id}`, value: `merged into ${choice.id}`, because: "a prediction renders with its Choice, preselected" }
       )
     } else if (node.type === "Tradeoff" && node.of && byId.has(node.of)) {
       attach(node.of, node, "a tradeoff renders with the option it describes")
@@ -250,6 +268,7 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
     if (node.expandable) {
       out.expanded = decide<boolean>(trace, `${at}.expanded`, [
         level === "critical" && { rule: "critical-never-hidden", level: "safety", value: true, because: "critical detail is never hidden behind expansion" },
+        capability.reading === "plain" && { rule: "reading", level: "accessibility", value: false, because: "plain reading: less to read at once, detail behind \"Why?\"" },
         persona.explanation === "detailed" && { rule: "explanation-depth", level: preference("explanation"), value: true, because: "the person wants detailed explanations" },
         persona.explanation === "brief" && { rule: "explanation-depth", level: preference("explanation"), value: false, because: "the person wants brief explanations" },
         { rule: "defaults", level: "default", value: false, because: 'detail on demand, behind "Why?" (principle 5)' },
@@ -273,12 +292,18 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
       const selected = node.multiple !== true && node.selected?.length === 1 ? node.selected[0] : undefined
       const preselected = decide<string | null>(trace, `${at}.preselected`, [
         irreversible && { rule: "irreversible-explicit", level: "safety", value: null, because: "an irreversible choice is never preselected" },
+        asks && prediction?.type === "PredictedChoice" && {
+          rule: "autonomy",
+          level: preference("autonomy"),
+          value: selected !== undefined && selected !== "" ? selected : null,
+          because: "the person picks for themselves: the prediction is not preselected",
+        },
         prediction?.type === "PredictedChoice" && { rule: "recommendation-first", level: "task", value: prediction.option, because: `the predicted option "${prediction.option}" is preselected` },
         selected !== undefined && selected !== "" && { rule: "recommendation-first", level: "task", value: selected, because: `the caller's selection "${selected}"` },
         { rule: "defaults", level: "default", value: null, because: "nothing to preselect" },
       ])
       if (preselected !== null) out.preselected = preselected
-      if (prediction && irreversible) {
+      if (prediction && (irreversible || asks)) {
         out.attached = [{ ...planNode(prediction), organism: "PredictionNote" }]
       } else if (prediction) {
         out.organism = "PredictedChoice"
@@ -321,6 +346,22 @@ function composeValid(experience: Experience, rawContext: unknown): LayoutPlan {
       strongest !== "quiet" && { rule: "importance", level: "task", value: strongest, because: "a list stands out as much as its strongest alternative" },
       { rule: "importance", level: "default", value: "quiet", because: "every alternative in it is quiet" },
     ])
+  }
+
+  // ── Autonomy and reading: other ways to go fold behind one disclosure ───────────────────────────────────────────
+  // Never when something there is critical, and never beside an act that cannot be undone: the person sees every way
+  // before committing to one that is permanent.
+  const primaryIrreversible = primaryNode !== undefined && isIrreversible(primaryNode)
+  for (const node of secondary) {
+    const collapsed = decide<boolean>(trace, `node ${node.id}.collapsed`, [
+      node.emphasis === "critical" && { rule: "critical-never-hidden", level: "safety", value: false, because: "a critical option is never folded away" },
+      primaryIrreversible && { rule: "irreversible-explicit", level: "safety", value: false, because: `the primary act "${primary}" cannot be undone: every other way stays in view` },
+      capability.reading === "plain" && { rule: "reading", level: "accessibility", value: true, because: "plain reading: other options fold behind one disclosure" },
+      persona.autonomy === "delegate" && { rule: "autonomy", level: preference("autonomy"), value: true, because: "the person delegates: only the recommended way stays in view" },
+      persona.autonomy === "ask" && { rule: "autonomy", level: preference("autonomy"), value: false, because: "the person picks for themselves: every option stays in view" },
+      { rule: "defaults", level: "default", value: false, because: "other ways to go show below the main path" },
+    ])
+    if (collapsed) node.collapsed = true
   }
 
   // ── Order: every IR node once, as it is read, spoken or scanned ─────────────────────────────────────────────────

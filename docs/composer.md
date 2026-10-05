@@ -1,4 +1,4 @@
-# The liquid composer (milestone L3)
+# The liquid composer (milestones L3 and L5)
 
 ```text
 compose(experience, context) → LayoutPlan
@@ -22,8 +22,8 @@ comes back as an `unreadable` issue.
 
 | Part | Fields |
 |---|---|
-| `persona` | `density`, `explanation` (brief, standard, detailed), `motion` (full, reduced), `inputMode`, `learned` (which of those fields the host learned rather than the person set) |
-| `capability` | `input` (pointer, touch, keyboard, voice, switch), `output` (visual, audio: available or unavailable), `vision` (typical, low), `precision` (typical, low) |
+| `persona` | `density`, `explanation` (brief, standard, detailed), `motion` (full, reduced), `inputMode`, `autonomy` (ask, suggest, delegate), `learned` (which of those fields the host learned rather than the person set) |
+| `capability` | `input` (pointer, touch, keyboard, voice, switch), `output` (visual, audio: available or unavailable), `vision` (typical, low), `precision` (typical, low), `reading` (typical, plain), `temporary` (`eyesBusy`, `handsBusy`, `noisy`: what holds for now) |
 | `device` | `surface` (phone, tablet, desktop, watch, speaker, terminal), `width`, `reducedMotion`, `colorScheme` |
 | `brand` | the brand's `density` and `motion` axes |
 | `locale` | a BCP 47 tag, for formatting and the confirm keyword; defaults to the experience's locale, then `en` |
@@ -80,13 +80,15 @@ and a Warning `high` unless they say otherwise.
 | `recommendation-first` (7.3) | Alternatives follow in the `secondary` region, one AlternativeList per node they are alternatives to (`~alternatives:<for>`, or `~alternatives` when they name none). A reversible Choice preselects its predicted option, or the caller's selection. Focus starts on a reversible primary act. |
 | `critical-never-hidden` (7.4) | A critical node (with the IR's defaults) has emphasis `critical`, and its detail shows open (`expanded: true`), whatever the persona. |
 | `density-and-targets` (7.5) | `plan.density` comes from the person, then the brand, then `comfortable`. Low precision gives `spacious` density and 44 px targets. Touch surfaces get 44 px targets; others get the 24 px minimum (`plan.minTarget`). |
-| `output-routing` (7.6) | `plan.manifestation` follows output first: no visual output or a speaker gives `voice` (`text` when there is no audio either), and a terminal gives `text`. Switch access, needed or preferred, gives `switch` only where there is a screen. Anything else gets `web`. An input preference never removes a screen, so `inputMode: "voice"` keeps `web`. No audio output makes `plan.cues` `text-only`, and an audio or video Media gets `textEquivalent: true`. |
+| `output-routing` (7.6) | `plan.manifestation` follows output first: no visual output or a speaker gives `voice` (`text` when there is no audio either), and a terminal gives `text`. Switch access, needed or preferred, gives `switch` only where there is a screen. Anything else gets `web`. An input preference never removes a screen, so `inputMode: "voice"` keeps `web`. A person who cannot speak (`input.voice: false`) is never routed to voice: without a screen they get `text`. While the person's eyes or hands are busy (`temporary`), the experience is `voice` when speech works both ways (they can hear and speak, and the room is not `noisy`). No audio output, or a noisy room, makes `plan.cues` `text-only`, and with no audio output an audio or video Media gets `textEquivalent: true`. |
 | `explanation-depth` (7.7) | `expanded` on nodes with detail: brief closes it, detailed opens it. |
 | `reduced-motion` (7.8) | `plan.motion` is `reduced` when the OS or the person asks, over any brand motion. |
 | `text-without-decision` (7.9) | `plan.chrome` is `none` (plain text, no card) for a single Text, Confirmation or Status with no expandable detail, at most 120 code points and one line. |
 | `contrast` (7.10) | `plan.contrast` is `AAA` where vision is low, otherwise `AA`. |
 | `importance` | High importance gives emphasis `high`, low gives `quiet`. A group of alternatives stands out as much as its strongest member. |
 | `structure` | A PredictedChoice merges into its reversible Choice (organism `PredictedChoice`), composed as a plan node. A Tradeoff attaches to the option it describes, and the requester attaches to every Approval it asks for. |
+| `autonomy` (L5) | `ask`: a reversible prediction shows as a `PredictionNote` and nothing is preselected (the caller's own selection stays), and secondary nodes stay in view. `delegate`: each secondary node gets `collapsed: true`. At the person's level (explicit or learned). Never folds a critical node, nor anything beside an irreversible primary act (both at safety level), and never changes an irreversible Choice. |
+| `reading` (L5) | Plain reading closes expandable detail (critical detail still shows) and collapses secondary nodes, at accessibility level: above the person's own `explanation` or `autonomy`. |
 | `defaults` | What the composer assumes when no rule applies, stated in the trace. |
 
 Every rule has tests in `packages/liquid/test/rules.test.ts`. Every valid conformance fixture, composed in every
@@ -135,6 +137,7 @@ interface PlanNode {
   items?: PlanNode[]              // the members of a group
   node?: IRNode                   // the IR node it renders
   merged?: PlanNode[]             // the PredictedChoice of a reversible Choice
+  collapsed?: true                // a secondary node folded behind one "Other options" disclosure; its acts stay reachable
 }
 ```
 
@@ -157,6 +160,10 @@ The web manifestation renders a plan with Feather's organisms and atoms. It must
   - `textEquivalent` renders the Media's transcript in place of the player.
   - A `PredictionNote` shows the prediction beside the Choice as text, and never preselects.
   - `preselected` preselects the option.
+  - `collapsed` secondary nodes render together inside one disclosure, closed at first render: a button labelled
+    "Other options" (`data-slot="experience-other-options"`, `aria-expanded`, `aria-controls`) after the rest of the
+    secondary region. Opening it emits nothing and shows them in plan order; it stays open. Closed, its contents are
+    not rendered, so nothing inside is focusable or scanned.
   - `focus` moves focus to that node's first control once, on mount, and never otherwise. Organisms themselves
     never move focus on render.
 - **Turn every act into a reply:** an organism's `onAct(act, value?)` becomes `{ experience, node, act, value }`.

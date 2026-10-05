@@ -5,7 +5,7 @@ import type { RenderContext } from "@aleeforoughi/feather-context"
 import type { TraceEntry } from "./plan.ts"
 
 const DENSITY = ["compact", "comfortable", "spacious"] as const
-const LEARNABLE = ["density", "explanation", "motion", "inputMode"] as const
+const LEARNABLE = ["density", "explanation", "motion", "inputMode", "autonomy"] as const
 const INPUTS = ["pointer", "touch", "keyboard", "voice", "switch"] as const
 const AVAILABILITY = ["available", "unavailable"] as const
 const LOCALE = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$/
@@ -54,6 +54,7 @@ export function normalizeContext(raw: unknown, trace: TraceEntry[]): RenderConte
     assign(p, "explanation", pick(persona, "persona", "explanation", ["brief", "standard", "detailed"]))
     assign(p, "motion", pick(persona, "persona", "motion", ["full", "reduced"]))
     assign(p, "inputMode", pick(persona, "persona", "inputMode", INPUTS))
+    assign(p, "autonomy", pick(persona, "persona", "autonomy", ["ask", "suggest", "delegate"]))
     const learned = read(persona, "learned")
     if (learned !== undefined) {
       if (Array.isArray(learned)) {
@@ -83,6 +84,13 @@ export function normalizeContext(raw: unknown, trace: TraceEntry[]): RenderConte
     } else if (output !== undefined) drop("capability.output", output, "an object")
     assign(c, "vision", pick(capability, "capability", "vision", ["typical", "low"]))
     assign(c, "precision", pick(capability, "capability", "precision", ["typical", "low"]))
+    assign(c, "reading", pick(capability, "capability", "reading", ["typical", "plain"]))
+    const temporary = read(capability, "temporary")
+    if (isObject(temporary)) {
+      const t: NonNullable<typeof c.temporary> = {}
+      for (const key of ["eyesBusy", "handsBusy", "noisy"] as const) assign(t, key, flag(temporary, "capability.temporary", key))
+      c.temporary = t
+    } else if (temporary !== undefined) drop("capability.temporary", temporary, "an object")
     out.capability = c
   }
 

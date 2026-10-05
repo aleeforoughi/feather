@@ -230,6 +230,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node ~alternatives:rec_premium.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   },
@@ -464,6 +471,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node ~alternatives:rec_premium.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   },
@@ -719,6 +733,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node ~alternatives:rec_premium.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   },
@@ -953,6 +974,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "defaults",
+        "level": "default",
+        "subject": "node ~alternatives:rec_premium.collapsed",
+        "value": false,
+        "because": "other ways to go show below the main path"
       }
     ]
   }

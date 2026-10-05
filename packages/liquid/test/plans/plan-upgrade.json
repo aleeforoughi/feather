@@ -245,6 +245,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "level": "safety",
+        "subject": "node ~alternatives:rec_pro.collapsed",
+        "value": false,
+        "because": "the primary act \"rec_pro\" cannot be undone: every other way stays in view"
       }
     ]
   },
@@ -494,6 +501,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "level": "safety",
+        "subject": "node ~alternatives:rec_pro.collapsed",
+        "value": false,
+        "because": "the primary act \"rec_pro\" cannot be undone: every other way stays in view"
       }
     ]
   },
@@ -764,6 +778,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "level": "safety",
+        "subject": "node ~alternatives:rec_pro.collapsed",
+        "value": false,
+        "because": "the primary act \"rec_pro\" cannot be undone: every other way stays in view"
       }
     ]
   },
@@ -1028,6 +1049,13 @@
             "because": "every alternative in it is quiet"
           }
         ]
+      },
+      {
+        "rule": "irreversible-explicit",
+        "level": "safety",
+        "subject": "node ~alternatives:rec_pro.collapsed",
+        "value": false,
+        "because": "the primary act \"rec_pro\" cannot be undone: every other way stays in view"
       }
     ]
   }
