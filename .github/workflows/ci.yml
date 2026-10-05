@@ -119,6 +119,35 @@ jobs:
             apps/playground/test-results
           retention-days: 7
 
+  docs:
+    name: Docs site (built from the markdown docs; links, search and axe)
+    needs: check
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test:docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: apps/docs/dist
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: docs-report
+          path: |
+            apps/docs/playwright-report
+            apps/docs/test-results
+          retention-days: 7
+
   python:
     name: Python SDK (${{ matrix.python }}; parity with the TypeScript validator)
     runs-on: ubuntu-latest
