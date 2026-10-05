@@ -1,5 +1,51 @@
 # Feather — changelog
 
+## 1.17.0 — 2026-10-05
+
+**The experience lifecycle (milestone L6).** An experience now lives as long as its purpose: it opens, changes in
+place while the work behind it moves, ends, and collapses to what it leaves behind. Feather stays pure: the caller
+owns time and state and sends small updates, and nothing about the person is kept. The contract is
+[docs/lifecycle.md](docs/lifecycle.md).
+
+- **IR:**
+  - two optional fields: `revision` (0 when opened, one more with each update) and `resolved` (`outcome`, a one-line
+    `summary` of at most 120 code points, and an optional `artifact` with `label`, `href` and `kind`);
+  - a resolved experience may have no nodes, and takes no replies (`validateReply` answers `resolved`).
+- **Updates, `feather.update/0`:**
+  - ops `add` (after a node, or at the end), `replace`, `patch` (`null` removes a field; never `id` or `type`),
+    `remove`, and `resolve` (always last);
+  - `applyUpdate(experience, update)` is pure and all or nothing, and re-validates what it makes. Problems in the
+    result are reported under `/result`;
+  - new codes: `stale-revision`, `wrong-experience`, `empty-update`, `unknown-op`, `unknown-node`,
+    `already-resolved`, `after-resolve`;
+  - a generated JSON Schema, `schema/feather.update-0.json`.
+- **Composer:** a new rule, `lifecycle`. `plan.revision` and `plan.lifecycle` (`open` or `collapsed`); a collapsed plan
+  carries `plan.resolution` and nothing to act on, focus or read but its summary. It still follows the person's body.
+- **Every body changes in place** (web, switch, text and voice; conformance proves the same replies in all four):
+  - the person keeps their place: surviving nodes keep their state, and focus never moves on an update;
+  - **safety:** an update that changes or removes an armed irreversible act disarms it and says so; confirming then
+    commits nothing;
+  - what is new is told once, politely ("New: approve the booking."), and progress is never announced every tick;
+  - collapse: the summary and the artifact, with the artifact a link only when it is http(s). Switch keeps the link
+    as its only target;
+  - a lower revision is ignored, the same one replaces;
+  - an open experience with nothing to act on waits for its next update (`Dialog.resolved`).
+- **Python (`feather-sdk`):** `apply_update`, the `update()` builder and op helpers (`feather_sdk.ops`), and
+  `experience(revision=, resolved=)`. They match TypeScript case for case on a new parity corpus: 273 update
+  cases, plus lifecycle cases in the IR and reply corpora.
+- **Embed:** `mount()` returns `apply(update)`. It applies the update to what is shown and renders in place, or keeps
+  what is shown and calls `onIssues`. It returns the result either way. `onIssues` now receives update issues too:
+  a TypeScript caller that typed its callback `Issue[]` widens it to `Array<Issue | UpdateIssue>`.
+- **Playground:** a "Stream" view plays the streamed trip in any body, with Next update, Restart and a Play control
+  that never starts on its own and pauses at the approval. A paste box applies your own update, and shows
+  `stale-revision` and the other refusals. The L6 exit test runs there end to end: progress, recommendation,
+  approval, then only the summary and the artifact remain.
+- **Stories:** Experiences/Lifecycle shows each stage of the streamed trip.
+- **Conformance:**
+  - `conformance/update`: the streamed trip (progress → recommendation → approval → done), and 13 refused updates
+    with their exact issues;
+  - two resolved IR fixtures, and five invalid ones.
+
 ## 1.16.0 — 2026-10-05
 
 **Person-shaped (milestone L5).** The same experience now follows how a person likes to work and what they can do
