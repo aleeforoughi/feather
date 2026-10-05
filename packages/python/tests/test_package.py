@@ -26,6 +26,18 @@ class Version(unittest.TestCase):
 
     def test_ir_version(self):
         self.assertEqual(feather_sdk.IR_VERSION, "feather.ir/1")
+        self.assertEqual(feather_sdk.IR_VERSIONS, ("feather.ir/1", "feather.ir/0"))
+        self.assertEqual(feather_sdk.UPDATE_VERSION, "feather.update/1")
+        self.assertEqual(feather_sdk.UPDATE_VERSIONS, ("feather.update/1", "feather.update/0"))
+
+    def test_ir_0_documents_are_read_as_is(self):
+        doc = {"ir": "feather.ir/0", "experience": "e", "nodes": [{"type": "Text", "id": "t", "text": "hi"}]}
+        self.assertTrue(validate(doc).ok)
+        self.assertTrue(validate({**doc, "ir": "feather.ir/1"}).ok)
+        for bad in ("feather.ir/2", "feather.ir/", "", "feather.update/1"):
+            issues = validate({**doc, "ir": bad}).issues
+            self.assertEqual([(i.code, i.path) for i in issues], [("unsupported-version", "/ir")])
+        self.assertEqual(validate({**doc, "ir": 0}).issues[0].code, "wrong-type")
 
 
 class NoDependencies(unittest.TestCase):

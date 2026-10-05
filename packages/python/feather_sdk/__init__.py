@@ -12,7 +12,7 @@ from . import nodes, ops
 from ._experience import experience, update
 from ._reply import ReplyIssue, ReplyResult, acts_for, validate_reply
 from ._static import static_dir
-from ._spec import DEFAULT_MAX_LENGTH, IR_VERSION, MAX_ISSUES, UPDATE_VERSION
+from ._spec import DEFAULT_MAX_LENGTH, IR_VERSION, IR_VERSIONS, MAX_ISSUES, UPDATE_VERSION, UPDATE_VERSIONS
 from ._update import UpdateIssue, UpdateResult, apply_update
 from ._validate import Issue, ValidationResult, format_issues, parse_date, validate
 from ._version import __version__
@@ -20,11 +20,13 @@ from ._version import __version__
 __all__ = [
     "DEFAULT_MAX_LENGTH",
     "IR_VERSION",
+    "IR_VERSIONS",
     "Issue",
     "MAX_ISSUES",
     "ReplyIssue",
     "ReplyResult",
     "UPDATE_VERSION",
+    "UPDATE_VERSIONS",
     "UpdateIssue",
     "UpdateResult",
     "ValidationResult",

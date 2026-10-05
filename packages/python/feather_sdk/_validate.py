@@ -31,6 +31,7 @@ from ._spec import (
     ARTIFACT_KINDS,
     DEFAULT_MAX_LENGTH,
     IR_VERSION,
+    IR_VERSIONS,
     MAX_ISSUES,
     NODE_SPECS,
     OUTCOMES,
@@ -154,8 +155,12 @@ def _run(doc: Any, add: Add) -> None:
     elif not isinstance(ir, str):
         add("wrong-type", "/ir", f'ir must be the string "{IR_VERSION}"; got {describe(ir)}.')
         return
-    elif ir != IR_VERSION:
-        add("unsupported-version", "/ir", f"This Feather reads {IR_VERSION}; the document is {quote(ir)}.")
+    elif ir not in IR_VERSIONS:
+        add(
+            "unsupported-version",
+            "/ir",
+            f"This Feather reads {IR_VERSION} (and {', '.join(IR_VERSIONS[1:])}, its name before the freeze); the document is {quote(ir)}.",
+        )
         return
     experience = get(doc, "experience")
     if experience is UNDEF:

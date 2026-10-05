@@ -19,6 +19,30 @@ def codes(result):
     return [i.code for i in result.issues]
 
 
+class Versions(unittest.TestCase):
+    EXP = {"ir": "feather.ir/0", "experience": "plan_trip", "revision": 1, "nodes": [{"type": "Text", "id": "t", "text": "Hi."}, {"type": "Text", "id": "u", "text": "Yo."}]}
+
+    def change(self, version):
+        return {"update": version, "experience": "plan_trip", "revision": 2, "ops": [{"op": "remove", "id": "u"}]}
+
+    def test_update_0_and_1_are_read_as_is(self):
+        for version in ("feather.update/0", "feather.update/1"):
+            result = apply_update(self.EXP, self.change(version))
+            self.assertTrue(result.ok, version)
+            self.assertEqual(result.experience["ir"], "feather.ir/0")
+            self.assertEqual([n["id"] for n in result.experience["nodes"]], ["t"])
+
+    def test_other_versions_are_refused(self):
+        for version in ("feather.update/2", "feather.update/", "FEATHER.UPDATE/1", "feather.ir/1", "", 0, None):
+            result = apply_update(self.EXP, self.change(version))
+            self.assertFalse(result.ok)
+            self.assertEqual([(i.code, i.path) for i in result.issues], [("unsupported-version", "/update")])
+
+    def test_an_ir_1_experience_stays_ir_1(self):
+        result = apply_update({**self.EXP, "ir": "feather.ir/1"}, self.change("feather.update/0"))
+        self.assertEqual(result.experience["ir"], "feather.ir/1")
+
+
 class Builders(unittest.TestCase):
     def test_update_and_ops_build_plain_dicts(self):
         change = update(
@@ -33,7 +57,7 @@ class Builders(unittest.TestCase):
                 ops.resolve("done", "Booked.", artifact={"label": "Receipt"}),
             ],
         )
-        self.assertEqual(change["update"], UPDATE_VERSION)
+        self.assertEqual(change["update"], "feather.update/1")
         self.assertEqual(change["ops"][0], {"op": "add", "node": {"type": "Text", "id": "t", "text": "Hi."}, "after": "work"})
         self.assertEqual(change["ops"][2], {"op": "patch", "id": "work", "set": {"value": 1, "label": None}})
         self.assertEqual(change["ops"][3]["set"], {"value": 1})

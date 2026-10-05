@@ -176,7 +176,14 @@ function targeted(base: Json): Array<[string, Json]> {
   add("a locale that is not a tag", (d) => void (d.locale = "english_US"))
   add("a locale tag", (d) => void (d.locale = "ar-AE"))
   add("a locale of the wrong type", (d) => void (d.locale = 4))
-  add("another ir version", (d) => void (d.ir = "feather.ir/1"))
+  add("the frozen ir version", (d) => void (d.ir = "feather.ir/1"))
+  add("the ir version before the freeze, read as is", (d) => void (d.ir = "feather.ir/0"))
+  add("a later ir version", (d) => void (d.ir = "feather.ir/2"))
+  add("an ir version with no number", (d) => void (d.ir = "feather.ir/"))
+  add("an ir version in capitals", (d) => void (d.ir = "FEATHER.IR/1"))
+  add("an update version where the ir goes", (d) => void (d.ir = "feather.update/1"))
+  add("an empty ir version", (d) => void (d.ir = ""))
+  add("ir null", (d) => void (d.ir = null))
   add("ir of the wrong type", (d) => void (d.ir = 0))
   add("no ir", (d) => void delete d.ir)
   add("no experience name", (d) => void delete d.experience)
@@ -723,6 +730,7 @@ export function buildUpdateCorpus(): UpdateCorpus {
   }
 
   experiences.trip = TRIP
+  experiences["trip ir/0"] = { ...clone(TRIP), ir: "feather.ir/0" }
   const noRevision = clone(TRIP)
   delete noRevision.revision
   experiences["trip without a revision"] = noRevision
@@ -749,7 +757,11 @@ export function buildUpdateCorpus(): UpdateCorpus {
   const noUpdate = u(5, [{ op: "remove", id: "go" }])
   delete noUpdate.update
   run("no update version", noUpdate)
-  for (const [label, value] of [["another version", "feather.update/1"], ["a number", 0], ["null", null], ["an ir version", "feather.ir/1"], ["an empty string", ""], ["a long string", "😀".repeat(60)]] as Array<[string, Json]>) run(`update version is ${label}`, u(5, [{ op: "remove", id: "go" }], { update: value }))
+  for (const [label, value] of [["a later version", "feather.update/2"], ["no number", "feather.update/"], ["in capitals", "FEATHER.UPDATE/1"], ["a number", 0], ["null", null], ["an ir version", "feather.ir/1"], ["an empty string", ""], ["a long string", "😀".repeat(60)]] as Array<[string, Json]>) run(`update version is ${label}`, u(5, [{ op: "remove", id: "go" }], { update: value }))
+  run("the version before the freeze, read as is", u(5, [{ op: "remove", id: "go" }], { update: "feather.update/0" }))
+  run("the version before the freeze, with a bad op", u(5, [{ op: "destroy" }], { update: "feather.update/0" }))
+  run("the version before the freeze, applied to an ir/0 experience", u(5, [{ op: "remove", id: "go" }], { update: "feather.update/0" }), "trip ir/0")
+  run("the frozen version, applied to an ir/0 experience", u(5, [{ op: "remove", id: "go" }]), "trip ir/0")
   run("an unsupported version and a wrong experience", u(5, [], { update: "x", experience: "other" }))
   const noExperience = u(5, [{ op: "remove", id: "go" }])
   delete noExperience.experience

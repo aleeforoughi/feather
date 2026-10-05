@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 from ._js import UNDEF, describe, get, is_array, is_integer, is_number, is_object, js_keys, js_num, quote
-from ._spec import MAX_ISSUES, UPDATE_VERSION
+from ._spec import MAX_ISSUES, UPDATE_VERSION, UPDATE_VERSIONS
 from ._validate import _unknown_field, check_resolution, seg, validate
 
 _UPDATE_FIELDS = ["update", "experience", "revision", "ops"]
@@ -100,8 +100,12 @@ def _run(experience: Any, update: Any, add: Add, issues: list[UpdateIssue]) -> d
     version = get(update, "update")
     if version is UNDEF:
         add("missing-field", "/update", f'Say which format this is: "update": "{UPDATE_VERSION}".')
-    elif version != UPDATE_VERSION:
-        add("unsupported-version", "/update", f"This Feather reads {UPDATE_VERSION}; the update is {quote(version)}.")
+    elif version not in UPDATE_VERSIONS:
+        add(
+            "unsupported-version",
+            "/update",
+            f"This Feather reads {UPDATE_VERSION} (and {', '.join(UPDATE_VERSIONS[1:])}, its name before the freeze); the update is {quote(version)}.",
+        )
         return None
     target_name = get(update, "experience")
     if target_name != experience["experience"]:

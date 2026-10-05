@@ -9,11 +9,13 @@ from typing import Any
 _RAW: dict[str, Any] = json.loads((Path(__file__).with_name("_spec.json")).read_text(encoding="utf-8"))
 
 IR_VERSION: str = _RAW["irVersion"]
+IR_VERSIONS: tuple[str, ...] = tuple(_RAW["irVersions"])
 DEFAULT_MAX_LENGTH: int = _RAW["defaultMaxLength"]
 MAX_ISSUES: int = _RAW["maxIssues"]
 ISSUE_CODES: tuple[str, ...] = tuple(_RAW["issueCodes"])
 REPLY_ISSUE_CODES: tuple[str, ...] = tuple(_RAW["replyIssueCodes"])
 UPDATE_VERSION: str = _RAW["updateVersion"]
+UPDATE_VERSIONS: tuple[str, ...] = tuple(_RAW["updateVersions"])
 UPDATE_ISSUE_CODES: tuple[str, ...] = tuple(_RAW["updateIssueCodes"])
 SUMMARY_MAX: int = _RAW["summaryMax"]
 OUTCOMES: tuple[str, ...] = tuple(_RAW["outcomes"])

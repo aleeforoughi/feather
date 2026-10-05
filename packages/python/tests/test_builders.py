@@ -88,8 +88,10 @@ class Builders(unittest.TestCase):
                     revision=fixture["ir"].get("revision"),
                     resolved=fixture["ir"].get("resolved"),
                 )
-                self.assertEqual(doc, fixture["ir"])
+                # The builders emit feather.ir/1; a feather.ir/0 fixture is the same document under its older name.
+                self.assertEqual(doc, {**fixture["ir"], "ir": IR_VERSION})
                 self.assertTrue(validate(doc).ok)
+                self.assertTrue(validate(fixture["ir"]).ok)
 
     def test_a_reply_to_a_built_experience(self):
         doc = ad_campaign()
