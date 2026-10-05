@@ -58,7 +58,7 @@ export interface ReplyHandler {
  * - 400 `{ ok: false, issues }` for a reply that is not valid for the experience (or not JSON);
  * - 404 when `experience()` has none; 405 unless the method is POST; 413 when the body is too large;
  * - 409 when the experience is resolved (`issues[0].code` is `"resolved"`): it takes no more replies;
- * - 500 when the experience itself is invalid or `onReply` throws.
+ * - 500 when the experience itself is invalid (`invalid-experience`), or when `onReply` throws (`not-handled`).
  *
  * Detection: a Fetch `Request` (it has `headers.get`) gets a `Response`; anything else is Node's request, with the
  * response as the second argument. It stores and logs nothing; the reply (which names a node and an act, and may carry
@@ -93,7 +93,7 @@ export function createReplyHandler(options: ReplyHandlerOptions): ReplyHandler {
     try {
       await options.onReply(result.reply)
     } catch {
-      return { status: 500, body: { ok: false, issues: [{ code: "invalid-experience", message: "The reply could not be handled." }] } }
+      return fail(500, "not-handled", "The reply was valid, but it could not be handled; nothing was recorded. Try again.")
     }
     return { status: 200, body: { ok: true } }
   }

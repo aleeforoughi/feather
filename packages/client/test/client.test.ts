@@ -138,7 +138,9 @@ describe("createReplyHandler", () => {
       const boom = createReplyHandler({ experience: () => approve(), onReply() { throw new Error("secret persona data") } })
       const res = await post(boom, JSON.stringify(body))
       expect(res.status).toBe(500)
-      expect(JSON.stringify(await res.json())).not.toContain("secret")
+      const answered = (await res.json()) as { issues: Array<{ code: string }> }
+      expect(answered.issues[0].code).toBe("not-handled")
+      expect(JSON.stringify(answered)).not.toContain("secret")
     })
   })
 
