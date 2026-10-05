@@ -1,7 +1,7 @@
 # Feather
 
 Feather is becoming the first liquid design system: semantics in, the right experience out. Read
-`docs/PLAN.md` before planning work. It holds the mission, the principles (section 3), the architecture,
+`docs/PLAN.md` before planning work; its section 0 says where things stand and what is open. It holds the mission, the principles (section 3), the architecture,
 the Experience IR, the composer rules and the milestones L0–L7. The owner decided the open questions in its
 section 12.
 
