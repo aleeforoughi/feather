@@ -52,6 +52,26 @@ A new package, the website layer ([docs/expression.md](docs/expression.md)). It 
   - the rendered audit stays product UI's law and skips the `Website/*`, `Living/*` and `Pages/*` stories;
   - Storybook gains the three `/3` themes.
 
+### W3. `@aleeforoughi/feather-living`
+
+A new package, the Living Page shell ([docs/living.md](docs/living.md)). The host streams events; Feather renders
+them and keeps nothing.
+- `Composer`: the disclosure line is visible before the first word and describes the field (EU AI Act, Article 50).
+  Send turns into Stop in the same place. Enter sends, and IME composition never does.
+- `LivingTurn`: a named phase before the first word (never typing dots), the spoken line in the voice face word by
+  word, one to three blocks, next asks, and a fold to a receipt that reopens.
+- `LivingPage` and `useConversation`:
+  - a turn is inserted after the section in view;
+  - the question anchors at the top;
+  - the page follows only while the reader is at the bottom, and Jump to latest shows only away from it;
+  - "Back to the page" folds every turn.
+- `Presence`: the brand's slot, which leans in while thinking.
+- The block registry (`createRegistry`, with IR nodes mapped to blocks).
+- Prepared scenes: `matchPrepared`, `preparedRoutes` and `PreparedSceneView`, as static routes that work with the
+  model off.
+- A pure core (`conversationReducer`, placement, registry, prepared scenes, disclosure), with stories (`Living/*`)
+  and tests.
+
 ## 1.17.0 — 2026-10-05
 
 **The experience lifecycle (milestone L6).** An experience now lives as long as its purpose: it opens, changes in
