@@ -17,10 +17,10 @@ type Story = StoryObj<typeof meta>
 
 const Content = () => (
   <div data-slot="story" className="col-span-full flex flex-col gap-4">
-    <h2 id="section-title" data-slot="story" className="type-display-m text-fg-primary">
+    <h2 id="section-title" data-slot="story" className="type-display-m">
       The work, in one sentence
     </h2>
-    <p data-slot="story" className="type-body-lg text-prose max-w-prose text-fg-secondary">
+    <p data-slot="story" className="type-body-lg text-prose max-w-prose">
       Related things sit close and groups sit far apart. This band holds one focal point and leaves the rest to space.
     </p>
   </div>
