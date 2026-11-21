@@ -1,6 +1,6 @@
 # Feather — changelog
 
-## Unreleased — proposed 1.18.0
+## 1.18.0 — 2026-11-21
 
 **Website craft.** Feather can now build award-grade websites and the Living Page, from the same tokens, without
 touching product UI. Brand motion lives only in the new expression roles; product UI keeps `--ease-standard`. The
