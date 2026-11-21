@@ -1,0 +1,15 @@
+// @aleeforoughi/feather-expression: Feather's website layer (docs/expression.md). Product UI lives in
+// @aleeforoughi/feather-react; this package is for sites and the Living Page, and reads feather-tokens/3.
+export * from "./core/index"
+export { useReducedMotion, useReveal, useMergedRef } from "./hooks"
+export { Section, type SectionProps, type SectionSpace, type SectionTone } from "./components/section"
+export { Stage, type StageProps } from "./components/stage"
+export { Split, Grid, Bento, BentoCell, type SplitProps, type SplitRatio, type GridProps, type GridColumns, type BentoProps, type BentoCellProps } from "./components/layout"
+export { DisplayTitle, type DisplayTitleProps, type DisplaySize, type DisplaySplit } from "./components/display-title"
+export { MediaFrame, type MediaFrameProps, type MediaAspect, type MediaRadius, type MediaSource, type MediaVideo } from "./components/media-frame"
+export { Marquee, Reel, type MarqueeProps, type ReelProps } from "./components/marquee"
+export { Counter, type CounterProps } from "./components/counter"
+export { Magnetic, Cursor, type MagneticProps, type CursorProps } from "./components/magnetic"
+export { ScrollProvider, useScroll, ScrollProgress, type ScrollProviderProps, type ScrollContextValue } from "./components/scroll"
+export { TransitionProvider, useTransitions, PersistentSlot, type TransitionProviderProps, type PersistentSlotProps } from "./components/transition"
+export { World, type WorldProps } from "./components/world"

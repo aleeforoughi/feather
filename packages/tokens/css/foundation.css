@@ -385,6 +385,8 @@
     --grain-opacity: 0;
     --ring-width: 2px;
     --ring-offset: 2px;
+    /* The padding between a container and the rounded thing inside it (rounded-concentric). */
+    --concentric-pad: 0px;
     /* Layout grid (section 11): mobile first. */
     --layout-columns: 4;
     --layout-gutter: 1rem;
@@ -846,6 +848,20 @@
   transition-duration: var(--duration-hover-out);
   transition-timing-function: var(--ease-signature);
 }
+/* The marquee: the track holds two copies, so moving by half its width loops seamlessly. The duration is inline. */
+@keyframes feather-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@utility motion-marquee {
+  animation-name: feather-marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
 @utility type-display-xl {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: var(--display-xl-size);
@@ -877,6 +893,57 @@
   letter-spacing: var(--display-s-tracking);
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
+}
+/* Website layout (section 14.5): the page grid as a utility, section rhythm (group gaps of 48 to 160px, fluid),
+   concentric radii, and the surface axis made visible. */
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+  column-gap: var(--layout-gutter);
+  width: 100%;
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+}
+@utility section-space-s {
+  padding-block: clamp(3rem, 2.6667rem + 1.4815vw, 4rem);
+}
+@utility section-space-m {
+  padding-block: clamp(4rem, 3.3333rem + 2.963vw, 6rem);
+}
+@utility section-space-l {
+  padding-block: clamp(6rem, 5.3333rem + 2.963vw, 8rem);
+}
+@utility section-space-xl {
+  padding-block: clamp(8rem, 7.3333rem + 2.963vw, 10rem);
+}
+/* Outer radius = inner radius + padding: set --concentric-pad to the padding between the two. */
+@utility rounded-concentric {
+  border-radius: calc(var(--radius-card) + var(--concentric-pad));
+}
+/* One framing rule for media: a 1px edge at 10% of the text color, inset so it never adds to the box. */
+@utility media-edge {
+  outline: 1px solid color-mix(in oklab, var(--text-primary) 10%, transparent);
+  outline-offset: -1px;
+}
+/* Glass (surface axis): for overlays only. Without the glass surface the blur is 0 and the fill opaque. */
+@utility overlay-surface {
+  background-color: var(--overlay-fill);
+  backdrop-filter: blur(var(--overlay-blur));
+}
+/* Film (surface axis): the one texture. A static SVG noise, never animated, under the content and decorative. */
+@utility film-grain {
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+/* The Living Page composer (section 14.6): its edge is 10% of the text color at rest and 25% while it has focus,
+   with no glow. The ring stays on the focused control inside it. */
+@utility composer-edge {
+  border-color: color-mix(in oklab, var(--text-primary) 10%, transparent);
+  &:focus-within {
+    border-color: color-mix(in oklab, var(--text-primary) 25%, transparent);
+  }
 }
 /* The speaker's voice in a Living Page (typography.voiceFace), and prose set with the brand's type features. */
 @utility font-voice {

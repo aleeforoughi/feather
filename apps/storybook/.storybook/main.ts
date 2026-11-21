@@ -11,9 +11,10 @@ function getAbsolutePath(value: string) {
 // JetBrains Mono for Storybook's own chrome (the manager), served from the tokens package's Fontsource dependency.
 const fontFiles = join(dirname(createRequire(join(getAbsolutePath("@aleeforoughi/feather-tokens"), "package.json")).resolve("@fontsource-variable/jetbrains-mono/index.css")), "files")
 
-// The stories live next to their components in packages/react, and next to the renderers in packages/manifest-web.
+// The stories live next to their components in packages/react, next to the renderers in packages/manifest-web, and
+// next to the website layer in packages/expression, packages/living and packages/page.
 const config: StorybookConfig = {
-  stories: ["../../../packages/react/src/**/*.mdx", "../../../packages/react/src/**/*.stories.@(js|jsx|mjs|ts|tsx)", "../../../packages/manifest-web/src/**/*.stories.@(ts|tsx)", "../../../packages/manifest-switch/src/**/*.stories.@(ts|tsx)"],
+  stories: ["../../../packages/react/src/**/*.mdx", "../../../packages/react/src/**/*.stories.@(js|jsx|mjs|ts|tsx)", "../../../packages/manifest-web/src/**/*.stories.@(ts|tsx)", "../../../packages/manifest-switch/src/**/*.stories.@(ts|tsx)", "../../../packages/expression/src/**/*.stories.@(ts|tsx)", "../../../packages/living/src/**/*.stories.@(ts|tsx)", "../../../packages/page/src/**/*.stories.@(ts|tsx)"],
   addons: [
     getAbsolutePath("@chromatic-com/storybook"),
     getAbsolutePath("@storybook/addon-vitest"),

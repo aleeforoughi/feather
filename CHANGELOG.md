@@ -32,6 +32,26 @@ what it was (the golden themes prove it). The expression block is written only f
   `primary`). New utility `focus-ring`.
 - `schema/feather-tokens-3.json`, the `/3` types, and three `/3` reference themes: `studio`, `portrait` and `seed`.
 
+### W2. `@aleeforoughi/feather-expression`
+
+A new package, the website layer ([docs/expression.md](docs/expression.md)). It has a framework-free core
+(`/core`: no React and no dependencies), with thin React bodies over it.
+- **Primitives:** `Section`, `Stage`, `Split`, `Grid`, `Bento`/`BentoCell`, `DisplayTitle`, `MediaFrame`, `Marquee`,
+  `Reel`, `Counter`, `Magnetic`, `Cursor`, `ScrollProvider`/`ScrollProgress`, `TransitionProvider`/`PersistentSlot`
+  and `World`. Each has stories (`Website/*`), tests and a reduced-motion path.
+- **One clock** (`core/clock.ts`), the only `requestAnimationFrame` in the layer. It runs only while something is
+  subscribed, and rides GSAP's ticker when a site has one. Lenis (lerp 0.1, native on touch) and GSAP are the site's
+  own; Feather wires them, with `lagSmoothing(0)`.
+- **World:** the device pixel ratio is capped per tier (2, 1.5 or 1), with quality tiers from device hints. It
+  renders on demand, pauses off screen and in a hidden tab, and shows a still under reduced motion.
+- **New foundation utilities:** `page-grid`, `section-space-*`, `rounded-concentric`, `media-edge`,
+  `overlay-surface`, `film-grain`, `motion-marquee` and `composer-edge`.
+- **Gates:**
+  - the hygiene gate scans the website packages with Gate 1, plus new rules: `scale-zero`, `dpr-cap`, `raf`,
+    `reduced-motion`, `focus-visible` and `lcp-lazy`;
+  - the rendered audit stays product UI's law and skips the `Website/*`, `Living/*` and `Pages/*` stories;
+  - Storybook gains the three `/3` themes.
+
 ## 1.17.0 — 2026-10-05
 
 **The experience lifecycle (milestone L6).** An experience now lives as long as its purpose: it opens, changes in

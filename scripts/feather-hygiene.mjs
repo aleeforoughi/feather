@@ -31,7 +31,13 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/embed", "packages/documents"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/embed", "packages/documents", "packages/expression", "packages/living"]
+/** The website layer (docs/visual-system.md section 14): its source gets the expression rules on top of Gate 1. */
+const WEBSITE = ["packages/expression", "packages/living", "packages/page"]
+/** The one file allowed to call requestAnimationFrame: the clock. */
+const CLOCK = "packages/expression/src/core/clock.ts"
+/** The one file allowed to read devicePixelRatio, and only through Math.min (the cap). */
+const WORLD = "packages/expression/src/core/world.ts"
 const read = (p) => fs.readFileSync(p, "utf8")
 const exists = (p) => fs.existsSync(p)
 
@@ -388,6 +394,12 @@ export const VISUAL_RULES = [
   "data-variant",
   "theme-motion",
   "region",
+  "scale-zero",
+  "dpr-cap",
+  "raf",
+  "reduced-motion",
+  "focus-visible",
+  "lcp-lazy",
 ]
 
 /** The Tailwind steps the system allows (section 2): 0, 0.5 (optical only), 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32. */
@@ -502,12 +514,40 @@ export function scanSource(rel, source, exceptions = []) {
     if (/\bcva\s*\(/.test(text) && !/\bdata-variant\s*=/.test(text) && !/\bslot\s*:\s*"[^"]+"\s*,\s*variant\b/.test(text)) add("data-variant", "cva variants without data-variant", 1)
     if (/from\s+"motion\/react"/.test(text) && !/\buseThemeMotion\b/.test(text) && !/lib\/motion\.ts$/.test(rel)) add("theme-motion", "motion/react without useThemeMotion", 1)
   }
+  if (WEBSITE.some((pkg) => rel.startsWith(`${pkg}/`))) findings.push(...scanWebsite(rel, source))
+  return findings
+}
+
+/** What animates a component, and what proves it has a reduced-motion path (the core's helpers all handle it). */
+const ANIMATES = /\.animate\(|\btransition\b|\bmotion-(?:reveal|media|scene|hover-out|hover|state|press)\b|@keyframes|\banimation\b|\bscrub\(|\bmagnetic\(|\bfollow\(|\bcountTo\(|\bcreateWorld\(/
+const REDUCED_PATH = /\b(?:useReducedMotion|prefersReducedMotion|roleMotion|useReveal|reveal|countTo|magnetic|follow|scrub|createWorld|staggerStep|connectScroll|createTransitions|pointerEffectsAllowed)\b|motion-reduce:|data-motion/
+
+/** The expression rules (section 14.4), for the website layer only. */
+export function scanWebsite(rel, source) {
+  const findings = []
+  const add = (rule, token, line) => findings.push({ rule, file: rel, token, line })
+  const plain = stripComments(source)
+  const bare = code(source)
+  const lineOf = (text, index) => text.slice(0, index).split("\n").length
+  for (const m of plain.matchAll(/scale3?d?\(\s*0\s*[,)]|\bscale\s*:\s*["'`]?0(?![.\d])|(?:^|[\s"'`:])scale-0(?![.\d-])/g)) add("scale-zero", m[0].trim(), lineOf(plain, m.index))
+  for (const m of bare.matchAll(/\brequestAnimationFrame\b/g)) if (rel !== CLOCK) add("raf", "requestAnimationFrame outside the clock", lineOf(bare, m.index))
+  bare.split("\n").forEach((line, i) => {
+    if (!/\bdevicePixelRatio\b/.test(line)) return
+    if (rel !== WORLD) add("dpr-cap", "devicePixelRatio outside the World (use cappedPixelRatio)", i + 1)
+  })
+  if (rel === WORLD && !/Math\.min\(\s*devicePixelRatio/.test(bare)) add("dpr-cap", "the World does not cap the device pixel ratio with Math.min", 1)
+  if (/\/components\/[^/]+\.tsx$/.test(rel) && ANIMATES.test(plain) && !REDUCED_PATH.test(bare)) add("reduced-motion", "animates without a reduced-motion path", 1)
+  for (const { token, line } of classTokens(source)) if (/(?:^|:)(?:group-|peer-)?focus:/.test(token)) add("focus-visible", token, line)
+  for (const m of plain.matchAll(/:focus(?![-\w])/g)) add("focus-visible", ":focus", lineOf(plain, m.index))
+  for (const m of plain.matchAll(/<[A-Za-z][\w.]*\b((?:[^<>{}]|\{[^{}]*\})*)>/g)) {
+    if (/\bloading\s*=\s*["']lazy["']/.test(m[1]) && /\bfetch[Pp]riority\s*=\s*["']high["']/.test(m[1])) add("lcp-lazy", "loading=lazy on a high-priority (LCP) image", lineOf(plain, m.index))
+  }
   return findings
 }
 
 /** The files the visual rules cover: packages/react/src and every manifest-*'s src, without stories, tests and test dirs. */
 function visualFiles(root) {
-  const dirs = [`${REACT}/src`, ...fs.readdirSync(path.join(root, "packages")).filter((d) => d.startsWith("manifest-")).map((d) => `packages/${d}/src`)]
+  const dirs = [`${REACT}/src`, ...fs.readdirSync(path.join(root, "packages")).filter((d) => d.startsWith("manifest-")).map((d) => `packages/${d}/src`), ...WEBSITE.map((d) => `${d}/src`)]
   return dirs.flatMap((dir) => sourceFiles(path.join(root, dir)))
 }
 
