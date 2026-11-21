@@ -1,5 +1,37 @@
 # Feather — changelog
 
+## Unreleased — proposed 1.18.0
+
+**Website craft.** Feather can now build award-grade websites and the Living Page, from the same tokens, without
+touching product UI. Brand motion lives only in the new expression roles; product UI keeps `--ease-standard`. The
+IR stays `feather.ir/0`. Spec: Qooler's proposal of 2026-11-21 (website craft), evidence in its file 23.
+
+### W1. `feather-tokens/3`
+
+Additive. `migrateTokens` reads `/2` and `qooe-tokens/1` unchanged, and a `/2` brand's theme CSS is byte for byte
+what it was (the golden themes prove it). The expression block is written only for a document that says
+`"schema": "feather-tokens/3"`. The rules are in [docs/visual-system.md §14](docs/visual-system.md).
+
+- **Open type:** `fontFamily.display | body | mono` and `voiceFace` take a font object. Fonts are self-hosted
+  WOFF2 only, with a metric-matched local fallback (`size-adjust` and the ascent, descent and line-gap overrides).
+  Only display faces may be preloaded: `buildTheme().preload`, and `feather-brand` writes `brand-preload.html`.
+- **The fluid display scale** `xl | l | m | s`, compiled to `clamp()` between 360 and 1440px, with fluid tracking
+  that tightens as the type grows. Bounds are checked. New utilities: `type-display-*`, `font-voice`, `text-prose`
+  and `numeric`.
+- **Type features:** `tabularNums`, `balanceTitles` and `prettyBody`, all on by default.
+- **Motion:**
+  - a `signature` curve (`expo-out`, `quint-out`, `sine-out`, `scout`, `sheet`, `standard`, or a bounded custom
+    cubic-bezier);
+  - `overshoot`, off by default and capped at `(.34, 1.56, .64, 1)`;
+  - `pace: calm | snappy | cinematic`. Cinematic stretches only the expression roles;
+  - the expression roles reveal, media, scene, stagger, hover-out and spring (`motion-reveal`, `motion-media`,
+    `motion-scene`, `motion-hover-out`), each with a reduced-motion mapping (a 150ms cross-fade or nothing) that a
+    brand can only make quieter. Every sequence ends within 1.2s.
+- **Axes:** `contrast` (`quiet` 500 / `bold` 700 display), `surface` (`flat`, `paper`, `glass` with an 8 to 30px
+  overlay blur, `film` with one grain), and `focus` (`accent` by default, checked at 3:1; a migrated brand keeps
+  `primary`). New utility `focus-ring`.
+- `schema/feather-tokens-3.json`, the `/3` types, and three `/3` reference themes: `studio`, `portrait` and `seed`.
+
 ## 1.17.0 — 2026-10-05
 
 **The experience lifecycle (milestone L6).** An experience now lives as long as its purpose: it opens, changes in

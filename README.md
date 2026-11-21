@@ -28,7 +28,7 @@ What is built so far:
 
 | Package | What it is |
 |---|---|
-| [`@aleeforoughi/feather-tokens`](packages/tokens) | Token schema `feather-tokens/2`, the theme engine and `feather-brand` CLI, the foundation CSS, the reference themes and fonts. |
+| [`@aleeforoughi/feather-tokens`](packages/tokens) | Token schema `feather-tokens/3` (reads /2 and `qooe-tokens/1`), the theme engine and `feather-brand` CLI, the foundation CSS, the reference themes and fonts. |
 | [`@aleeforoughi/feather-intent`](packages/intent) | The Experience IR `feather.ir/0`: TypeScript types, JSON Schema, `validate()`, `validateReply()` and the `feather-ir` CLI. No dependencies. |
 | [`@aleeforoughi/feather-context`](packages/context) | Who an experience is rendered for, and where: persona, capability, device and brand types. Types only. |
 | [`@aleeforoughi/feather-liquid`](packages/liquid) | The composer: `compose(experience, context)` gives a layout plan, by named rules, with a trace. Pure and deterministic. |
@@ -107,12 +107,12 @@ value in the plan comes with the rule that chose it and what it overrode. The ru
    carries meaning (status, errors). Everything is set in JetBrains Mono, headings and text alike, and `.dark` switches to
    **feather-dark**. Steps 3 and 4 are for a product that has its own brand.
 
-3. Write the brand into `brand/tokens.json` (`feather-tokens/2`; a QOOE `qooe-tokens/1` file works as it is) and
+3. Write the brand into `brand/tokens.json` (`feather-tokens/3`; a `feather-tokens/2` or QOOE `qooe-tokens/1` file works as it is) and
    generate the theme:
 
    ```bash
    npx feather-brand                     # brand/tokens.json → src/styles/brand.css, brand-fonts.css
-   npx feather-brand --migrate           # optional: stamp an old qooe-tokens/1 file as feather-tokens/2
+   npx feather-brand --migrate           # optional: stamp an older file as feather-tokens/3
    ```
 
 4. In the product's stylesheet:

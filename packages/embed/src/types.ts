@@ -2,13 +2,13 @@ import type { RenderContext } from "@aleeforoughi/feather-context"
 import type { Issue, ReplyEvent, UpdateIssue, UpdateResult } from "@aleeforoughi/feather-intent"
 import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 
-/** A reference theme by name, or a brand's `feather-tokens/2` tokens. */
+/** A reference theme by name, or a brand's `feather-tokens/3` (or /2) tokens. */
 export type ThemeInput = "feather" | "feather-dark" | BrandTokens
 
 export interface MountOptions {
   /** Who it is rendered for, and where (persona, capability, device, brand). Optional: the composer's defaults apply. */
   context?: RenderContext
-  /** `"feather"` (default), `"feather-dark"`, or a `feather-tokens/2` brand tokens object. Applies inside Feather's roots only. */
+  /** `"feather"` (default), `"feather-dark"`, or a `feather-tokens/3` (or /2) brand tokens object. Applies inside Feather's roots only. */
   theme?: ThemeInput
   /** Receives the validated reply `{ experience, node, act, value? }` each time the person acts. */
   onReply?: (reply: ReplyEvent) => void

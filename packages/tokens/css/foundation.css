@@ -339,6 +339,52 @@
     --duration-large: 420ms;
     --motion-duration: var(--duration-base);
     --motion-ease: var(--ease-standard);
+    /* Expression (section 14, feather-tokens/3): the house defaults, which a /3 brand's theme replaces. Product UI
+       never reads these: its roles keep --ease-standard and the six durations. */
+    --brand-font-voice: var(--brand-font-body, "JetBrains Mono Variable", monospace);
+    --display-weight: 500;
+    --display-xl-size: clamp(3rem, 1rem + 8.8889vw, 9rem);
+    --display-xl-tracking: clamp(-0.45rem, 0.07rem - 0.5778vw, -0.06rem);
+    --display-xl-leading: 0.9;
+    --display-l-size: clamp(2.5rem, 1.3333rem + 5.1852vw, 6rem);
+    --display-l-tracking: clamp(-0.27rem, 0.0233rem - 0.3259vw, -0.05rem);
+    --display-l-leading: 0.95;
+    --display-m-size: clamp(2rem, 1.1667rem + 3.7037vw, 4.5rem);
+    --display-m-tracking: clamp(-0.1575rem, 0.0125rem - 0.1889vw, -0.03rem);
+    --display-m-leading: 1;
+    --display-s-size: clamp(1.5rem, 1rem + 2.2222vw, 3rem);
+    --display-s-tracking: clamp(-0.075rem, 0.005rem - 0.0889vw, -0.015rem);
+    --display-s-leading: 1.05;
+    --title-wrap: balance;
+    --body-wrap: pretty;
+    --numeric-figures: tabular-nums;
+    --ease-signature: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-overshoot: cubic-bezier(0.19, 1, 0.22, 1);
+    --duration-reveal: 700ms;
+    --duration-media: 800ms;
+    --duration-scene: 900ms;
+    --duration-hover-out: 280ms;
+    --stagger-word: 40ms;
+    --stagger-block: 100ms;
+    --distance-reveal: 32px;
+    --scale-media: 1.03;
+    --spring-bounce: 0.1;
+    --sequence-cap: 1200ms;
+    --duration-reduced: 150ms;
+    --reduced-reveal: fade;
+    --reduced-media: fade;
+    --reduced-scene: fade;
+    --reduced-stagger: none;
+    --reduced-hover-out: none;
+    --reduced-spring: none;
+    --surface-kind: flat;
+    --expression-shadow: var(--elevation-2);
+    --expression-edge: transparent;
+    --overlay-blur: 0px;
+    --overlay-fill: var(--popover);
+    --grain-opacity: 0;
+    --ring-width: 2px;
+    --ring-offset: 2px;
     /* Layout grid (section 11): mobile first. */
     --layout-columns: 4;
     --layout-gutter: 1rem;
@@ -773,6 +819,81 @@
   transition-property: opacity, transform, translate, scale;
   transition-duration: var(--duration-large);
   transition-timing-function: var(--ease-standard);
+}
+
+/* Expression roles (section 14): website motion and display type, for @aleeforoughi/feather-expression and
+   @aleeforoughi/feather-living only. They use the brand's signature curve; product UI never does. Reduced motion
+   ends their transitions at once (above); the expression runtime plays the 150ms cross-fade where a role maps to
+   "fade". */
+@utility motion-reveal {
+  transition-property: opacity, transform, translate, clip-path;
+  transition-duration: var(--duration-reveal);
+  transition-timing-function: var(--ease-signature);
+}
+@utility motion-media {
+  transition-property: opacity, transform, scale, clip-path;
+  transition-duration: var(--duration-media);
+  transition-timing-function: var(--ease-signature);
+}
+@utility motion-scene {
+  transition-property: opacity, transform, translate, clip-path;
+  transition-duration: var(--duration-scene);
+  transition-timing-function: var(--ease-signature);
+}
+/* A hover exit runs slower than its entry (the entry is the `hover` role). */
+@utility motion-hover-out {
+  transition-property: color, background-color, border-color, opacity, transform, scale;
+  transition-duration: var(--duration-hover-out);
+  transition-timing-function: var(--ease-signature);
+}
+@utility type-display-xl {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-xl-size);
+  line-height: var(--display-xl-leading);
+  letter-spacing: var(--display-xl-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+@utility type-display-l {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-l-size);
+  line-height: var(--display-l-leading);
+  letter-spacing: var(--display-l-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+@utility type-display-m {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-m-size);
+  line-height: var(--display-m-leading);
+  letter-spacing: var(--display-m-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+@utility type-display-s {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-s-size);
+  line-height: var(--display-s-leading);
+  letter-spacing: var(--display-s-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+/* The speaker's voice in a Living Page (typography.voiceFace), and prose set with the brand's type features. */
+@utility font-voice {
+  font-family: var(--brand-font-voice);
+}
+@utility text-prose {
+  text-wrap: var(--body-wrap);
+}
+@utility numeric {
+  font-variant-numeric: var(--numeric-figures);
+}
+/* The focus axis: a 2px ring, offset 2px, in the brand's focus color. It never changes the element's box. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: var(--ring-width, 2px) solid var(--ring);
+    outline-offset: var(--ring-offset, 2px);
+  }
 }
 
 /* Loading (section 10, loading only): a calm 1600ms breath for skeletons and live indicators. These are the only
