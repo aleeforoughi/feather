@@ -20,6 +20,7 @@
     "test:visual": "pnpm --filter @feather-apps/storybook test:visual",
     "test:audit": "pnpm --filter @feather-apps/storybook test:audit",
     "test:playground": "pnpm --filter @feather-apps/playground build && pnpm --filter @feather-apps/playground test:e2e",
+    "test:sites": "pnpm --filter @feather-apps/showcase build && pnpm --filter @feather-apps/showcase test:sites",
     "test:embed": "pnpm --filter @aleeforoughi/feather-embed test:e2e",
     "test:python": "cd packages/python && python3 -m unittest discover -s tests",
     "build:wheel": "node packages/python/scripts/build-wheel.mjs",

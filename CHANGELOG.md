@@ -72,6 +72,35 @@ them and keeps nothing.
 - A pure core (`conversationReducer`, placement, registry, prepared scenes, disclosure), with stories (`Living/*`)
   and tests.
 
+### W4. `feather.page/0` and `@aleeforoughi/feather-page`
+
+Websites from a schema ([docs/page.md](docs/page.md)).
+- `src/core/spec.ts` is the one table of the 13 blocks. The block set is the Living Page library, and a test holds
+  the two equal. `validatePage` reads the table and also checks library references, unique ids, safe links and
+  media, alt text, scene sizes, prepared scenes and the honesty floor (a living page names its speaker).
+  `schema/feather.page-0.json` is generated from the table.
+- A default block library built on the expression primitives: hero, statement, work, case, numbers, timeline,
+  process, logos, quote, offer, faq, contact and signature. A brand overrides any block.
+- `FeatherPage` renders a whole site in the brand's tokens, with the Living Page layered on when the document has
+  one. Hero starters play the prepared scenes. `PreparedPage` renders a scene as its own route.
+- The `feather-page` CLI: `validate`, `routes`, and `build` (static HTML, one route per prepared scene, readable
+  with no script).
+- `useLivingAsk()` in `@aleeforoughi/feather-living` lets a block in the base page ask.
+- **Showcase:** `apps/showcase/sites.html` renders one document (`examples/studio-of-one.page.json`) in Studio,
+  Portrait and Seed. Only the tokens change.
+
+### W5. Gates
+
+- **Hygiene (Gate 1):** the website rules `scale-zero`, `dpr-cap`, `raf`, `reduced-motion`, `focus-visible` and
+  `lcp-lazy`, together with Gate 1 over the three website packages (in W2). `transition: all` was already a rule.
+- **`pnpm test:sites`** runs the showcase sites, in every brand, on a 4× CPU-throttled phone profile:
+  - LCP ≤ 2.5s, CLS ≤ 0.1 and TBT < 200ms;
+  - a scroll performance trace with a median of at least 55fps;
+  - axe (WCAG 2.2 AA), one h1, the native cursor and a focus-visible ring;
+  - nothing moving under reduced motion;
+  - the LCP image is never lazy.
+- **CI:** a `sites` job runs it, plus Lighthouse CI on the same budgets (`apps/showcase/lighthouserc.json`).
+
 ## 1.17.0 — 2026-10-05
 
 **The experience lifecycle (milestone L6).** An experience now lives as long as its purpose: it opens, changes in
