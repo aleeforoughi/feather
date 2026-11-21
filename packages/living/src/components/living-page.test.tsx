@@ -166,3 +166,16 @@ describe("LivingPage", () => {
     expect(await screen.findByRole("button", { name: "Send" })).toBeTruthy()
   })
 })
+
+describe("useLivingAsk", () => {
+  it("lets the base page ask, and is null outside a LivingPage", async () => {
+    const { useLivingAsk } = await import("./living-page")
+    const seen: Array<unknown> = []
+    function Probe() {
+      seen.push(useLivingAsk())
+      return null
+    }
+    render(<Probe />)
+    expect(seen.at(-1)).toBeNull()
+  })
+})

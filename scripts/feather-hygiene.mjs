@@ -31,7 +31,7 @@ const UI = `${REACT}/src/components/ui`
 const FOUNDATION_CSS = `${TOKENS}/css/foundation.css`
 const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
-const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/embed", "packages/documents", "packages/expression", "packages/living"]
+const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/embed", "packages/documents", "packages/expression", "packages/living", "packages/page"]
 /** The website layer (docs/visual-system.md section 14): its source gets the expression rules on top of Gate 1. */
 const WEBSITE = ["packages/expression", "packages/living", "packages/page"]
 /** The one file allowed to call requestAnimationFrame: the clock. */

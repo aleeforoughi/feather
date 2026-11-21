@@ -79,6 +79,13 @@ export function useConversation({ prepared, onAsk }: UseConversationOptions = {}
   return { conversation, turns: conversation.turns, streaming: isStreaming(conversation), ask, stop, fold, foldAll }
 }
 
+/** Lets anything inside the base page ask (a hero's starters, an "ask here" prompt in a section). Null outside a
+ * LivingPage, so a block can render its asks only where a conversation exists. */
+const AskContext = React.createContext<((ask: string) => void) | null>(null)
+export function useLivingAsk(): ((ask: string) => void) | null {
+  return React.useContext(AskContext)
+}
+
 export interface LivingPageProps extends UseConversationOptions {
   /** The base page: elements with `data-living-section="<id>"`. It stays fully readable with the model off. */
   children: React.ReactNode
@@ -209,7 +216,7 @@ export function LivingPage({ children, speaker, registry, prepared, onAsk, discl
   return (
     <div ref={rootRef} data-slot="living-page" className={cn("relative w-full", className)}>
       <div ref={baseRef} data-slot="living-base">
-        {children}
+        <AskContext.Provider value={handleSend}>{children}</AskContext.Provider>
       </div>
       {[...grouped.entries()].map(([key, list]) =>
         slots[key]

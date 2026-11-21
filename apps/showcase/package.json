@@ -8,14 +8,18 @@
     "dev": "feather-brand && vite",
     "build": "feather-brand && tsc -p tsconfig.json && vite build",
     "typecheck": "feather-brand && tsc -p tsconfig.json",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:sites": "playwright test"
   },
   "dependencies": {
     "@aleeforoughi/feather-react": "workspace:*",
     "@aleeforoughi/feather-tokens": "workspace:*",
     "lucide-react": "^1.49.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "@aleeforoughi/feather-expression": "workspace:*",
+    "@aleeforoughi/feather-living": "workspace:*",
+    "@aleeforoughi/feather-page": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",
@@ -23,6 +27,9 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.1",
     "tailwindcss": "4.3.3",
-    "vite": "8.3.1"
+    "vite": "8.3.1",
+    "@playwright/test": "1.63.0",
+    "axe-core": "4.13.0",
+    "@types/node": "24.19.0"
   }
 }
