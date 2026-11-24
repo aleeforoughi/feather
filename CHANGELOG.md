@@ -1,5 +1,92 @@
 # Feather — changelog
 
+## 1.19.0 — 2026-11-24
+
+**Wave 1: the page edges, and the runtime under them.** The moves the 2026 award winners name most (Qooler file 27
+sections 6 and 7: of 492 winning sites, page transitions 49, loaders 47, 404 scenes 45, intro scenes 37, the
+overlay menu 36, the footer 32), each a finished block in every brand, with the access work the winners skip built
+in: a keyboard path, labels, a no-script tier, a reduced-motion tier, and pausing while hidden. Values come from the
+winners' shipped code; the code is Feather's own. The plan for the waves after this one is
+[docs/proposals/2026-11-24-range.md](docs/proposals/2026-11-24-range.md).
+
+### The edges
+
+- **`Loader`** (`@aleeforoughi/feather-expression`):
+  - `counter` is an honest percentage that lifts off with a curved wipe;
+  - `dock` is a bar that fills along a stop-and-go curve and moves into the header (`[data-loader-dock]`);
+  - with `sound`, it asks Sound off / Sound on at the end; off is first and focused;
+  - it is `role="status"` with a label, holds the page `inert` and still while it shows, and is never shown without
+    script (`noscript:hidden`) or under reduced motion.
+- **Route transitions:** `createTransitions().go(update, { variant })` takes `view`, `push`, `columns`, `fade` or
+  `none`.
+  - `view`: the old page recedes to 0.9 while the new one wipes up, 0.95s on `--ease-wipe`;
+  - `push`: the old page drifts up 25vh under a veil while the new one rises, 1.2s on `--ease-push`;
+  - `columns`: four columns cover the page and lift off the new one, 0.06s stagger, each leg within the 1.2s cap.
+
+  Every variant is instant under reduced motion. On arrival, focus moves to the new `h1` and its title is announced.
+  `view` and `push` are CSS on the view-transition pseudo-elements (foundation.css), so cross-document transitions
+  get them too.
+- **`OverlayMenu`:** a minimal bar whose Menu opens a full-screen list of large links. Without script it is a plain
+  list. Open, it is a modal dialog: focus trapped, Escape, the rest of the page `inert`, focus returned. A clip
+  reveal and masked link rise, or a fade under reduced motion.
+- **`SoundToggle`:** one ambient bed, off until the person turns it on, `aria-pressed`, remembered, silent while
+  the tab is hidden.
+- **`Footer`** (`plain`, `wordmark` set to the full width, and `reveal`, which waits behind the page; focus moving
+  into it scrolls the page to its end so a focused link is never covered) and **`NotFound`** (`type`, `minimal`)
+  in `@aleeforoughi/feather-page`.
+
+### `feather.page/1`
+
+- Top-level edges `nav`, `footer`, `notFound`, `loader`, `transition` and `sound`. Every `/0` page is still valid.
+  An edge on a `/0` page reports `needs-schema-1`. The new field kinds are `enum` and `boolean`.
+  `schema/feather.page-1.json` is generated beside `-0`, which is unchanged.
+- `FeatherPage` places the loader, the nav before `main` and the footer after it. A page without edges renders as
+  before. `PageNotFound` serves the 404, and `feather-page build` writes `404.html`.
+- Static builds get cross-document View Transitions when the page names a `transition` (off under reduced motion).
+- `mountPage(...).swap(node)` commits a route's new page at once, for the update inside `go()`.
+- `PAGE_SCHEMA` is now `feather.page/1`. `PAGE_SCHEMAS` lists both.
+
+### The runtime (`@aleeforoughi/feather-expression/core`)
+
+- **The clock:** a tick never sees more than 1/20s (`MAX_DELTA`).
+- **Pixel budget:** `cappedPixelRatio(quality, dpr, width, height)` keeps the tier cap and adds a budget. A canvas
+  never draws more than 2560×1440 pixels (`PIXEL_BUDGET`) or drops below a 0.5 ratio.
+- **`createQualityLadder`:**
+  - steps down below 50fps (measured over 1s);
+  - tries one step up after 10s of comfort, doubling the wait after a failed try;
+  - never measures while hidden, and reports when the last level still struggles.
+
+  `createWorld` runs one, through the renderer's new `levels` and `setLevel`, or by lowering its own pixel ratio in
+  three steps.
+- **`capabilityGate` and `retire`:**
+  - the heavy tier needs more than 4 cores and more than 4 GB, a fine pointer, WebGL, no data saver and no reduced
+    motion;
+  - a retired effect stays on the light tier for 30 days.
+
+  `World` gates itself (the `gate` prop) and retires itself when its ladder runs out.
+- **`perFrame`:** one task per frame. `WorldRenderer.prewarm()` and `world.prewarm()` compile shaders behind the
+  loader; `World` hands its controller over through `onWorld`.
+- **`honestProgress`:** shows the lesser of real readiness and elapsed time over a minimum (2.4s first, 1.4s on
+  return), capped at 8s.
+- **Sound:** `createSoundPreference`, `sound` and `playBed`.
+- **Visibility:** `isHidden` and `onVisibilityChange`.
+
+### Foundation
+
+- The page-change curves `--ease-wipe`, `--ease-route` and `--ease-push`.
+- The `scripting:` and `noscript:` variants for the no-script tier.
+
+### Gates
+
+- `apps/showcase/e2e/edges.spec.ts` covers:
+  - the menu's keyboard path, and its no-script tier;
+  - both loaders: label, inert, the cap, never under reduced motion;
+  - all five route variants: arrival, focus, nothing left behind, instant under reduced motion;
+  - the footer's reachable links;
+  - the 404 in three brands with axe.
+- The showcase sites now carry the nav, the footer and a `view` transition, and still meet the mobile budgets.
+- New stories: `Website/Loader`, `Website/OverlayMenu`, `Website/SoundToggle`, `Pages/Edges`.
+
 ## 1.18.0 — 2026-11-24
 
 **Website craft.** Feather can now build award-grade websites and the Living Page, from the same tokens, without
