@@ -616,6 +616,12 @@
 @utility rounded-dialog {
   border-radius: calc(var(--radius-dialog) + var(--radius-step) * var(--surface-extra));
 }
+/* A small rounded mark that sits inside a control's curve but is not flush with it (a tooltip's arrow, a key cap in a
+   tooltip): the xs tier, but never closer than one step under the control. In a shape whose control is already xs
+   (soft) it is square, so the curve inside the curve is still the tighter one. */
+@utility rounded-inset {
+  border-radius: min(var(--radius-xs), calc(var(--radius-control) - var(--radius-step)));
+}
 .rounded-card:has(.rounded-card) {
   --surface-extra: 1;
 }

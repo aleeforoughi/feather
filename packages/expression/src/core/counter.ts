@@ -42,8 +42,18 @@ export function countTo({ from = 0, to, duration = 900, ease, onUpdate, onDone, 
   return remove
 }
 
+// One formatter per locale and decimals: `toLocaleString` with options builds a new Intl.NumberFormat on every call,
+// and a counter formats every frame.
+const formatters = new Map<string, Intl.NumberFormat>()
+
 /** Formats a counter value with the target's decimals, so the width does not jump. */
 export function formatCount(value: number, to: number, locale?: string): string {
   const decimals = (String(to).split(".")[1] ?? "").length
-  return value.toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+  const key = `${locale ?? ""}|${decimals}`
+  let format = formatters.get(key)
+  if (!format) {
+    format = new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+    formatters.set(key, format)
+  }
+  return format.format(value)
 }

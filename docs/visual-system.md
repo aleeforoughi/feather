@@ -338,6 +338,9 @@ The radius scale is therefore 0, 4, 8, 12, 16, 20, 24 and full.
   `--radius-xs`, `--radius-control`, `--radius-card`, `--radius-dialog` and `--radius-step`.
 - **Concentric by construction.** A list, menu or segmented control that insets its items by one step (4px,
   `p-1`) is exactly concentric with them: 8px items in a 12px container.
+- **Marks inside a control are one step under it.** A tooltip's arrow or a key cap inside a tooltip is not flush
+  with the curve around it, so it uses `rounded-inset`: the xs radius, but never closer than one step under the
+  control. In `soft`, where the control is already xs, that is square.
 - **Flush children match.** A child flush with its container on two sides (a clipped image, a header band) takes
   the container's corner, never a larger one.
 - **The audit checks it** (`radius.nesting`). A rounded surface inside a rounded surface must be at least one step

@@ -1,6 +1,6 @@
 # Feather — changelog
 
-## 1.18.0 — 2026-11-21
+## 1.18.0 — 2026-11-24
 
 **Website craft.** Feather can now build award-grade websites and the Living Page, from the same tokens, without
 touching product UI. Brand motion lives only in the new expression roles; product UI keeps `--ease-standard`. The
@@ -44,13 +44,15 @@ A new package, the website layer ([docs/expression.md](docs/expression.md)). It 
   own; Feather wires them, with `lagSmoothing(0)`.
 - **World:** the device pixel ratio is capped per tier (2, 1.5 or 1), with quality tiers from device hints. It
   renders on demand, pauses off screen and in a hidden tab, and shows a still under reduced motion.
-- **New foundation utilities:** `page-grid`, `section-space-*`, `rounded-concentric`, `media-edge`,
+- `formatCount` keeps one `Intl.NumberFormat` per locale and decimals; it built a new one on every frame.
+- **New foundation utilities:** `page-grid`, `section-space-*`, `rounded-concentric`, `rounded-inset`, `media-edge`,
   `overlay-surface`, `film-grain`, `motion-marquee` and `composer-edge`.
 - **Gates:**
   - the hygiene gate scans the website packages with Gate 1, plus new rules: `scale-zero`, `dpr-cap`, `raf`,
     `reduced-motion`, `focus-visible` and `lcp-lazy`;
   - the rendered audit stays product UI's law and skips the `Website/*`, `Living/*` and `Pages/*` stories;
-  - Storybook gains the three `/3` themes.
+  - Storybook gains the three `/3` themes. In `soft`, where the control radius is already xs, the tooltip's arrow
+    and key cap now use `rounded-inset` (one step under the control, so square there), as `radius.nesting` requires.
 
 ### W3. `@aleeforoughi/feather-living`
 
@@ -85,6 +87,9 @@ Websites from a schema ([docs/page.md](docs/page.md)).
   one. Hero starters play the prepared scenes. `PreparedPage` renders a scene as its own route.
 - The `feather-page` CLI: `validate`, `routes`, and `build` (static HTML, one route per prepared scene, readable
   with no script).
+- `mountPage(container, node)` puts a page on screen: it renders in a React transition, so the long first render
+  yields to the main thread. A plain `root.render` of the reference page built it in one long task: TBT 208 to
+  216ms on the 4× throttled phone profile in CI, over the 200ms budget.
 - `useLivingAsk()` in `@aleeforoughi/feather-living` lets a block in the base page ask.
 - **Showcase:** `apps/showcase/sites.html` renders one document (`examples/studio-of-one.page.json`) in Studio,
   Portrait and Seed. Only the tokens change.

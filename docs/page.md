@@ -42,6 +42,10 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   only from these.
 - `brand` is a path the host resolves (the CLI reads it), or the tokens inline. Any `feather-tokens/3` brand works;
   a `/2` brand works with the house expression defaults.
+- `mountPage(container, node)` is how a host puts a page on screen: it renders `<FeatherPage>` (with any host
+  chrome around it) in a React transition, so the long first render yields to the main thread instead of holding it
+  in one task. A plain `root.render` of a full page breaks the 200ms mobile TBT budget on a throttled phone; the
+  showcase sites mount this way and the website gate measures them.
 - `scenes` are the prepared answers. With `living.prepared`, each becomes a static, indexable route that works with
   the model off.
 

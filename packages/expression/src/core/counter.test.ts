@@ -60,4 +60,10 @@ describe("formatCount", () => {
     expect(formatCount(1234.5, 5000, "en-US")).toBe("1,235")
     expect(formatCount(0, 12.25, "en-US")).toBe("0.00")
   })
+  it("reuses one formatter per locale and decimals, and keeps them apart", () => {
+    expect(formatCount(1234.5, 5000, "de-DE")).toBe("1.235")
+    expect(formatCount(1234.5, 5000, "en-US")).toBe("1,235")
+    expect(formatCount(1234.5, 5000.5, "en-US")).toBe("1,234.5")
+    expect(formatCount(1234.5, 5000, "de-DE")).toBe("1.235")
+  })
 })

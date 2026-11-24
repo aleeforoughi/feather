@@ -4,3 +4,4 @@ export { validatePage, resolveRefs, isSafeHref, isSafeMedia } from "./core/valid
 export type { Media, PageBlock, BlockName, PageDocument, PageIssue, PageResult, Scene, WorkItem } from "./core/types"
 export { FeatherPage, PreparedPage, livingRegistry, pageScenes, type BlockLibrary, type FeatherPageProps, type PreparedPageProps } from "./render"
 export { defaultBlocks, type BlockProps } from "./blocks/index"
+export { mountPage, type MountedPage } from "./mount"
