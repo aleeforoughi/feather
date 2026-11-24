@@ -454,7 +454,7 @@ function ruleOfToken(token) {
   if (shadow && !["none", "1", "2", "3"].includes(shadow[1])) hit.push("shadow")
   if (/^font-(?:thin|extralight|light|extrabold|black)$/.test(core)) hit.push("font-weight")
   const opacity = /^opacity-(.+)$/.exec(core)
-  if (opacity && !["0", "100", "disabled"].includes(opacity[1])) hit.push("opacity")
+  if (opacity && !["0", "100", "disabled", "dim", "muted"].includes(opacity[1])) hit.push("opacity")
   const slash = /^(?:text|border(?:-[xytblrse])?|fill|stroke)-([a-z][a-z0-9-]*)\/(?:\d+|\[[^\]]*\])$/.exec(core)
   if (slash && !FONT_SIZES.has(slash[1])) hit.push("slash-opacity")
   return hit
