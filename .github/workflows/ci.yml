@@ -136,7 +136,11 @@ jobs:
       - run: pnpm test:sites
       - name: Lighthouse mobile budgets (LCP 2.5s, CLS 0.1, TBT 200ms)
         working-directory: apps/showcase
-        run: npx --yes @lhci/cli@0.14.0 autorun --config=lighthouserc.json
+        # The Playwright container has Playwright's Chromium, not a system Chrome, and runs as root.
+        run: |
+          export CHROME_PATH="$(node -p "require('@playwright/test').chromium.executablePath()")"
+          test -x "$CHROME_PATH"
+          npx --yes @lhci/cli@0.14.0 autorun --config=lighthouserc.json --collect.settings.chromeFlags="--no-sandbox"
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
