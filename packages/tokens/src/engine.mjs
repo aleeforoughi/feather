@@ -1,9 +1,11 @@
 // Feather theme engine.
-// Turns brand tokens (feather-tokens/2, or qooe-tokens/1 through migrateTokens) into the theme CSS every Feather
+// Turns brand tokens (feather-tokens/4, /3 or /2, or qooe-tokens/1 through migrateTokens) into the theme CSS every Feather
 // component reads, plus the font imports the brand needs. Deterministic: no network, no dependencies, no Node
 // built-ins, so it runs the same in Node (the feather-brand CLI) and in the browser (Storybook, the playground).
-import { migrateTokens, TOKEN_SCHEMA } from "./schema.mjs"
+import { migrateTokens, KNOWN_SCHEMAS, LATEST_SCHEMA, TOKEN_SCHEMA } from "./schema.mjs"
 import { expressionTheme } from "./expression.mjs"
+import { applyPersonality, checkLoudness, rangeTheme } from "./range.mjs"
+import { FOUNDATION_FALLBACKS } from "./fallbacks.mjs"
 
 /** The heading weights a brand may pick (section 2). */
 export const HEADING_WEIGHTS = [400, 500, 600, 700]
@@ -311,8 +313,15 @@ function componentRules(components, problems) {
 export function buildTheme(input) {
   const migrated = migrateTokens(input)
   if (!migrated.ok) return { ok: false, problems: migrated.problems }
-  const tokens = migrated.tokens
+  const level = KNOWN_SCHEMAS.indexOf(migrated.from)
+  // feather-tokens/3 adds open font objects, a mono slot, a voice face and the expression layer; /4 adds the range
+  // layer (loudness, colour blocks, the media scrim, the motion personality). Older documents keep their rules.
+  const v3 = level >= KNOWN_SCHEMAS.indexOf(TOKEN_SCHEMA)
+  const v4 = level >= KNOWN_SCHEMAS.indexOf(LATEST_SCHEMA)
   const problems = []
+  // A /4 personality fills pace, signature and overshoot where the brand left them out.
+  const persona = v4 ? applyPersonality(migrated.tokens, problems) : { tokens: migrated.tokens, personality: undefined }
+  const tokens = persona.tokens
   const c = tokens.colors ?? {}
   for (const role of ["primary", "background", "surface", "text"]) {
     if (typeof c[role] !== "string" || !HEX.test(c[role])) problems.push(`colors.${role} must be a hex color`)
@@ -320,8 +329,6 @@ export function buildTheme(input) {
   for (const [role, value] of Object.entries(c)) {
     if (typeof value === "string" && !HEX.test(value)) problems.push(`colors.${role} must be a hex color, got ${value}`)
   }
-  // feather-tokens/3 adds open font objects, a mono slot and a voice face; a document read as /2 keeps the /2 rules.
-  const v3 = migrated.from === TOKEN_SCHEMA
   const fonts = tokens.typography?.fontFamily ?? {}
   const display = fonts.display ?? fonts.body
   const body = fonts.body ?? fonts.display
@@ -331,6 +338,10 @@ export function buildTheme(input) {
     else if (!FONTS[family]) problems.push(`typography.fontFamily.${slot} "${family}" is not in the foundation font set: ${Object.keys(FONTS).join(", ")}`)
   }
   if (!v3 && (fonts.mono !== undefined || tokens.typography?.voiceFace !== undefined)) problems.push(`typography.fontFamily.mono and typography.voiceFace need "schema": "${TOKEN_SCHEMA}"`)
+  if (!v4) {
+    const range = [["loudness", tokens.loudness], ["colors.blocks", c.blocks], ["colors.mediaScrim", c.mediaScrim], ["colors.inkOnMedia", c.inkOnMedia], ["personality", tokens.personality]]
+    for (const [field, value] of range) if (value !== undefined) problems.push(`${field} needs "schema": "${LATEST_SCHEMA}"`)
+  }
   const headingWeight = tokens.typography?.headingWeight
   if (headingWeight !== undefined && !HEADING_WEIGHTS.includes(headingWeight)) {
     problems.push(`typography.headingWeight must be one of ${HEADING_WEIGHTS.join(", ")}`)
@@ -341,11 +352,14 @@ export function buildTheme(input) {
   const pace = tokens.pace ?? "calm"
   // Product UI durations follow `motion`; a /3 brand may give only `pace`, and cinematic runs product UI calm.
   const motion = tokens.motion ?? (pace === "snappy" ? "snappy" : "calm")
-  if (v3 && tokens.motion !== undefined && tokens.pace !== undefined && tokens.pace !== "cinematic" && tokens.pace !== tokens.motion) problems.push(`motion (${tokens.motion}) and pace (${tokens.pace}) disagree; a feather-tokens/3 brand sets pace`)
+  // The check reads the pace the brand wrote: a personality's pace never overrules an explicit motion.
+  const writtenPace = migrated.tokens.pace
+  if (v3 && tokens.motion !== undefined && writtenPace !== undefined && writtenPace !== "cinematic" && writtenPace !== tokens.motion) problems.push(`motion (${tokens.motion}) and pace (${writtenPace}) disagree; a feather-tokens/3 brand sets pace`)
   if (!RADIUS_TIERS[shape]) problems.push(`shape must be one of ${Object.keys(RADIUS_TIERS).join(", ")}`)
   if (!DENSITY[density]) problems.push(`density must be one of ${Object.keys(DENSITY).join(", ")}`)
+  if (v4) checkLoudness(tokens, problems)
   if (!ELEVATION[elevation]) problems.push(`elevation must be one of ${Object.keys(ELEVATION).join(", ")}`)
-  if (!DURATIONS[motion]) problems.push(`motion must be one of ${Object.keys(DURATIONS).join(", ")}`)
+  if (!DURATIONS[motion] && !(v4 && typeof motion === "object")) problems.push(`motion must be one of ${Object.keys(DURATIONS).join(", ")}`)
   const rules = componentRules(tokens.components, problems)
   if (problems.length > 0) return { ok: false, problems }
   const familyStack = (name) => (typeof name === "string" ? `"${fontFamilyName(name)}", ${fallback(name)}` : "sans-serif")
@@ -426,9 +440,13 @@ export function buildTheme(input) {
   const expression = v3
     ? expressionTheme(
         tokens,
-        { fonts: { display, body, mono: fonts.mono, voice: tokens.typography?.voiceFace }, foundation: FONTS, familyName: fontFamilyName, generic: fallback, accent, primary, on, contrast },
+        { fonts: { display, body, mono: fonts.mono, voice: tokens.typography?.voiceFace }, foundation: FONTS, familyName: fontFamilyName, generic: fallback, accent, primary, on, contrast, fallbacks: v4 ? FOUNDATION_FALLBACKS : undefined },
         problems
       )
+    : null
+  // ── Range (feather-tokens/4, section 14.5): only for a document written as /4. ──
+  const range = v4
+    ? rangeTheme(tokens, { colors: c, primary, primaryText: c.primaryText ? expand(c.primaryText) : null, accent, accentGiven: c.accent !== undefined, text, bg, contrast, mix: oklabMix, onColor, expand, isHex: (v) => typeof v === "string" && HEX.test(v) }, problems)
     : null
   if (problems.length > 0) return { ok: false, problems }
 
@@ -528,6 +546,7 @@ export function buildTheme(input) {
     "--motion-ease": "var(--ease-standard)",
     ...(headingWeight !== undefined ? { "--heading-weight": String(headingWeight) } : {}),
     ...(expression?.vars ?? {}),
+    ...(range?.vars ?? {}),
   }
   // The AAA block redeclares every variable it changes, and every variable that refers to one of them: a custom
   // property is resolved where it is declared, so an alias set on :root would keep the AA value in the subtree.
@@ -559,6 +578,6 @@ export function buildTheme(input) {
     fonts: `/* Generated by feather-brand (@aleeforoughi/feather-tokens) — brand fonts. */\n${imports}\n${faces}`,
     derived,
     preload: expression?.preload ?? [],
-    summary: { shape, density, elevation, motion, display: label(display), body: label(body), ...(expression ? expression.summary : {}) },
+    summary: { shape, density, elevation, motion, display: label(display), body: label(body), ...(expression ? expression.summary : {}), ...(range ? range.summary : {}), ...(persona.personality ? { personality: persona.personality } : {}) },
   }
 }

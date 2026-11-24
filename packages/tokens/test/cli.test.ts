@@ -37,6 +37,30 @@ describe("feather-brand", () => {
     expect(migrated).toEqual({ schema: "feather-tokens/3", ...v1, pace: v1.motion, focus: "primary" })
   })
 
+  it("leaves a /3 file /3 on a plain --migrate, and upgrades it to /4 only with --to 4", () => {
+    const v3 = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "golden/v3-brands.json"), "utf8")).portrait
+    const dir = product(v3)
+    expect(run(dir, "--migrate")).toContain("feather-tokens/3 → feather-tokens/3")
+    expect(JSON.parse(fs.readFileSync(path.join(dir, "brand/tokens.json"), "utf8"))).toEqual(v3)
+    expect(run(dir, "--migrate", "--to", "4")).toContain("feather-tokens/3 → feather-tokens/4")
+    expect(JSON.parse(fs.readFileSync(path.join(dir, "brand/tokens.json"), "utf8"))).toEqual({ ...v3, schema: "feather-tokens/4" })
+    // The upgraded file themes, with the /4 roles.
+    run(dir)
+    expect(fs.readFileSync(path.join(dir, "src/styles/brand.css"), "utf8")).toContain("--loudness: 1;")
+  })
+
+  it("refuses a --to 4 that would not theme, a downgrade and an unknown target, and leaves the file alone", () => {
+    const broken = { schema: "feather-tokens/3", colors: { primary: "#336699" }, typography: { fontFamily: { body: "Inter" } } }
+    const dir = product(broken)
+    const before = fs.readFileSync(path.join(dir, "brand/tokens.json"), "utf8")
+    expect(() => run(dir, "--migrate", "--to", "4")).toThrow(/Migration refused[\s\S]*colors\.background must be a hex color/)
+    expect(fs.readFileSync(path.join(dir, "brand/tokens.json"), "utf8")).toBe(before)
+    const v4 = product({ ...v1, schema: "feather-tokens/4" })
+    expect(() => run(v4, "--migrate", "--to", "3")).toThrow(/cannot migrate feather-tokens\/4 down to feather-tokens\/3/)
+    expect(() => run(v4, "--migrate", "--to", "9")).toThrow(/cannot migrate to "feather-tokens\/9"/)
+    expect(() => run(v4, "--to", "4")).toThrow(/--to names the schema a --migrate moves to/)
+  })
+
   it("fails with every problem listed", () => {
     const dir = product({ colors: {}, typography: { fontFamily: { body: "Inter" } } })
     expect(() => run(dir)).toThrow(/colors\.primary must be a hex color/)

@@ -285,10 +285,10 @@ describe("schema/feather-tokens-3.json", () => {
   })
 })
 
-describe("the /3 reference themes", () => {
+describe("the expression reference themes (written as feather-tokens/4)", () => {
   it.each(["studio", "portrait", "seed"])("%s compiles and differs from the others in every expression axis it names", (name) => {
     const theme = json(`../themes/${name}.json`)
-    expect(theme.tokens.schema).toBe("feather-tokens/3")
+    expect(theme.tokens.schema).toBe("feather-tokens/4")
     const t = built(theme.tokens)
     expect(t.css).toContain("--ease-signature")
   })

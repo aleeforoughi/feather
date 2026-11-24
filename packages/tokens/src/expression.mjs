@@ -260,7 +260,16 @@ export function expressionTheme(tokens, ctx, problems) {
     const font = checkFont(slot, value, ctx.foundation, problems, { preloadable: slot === "display" })
     if (!font) continue
     if (font.kind === "foundation") {
-      stacks[slot] = `"${ctx.familyName(font.name)}", ${slot === "mono" ? "monospace" : generic}`
+      const fb = ctx.fallbacks?.[font.name]
+      const name = ctx.familyName(font.name)
+      if (fb) {
+        // feather-tokens/4: a foundation family gets its metric-matched fallback too (src/fallbacks.mjs), so the swap
+        // shifts nothing. Older documents keep their stack byte for byte.
+        stacks[slot] = `"${name}", "${name} Fallback", ${slot === "mono" ? "monospace" : generic}`
+        open.add(slot)
+        const face = `@font-face {\n  font-family: "${name} Fallback";\n  src: local("${fb.family}");\n  size-adjust: ${fb.sizeAdjust}%;\n  ascent-override: ${fb.ascentOverride}%;\n  descent-override: ${fb.descentOverride}%;\n  line-gap-override: ${fb.lineGapOverride}%;\n}`
+        if (!faces.includes(face)) faces.push(face)
+      } else stacks[slot] = `"${name}", ${slot === "mono" ? "monospace" : generic}`
       continue
     }
     stacks[slot] = openStack(font, generic)

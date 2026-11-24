@@ -2,7 +2,7 @@
   "name": "studio",
   "dark": true,
   "tokens": {
-    "schema": "feather-tokens/3",
+    "schema": "feather-tokens/4",
     "name": "Studio",
     "colors": {
       "background": "#100904",
@@ -24,7 +24,8 @@
     "shape": "sharp",
     "density": "comfortable",
     "elevation": "flat",
-    "pace": "cinematic",
+    "loudness": 2,
+    "personality": "cinematic",
     "signature": "scout",
     "contrast": "bold",
     "surface": "film",

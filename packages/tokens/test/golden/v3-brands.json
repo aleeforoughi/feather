@@ -1,0 +1,99 @@
+{
+  "studio": {
+    "schema": "feather-tokens/3",
+    "name": "Studio",
+    "colors": {
+      "background": "#100904",
+      "surface": "#1C130C",
+      "text": "#FFEDD7",
+      "primary": "#FF8539",
+      "accent": "#FF8539"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "Space Grotesk",
+        "body": "Inter",
+        "mono": "JetBrains Mono"
+      },
+      "display": {
+        "xl": {
+          "size": {
+            "min": 3.5,
+            "max": 10
+          },
+          "leading": 0.86
+        }
+      }
+    },
+    "shape": "sharp",
+    "density": "comfortable",
+    "elevation": "flat",
+    "pace": "cinematic",
+    "signature": "scout",
+    "contrast": "bold",
+    "surface": "film",
+    "grain": 0.04,
+    "focus": "accent"
+  },
+  "portrait": {
+    "schema": "feather-tokens/3",
+    "name": "Portrait",
+    "colors": {
+      "background": "#EBE7DF",
+      "surface": "#F4F1EA",
+      "text": "#241F21",
+      "primary": "#241F21",
+      "primaryText": "#F4F1EA",
+      "accent": "#7A4E1D",
+      "destructive": "#9A1F17"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "Fraunces",
+        "body": "Inter"
+      },
+      "voiceFace": "Fraunces"
+    },
+    "shape": "soft",
+    "density": "spacious",
+    "elevation": "flat",
+    "pace": "calm",
+    "signature": "expo-out",
+    "contrast": "quiet",
+    "surface": "paper",
+    "focus": "accent"
+  },
+  "seed": {
+    "schema": "feather-tokens/3",
+    "name": "Seed",
+    "colors": {
+      "background": "#F6F7FB",
+      "surface": "#FFFFFF",
+      "text": "#12131A",
+      "primary": "#3B3BF5",
+      "accent": "#3B3BF5"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "Sora",
+        "body": "DM Sans"
+      },
+      "features": {
+        "prettyBody": true
+      }
+    },
+    "shape": "pill",
+    "density": "comfortable",
+    "elevation": "soft",
+    "pace": "snappy",
+    "signature": "quint-out",
+    "overshoot": true,
+    "spring": {
+      "bounce": 0.2
+    },
+    "contrast": "quiet",
+    "surface": "glass",
+    "blur": 16,
+    "focus": "accent"
+  }
+}
