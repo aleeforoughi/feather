@@ -1,0 +1,25 @@
+/* feather-page.css: the stylesheet of every Feather page block and edge, as the release ships it. A page's brand
+   theme comes from its tokens (FeatherPage writes it inline); this file holds the foundation, the classes of the
+   React, expression, living and page packages, and every foundation font face (each one downloads only when a
+   brand uses it). */
+@import "tailwindcss";
+@import "@aleeforoughi/feather-react/styles.css";
+@import "@aleeforoughi/feather-tokens/fonts/dm-sans.css";
+@import "@aleeforoughi/feather-tokens/fonts/figtree.css";
+@import "@aleeforoughi/feather-tokens/fonts/fraunces.css";
+@import "@aleeforoughi/feather-tokens/fonts/geist-mono.css";
+@import "@aleeforoughi/feather-tokens/fonts/geist.css";
+@import "@aleeforoughi/feather-tokens/fonts/inter.css";
+@import "@aleeforoughi/feather-tokens/fonts/jetbrains-mono.css";
+@import "@aleeforoughi/feather-tokens/fonts/manrope.css";
+@import "@aleeforoughi/feather-tokens/fonts/nunito.css";
+@import "@aleeforoughi/feather-tokens/fonts/outfit.css";
+@import "@aleeforoughi/feather-tokens/fonts/playfair-display.css";
+@import "@aleeforoughi/feather-tokens/fonts/plus-jakarta-sans.css";
+@import "@aleeforoughi/feather-tokens/fonts/poppins.css";
+@import "@aleeforoughi/feather-tokens/fonts/sora.css";
+@import "@aleeforoughi/feather-tokens/fonts/space-grotesk.css";
+
+@source "../node_modules/@aleeforoughi/feather-expression/dist";
+@source "../node_modules/@aleeforoughi/feather-living/dist";
+@source "../node_modules/@aleeforoughi/feather-page/dist";

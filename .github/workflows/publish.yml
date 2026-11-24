@@ -4,7 +4,7 @@ name: Publish
 # the packages are published to GitHub Packages, and the tag and a GitHub release (notes from CHANGELOG.md) are
 # created. Pushing to main with an unchanged version publishes nothing. To release, bump the version in every
 # package.json (and packages/python/feather_sdk/_version.py), add the CHANGELOG entry, and merge to main. The
-# feather-sdk wheel is attached to the release.
+# feather-sdk wheel, the feather-page CLI and the page web bundle are attached to the release.
 on:
   push:
     branches: [main]
@@ -67,5 +67,11 @@ jobs:
           # Python callers (Godpip) install the feather-sdk wheel from the release; it holds the browser bundle too.
           pnpm build:wheel wheel
           gh release upload "v$version" wheel/feather_sdk-$version-py3-none-any.whl
+          # Page callers (Qooler) take the page runtime from the release: the feather-page CLI as one Node file, and
+          # the web bundle (feather-page.css with its fonts, and the browser runtime that hydrates a built page).
+          pnpm --filter @feather-apps/release build
+          cp apps/release/dist/feather-page.mjs feather-page-$version.mjs
+          (cd apps/release/dist && zip -qr "$GITHUB_WORKSPACE/feather-page-web-$version.zip" feather-page.css feather-page-runtime.js fonts)
+          gh release upload "v$version" feather-page-$version.mjs feather-page-web-$version.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -34,6 +34,11 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm hygiene
+      - name: Release assets (the feather-page CLI as one file, the page CSS and runtime) build and run standalone
+        run: |
+          pnpm --filter @feather-apps/release build
+          mkdir -p /tmp/feather-page-smoke && cp apps/release/dist/feather-page.mjs /tmp/feather-page-smoke/
+          node /tmp/feather-page-smoke/feather-page.mjs validate packages/page/examples/studio-of-one.page.json
       - name: Size (liquid + manifest-web under 60 KB gzipped, PLAN.md section 9)
         run: pnpm size
       - name: Build Storybook

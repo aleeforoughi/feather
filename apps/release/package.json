@@ -1,0 +1,29 @@
+{
+  "name": "@feather-apps/release",
+  "private": true,
+  "version": "1.20.0",
+  "type": "module",
+  "description": "The release assets callers download from each GitHub release: the feather-page CLI as one file, the page stylesheet with its fonts, and the browser runtime that mounts a page with motion.",
+  "scripts": {
+    "build": "vite build && vite build -c vite.css.config.ts && vite build -c vite.cli.config.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@aleeforoughi/feather-expression": "workspace:*",
+    "@aleeforoughi/feather-living": "workspace:*",
+    "@aleeforoughi/feather-page": "workspace:*",
+    "@aleeforoughi/feather-react": "workspace:*",
+    "@aleeforoughi/feather-tokens": "workspace:*",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.1"
+  }
+}
