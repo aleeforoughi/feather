@@ -35,7 +35,7 @@ export interface GateOptions {
 const storageOf = (opts: GateOptions) => {
   if (opts.storage !== undefined) return opts.storage
   try {
-    return typeof localStorage === "undefined" ? null : localStorage
+    return typeof window === "undefined" ? null : window.localStorage
   } catch {
     return null
   }

@@ -23,17 +23,20 @@ export interface SoundPreferenceOptions {
 }
 
 export function createSoundPreference({ key = "feather-sound", storage }: SoundPreferenceOptions = {}): SoundPreference {
+  // Storage is read on first use, never at import: a module that only imports Feather (a server render, a CLI)
+  // must not touch it.
   let store: Pick<Storage, "getItem" | "setItem"> | null = null
-  try {
-    store = storage !== undefined ? storage : typeof localStorage === "undefined" ? null : localStorage
-  } catch {
-    store = null
-  }
   let state: SoundState = "off"
-  try {
-    if (store?.getItem(key) === "on") state = "on"
-  } catch {
-    // Default off.
+  let loaded = false
+  const load = () => {
+    if (loaded) return
+    loaded = true
+    try {
+      store = storage !== undefined ? storage : typeof window === "undefined" ? null : window.localStorage
+      if (store?.getItem(key) === "on") state = "on"
+    } catch {
+      store = null
+    }
   }
   const listeners = new Set<(audible: boolean, state: SoundState) => void>()
   let stopVisibility: (() => void) | null = null
@@ -42,12 +45,15 @@ export function createSoundPreference({ key = "feather-sound", storage }: SoundP
   }
   const pref: SoundPreference = {
     get state() {
+      load()
       return state
     },
     get audible() {
+      load()
       return state === "on" && !isHidden()
     },
     set(next) {
+      load()
       if (next === state) return
       state = next
       try {
@@ -58,6 +64,7 @@ export function createSoundPreference({ key = "feather-sound", storage }: SoundP
       notify()
     },
     toggle() {
+      load()
       pref.set(state === "on" ? "off" : "on")
     },
     subscribe(listener) {

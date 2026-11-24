@@ -38,7 +38,7 @@ export function honestProgress(opts: HonestProgressOptions): HonestProgress {
   const { tasks = [], minimum = LOADER_MS, cap = LOADER_MS.cap, onProgress, onDone, clock = sharedClock, key = "feather-visited" } = opts
   let store: Pick<Storage, "getItem" | "setItem"> | null = null
   try {
-    store = opts.storage !== undefined ? opts.storage : typeof sessionStorage === "undefined" ? null : sessionStorage
+    store = opts.storage !== undefined ? opts.storage : typeof window === "undefined" ? null : window.sessionStorage
   } catch {
     store = null
   }

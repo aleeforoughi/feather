@@ -1,5 +1,7 @@
 import * as React from "react"
-import { useMergedRef, useReveal } from "../hooks"
+import { reveal as revealIn } from "../core/reveal"
+import { useMergedRef } from "../hooks"
+import { loudnessAllows } from "./loudness"
 import { cn } from "../cn"
 
 export type SectionSpace = "s" | "m" | "l" | "xl"
@@ -21,7 +23,8 @@ export interface SectionProps extends Omit<React.HTMLAttributes<HTMLElement>, "t
   tone?: SectionTone
   /** Lays the children on the 12-column page grid (4 on mobile, 8 on tablet). */
   grid?: boolean
-  /** The section's own scroll trigger: its content rises in as it enters (the reveal role). */
+  /** The section's own scroll trigger: its content rises in as it enters (the reveal role). Off at loudness 0 (a
+   * data-loudness on the section or an ancestor, or the brand's --loudness). */
   reveal?: boolean
 }
 
@@ -33,7 +36,12 @@ export const Section = React.forwardRef<HTMLElement, SectionProps>(function Sect
   const inner = React.useRef<HTMLDivElement>(null)
   const outer = React.useRef<HTMLElement>(null)
   const ref = useMergedRef(forwarded, outer)
-  useReveal(inner, { enabled: reveal, role: "reveal", from: "rise" })
+  // The reveal needs the "reveal" capability: a quiet (loudness 0) page or block shows its content at once.
+  React.useEffect(() => {
+    const el = inner.current
+    if (!el || !reveal || !loudnessAllows(el, "reveal")) return
+    return revealIn(el, { role: "reveal", from: "rise" })
+  }, [reveal])
   return (
     <Tag ref={ref} data-slot="section" data-variant={tone} data-space={space} className={cn("relative w-full", SPACE[space], TONE[tone], className)} {...props}>
       <div ref={inner} data-slot="section-content" className={cn(grid ? "page-grid" : "mx-auto w-full")}>
