@@ -1,5 +1,111 @@
 # Feather — changelog
 
+## 1.18.0 — 2026-11-24
+
+**Website craft.** Feather can now build award-grade websites and the Living Page, from the same tokens, without
+touching product UI. Brand motion lives only in the new expression roles; product UI keeps `--ease-standard`. The
+IR stays `feather.ir/0`. Spec: Qooler's proposal of 2026-11-21 (website craft), evidence in its file 23.
+
+### W1. `feather-tokens/3`
+
+Additive. `migrateTokens` reads `/2` and `qooe-tokens/1` unchanged, and a `/2` brand's theme CSS is byte for byte
+what it was (the golden themes prove it). The expression block is written only for a document that says
+`"schema": "feather-tokens/3"`. The rules are in [docs/visual-system.md §14](docs/visual-system.md).
+
+- **Open type:** `fontFamily.display | body | mono` and `voiceFace` take a font object. Fonts are self-hosted
+  WOFF2 only, with a metric-matched local fallback (`size-adjust` and the ascent, descent and line-gap overrides).
+  Only display faces may be preloaded: `buildTheme().preload`, and `feather-brand` writes `brand-preload.html`.
+- **The fluid display scale** `xl | l | m | s`, compiled to `clamp()` between 360 and 1440px, with fluid tracking
+  that tightens as the type grows. Bounds are checked. New utilities: `type-display-*`, `font-voice`, `text-prose`
+  and `numeric`.
+- **Type features:** `tabularNums`, `balanceTitles` and `prettyBody`, all on by default.
+- **Motion:**
+  - a `signature` curve (`expo-out`, `quint-out`, `sine-out`, `scout`, `sheet`, `standard`, or a bounded custom
+    cubic-bezier);
+  - `overshoot`, off by default and capped at `(.34, 1.56, .64, 1)`;
+  - `pace: calm | snappy | cinematic`. Cinematic stretches only the expression roles;
+  - the expression roles reveal, media, scene, stagger, hover-out and spring (`motion-reveal`, `motion-media`,
+    `motion-scene`, `motion-hover-out`), each with a reduced-motion mapping (a 150ms cross-fade or nothing) that a
+    brand can only make quieter. Every sequence ends within 1.2s.
+- **Axes:** `contrast` (`quiet` 500 / `bold` 700 display), `surface` (`flat`, `paper`, `glass` with an 8 to 30px
+  overlay blur, `film` with one grain), and `focus` (`accent` by default, checked at 3:1; a migrated brand keeps
+  `primary`). New utility `focus-ring`.
+- `schema/feather-tokens-3.json`, the `/3` types, and three `/3` reference themes: `studio`, `portrait` and `seed`.
+
+### W2. `@aleeforoughi/feather-expression`
+
+A new package, the website layer ([docs/expression.md](docs/expression.md)). It has a framework-free core
+(`/core`: no React and no dependencies), with thin React bodies over it.
+- **Primitives:** `Section`, `Stage`, `Split`, `Grid`, `Bento`/`BentoCell`, `DisplayTitle`, `MediaFrame`, `Marquee`,
+  `Reel`, `Counter`, `Magnetic`, `Cursor`, `ScrollProvider`/`ScrollProgress`, `TransitionProvider`/`PersistentSlot`
+  and `World`. Each has stories (`Website/*`), tests and a reduced-motion path.
+- **One clock** (`core/clock.ts`), the only `requestAnimationFrame` in the layer. It runs only while something is
+  subscribed, and rides GSAP's ticker when a site has one. Lenis (lerp 0.1, native on touch) and GSAP are the site's
+  own; Feather wires them, with `lagSmoothing(0)`.
+- **World:** the device pixel ratio is capped per tier (2, 1.5 or 1), with quality tiers from device hints. It
+  renders on demand, pauses off screen and in a hidden tab, and shows a still under reduced motion.
+- `formatCount` keeps one `Intl.NumberFormat` per locale and decimals; it built a new one on every frame.
+- **New foundation utilities:** `page-grid`, `section-space-*`, `rounded-concentric`, `rounded-inset`, `media-edge`,
+  `overlay-surface`, `film-grain`, `motion-marquee` and `composer-edge`.
+- **Gates:**
+  - the hygiene gate scans the website packages with Gate 1, plus new rules: `scale-zero`, `dpr-cap`, `raf`,
+    `reduced-motion`, `focus-visible` and `lcp-lazy`;
+  - the rendered audit stays product UI's law and skips the `Website/*`, `Living/*` and `Pages/*` stories;
+  - Storybook gains the three `/3` themes. In `soft`, where the control radius is already xs, the tooltip's arrow
+    and key cap now use `rounded-inset` (one step under the control, so square there), as `radius.nesting` requires.
+
+### W3. `@aleeforoughi/feather-living`
+
+A new package, the Living Page shell ([docs/living.md](docs/living.md)). The host streams events; Feather renders
+them and keeps nothing.
+- `Composer`: the disclosure line is visible before the first word and describes the field (EU AI Act, Article 50).
+  Send turns into Stop in the same place. Enter sends, and IME composition never does.
+- `LivingTurn`: a named phase before the first word (never typing dots), the spoken line in the voice face word by
+  word, one to three blocks, next asks, and a fold to a receipt that reopens.
+- `LivingPage` and `useConversation`:
+  - a turn is inserted after the section in view;
+  - the question anchors at the top;
+  - the page follows only while the reader is at the bottom, and Jump to latest shows only away from it;
+  - "Back to the page" folds every turn.
+- `Presence`: the brand's slot, which leans in while thinking.
+- The block registry (`createRegistry`, with IR nodes mapped to blocks).
+- Prepared scenes: `matchPrepared`, `preparedRoutes` and `PreparedSceneView`, as static routes that work with the
+  model off.
+- A pure core (`conversationReducer`, placement, registry, prepared scenes, disclosure), with stories (`Living/*`)
+  and tests.
+
+### W4. `feather.page/0` and `@aleeforoughi/feather-page`
+
+Websites from a schema ([docs/page.md](docs/page.md)).
+- `src/core/spec.ts` is the one table of the 13 blocks. The block set is the Living Page library, and a test holds
+  the two equal. `validatePage` reads the table and also checks library references, unique ids, safe links and
+  media, alt text, scene sizes, prepared scenes and the honesty floor (a living page names its speaker).
+  `schema/feather.page-0.json` is generated from the table.
+- A default block library built on the expression primitives: hero, statement, work, case, numbers, timeline,
+  process, logos, quote, offer, faq, contact and signature. A brand overrides any block.
+- `FeatherPage` renders a whole site in the brand's tokens, with the Living Page layered on when the document has
+  one. Hero starters play the prepared scenes. `PreparedPage` renders a scene as its own route.
+- The `feather-page` CLI: `validate`, `routes`, and `build` (static HTML, one route per prepared scene, readable
+  with no script).
+- `mountPage(container, node)` puts a page on screen: it renders in a React transition, so the long first render
+  yields to the main thread. A plain `root.render` of the reference page built it in one long task: TBT 208 to
+  216ms on the 4× throttled phone profile in CI, over the 200ms budget.
+- `useLivingAsk()` in `@aleeforoughi/feather-living` lets a block in the base page ask.
+- **Showcase:** `apps/showcase/sites.html` renders one document (`examples/studio-of-one.page.json`) in Studio,
+  Portrait and Seed. Only the tokens change.
+
+### W5. Gates
+
+- **Hygiene (Gate 1):** the website rules `scale-zero`, `dpr-cap`, `raf`, `reduced-motion`, `focus-visible` and
+  `lcp-lazy`, together with Gate 1 over the three website packages (in W2). `transition: all` was already a rule.
+- **`pnpm test:sites`** runs the showcase sites, in every brand, on a 4× CPU-throttled phone profile:
+  - LCP ≤ 2.5s, CLS ≤ 0.1 and TBT < 200ms;
+  - a scroll performance trace with a median of at least 55fps;
+  - axe (WCAG 2.2 AA), one h1, the native cursor and a focus-visible ring;
+  - nothing moving under reduced motion;
+  - the LCP image is never lazy.
+- **CI:** a `sites` job runs it, plus Lighthouse CI on the same budgets (`apps/showcase/lighthouserc.json`).
+
 ## 1.17.0 — 2026-10-05
 
 **The experience lifecycle (milestone L6).** An experience now lives as long as its purpose: it opens, changes in

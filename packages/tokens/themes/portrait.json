@@ -1,0 +1,32 @@
+{
+  "name": "portrait",
+  "dark": false,
+  "tokens": {
+    "schema": "feather-tokens/3",
+    "name": "Portrait",
+    "colors": {
+      "background": "#EBE7DF",
+      "surface": "#F4F1EA",
+      "text": "#241F21",
+      "primary": "#241F21",
+      "primaryText": "#F4F1EA",
+      "accent": "#7A4E1D",
+      "destructive": "#9A1F17"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "Fraunces",
+        "body": "Inter"
+      },
+      "voiceFace": "Fraunces"
+    },
+    "shape": "soft",
+    "density": "spacious",
+    "elevation": "flat",
+    "pace": "calm",
+    "signature": "expo-out",
+    "contrast": "quiet",
+    "surface": "paper",
+    "focus": "accent"
+  }
+}

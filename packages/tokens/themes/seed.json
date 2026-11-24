@@ -1,0 +1,33 @@
+{
+  "name": "seed",
+  "dark": false,
+  "tokens": {
+    "schema": "feather-tokens/3",
+    "name": "Seed",
+    "colors": {
+      "background": "#F6F7FB",
+      "surface": "#FFFFFF",
+      "text": "#12131A",
+      "primary": "#3B3BF5",
+      "accent": "#3B3BF5"
+    },
+    "typography": {
+      "fontFamily": {
+        "display": "Sora",
+        "body": "DM Sans"
+      },
+      "features": { "prettyBody": true }
+    },
+    "shape": "pill",
+    "density": "comfortable",
+    "elevation": "soft",
+    "pace": "snappy",
+    "signature": "quint-out",
+    "overshoot": true,
+    "spring": { "bounce": 0.2 },
+    "contrast": "quiet",
+    "surface": "glass",
+    "blur": 16,
+    "focus": "accent"
+  }
+}

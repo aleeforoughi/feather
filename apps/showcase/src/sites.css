@@ -1,0 +1,14 @@
+/* The website layer, as a product's stylesheet adds it: Feather for React, then the expression, living and page
+   packages' built classes, then the fonts of the three reference brands (self-hosted through Fontsource). */
+@import "tailwindcss";
+@import "@aleeforoughi/feather-react/styles.css";
+@import "@aleeforoughi/feather-tokens/fonts/space-grotesk.css";
+@import "@aleeforoughi/feather-tokens/fonts/inter.css";
+@import "@aleeforoughi/feather-tokens/fonts/fraunces.css";
+@import "@aleeforoughi/feather-tokens/fonts/sora.css";
+@import "@aleeforoughi/feather-tokens/fonts/dm-sans.css";
+@import "@aleeforoughi/feather-tokens/fonts/jetbrains-mono.css";
+
+@source "../node_modules/@aleeforoughi/feather-expression/dist";
+@source "../node_modules/@aleeforoughi/feather-living/dist";
+@source "../node_modules/@aleeforoughi/feather-page/dist";

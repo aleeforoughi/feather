@@ -86,10 +86,15 @@ describe("buildTheme", () => {
 })
 
 describe("migrateTokens", () => {
-  it("reads a qooe-tokens/1 brand (no schema field) as feather-tokens/2, keeping every field", () => {
+  it("reads a qooe-tokens/1 brand (no schema field) as feather-tokens/3, keeping every field", () => {
     const v1 = json("golden/rich-brand.json")
     const result = migrateTokens(v1)
-    expect(result).toEqual({ ok: true, from: "qooe-tokens/1", tokens: { ...v1, schema: "feather-tokens/2" } })
+    expect(result).toEqual({ ok: true, from: "qooe-tokens/1", tokens: { ...v1, schema: "feather-tokens/3", pace: v1.motion ?? "calm", focus: "primary" } })
+  })
+
+  it("reads a feather-tokens/2 brand as /3: pace from its motion axis, the focus ring it had", () => {
+    const v2 = { ...json("golden/rich-brand.json"), schema: "feather-tokens/2", motion: "snappy" }
+    expect(migrateTokens(v2)).toEqual({ ok: true, from: "feather-tokens/2", tokens: { ...v2, schema: "feather-tokens/3", pace: "snappy", focus: "primary" } })
   })
 
   it("accepts an explicit qooe-tokens/1 and leaves feather-tokens/2 alone", () => {
@@ -100,7 +105,7 @@ describe("migrateTokens", () => {
   it("rejects an unknown schema and non-objects", () => {
     expect(migrateTokens({ schema: "feather-tokens/9" })).toEqual({
       ok: false,
-      problems: ['schema "feather-tokens/9" is not one Feather reads (qooe-tokens/1, feather-tokens/2)'],
+      problems: ['schema "feather-tokens/9" is not one Feather reads (qooe-tokens/1, feather-tokens/2, feather-tokens/3)'],
     })
     expect(migrateTokens([])).toMatchObject({ ok: false })
     expect(buildTheme(null)).toMatchObject({ ok: false })

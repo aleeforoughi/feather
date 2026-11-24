@@ -119,6 +119,38 @@ jobs:
             apps/playground/test-results
           retention-days: 7
 
+  sites:
+    name: Website layer (one page schema, three brands; mobile budgets, frame rate, axe, reduced motion)
+    needs: check
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test:sites
+      - name: Lighthouse mobile budgets (LCP 2.5s, CLS 0.1, TBT 200ms)
+        working-directory: apps/showcase
+        # The Playwright container has Playwright's Chromium, not a system Chrome; it runs as root with a 64 MB /dev/shm.
+        run: |
+          export CHROME_PATH="$(node -p "require('@playwright/test').chromium.executablePath()")"
+          test -x "$CHROME_PATH"
+          npx --yes @lhci/cli@0.14.0 autorun --config=lighthouserc.json --collect.settings.chromeFlags="--no-sandbox --disable-dev-shm-usage"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: sites-report
+          path: |
+            apps/showcase/playwright-report
+            apps/showcase/test-results
+            apps/showcase/.lighthouseci
+          retention-days: 7
+
   python:
     name: Python SDK (${{ matrix.python }}; parity with the TypeScript validator)
     runs-on: ubuntu-latest

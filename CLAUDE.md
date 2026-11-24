@@ -7,7 +7,7 @@ section 12.
 
 ## Layout
 
-- `packages/tokens` (`@aleeforoughi/feather-tokens`): token schema `feather-tokens/2`, plus `qooe-tokens/1`
+- `packages/tokens` (`@aleeforoughi/feather-tokens`): token schema `feather-tokens/3` (its expression layer is in `src/expression.mjs`), plus `feather-tokens/2` and `qooe-tokens/1`
   migration. Also the theme engine (`src/engine.mjs`, browser-safe, no dependencies), the `feather-brand` CLI,
   `css/foundation.css` (semantic tokens and their Tailwind mapping), the reference themes and the fonts.
 - `packages/react` (`@aleeforoughi/feather-react`): components in `src/components/ui` (stories and tests next

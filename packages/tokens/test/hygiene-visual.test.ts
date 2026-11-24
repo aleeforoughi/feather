@@ -128,6 +128,43 @@ describe("scanSource: the rules", () => {
   })
 
   it("names every rule it reports", () => {
-    expect(VISUAL_RULES).toEqual(["spacing-step", "arbitrary-value", "transition-all", "duration", "ease", "radius-tier", "border-width", "shadow", "font-weight", "opacity", "slash-opacity", "bare-icon", "data-slot", "data-variant", "theme-motion", "region"])
+    expect(VISUAL_RULES).toEqual(["spacing-step", "arbitrary-value", "transition-all", "duration", "ease", "radius-tier", "border-width", "shadow", "font-weight", "opacity", "slash-opacity", "bare-icon", "data-slot", "data-variant", "theme-motion", "region", "scale-zero", "dpr-cap", "raf", "reduced-motion", "focus-visible", "lcp-lazy"])
+  })
+})
+
+// The expression rules (docs/visual-system.md section 14.4): the website layer only.
+describe("scanSource: the website rules", () => {
+  const SITE = "packages/expression/src/components/probe.tsx"
+  const site = (source: string, file = SITE) => [...new Set(scanSource(file, source, []).map((f: { rule: string }) => f.rule))].sort()
+
+  it.each([
+    ["scale-zero", `export const k = [{ transform: "scale(0)" }, { transform: "scale(1)" }]`],
+    ["scale-zero", `export const k = { scale: 0 }`],
+    ["scale-zero", `export const P = () => <div data-slot="p" className="scale-0 hover:scale-100" />`],
+    ["raf", `export const loop = () => requestAnimationFrame(loop)`],
+    ["dpr-cap", `export const r = window.devicePixelRatio`],
+    ["focus-visible", `export const P = () => <button data-slot="p" className="focus:ring-2" />`],
+    ["focus-visible", `export const css = "a:focus { outline: none }"`],
+    ["lcp-lazy", `export const P = () => <img data-slot="p" alt="" src="a.avif" fetchPriority="high" loading="lazy" />`],
+    ["reduced-motion", `export const P = () => <div data-slot="p" className="motion-reveal" />`],
+  ])("%s catches %s", (rule, source) => {
+    expect(site(source)).toContain(rule)
+  })
+
+  it("leaves the system's own values alone", () => {
+    expect(site(`export const k = [{ transform: "scale(0.95)" }, { scale: 1 }]`)).toEqual([])
+    expect(site(`export const P = () => <button data-slot="p" className="focus-visible:ring-2 focus-ring" />`)).toEqual([])
+    expect(site(`export const P = () => <img data-slot="p" alt="" src="a.avif" fetchPriority="high" loading="eager" />`)).toEqual([])
+    expect(site(`import { useReveal } from "../hooks"\nexport const P = () => <div data-slot="p" className="motion-reveal" />`)).toEqual([])
+    expect(site(`export const loop = () => requestAnimationFrame(loop)`, "packages/expression/src/core/clock.ts")).toEqual([])
+    expect(site(`export const r = Math.min(devicePixelRatio, 2)`, "packages/expression/src/core/world.ts")).toEqual([])
+  })
+
+  it("applies only to the website layer", () => {
+    expect(rules(`export const loop = () => requestAnimationFrame(loop)`)).toEqual([])
+  })
+
+  it("lists the website rules", () => {
+    for (const rule of ["scale-zero", "dpr-cap", "raf", "reduced-motion", "focus-visible", "lcp-lazy"]) expect(VISUAL_RULES).toContain(rule)
   })
 })

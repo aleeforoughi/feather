@@ -59,7 +59,7 @@ export interface DeviceContext {
   colorScheme?: "light" | "dark"
 }
 
-/** The brand's theme axes that bear on composition (from its feather-tokens/2 file). */
+/** The brand's theme axes that bear on composition (from its feather-tokens/3 file; /2 reads the same). */
 export interface BrandAxes {
   density?: Density
   motion?: "calm" | "snappy"

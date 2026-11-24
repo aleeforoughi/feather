@@ -339,6 +339,54 @@
     --duration-large: 420ms;
     --motion-duration: var(--duration-base);
     --motion-ease: var(--ease-standard);
+    /* Expression (section 14, feather-tokens/3): the house defaults, which a /3 brand's theme replaces. Product UI
+       never reads these: its roles keep --ease-standard and the six durations. */
+    --brand-font-voice: var(--brand-font-body, "JetBrains Mono Variable", monospace);
+    --display-weight: 500;
+    --display-xl-size: clamp(3rem, 1rem + 8.8889vw, 9rem);
+    --display-xl-tracking: clamp(-0.45rem, 0.07rem - 0.5778vw, -0.06rem);
+    --display-xl-leading: 0.9;
+    --display-l-size: clamp(2.5rem, 1.3333rem + 5.1852vw, 6rem);
+    --display-l-tracking: clamp(-0.27rem, 0.0233rem - 0.3259vw, -0.05rem);
+    --display-l-leading: 0.95;
+    --display-m-size: clamp(2rem, 1.1667rem + 3.7037vw, 4.5rem);
+    --display-m-tracking: clamp(-0.1575rem, 0.0125rem - 0.1889vw, -0.03rem);
+    --display-m-leading: 1;
+    --display-s-size: clamp(1.5rem, 1rem + 2.2222vw, 3rem);
+    --display-s-tracking: clamp(-0.075rem, 0.005rem - 0.0889vw, -0.015rem);
+    --display-s-leading: 1.05;
+    --title-wrap: balance;
+    --body-wrap: pretty;
+    --numeric-figures: tabular-nums;
+    --ease-signature: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-overshoot: cubic-bezier(0.19, 1, 0.22, 1);
+    --duration-reveal: 700ms;
+    --duration-media: 800ms;
+    --duration-scene: 900ms;
+    --duration-hover-out: 280ms;
+    --stagger-word: 40ms;
+    --stagger-block: 100ms;
+    --distance-reveal: 32px;
+    --scale-media: 1.03;
+    --spring-bounce: 0.1;
+    --sequence-cap: 1200ms;
+    --duration-reduced: 150ms;
+    --reduced-reveal: fade;
+    --reduced-media: fade;
+    --reduced-scene: fade;
+    --reduced-stagger: none;
+    --reduced-hover-out: none;
+    --reduced-spring: none;
+    --surface-kind: flat;
+    --expression-shadow: var(--elevation-2);
+    --expression-edge: transparent;
+    --overlay-blur: 0px;
+    --overlay-fill: var(--popover);
+    --grain-opacity: 0;
+    --ring-width: 2px;
+    --ring-offset: 2px;
+    /* The padding between a container and the rounded thing inside it (rounded-concentric). */
+    --concentric-pad: 0px;
     /* Layout grid (section 11): mobile first. */
     --layout-columns: 4;
     --layout-gutter: 1rem;
@@ -568,6 +616,12 @@
 @utility rounded-dialog {
   border-radius: calc(var(--radius-dialog) + var(--radius-step) * var(--surface-extra));
 }
+/* A small rounded mark that sits inside a control's curve but is not flush with it (a tooltip's arrow, a key cap in a
+   tooltip): the xs tier, but never closer than one step under the control. In a shape whose control is already xs
+   (soft) it is square, so the curve inside the curve is still the tighter one. */
+@utility rounded-inset {
+  border-radius: min(var(--radius-xs), calc(var(--radius-control) - var(--radius-step)));
+}
 .rounded-card:has(.rounded-card) {
   --surface-extra: 1;
 }
@@ -773,6 +827,146 @@
   transition-property: opacity, transform, translate, scale;
   transition-duration: var(--duration-large);
   transition-timing-function: var(--ease-standard);
+}
+
+/* Expression roles (section 14): website motion and display type, for @aleeforoughi/feather-expression and
+   @aleeforoughi/feather-living only. They use the brand's signature curve; product UI never does. Reduced motion
+   ends their transitions at once (above); the expression runtime plays the 150ms cross-fade where a role maps to
+   "fade". */
+@utility motion-reveal {
+  transition-property: opacity, transform, translate, clip-path;
+  transition-duration: var(--duration-reveal);
+  transition-timing-function: var(--ease-signature);
+}
+@utility motion-media {
+  transition-property: opacity, transform, scale, clip-path;
+  transition-duration: var(--duration-media);
+  transition-timing-function: var(--ease-signature);
+}
+@utility motion-scene {
+  transition-property: opacity, transform, translate, clip-path;
+  transition-duration: var(--duration-scene);
+  transition-timing-function: var(--ease-signature);
+}
+/* A hover exit runs slower than its entry (the entry is the `hover` role). */
+@utility motion-hover-out {
+  transition-property: color, background-color, border-color, opacity, transform, scale;
+  transition-duration: var(--duration-hover-out);
+  transition-timing-function: var(--ease-signature);
+}
+/* The marquee: the track holds two copies, so moving by half its width loops seamlessly. The duration is inline. */
+@keyframes feather-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@utility motion-marquee {
+  animation-name: feather-marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@utility type-display-xl {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-xl-size);
+  line-height: var(--display-xl-leading);
+  letter-spacing: var(--display-xl-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+@utility type-display-l {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-l-size);
+  line-height: var(--display-l-leading);
+  letter-spacing: var(--display-l-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+@utility type-display-m {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-m-size);
+  line-height: var(--display-m-leading);
+  letter-spacing: var(--display-m-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+@utility type-display-s {
+  font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
+  font-size: var(--display-s-size);
+  line-height: var(--display-s-leading);
+  letter-spacing: var(--display-s-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+/* Website layout (section 14.5): the page grid as a utility, section rhythm (group gaps of 48 to 160px, fluid),
+   concentric radii, and the surface axis made visible. */
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+  column-gap: var(--layout-gutter);
+  width: 100%;
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+}
+@utility section-space-s {
+  padding-block: clamp(3rem, 2.6667rem + 1.4815vw, 4rem);
+}
+@utility section-space-m {
+  padding-block: clamp(4rem, 3.3333rem + 2.963vw, 6rem);
+}
+@utility section-space-l {
+  padding-block: clamp(6rem, 5.3333rem + 2.963vw, 8rem);
+}
+@utility section-space-xl {
+  padding-block: clamp(8rem, 7.3333rem + 2.963vw, 10rem);
+}
+/* Outer radius = inner radius + padding: set --concentric-pad to the padding between the two. */
+@utility rounded-concentric {
+  border-radius: calc(var(--radius-card) + var(--concentric-pad));
+}
+/* One framing rule for media: a 1px edge at 10% of the text color, inset so it never adds to the box. */
+@utility media-edge {
+  outline: 1px solid color-mix(in oklab, var(--text-primary) 10%, transparent);
+  outline-offset: -1px;
+}
+/* Glass (surface axis): for overlays only. Without the glass surface the blur is 0 and the fill opaque. */
+@utility overlay-surface {
+  background-color: var(--overlay-fill);
+  backdrop-filter: blur(var(--overlay-blur));
+}
+/* Film (surface axis): the one texture. A static SVG noise, never animated, under the content and decorative. */
+@utility film-grain {
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+/* The Living Page composer (section 14.6): its edge is 10% of the text color at rest and 25% while it has focus,
+   with no glow. The ring stays on the focused control inside it. */
+@utility composer-edge {
+  border-color: color-mix(in oklab, var(--text-primary) 10%, transparent);
+  &:focus-within {
+    border-color: color-mix(in oklab, var(--text-primary) 25%, transparent);
+  }
+}
+/* The speaker's voice in a Living Page (typography.voiceFace), and prose set with the brand's type features. */
+@utility font-voice {
+  font-family: var(--brand-font-voice);
+}
+@utility text-prose {
+  text-wrap: var(--body-wrap);
+}
+@utility numeric {
+  font-variant-numeric: var(--numeric-figures);
+}
+/* The focus axis: a 2px ring, offset 2px, in the brand's focus color. It never changes the element's box. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: var(--ring-width, 2px) solid var(--ring);
+    outline-offset: var(--ring-offset, 2px);
+  }
 }
 
 /* Loading (section 10, loading only): a calm 1600ms breath for skeletons and live indicators. These are the only

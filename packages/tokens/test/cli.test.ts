@@ -31,10 +31,10 @@ describe("feather-brand", () => {
 
   it("migrates a qooe-tokens/1 file in place, schema first", () => {
     const dir = product(v1)
-    expect(run(dir, "--migrate")).toContain("qooe-tokens/1 → feather-tokens/2")
+    expect(run(dir, "--migrate")).toContain("qooe-tokens/1 → feather-tokens/3")
     const migrated = JSON.parse(fs.readFileSync(path.join(dir, "brand/tokens.json"), "utf8"))
     expect(Object.keys(migrated)[0]).toBe("schema")
-    expect(migrated).toEqual({ schema: "feather-tokens/2", ...v1 })
+    expect(migrated).toEqual({ schema: "feather-tokens/3", ...v1, pace: v1.motion, focus: "primary" })
   })
 
   it("fails with every problem listed", () => {

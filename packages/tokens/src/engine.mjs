@@ -2,7 +2,8 @@
 // Turns brand tokens (feather-tokens/2, or qooe-tokens/1 through migrateTokens) into the theme CSS every Feather
 // component reads, plus the font imports the brand needs. Deterministic: no network, no dependencies, no Node
 // built-ins, so it runs the same in Node (the feather-brand CLI) and in the browser (Storybook, the playground).
-import { migrateTokens } from "./schema.mjs"
+import { migrateTokens, TOKEN_SCHEMA } from "./schema.mjs"
+import { expressionTheme } from "./expression.mjs"
 
 /** The heading weights a brand may pick (section 2). */
 export const HEADING_WEIGHTS = [400, 500, 600, 700]
@@ -319,13 +320,17 @@ export function buildTheme(input) {
   for (const [role, value] of Object.entries(c)) {
     if (typeof value === "string" && !HEX.test(value)) problems.push(`colors.${role} must be a hex color, got ${value}`)
   }
+  // feather-tokens/3 adds open font objects, a mono slot and a voice face; a document read as /2 keeps the /2 rules.
+  const v3 = migrated.from === TOKEN_SCHEMA
   const fonts = tokens.typography?.fontFamily ?? {}
   const display = fonts.display ?? fonts.body
   const body = fonts.body ?? fonts.display
   for (const [slot, family] of [["display", display], ["body", body]]) {
     if (!family) problems.push(`typography.fontFamily.${slot} is required`)
+    else if (v3 && typeof family === "object") continue
     else if (!FONTS[family]) problems.push(`typography.fontFamily.${slot} "${family}" is not in the foundation font set: ${Object.keys(FONTS).join(", ")}`)
   }
+  if (!v3 && (fonts.mono !== undefined || tokens.typography?.voiceFace !== undefined)) problems.push(`typography.fontFamily.mono and typography.voiceFace need "schema": "${TOKEN_SCHEMA}"`)
   const headingWeight = tokens.typography?.headingWeight
   if (headingWeight !== undefined && !HEADING_WEIGHTS.includes(headingWeight)) {
     problems.push(`typography.headingWeight must be one of ${HEADING_WEIGHTS.join(", ")}`)
@@ -333,13 +338,17 @@ export function buildTheme(input) {
   const shape = tokens.shape ?? "rounded"
   const density = tokens.density ?? "comfortable"
   const elevation = tokens.elevation ?? "soft"
-  const motion = tokens.motion ?? "calm"
+  const pace = tokens.pace ?? "calm"
+  // Product UI durations follow `motion`; a /3 brand may give only `pace`, and cinematic runs product UI calm.
+  const motion = tokens.motion ?? (pace === "snappy" ? "snappy" : "calm")
+  if (v3 && tokens.motion !== undefined && tokens.pace !== undefined && tokens.pace !== "cinematic" && tokens.pace !== tokens.motion) problems.push(`motion (${tokens.motion}) and pace (${tokens.pace}) disagree; a feather-tokens/3 brand sets pace`)
   if (!RADIUS_TIERS[shape]) problems.push(`shape must be one of ${Object.keys(RADIUS_TIERS).join(", ")}`)
   if (!DENSITY[density]) problems.push(`density must be one of ${Object.keys(DENSITY).join(", ")}`)
   if (!ELEVATION[elevation]) problems.push(`elevation must be one of ${Object.keys(ELEVATION).join(", ")}`)
   if (!DURATIONS[motion]) problems.push(`motion must be one of ${Object.keys(DURATIONS).join(", ")}`)
   const rules = componentRules(tokens.components, problems)
   if (problems.length > 0) return { ok: false, problems }
+  const familyStack = (name) => (typeof name === "string" ? `"${fontFamilyName(name)}", ${fallback(name)}` : "sans-serif")
 
   const bg = expand(c.background)
   const text = expand(c.text)
@@ -413,6 +422,14 @@ export function buildTheme(input) {
   const aaaDestructive = hoverPct === null ? null : towardText(destructive, (red) => Math.min(...on.flatMap((s) => [contrast(red, s), contrast(red, oklabMix(red, s, rest)), contrast(red, oklabMix(red, s, hoverPct))])) >= aaaFloor)
   const aaaPrimary = towardText(primary, (fill) => worst(fill) >= aaaFloor && contrast(fill, onColor(fill, text, bg)) >= aaaFloor)
   if (!aaaSecondary || !aaaDestructive || !aaaPrimary) problems.push(`no mix toward colors.text reaches ${aaaFloor}:1 for the AAA contrast block`)
+  // ── Expression (feather-tokens/3, section 14): only for a document written as /3. ──
+  const expression = v3
+    ? expressionTheme(
+        tokens,
+        { fonts: { display, body, mono: fonts.mono, voice: tokens.typography?.voiceFace }, foundation: FONTS, familyName: fontFamilyName, generic: fallback, accent, primary, on, contrast },
+        problems
+      )
+    : null
   if (problems.length > 0) return { ok: false, problems }
 
   const shadows = ELEVATION[elevation]
@@ -494,8 +511,8 @@ export function buildTheme(input) {
     "--sidebar-accent-foreground": "var(--text-primary)",
     "--sidebar-border": mix(text, surface, 16),
     "--sidebar-ring": primary,
-    "--brand-font-body": `"${fontFamilyName(body)}", ${fallback(body)}`,
-    "--brand-font-display": `"${fontFamilyName(display)}", ${fallback(display)}`,
+    "--brand-font-body": familyStack(body),
+    "--brand-font-display": familyStack(display),
     // The unit is fixed; density sets sizes and gaps through its own variables.
     "--spacing": "0.25rem",
     ...DENSITIES[semanticDensity],
@@ -510,6 +527,7 @@ export function buildTheme(input) {
     "--motion-duration": "var(--duration-base)",
     "--motion-ease": "var(--ease-standard)",
     ...(headingWeight !== undefined ? { "--heading-weight": String(headingWeight) } : {}),
+    ...(expression?.vars ?? {}),
   }
   // The AAA block redeclares every variable it changes, and every variable that refers to one of them: a custom
   // property is resolved where it is declared, so an alias set on :root would keep the AA value in the subtree.
@@ -531,6 +549,16 @@ export function buildTheme(input) {
     .map(([name, set]) => `[data-density="${name}"],\n:root:root[data-density="${name}"] {\n${Object.entries(set).map(([k, v]) => `  ${k}: ${v};`).join("\n")}\n}`)
     .join("\n\n")
   const css = `/* Generated by feather-brand (@aleeforoughi/feather-tokens) from the brand tokens — do not edit by hand. */\n:root:root {\n${Object.entries(vars).map(([k, v]) => `  ${k}: ${v};`).join("\n")}\n  color-scheme: ${darkBg ? "dark" : "light"};\n}\n\n/* Density: any element with data-density overrides the density variables for its subtree. */\n${densityBlocks}\n${aaaBlock}${headingWeight !== undefined ? `\n/* Heading weight (typography.headingWeight) — component tokens below may still override one component. */\n.font-heading {\n  font-weight: ${headingWeight};\n}\n` : ""}${rules.length > 0 ? `\n/* Component tokens */\n${rules.join("\n\n")}\n` : ""}`
-  const imports = [...new Set([...fontImports(display), ...fontImports(body)])].map((pkg) => `@import "${pkg}";`).join("\n")
-  return { ok: true, css, fonts: `/* Generated by feather-brand (@aleeforoughi/feather-tokens) — brand fonts. */\n${imports}\n`, derived, summary: { shape, density, elevation, motion, display, body } }
+  const named = [display, body, fonts.mono, tokens.typography?.voiceFace].filter((f) => typeof f === "string")
+  const imports = [...new Set(named.flatMap(fontImports))].map((pkg) => `@import "${pkg}";`).join("\n")
+  const faces = expression?.faces.length ? `\n/* Open fonts (self-hosted WOFF2), each with a metric-matched fallback so the swap does not shift the layout. */\n${expression.faces.join("\n")}\n` : ""
+  const label = (f) => (typeof f === "string" ? f : f.family)
+  return {
+    ok: true,
+    css,
+    fonts: `/* Generated by feather-brand (@aleeforoughi/feather-tokens) — brand fonts. */\n${imports}\n${faces}`,
+    derived,
+    preload: expression?.preload ?? [],
+    summary: { shape, density, elevation, motion, display: label(display), body: label(body), ...(expression ? expression.summary : {}) },
+  }
 }

@@ -11,3 +11,11 @@
 /* The switch manifestation's own classes (the scanning ring), and its stories' layout classes. */
 @source "../../../packages/manifest-switch/src";
 @source not "../../../packages/manifest-switch/src/**/*.test.tsx";
+
+/* The website layer (feather-tokens/3): expression, the Living Page and the page renderer. */
+@source "../../../packages/expression/src";
+@source not "../../../packages/expression/src/**/*.test.tsx";
+@source "../../../packages/living/src";
+@source not "../../../packages/living/src/**/*.test.tsx";
+@source "../../../packages/page/src";
+@source not "../../../packages/page/src/**/*.test.tsx";

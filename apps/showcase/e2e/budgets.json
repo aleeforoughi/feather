@@ -1,0 +1,8 @@
+{
+  "$comment": "The website layer's mobile budgets (Qooler file 23 section 8). Read by e2e/sites.spec.ts and by Lighthouse CI (lighthouserc.json).",
+  "lcpMs": 2500,
+  "cls": 0.1,
+  "tbtMs": 200,
+  "fpsMedian": 55,
+  "cpuThrottle": 4
+}

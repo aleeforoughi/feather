@@ -1,0 +1,803 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aleeforoughi/feather/schema/feather.page-0.json",
+  "title": "A Feather page (feather.page/0)",
+  "description": "A website as data: one document renders a complete, themeable site; changing brand restyles all of it. Generated from packages/page/src/core/spec.ts by scripts/generate.ts; validatePage is the authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "brand",
+    "sections"
+  ],
+  "properties": {
+    "schema": {
+      "const": "feather.page/0"
+    },
+    "brand": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "lang": {
+      "type": "string"
+    },
+    "speaker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "person",
+            "company",
+            "product"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "voice": {
+          "type": "string"
+        }
+      }
+    },
+    "library": {
+      "type": "object",
+      "properties": {
+        "work": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "title": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "summary": {
+                "type": "string",
+                "maxLength": 600
+              },
+              "media": {
+                "$ref": "#/$defs/media"
+              },
+              "href": {
+                "type": "string",
+                "not": {
+                  "pattern": "^\\s*(javascript|data|vbscript):"
+                }
+              },
+              "year": {
+                "type": "string",
+                "maxLength": 12
+              },
+              "role": {
+                "type": "string",
+                "maxLength": 80
+              }
+            },
+            "required": [
+              "title"
+            ]
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 40,
+      "items": {
+        "$ref": "#/$defs/block"
+      }
+    },
+    "scenes": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ask",
+          "line",
+          "blocks"
+        ],
+        "properties": {
+          "ask": {
+            "type": "string"
+          },
+          "line": {
+            "type": "string"
+          },
+          "blocks": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "$ref": "#/$defs/block"
+            }
+          },
+          "asks": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "living": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "anchor": {
+          "enum": [
+            "reader",
+            "end"
+          ]
+        },
+        "fold": {
+          "type": "boolean"
+        },
+        "prepared": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disclosure": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "media": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "required": [
+            "src"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "src": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            },
+            "poster": {
+              "type": "string"
+            },
+            "decorative": {
+              "type": "boolean"
+            },
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "src",
+                  "type"
+                ],
+                "properties": {
+                  "src": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "block": {
+      "oneOf": [
+        {
+          "description": "The first view: the display title, a short lede, the brand's medium and the starters.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "hero"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "eyebrow": {
+              "type": "string",
+              "maxLength": 60
+            },
+            "lede": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "starters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 5
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "One idea in display type, with an optional line of body.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "statement"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "Selected work, from the library or inline.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "work"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 60
+                      },
+                      "title": {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "summary": {
+                        "type": "string",
+                        "maxLength": 600
+                      },
+                      "media": {
+                        "$ref": "#/$defs/media"
+                      },
+                      "href": {
+                        "type": "string",
+                        "not": {
+                          "pattern": "^\\s*(javascript|data|vbscript):"
+                        }
+                      },
+                      "year": {
+                        "type": "string",
+                        "maxLength": 12
+                      },
+                      "role": {
+                        "type": "string",
+                        "maxLength": 80
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title"
+                    ]
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 12
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "One piece of work told: a title, the medium, the facts.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "case"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "facts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "value": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "required": [
+                  "label",
+                  "value"
+                ]
+              },
+              "maxItems": 6
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "Up to four numbers that prove something, counted in.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "numbers"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "value": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "maxLength": 12
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "required": [
+                  "value",
+                  "label"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Moments in order.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "timeline"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "maxLength": 24
+                  },
+                  "what": {
+                    "type": "string",
+                    "maxLength": 160
+                  }
+                },
+                "required": [
+                  "when",
+                  "what"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 12
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "How the work is done, in two to six steps.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "process"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 240
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 6
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Who it was for. Names are always text; a mark is optional.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "logos"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "src": {
+                    "$ref": "#/$defs/media"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 24
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Someone else's words, attributed.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "quote"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 400
+            },
+            "by": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "role": {
+              "type": "string",
+              "maxLength": 80
+            }
+          },
+          "required": [
+            "block",
+            "text",
+            "by"
+          ]
+        },
+        {
+          "description": "What can be bought or booked, and for how much.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "offer"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "price": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Questions people actually ask.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "faq"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "q": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "a": {
+                    "type": "string",
+                    "maxLength": 600
+                  }
+                },
+                "required": [
+                  "q",
+                  "a"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 12
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "The one next act: how to reach the real person.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "contact"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "actions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  }
+                },
+                "required": [
+                  "label",
+                  "href"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "The one block only this brand has. Its renderer is the brand's; without one it shows as a statement.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "signature"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "variant": {
+              "type": "string",
+              "maxLength": 40
+            }
+          },
+          "required": [
+            "block"
+          ]
+        }
+      ]
+    }
+  }
+}

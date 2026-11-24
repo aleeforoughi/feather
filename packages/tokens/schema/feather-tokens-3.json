@@ -1,0 +1,725 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aleeforoughi/feather/schema/feather-tokens-3.json",
+  "title": "Feather brand tokens (feather-tokens/3)",
+  "description": "A brand, as Feather themes it. The theme engine (buildTheme) is the authority and reports readable problems; this schema is for editors and documentation. feather-tokens/2 and qooe-tokens/1 documents migrate to this on read; /3 only adds the expression layer (docs/visual-system.md section 14).",
+  "type": "object",
+  "required": [
+    "colors",
+    "typography"
+  ],
+  "properties": {
+    "schema": {
+      "const": "feather-tokens/3"
+    },
+    "name": {
+      "type": "string"
+    },
+    "colors": {
+      "type": "object",
+      "required": [
+        "primary",
+        "background",
+        "surface",
+        "text"
+      ],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "background": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "surface": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "border": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "destructive": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "success": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "warning": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "info": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "primaryText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "successText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "warningText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "infoText": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        },
+        "mutedForeground": {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+        }
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+      }
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "fontFamily": {
+          "type": "object",
+          "properties": {
+            "display": {
+              "$ref": "#/$defs/font"
+            },
+            "body": {
+              "$ref": "#/$defs/font"
+            },
+            "mono": {
+              "$ref": "#/$defs/font"
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "display"
+              ]
+            },
+            {
+              "required": [
+                "body"
+              ]
+            }
+          ]
+        },
+        "headingWeight": {
+          "enum": [
+            400,
+            500,
+            600,
+            700
+          ]
+        },
+        "scale": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "display": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "xl": {
+              "$ref": "#/$defs/displayStep"
+            },
+            "l": {
+              "$ref": "#/$defs/displayStep"
+            },
+            "m": {
+              "$ref": "#/$defs/displayStep"
+            },
+            "s": {
+              "$ref": "#/$defs/displayStep"
+            }
+          }
+        },
+        "features": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tabularNums": {
+              "type": "boolean"
+            },
+            "balanceTitles": {
+              "type": "boolean"
+            },
+            "prettyBody": {
+              "type": "boolean"
+            }
+          }
+        },
+        "voiceFace": {
+          "$ref": "#/$defs/font"
+        }
+      },
+      "required": [
+        "fontFamily"
+      ]
+    },
+    "spacing": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "radius": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "shape": {
+      "enum": [
+        "sharp",
+        "soft",
+        "rounded",
+        "pill"
+      ],
+      "default": "rounded"
+    },
+    "density": {
+      "enum": [
+        "compact",
+        "comfortable",
+        "spacious"
+      ],
+      "default": "comfortable"
+    },
+    "elevation": {
+      "enum": [
+        "flat",
+        "soft",
+        "dramatic"
+      ],
+      "default": "soft"
+    },
+    "motion": {
+      "enum": [
+        "calm",
+        "snappy"
+      ],
+      "default": "calm"
+    },
+    "voice": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "components": {
+      "description": "Component tokens: per data-slot (\"button\") or per variant (\"button.outline\").",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z-]{1,40}(\\.[a-z][a-z0-9-]{0,30})?$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "radius": {
+            "description": "A radius tier or one of the radius primitives (docs/visual-system.md section 2).",
+            "enum": [
+              "xs",
+              "control",
+              "card",
+              "dialog",
+              "0",
+              "4",
+              "8",
+              "12",
+              "16",
+              "full",
+              0,
+              4,
+              8,
+              12,
+              16
+            ]
+          },
+          "borderWidth": {
+            "enum": [
+              "0px",
+              "1px"
+            ]
+          },
+          "shadow": {
+            "enum": [
+              "none",
+              "1",
+              "2",
+              "3",
+              "xs",
+              "sm",
+              "md",
+              "lg",
+              "xl",
+              1,
+              2,
+              3
+            ]
+          },
+          "fontWeight": {
+            "enum": [
+              100,
+              200,
+              300,
+              400,
+              500,
+              600,
+              700,
+              800,
+              900,
+              "100",
+              "200",
+              "300",
+              "400",
+              "500",
+              "600",
+              "700",
+              "800",
+              "900"
+            ]
+          },
+          "letterSpacing": {
+            "type": "string",
+            "pattern": "^-?\\d+(\\.\\d+)?em$"
+          },
+          "textTransform": {
+            "enum": [
+              "none",
+              "uppercase",
+              "lowercase",
+              "capitalize"
+            ]
+          },
+          "fontFamily": {
+            "enum": [
+              "display",
+              "body"
+            ]
+          },
+          "paddingX": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 16
+          },
+          "height": {
+            "type": "number",
+            "minimum": 4,
+            "maximum": 24
+          },
+          "background": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+              },
+              {
+                "enum": [
+                  "primary",
+                  "background",
+                  "surface",
+                  "text",
+                  "accent",
+                  "muted",
+                  "border",
+                  "destructive"
+                ]
+              }
+            ]
+          },
+          "foreground": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+              },
+              {
+                "enum": [
+                  "primary",
+                  "background",
+                  "surface",
+                  "text",
+                  "accent",
+                  "muted",
+                  "border",
+                  "destructive"
+                ]
+              }
+            ]
+          },
+          "borderColor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+              },
+              {
+                "enum": [
+                  "primary",
+                  "background",
+                  "surface",
+                  "text",
+                  "accent",
+                  "muted",
+                  "border",
+                  "destructive"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "pace": {
+      "enum": [
+        "calm",
+        "snappy",
+        "cinematic"
+      ]
+    },
+    "signature": {
+      "anyOf": [
+        {
+          "enum": [
+            "expo-out",
+            "quint-out",
+            "sine-out",
+            "scout",
+            "sheet",
+            "standard"
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
+            "cubicBezier"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "cubicBezier": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "number",
+                  "minimum": -0.6,
+                  "maximum": 1.6
+                },
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "number",
+                  "minimum": -0.6,
+                  "maximum": 1.6
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "overshoot": {
+      "type": "boolean"
+    },
+    "spring": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bounce": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.25
+        }
+      }
+    },
+    "reduced": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reveal": {
+          "enum": [
+            "fade",
+            "none"
+          ]
+        },
+        "media": {
+          "enum": [
+            "fade",
+            "none"
+          ]
+        },
+        "scene": {
+          "enum": [
+            "fade",
+            "none"
+          ]
+        },
+        "stagger": {
+          "enum": [
+            "fade",
+            "none"
+          ]
+        },
+        "hoverOut": {
+          "enum": [
+            "fade",
+            "none"
+          ]
+        },
+        "spring": {
+          "enum": [
+            "fade",
+            "none"
+          ]
+        }
+      }
+    },
+    "contrast": {
+      "enum": [
+        "quiet",
+        "bold"
+      ]
+    },
+    "surface": {
+      "enum": [
+        "flat",
+        "paper",
+        "glass",
+        "film"
+      ]
+    },
+    "blur": {
+      "type": "number",
+      "minimum": 8,
+      "maximum": 30
+    },
+    "grain": {
+      "type": "number",
+      "minimum": 0.02,
+      "maximum": 0.08
+    },
+    "focus": {
+      "enum": [
+        "accent",
+        "primary"
+      ]
+    }
+  },
+  "$defs": {
+    "font": {
+      "anyOf": [
+        {
+          "enum": [
+            "Geist",
+            "Inter",
+            "Sora",
+            "Space Grotesk",
+            "DM Sans",
+            "Plus Jakarta Sans",
+            "Outfit",
+            "Fraunces",
+            "Manrope",
+            "Nunito",
+            "Playfair Display",
+            "JetBrains Mono",
+            "Geist Mono",
+            "Figtree",
+            "Poppins"
+          ]
+        },
+        {
+          "$ref": "#/$defs/fontObject"
+        }
+      ]
+    },
+    "fontObject": {
+      "type": "object",
+      "required": [
+        "family",
+        "files",
+        "fallback"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "family": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9 -]{0,60}$"
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "src"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "src": {
+                "type": "string",
+                "pattern": "\\.woff2$",
+                "description": "Self-hosted: a relative or root-relative path, never another host."
+              },
+              "weight": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 1000
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                ]
+              },
+              "style": {
+                "enum": [
+                  "normal",
+                  "italic"
+                ]
+              }
+            }
+          }
+        },
+        "fallback": {
+          "type": "object",
+          "required": [
+            "family",
+            "sizeAdjust",
+            "ascentOverride",
+            "descentOverride"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "family": {
+              "enum": [
+                "Arial",
+                "Helvetica",
+                "Helvetica Neue",
+                "Times New Roman",
+                "Georgia",
+                "Courier New"
+              ]
+            },
+            "sizeAdjust": {
+              "type": "number",
+              "minimum": 50,
+              "maximum": 200
+            },
+            "ascentOverride": {
+              "type": "number",
+              "minimum": 50,
+              "maximum": 150
+            },
+            "descentOverride": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 60
+            },
+            "lineGapOverride": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 30
+            }
+          }
+        },
+        "preload": {
+          "type": "boolean",
+          "description": "Display faces only."
+        },
+        "display": {
+          "enum": [
+            "swap",
+            "optional",
+            "fallback"
+          ]
+        },
+        "generic": {
+          "enum": [
+            "sans-serif",
+            "serif",
+            "monospace"
+          ]
+        }
+      }
+    },
+    "displayStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 14
+            },
+            "max": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 14
+            }
+          }
+        },
+        "tracking": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": -0.08,
+              "maximum": 0.02
+            },
+            "max": {
+              "type": "number",
+              "minimum": -0.08,
+              "maximum": 0.02
+            }
+          }
+        },
+        "leading": {
+          "type": "number",
+          "minimum": 0.72,
+          "maximum": 1.15
+        }
+      }
+    }
+  }
+}

@@ -40,9 +40,10 @@ values move onto the system.
    tier.
 4. Hierarchy comes from emphasis (color and contrast), never from ad-hoc thickness, size or opacity.
 5. Border width is 1px everywhere. Focus is a separate 2px ring that never changes geometry.
-6. Every perceivable state change interpolates on the single canonical curve, with an approved duration and
-   distance. Nothing teleports, nothing bounces, and nothing animates layout properties when a transform can
-   do it.
+6. Every perceivable state change in product UI interpolates on the single canonical curve, with an approved
+   duration and distance. Nothing teleports, nothing bounces, and nothing animates layout properties when a
+   transform can do it. Website expression (§14) is the one place a brand's signature curve shows; a form, a
+   dialog and a menu feel the same in every brand.
 7. Reduced motion is built in, not added later.
 8. Geometry rests on whole pixels: borders, icons, dividers, small text and control boundaries.
 9. Perceptual consistency beats mathematical consistency, inside the optical budget (§9).
@@ -337,6 +338,9 @@ The radius scale is therefore 0, 4, 8, 12, 16, 20, 24 and full.
   `--radius-xs`, `--radius-control`, `--radius-card`, `--radius-dialog` and `--radius-step`.
 - **Concentric by construction.** A list, menu or segmented control that insets its items by one step (4px,
   `p-1`) is exactly concentric with them: 8px items in a 12px container.
+- **Marks inside a control are one step under it.** A tooltip's arrow or a key cap inside a tooltip is not flush
+  with the curve around it, so it uses `rounded-inset`: the xs radius, but never closer than one step under the
+  control. In `soft`, where the control is already xs, that is square.
 - **Flush children match.** A child flush with its container on two sides (a clipped image, a header band) takes
   the container's corner, never a larger one.
 - **The audit checks it** (`radius.nesting`). A rounded surface inside a rounded surface must be at least one step
@@ -555,3 +559,102 @@ which is also the order for resolving conflicts:
     nothing that serves no purpose.
 
 Every finding is fixed by normalizing (moving onto the system), never by redesigning.
+
+## 14. Expression: the website layer (feather-tokens/3)
+
+Feather 1.18 adds a layer for award-grade websites and the Living Page. It sits beside product UI, never inside
+it: the expression packages (`@aleeforoughi/feather-expression`, `@aleeforoughi/feather-living`) read these
+tokens; `packages/react` and the manifest bodies never do. The evidence for every value is Qooler's file 23 (award
+craft), measured on 18 winners from 2025 and 2026. The engine is `packages/tokens/src/expression.mjs`; a brand
+gets it by writing `"schema": "feather-tokens/3"`. A `/2` brand's theme CSS is unchanged byte for byte, and the
+house defaults below live in foundation.css for it.
+
+### 14.1 Type
+
+- **Open fonts.** `fontFamily.display | body | mono` and `voiceFace` take a foundation family name or a font
+  object: `{ family, files: [{ src, weight | [min, max], style }], fallback, preload, display, generic }`.
+  - Self-hosted WOFF2 only: a relative or root-relative path, never another host.
+  - `fallback` names a local face (Arial, Helvetica, Helvetica Neue, Times New Roman, Georgia or Courier New) with
+    `sizeAdjust`, `ascentOverride`, `descentOverride` and `lineGapOverride`, so the swap shifts nothing.
+  - Display and voice faces are `font-display: swap`; body and mono are `optional`.
+  - Only display faces may be preloaded. `buildTheme().preload` lists them; `feather-brand` writes
+    `brand-preload.html`.
+- **The fluid display scale**, `type-display-xl | l | m | s`. Each step has a size and tracking at the 360px and
+  1440px viewports and a leading, compiled to `clamp(min, a + b·vw, max)`. Tracking tightens as the type grows,
+  exact at both ends. Bounds: size 1 to 14rem, tracking −0.08 to 0.02em, leading 0.72 to 1.15, and no step
+  larger than the one above it.
+
+  | step | size (rem) | tracking (em) | leading |
+  |---|---|---|---|
+  | xl | 3 → 9 | −0.02 → −0.05 | 0.9 |
+  | l | 2.5 → 6 | −0.02 → −0.045 | 0.95 |
+  | m | 2 → 4.5 | −0.015 → −0.035 | 1 |
+  | s | 1.5 → 3 | −0.01 → −0.025 | 1.05 |
+
+  Display leading is a ratio, not a 4px multiple: it is the one type exception, and only for `type-display-*`.
+- **Features**, all on by default: `tabularNums` (`numeric`), `balanceTitles` (`--title-wrap`) and `prettyBody`
+  (`text-prose`).
+- **`voiceFace`**: the speaker's face in a Living Page (`font-voice`), so you can see who is speaking.
+- **`contrast`**: `quiet` sets display weight 500; `bold` sets 700 and runs the default tracking 25% tighter.
+
+### 14.2 Motion
+
+Product UI keeps §10. The expression roles use the brand's **signature** curve:
+
+| signature | curve |
+|---|---|
+| `expo-out` (default) | `(.19, 1, .22, 1)` |
+| `quint-out` | `(.23, 1, .32, 1)` |
+| `sine-out` | `(.39, .575, .565, 1)` |
+| `scout` | `(.38, .005, .215, 1)` |
+| `sheet` | `(.32, .72, 0, 1)` |
+| `standard` | `(.2, 0, 0, 1)` |
+
+A custom `{ "cubicBezier": [x1, y1, x2, y2] }` keeps x in [0, 1], and y in [−0.6, 1.6]. Outside [0, 1] it
+overshoots, and needs `overshoot: true`. `overshoot` also turns on `--ease-overshoot` `(.34, 1.56, .64, 1)` for
+playful roles only.
+
+`pace` is `calm | snappy | cinematic`. Calm and snappy also set product durations (§10). Cinematic stretches only
+the expression roles, and product UI runs calm.
+
+| role | utility | calm | snappy | cinematic | distance |
+|---|---|---|---|---|---|
+| reveal | `motion-reveal` | 700ms | 600ms | 900ms | 32 / 24 / 48px, or a mask |
+| media | `motion-media` | 800ms | 700ms | 1000ms | scale 1.03 / 1.02 / 1.04 |
+| scene | `motion-scene` | 900ms | 800ms | 1200ms | full |
+| stagger | `--stagger-word`, `--stagger-block` | 40 / 100ms | 30 / 80ms | 60 / 120ms | — |
+| hover-out | `motion-hover-out` | 280ms | 250ms | 320ms | — |
+| spring | `--spring-bounce` | 0.1 | 0.2 | 0.1 | bounce 0 to 0.25, interruptible |
+
+Rules:
+- Every sequence ends within 1.2s (`--sequence-cap`); a stagger compresses to fit.
+- **Reduced motion.** foundation.css still ends every transition at once. The expression runtime maps each role:
+  reveal, media and scene become a 150ms cross-fade (`--duration-reduced`); stagger, hover-out and spring become
+  nothing. A brand may only make a role quieter (`reduced: { reveal: "none" }`).
+- Never scale from 0, never `transition: all`, animate only transform, opacity, filter and clip-path, and
+  anything that moves longer than 5s can be paused (§14.4).
+
+### 14.3 Axes
+
+- **`surface`**, one idea of light per brand:
+  - `flat`: shadows from the elevation axis;
+  - `paper`: no shadow, 1px hairline edges (`--expression-edge`);
+  - `glass`: overlays only, `--overlay-blur` 8 to 30px (`blur`, default 16) over an 85% fill;
+  - `film`: one grain texture, `--grain-opacity` 0.02 to 0.08 (`grain`, default 0.04).
+- **`focus`**: the ring's color, `accent` (the default for /3) or `primary`, 2px with a 2px offset
+  (`focus-ring`). The accent must reach 3:1 on the background and the surface. A migrated /2 brand keeps
+  `primary`.
+
+### 14.4 Gates
+
+Gate 1 (`pnpm hygiene`) scans the expression packages too, and fails on:
+- `transition: all` or `transition-all`;
+- a scale from 0 (`scale(0)`, `scale: 0`, `scale-0`);
+- a canvas whose device pixel ratio is not capped (`devicePixelRatio` read without `Math.min`);
+- `requestAnimationFrame` anywhere but the one clock (`src/core/clock.ts`);
+- an expression component without a reduced-motion path;
+- a `focus:` style without `focus-visible`;
+- `loading="lazy"` on a media frame marked as the LCP element.
+
+CI adds Lighthouse mobile budgets on the showcase (LCP ≤ 2.5s, CLS ≤ 0.1, TBT < 200ms), axe on every story, and
+a Playwright performance trace.

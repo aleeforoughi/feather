@@ -11,6 +11,10 @@ import voidPill from "@aleeforoughi/feather-tokens/themes/void-pill.json"
 import paperSharp from "@aleeforoughi/feather-tokens/themes/paper-sharp.json"
 import feather from "@aleeforoughi/feather-tokens/themes/feather.json"
 import featherDark from "@aleeforoughi/feather-tokens/themes/feather-dark.json"
+import studio from "@aleeforoughi/feather-tokens/themes/studio.json"
+import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
+import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
+import "@aleeforoughi/feather-tokens/fonts/space-grotesk.css"
 // From source, not the package build: the stories import their components from source, and providers must be
 // the same module instances as the components that read them.
 import { featherTheme } from "./feather-theme"
@@ -23,6 +27,10 @@ const THEMES: Record<string, { dark: boolean; tokens: BrandTokens } | null> = {
   "feather-dark": featherDark as { dark: boolean; tokens: BrandTokens },
   "void-pill": voidPill as { dark: boolean; tokens: BrandTokens },
   "paper-sharp": paperSharp as { dark: boolean; tokens: BrandTokens },
+  // feather-tokens/3 brands: the website layer's three reference routes.
+  studio: studio as { dark: boolean; tokens: BrandTokens },
+  portrait: portrait as { dark: boolean; tokens: BrandTokens },
+  seed: seed as { dark: boolean; tokens: BrandTokens },
 }
 
 const STYLE_ID = "feather-storybook-theme"
@@ -70,6 +78,9 @@ const preview: Preview = {
           { value: "feather-dark", title: "Feather dark" },
           { value: "void-pill", title: "Void Pill (dark)" },
           { value: "paper-sharp", title: "Paper Sharp (light)" },
+          { value: "studio", title: "Studio (/3, dark, cinematic)" },
+          { value: "portrait", title: "Portrait (/3, paper)" },
+          { value: "seed", title: "Seed (/3, glass)" },
         ],
       },
     },

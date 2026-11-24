@@ -84,7 +84,7 @@ to itself) on the first mount.
   const experience = await (await fetch("/api/experience")).json()
   const view = mount(document.getElementById("decision"), experience, {
     context: { device: { surface: "desktop" } },   // optional: who this is for, and where
-    theme: "feather",                              // or "feather-dark", or a brand's feather-tokens/2 object
+    theme: "feather",                              // or "feather-dark", or a brand's feather-tokens/3 (or /2) object
     onReply: (reply) => fetch("/api/reply", { method: "POST", body: JSON.stringify(reply) }),
     onIssues: (issues) => console.error(issues),   // the experience was invalid; nothing renders
   })
@@ -109,7 +109,7 @@ if (!result.ok) console.warn(result.issues)   // also passed to onIssues; what i
 | `mount` option | |
 |---|---|
 | `context` | Who the experience is for, and where (below). |
-| `theme` | `"feather"` (default), `"feather-dark"`, or a `feather-tokens/2` brand object. |
+| `theme` | `"feather"` (default), `"feather-dark"`, or a `feather-tokens/3` (or /2) brand object. |
 | `onReply(reply)` | The person's decision, already validated in the browser. |
 | `onIssues(issues)` | The experience failed validation; nothing renders. |
 | `autoFocus` | Move focus into the experience when it renders. Default `false`: an embed never takes focus from the page. |
@@ -129,7 +129,7 @@ exactly what it was. Limits:
 (vision, motor precision, input), `device` (surface, input mode). It is passed on every render and never stored.
 The [composer](composer.md) uses it to choose the layout, the emphasis and the body.
 
-**Theme** is `"feather"` (the default, black and white), `"feather-dark"`, or a brand's `feather-tokens/2`
+**Theme** is `"feather"` (the default, black and white), `"feather-dark"`, or a brand's `feather-tokens/3` (or /2)
 object, the same file `feather-brand` reads. Each view takes its own, and its popups follow it.
 
 **Asking several things?** Use one `Form` (`nodes.Form(id=…, intent=…, fields=[{"id": "venue", "prompt": "Venue
