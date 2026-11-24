@@ -86,6 +86,7 @@ function PageFrame({ page, head, children }: { page: PageDocument; head: React.R
       {page.loader ? <Loader variant={page.loader.variant ?? "counter"} label={page.loader.label ?? `Loading ${page.title ?? "the page"}`} sound={page.loader.sound === true && !!bed} /> : null}
       {page.nav ? (
         <OverlayMenu
+          className="page-inset"
           label={page.nav.label}
           items={page.nav.items}
           brand={

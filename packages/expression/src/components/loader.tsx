@@ -94,6 +94,7 @@ export const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(function Loa
 ) {
   const root = React.useRef<HTMLDivElement | null>(null)
   const number = React.useRef<HTMLSpanElement>(null)
+  const caption = React.useRef<HTMLSpanElement>(null)
   const track = React.useRef<HTMLDivElement>(null)
   const fill = React.useRef<HTMLDivElement>(null)
   const backdrop = React.useRef<HTMLDivElement>(null)
@@ -176,8 +177,10 @@ export const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(function Loa
     let ready = false
     let ended = false
     let last = 0
+    let lastTime: number | null = null
     const paint = () => {
       if (number.current) number.current.textContent = String(Math.round(shown * 100))
+      if (caption.current) caption.current.textContent = `${Math.round(shown * 100)}%`
       if (fill.current) fill.current.style.transform = `scaleX(${Math.max(0.001, stopAndGo(shown))})`
       const m = shown >= 1 ? 100 : shown >= 0.5 ? 50 : 0
       if (m !== last) {
@@ -196,8 +199,12 @@ export const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(function Loa
         target = 1
       },
     })
-    const stop = clock.add((_time, delta) => {
+    const stop = clock.add((time) => {
       if (ended) return
+      // Real time between frames (at most 250ms), not the clock's clamped delta: the number keeps pace with the
+      // honest progress even when frames are throttled.
+      const delta = lastTime === null ? 0 : Math.min(250, Math.max(0, time - lastTime))
+      lastTime = time
       shown = Math.max(shown, shown + (target - shown) * (1 - Math.exp(-delta / (ready ? 60 : 120))))
       if (ready && shown >= 0.995) shown = 1
       paint()
@@ -252,10 +259,19 @@ export const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(function Loa
           )}
         </div>
       ) : (
-        <div ref={track} data-slot="loader-bar" aria-hidden="true" className="absolute inset-x-6 top-1/2 overflow-hidden"
-          style={{ height: 2 }}>
-          <div ref={fill} data-slot="loader-fill" className="h-full w-full origin-left bg-fg-primary" style={{ transform: "scaleX(0.001)" }} />
-        </div>
+        <>
+          {state === "asking" ? null : (
+            <div data-slot="loader-caption" aria-hidden="true" className="absolute inset-x-6 bottom-1/2 mb-4 flex items-baseline justify-between gap-4 type-label text-fg-primary">
+              <span data-slot="loader-label">{label}</span>
+              <span ref={caption} data-slot="loader-percent" className="numeric">
+                0%
+              </span>
+            </div>
+          )}
+          <div ref={track} data-slot="loader-bar" aria-hidden="true" className="absolute inset-x-6 top-1/2 overflow-hidden" style={{ height: 2 }}>
+            <div ref={fill} data-slot="loader-fill" className="h-full w-full origin-left bg-fg-primary" style={{ transform: "scaleX(0.001)" }} />
+          </div>
+        </>
       )}
       {state === "asking" ? (
         <div data-slot="loader-sound" role="group" aria-label="Sound" className={cn("flex gap-3", variant === "dock" ? "absolute inset-x-0 top-1/2 mt-8 justify-center" : "relative")}>

@@ -973,6 +973,13 @@ html[data-route-transition="push"]::view-transition-new(root) {
   margin-inline: auto;
   padding-inline: var(--layout-margin);
 }
+/* The page grid's inline measures without the grid: page chrome (a menu bar, a footer row) lines up with the content. */
+@utility page-inset {
+  width: 100%;
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+}
 @utility section-space-s {
   padding-block: clamp(3rem, 2.6667rem + 1.4815vw, 4rem);
 }

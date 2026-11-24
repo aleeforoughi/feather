@@ -189,9 +189,9 @@ export function OverlayMenu({ items, label = "Site", openLabel = "Menu", closeLa
         data-state={state}
         data-visible={shown || open ? "true" : "false"}
         {...(open ? { role: "dialog", "aria-modal": true, "aria-label": label } : {})}
-        className="fixed inset-0 z-50 flex flex-col justify-between gap-8 overflow-y-auto bg-surface-base px-4 pb-8 pt-24 text-fg-primary scripting:data-[visible=false]:invisible noscript:static noscript:inset-auto noscript:z-auto noscript:overflow-visible noscript:p-0"
+        className="fixed inset-0 z-50 flex flex-col justify-between gap-8 overflow-y-auto bg-surface-base pb-8 pt-24 text-fg-primary scripting:data-[visible=false]:invisible noscript:static noscript:inset-auto noscript:z-auto noscript:overflow-visible noscript:p-0"
       >
-        <nav data-slot="overlay-menu-nav" aria-label={label}>
+        <nav data-slot="overlay-menu-nav" aria-label={label} className="page-inset">
           <ul data-slot="overlay-menu-list" className="flex flex-col">
             {items.map((item) => (
               <li key={item.href + item.label} data-slot="overlay-menu-item" className="overflow-hidden">
@@ -210,7 +210,7 @@ export function OverlayMenu({ items, label = "Site", openLabel = "Menu", closeLa
           </ul>
         </nav>
         {aside ? (
-          <div data-slot="overlay-menu-aside" className="type-body text-fg-secondary">
+          <div data-slot="overlay-menu-aside" className="page-inset type-body text-fg-secondary">
             {aside}
           </div>
         ) : null}

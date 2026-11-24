@@ -21,9 +21,11 @@ export const CURTAIN = { columns: 4, stagger: 60, leg: 1020 } as const
 
 /** Moves focus to the new page's first h1 (made focusable for this) and says its title to screen readers. */
 export function arrive(root: ParentNode = document): void {
-  if (typeof document === "undefined" || typeof root?.querySelector !== "function") return
+  if (typeof document === "undefined" || typeof root?.querySelectorAll !== "function") return
   window.scrollTo?.({ top: 0, left: 0, behavior: "instant" as ScrollBehavior })
-  const heading = root.querySelector<HTMLElement>("h1")
+  // The first h1 that is rendered: a hidden one (a template, an inactive view) can neither take focus nor be the
+  // page the person arrived on.
+  const heading = Array.from(root.querySelectorAll<HTMLElement>("h1")).find((h) => (typeof h.checkVisibility === "function" ? h.checkVisibility() : true)) ?? null
   if (heading) {
     if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1")
     heading.focus({ preventScroll: true })

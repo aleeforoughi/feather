@@ -69,7 +69,7 @@ export function Footer({ footer, name }: FooterProps) {
         ) : null}
         {variant !== "plain" && mark ? (
           <div data-slot="page-footer-wordmark-box" className="col-span-full overflow-hidden">
-            <p ref={markRef} data-slot="page-footer-wordmark" aria-hidden="true" className="w-max whitespace-nowrap type-display-xl text-fg-primary">
+            <p ref={markRef} data-slot="page-footer-wordmark" aria-hidden="true" className="w-max whitespace-nowrap type-display-xl text-fg-primary transition-none">
               {mark}
             </p>
           </div>

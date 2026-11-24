@@ -1,9 +1,11 @@
 // Honest loading progress. What a loader shows is the lesser of how much is really ready and how much of a minimum
 // time has passed, so it never races to 100 and then waits, and never lingers once everything is in. A first visit
 // has a longer minimum than a return in the same session, and a cap ends the wait whatever happens (the page is
-// there underneath; the loader only ever hides it). Time is the clock's, so it stops in a hidden tab. Values from the
+// there underneath; the loader only ever hides it). Time is real time, less any time the tab spent hidden: never the
+// clock's clamped frame deltas, so a slow or throttled frame rate does not stretch the wait. Values from the
 // 2026 winners' code (Qooler file 27 section 7): 2.4s first, 1.4s on return, 8s cap.
 import { clock as sharedClock, type Clock } from "./clock"
+import { onVisibilityChange } from "./visibility"
 
 export const LOADER_MS = { first: 2400, returning: 1400, cap: 8000 } as const
 
@@ -55,12 +57,24 @@ export function honestProgress(opts: HonestProgressOptions): HonestProgress {
       () => settled++
     )
   let elapsed = 0
+  let start: number | null = null
+  let hiddenAt: number | null = null
+  let hiddenTotal = 0
+  const now = () => (typeof performance === "undefined" ? Date.now() : performance.now())
+  const stopVisibility = onVisibilityChange((hidden) => {
+    if (hidden) hiddenAt = now()
+    else if (hiddenAt !== null) {
+      hiddenTotal += now() - hiddenAt
+      hiddenAt = null
+    }
+  })
   let progress = 0
   let finished = false
   const finish = () => {
     if (finished) return
     finished = true
     stop()
+    stopVisibility()
     try {
       store?.setItem(key, "1")
     } catch {
@@ -68,8 +82,9 @@ export function honestProgress(opts: HonestProgressOptions): HonestProgress {
     }
     onDone()
   }
-  const stop = clock.add((_time, delta) => {
-    elapsed += delta
+  const stop = clock.add((time) => {
+    start ??= time
+    elapsed = Math.max(elapsed, time - start - hiddenTotal)
     const ready = tasks.length === 0 ? 1 : settled / tasks.length
     progress = Math.min(ready, elapsed / min, 1)
     if (elapsed >= cap) progress = 1
@@ -84,6 +99,7 @@ export function honestProgress(opts: HonestProgressOptions): HonestProgress {
     cancel() {
       finished = true
       stop()
+      stopVisibility()
     },
   }
 }

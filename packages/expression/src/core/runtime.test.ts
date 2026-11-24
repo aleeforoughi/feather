@@ -134,6 +134,14 @@ describe("honest progress", () => {
     expect(seen.at(-1)).toBe(1)
     expect(onDone).toHaveBeenCalledOnce()
   })
+  it("counts real time, so throttled frames (1 per second) do not stretch the wait", () => {
+    const frames = fakeFrames()
+    const clock = createClock(frames)
+    const onDone = vi.fn()
+    honestProgress({ clock, storage: null, onProgress: () => {}, onDone })
+    for (let t = 0; t <= 3000; t += 1000) frames.flush(t)
+    expect(onDone).toHaveBeenCalledOnce()
+  })
   it("uses the shorter minimum on a return visit, and the cap ends any wait", () => {
     const storage = memoryStorage()
     storage.setItem("feather-visited", "1")

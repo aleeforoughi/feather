@@ -60,6 +60,19 @@ describe("World", () => {
     expect(r.frame).not.toHaveBeenCalled()
   })
 
+  it("a device the capability gate turns away gets the still, visible and complete, never a blank frame", () => {
+    // jsdom has no WebGL, so the gate declines the heavy tier here, as it would on a device without it.
+    const r = renderer()
+    const { container } = render(<World renderer={r} still={<p data-slot="poster">The studio at night</p>} />)
+    flush(1)
+    expect(container.querySelector('[data-slot="world-canvas"]')).toBeNull()
+    expect(r.frame).not.toHaveBeenCalled()
+    const still = container.querySelector('[data-slot="world-still"]')!
+    expect(still.className).not.toContain("invisible")
+    expect(still.textContent).toBe("The studio at night")
+    expect(container.querySelector('[data-slot="world"]')!.getAttribute("data-variant")).toBe("static")
+  })
+
   it("quality static never renders", () => {
     const r = renderer()
     const { container } = render(<World renderer={r} quality="static" still={<i>still</i>} />)
