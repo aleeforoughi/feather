@@ -1,0 +1,15 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+import { ThemeBuilder } from "./components/theme-builder"
+
+<Meta title="Foundations/Theme builder" />
+
+# Theme builder
+
+Write a brand, see it on real components, take the JSON. The form builds the theme live with `buildTheme` from
+`@aleeforoughi/feather-tokens`, the same engine `feather-brand` runs, and shows every problem it reports.
+
+1. Pick a reference brand to start from, or set the colors and fonts yourself.
+2. Fix anything in red: the engine says which role misses which floor, and by how much.
+3. Copy or download the JSON. Save it as `brand/tokens.json` and run `npx feather-brand`.
+
+<Unstyled><ThemeBuilder /></Unstyled>

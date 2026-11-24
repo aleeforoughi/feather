@@ -1,0 +1,67 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+import { ColorRoles, DensityScale, DisplayScale, DurationTable, ElevationScale, ExtendedRoles, RadiusScale, TypeRoles } from "./components/tokens"
+
+<Meta title="Foundations/Tokens" />
+
+# Tokens
+
+Every visual value in Feather resolves through three layers, and a brand file changes the first two:
+
+1. **Primitives**: the palette and scales the engine derives from a handful of brand colors (the 4px grid, the six
+   durations, the radius and shadow ladders, the font families).
+2. **Semantic roles**: what a component actually reads. `--text-primary`, `--surface-hover`, `--border-primary`,
+   `--primary`, `--destructive`, `type-heading-2`, `shadow-2`. A component never reads a raw color.
+3. **Component tokens**: a brand's overrides for one `data-slot` (`"button"`) or one variant (`"button.outline"`).
+
+Everything below is read from the **current brand's CSS variables**. Change the brand in the toolbar and it changes
+here. A swatch that says "not in this brand" is a role the brand's schema does not define.
+
+## Color roles
+
+<Unstyled><ColorRoles /></Unstyled>
+
+The text, border and focus roles are derived from the brand's own colors and each is checked against both the
+background and the surface. The engine refuses a brand that cannot reach the floor (see **Accessibility floor**).
+
+## Block, scrim, layer and opacity roles (feather-tokens/4)
+
+A `/4` brand adds four **colour blocks** for coloured sections (`block-1` to `block-4`, each a surface and the ink that
+reads on it at 4.5:1), a **media scrim** and the ink on it (for text over photographs and film), and its default
+**loudness**. Layers (`--layer-*`) and opacity roles (`--opacity-*`) are house constants, the same in every brand.
+A brand written before `/4` shows these roles from the house defaults.
+
+<Unstyled><ExtendedRoles /></Unstyled>
+
+## Radius
+
+One shape per brand sets four tiers. A surface that holds a rounded child is one `--radius-step` rounder, so curves
+inside curves stay concentric.
+
+<Unstyled><RadiusScale /></Unstyled>
+
+## Elevation
+
+Three levels. Components use `shadow-1`, `shadow-2` and `shadow-3`, never a custom shadow.
+
+<Unstyled><ElevationScale /></Unstyled>
+
+## Density
+
+The brand's density axis (compact, comfortable, spacious) sets these. A control is never under 44px to hit, whatever
+its drawn height.
+
+<Unstyled><DensityScale /></Unstyled>
+
+## Type roles
+
+<Unstyled><TypeRoles /></Unstyled>
+
+## Fluid display scale
+
+For the website layer: four steps between a 360px and a 1440px viewport. Resize the window to watch them move.
+
+<Unstyled><DisplayScale /></Unstyled>
+
+## Durations
+
+<Unstyled><DurationTable /></Unstyled>

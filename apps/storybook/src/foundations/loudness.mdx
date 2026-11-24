@@ -1,0 +1,32 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+import { LoudnessBlocks, LoudnessMatrix } from "./components/loudness"
+
+<Meta title="Foundations/Loudness" />
+
+# Loudness
+
+Loudness is one knob, 0 to 3, for how much a surface moves. A brand sets its default (`feather-tokens/4`,
+written as `--loudness` on the theme). A page or a block overrides it with `data-loudness="0..3"` on any ancestor, and
+a component reads the nearest one.
+
+**The finish is the same at every level.** Anatomy, states, optical alignment, focus, both themes: a loudness 0 page
+passes the same detail pass as a loudness 3 one. Only how much moves changes.
+
+## What each level allows
+
+<Unstyled><LoudnessMatrix /></Unstyled>
+
+Components ask for the capability they need (`allows(level, "kinetic")`), never compare numbers themselves.
+
+## The same block at each level
+
+One block, four volumes. Layout, type, color and spacing are identical; the title enters only as the level allows.
+
+<Unstyled><LoudnessBlocks /></Unstyled>
+
+## Limits
+
+- **Reduced motion is stronger than any loudness.** A person who asks for less always gets less.
+- **The device caps it.** Loudness 3 on a weak phone renders as 2 or 1: the capability gate (cores, memory, data saver,
+  a fine pointer, WebGL) decides, and the verdict is remembered for 30 days.
+- **Default is 1** (composed): reveals only. A brand opts into more.

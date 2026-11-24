@@ -658,3 +658,60 @@ Gate 1 (`pnpm hygiene`) scans the expression packages too, and fails on:
 
 CI adds Lighthouse mobile budgets on the showcase (LCP ≤ 2.5s, CLS ≤ 0.1, TBT < 200ms), axe on every story, and
 a Playwright performance trace.
+
+### 14.5 Range (feather-tokens/4)
+
+`/4` is `/3` plus the range layer. The engine is `packages/tokens/src/range.mjs`; a brand gets it by writing
+`"schema": "feather-tokens/4"`. A `/3` brand's theme CSS is unchanged byte for byte, and a `/4` theme is the same
+theme plus exactly the variables below (the golden files in `packages/tokens/test/golden/` prove both). A `/3` file
+moves to `/4` only on request: `feather-brand --migrate --to 4` sets the schema, and refuses, leaving the file as it
+was, when the result would not theme. A plain `--migrate` still stops at `/3`, and a migration never goes down.
+
+- **`loudness`**, 0 to 3, default 1: how loud the brand's website patterns may get (proposal 2026-11-24 §3.3).
+
+  | | 0 quiet | 1 composed | 2 expressive | 3 spectacle |
+  |---|---|---|---|---|
+  | motion | micro-motion only | reveals | kinetic type, parallax, pinned scenes | full choreography |
+  | example | a form, a docs page | a company site | an agency site | a launch, a world |
+
+  The theme writes `--loudness` on the root, and `buildTheme().summary.loudness`. A block's `data-loudness` overrides
+  it, and the device tier caps it. The finish is the same at every level. A `/2` or `/3` brand reads 1 (foundation.css).
+- **Colour blocks**, `block-1` to `block-4` (`bg-block-1`, `text-block-1-ink`…), each a surface and its ink. By
+  default they come from the palette:
+
+  | block | surface | ink |
+  |---|---|---|
+  | 1 | the primary | `primaryText`, if it reads |
+  | 2 | the accent, when it is not the primary; else the inverse surface | the most legible; the background |
+  | 3 | the accent tint (the `--accent` mix, 18% into the background) | the text |
+  | 4 | the inverse surface, when block 2 is the accent; else the muted ground (8%) | the background; the text |
+
+  Every ink reaches 4.5:1 on its surface. A derived ink that does not, and an ink the table leaves open, is the most
+  legible of the text, the background, black and white. A brand may write its own: `colors.blocks: [{ surface, ink }]`, up to four, which
+  replace blocks 1, 2… in order. Leave out `ink` and the engine picks one that reads. An ink the brand wrote under
+  4.5:1 is refused, never changed. A `/2` or `/3` brand gets role pairs that already meet their floors: primary on its
+  foreground, the inverse surface, the accent tint under text, muted under text.
+- **The media scrim** (`bg-media-scrim`) and **the ink on media** (`text-ink-on-media`): the overlay under text on
+  photographs and film, and the text on it. The scrim is the inverse surface (or `colors.mediaScrim`) at 60%. The
+  engine raises it in steps of 2%, up to 90%, until the ink reaches 4.5:1 over both a white and a black frame. The
+  ink is the brand's background, or black or white, or `colors.inkOnMedia`. If no opacity up to 90% carries the ink,
+  the brand is refused. `bg-scrim` stays the dialog scrim of §6 (`--scrim`), which product UI owns.
+- **Layers**, one z-index scale for every brand (house constants, `z-layer-*`):
+
+  | layer | base | raised | sticky | overlay | modal | toast | cursor |
+  |---|---|---|---|---|---|---|---|
+  | `--layer-*` | 0 | 10 | 20 | 40 | 50 | 60 | 70 |
+
+- **Opacity roles**, house constants: `opacity-dim` 0.6, `opacity-muted` 0.72, `opacity-disabled` 0.5.
+- **`personality`**: one word for pace and signature together. Anything the brand sets explicitly wins, and the
+  summary records it. It sits at the top level beside `pace`, so `motion` stays the product durations axis.
+
+  | personality | pace | signature |
+  |---|---|---|
+  | `calm` | calm | `expo-out` |
+  | `precise` | snappy | `standard` |
+  | `playful` | snappy | `quint-out`, with `overshoot` |
+  | `cinematic` | cinematic | `expo-out` |
+
+The reference brands are `/4`: `studio` (loudness 2, cinematic, its own `scout` signature), `portrait` (1, calm)
+and `seed` (2, playful). The schema is `packages/tokens/schema/feather-tokens-4.json`.

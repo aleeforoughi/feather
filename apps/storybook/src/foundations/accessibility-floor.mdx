@@ -1,0 +1,39 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+import { ContrastReport } from "./components/a11y"
+
+<Meta title="Foundations/Accessibility floor" />
+
+# Accessibility floor
+
+WCAG 2.2 AA is the floor, and no brand, loudness or variant goes under it. The theme engine enforces the color floors:
+a brand that cannot reach them is refused with the exact ratio, not quietly adjusted.
+
+## Contrast, measured on the current brand
+
+<Unstyled><ContrastReport /></Unstyled>
+
+Switch the brand in the toolbar to see each one measured. The numbers come from the colors the browser resolved, so
+they include every mix the engine derived.
+
+## The floor
+
+| Area | Rule |
+|---|---|
+| Text | Primary text 7:1, secondary and tertiary 4.5:1, on the background and the surface. |
+| Controls | A control's border 3:1. Meaningful icons share the text scale. |
+| Status | The destructive color reads as text at 4.5:1 on both surfaces and both tints. |
+| Focus | One 2px ring, offset 2px, 3:1. `focus-visible` only: the ring never shows on a mouse click. |
+| Targets | 44px to hit (`hit-area`), whatever the drawn size. |
+| Labels | Every control has an accessible name; groups have legends; errors name a next step. |
+| Keyboard | Every interaction has a keyboard path. Dialogs trap focus and return it; menus close on Escape. |
+| Motion | Reduced motion is honoured everywhere; nothing moving over 5 seconds lacks a pause; no scroll-jacking. |
+| Meaning | Content lives in the DOM. A canvas is decoration. Split or scrambled text keeps its full label. |
+| Low vision | A plan can ask for AAA (`data-contrast="AAA"`): text moves to 7:1. |
+
+## How it is held
+
+- **Storybook** runs axe on every story, in the reference brands. Debt carried from 1.7.0 is listed and can only shrink.
+- **The theme engine** refuses a brand below the floors, so a product cannot ship one by mistake.
+- **The hygiene gate** and the rendered audit check the values and the targets.
+- **The Foundations pages** are documentation, so they are not in those suites. They follow the same rules by hand:
+  labelled fields, visible focus, and a keyboard path for every control.

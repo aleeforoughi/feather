@@ -17,8 +17,20 @@ versioned, themeable, standard and ready to use. A component earns its place onl
    touching code. Motion comes from the theme (`useThemeMotion`) and honours reduced motion.
 5. **Standard.** Accessible (roles, labels, keyboard), documented in Storybook with real examples, compiling
    in both reference themes, and listed in `foundation.json` (`level: atom | molecule | organism`).
-6. **Versioned.** A minor version per addition, a CHANGELOG entry saying where it came from and why, and the
+6. **Clean-room.** Feather learns techniques and values from other work (the award catalog in Qooler's file 27,
+   their shipped code read as reference) and writes its own code. No site's or component's code is copied or
+   ported. Before Feather depends on a library (a GSAP plugin, Lenis, Three.js, a WebCodecs helper), its current
+   licence is checked and recorded in the CHANGELOG entry that adds it; a licence that forbids redistributing it as
+   a component (Commons Clause and the like) rules it out.
+7. **Versioned.** A minor version per addition, a CHANGELOG entry saying where it came from and why, and the
    hygiene gate (`pnpm hygiene`) green before release.
+
+## How a missing block gets in
+
+Qooler (or any caller) asks for a missing block or variant with a `pattern-request` issue: the catalog id, a draft
+spec, the brand that needs it, and the evidence. It becomes a variant or a knob of something that exists when it
+can (rule 2); a new block is the last resort. Requests are the only way new blocks enter: the library grows from
+need, not from the catalog's length.
 
 ## Molecules
 
