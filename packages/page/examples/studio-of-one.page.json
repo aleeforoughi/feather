@@ -13,12 +13,13 @@
     }
   },
   "sections": [
-    { "block": "hero", "id": "top", "eyebrow": "Design engineer", "title": "I design interfaces that compose themselves.", "lede": "Products that show the next necessary thing, and websites that answer back.", "starters": ["Show me the work", "Can I hire you?", "What are you on now?"] },
-    { "block": "work", "id": "work", "title": "Selected work", "items": ["acceptto", "freezon", "evercover"] },
-    { "block": "numbers", "id": "proof", "title": "In numbers", "items": [{ "value": 12, "unit": "years", "label": "designing products" }, { "value": 40, "unit": "%", "label": "fewer support tickets at Acceptto" }, { "value": 3, "label": "design systems shipped" }] },
-    { "block": "process", "id": "process", "title": "How I work", "steps": [{ "title": "Find the sentence", "body": "Every product fits in one sentence. We write it first." }, { "title": "Design the floor", "body": "Accessibility, speed and states before effects." }, { "title": "Build the ceiling", "body": "Then the motion and the craft people remember." }] },
-    { "block": "quote", "id": "quote", "text": "Alee made the hard part feel obvious, and then made it beautiful.", "by": "Mara Ellis", "role": "VP Product, Acceptto" },
-    { "block": "contact", "id": "contact", "title": "Let's talk", "body": "I read every message myself.", "actions": [{ "label": "Write to me", "href": "mailto:hello@example.com" }, { "label": "Book a call", "href": "https://cal.example.com/alee" }] }
+    { "block": "hero", "id": "top", "variant": "giant-type", "eyebrow": "Design engineer", "title": "I design interfaces that compose themselves.", "lede": "Products that show the next necessary thing, and websites that answer back.", "starters": ["Show me the work", "Can I hire you?", "What are you on now?"] },
+    { "block": "work", "id": "work", "variant": "hover-list", "title": "Selected work", "items": ["acceptto", "freezon", "evercover"] },
+    { "block": "statement", "id": "belief", "variant": "offset", "title": "The best interface is the one that shows up only when it is needed.", "body": "Everything else waits, quietly, one sentence away." },
+    { "block": "numbers", "id": "proof", "variant": "lead", "title": "In numbers", "items": [{ "value": 12, "unit": "years", "label": "designing products" }, { "value": 40, "unit": "%", "label": "fewer support tickets at Acceptto" }, { "value": 3, "label": "design systems shipped" }] },
+    { "block": "process", "id": "process", "variant": "rows", "title": "How I work", "steps": [{ "title": "Find the sentence", "body": "Every product fits in one sentence. We write it first." }, { "title": "Design the floor", "body": "Accessibility, speed and states before effects." }, { "title": "Build the ceiling", "body": "Then the motion and the craft people remember." }] },
+    { "block": "quote", "id": "quote", "variant": "pull", "text": "Alee made the hard part feel obvious, and then made it beautiful.", "by": "Mara Ellis", "role": "VP Product, Acceptto", "tone": "subtle" },
+    { "block": "contact", "id": "contact", "title": "Let's talk", "body": "I read every message myself.", "actions": [{ "label": "Write to me", "href": "mailto:hello@example.com" }, { "label": "Book a call", "href": "https://cal.example.com/alee" }], "align": "center" }
   ],
   "scenes": {
     "work": { "ask": "Show me the work", "line": "Acceptto is the one I'd show you first.", "blocks": [{ "block": "case", "title": "Acceptto", "body": "Passwordless sign-in for 2 million people. The safe path became the default path.", "facts": [{ "label": "Role", "value": "Design lead" }, { "label": "Result", "value": "40% fewer tickets" }] }], "asks": ["How did you build it?", "Can I hire you?"] },

@@ -1,0 +1,42 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand/tokens.json",
+  "title": "Alee — design engineer, at full volume",
+  "description": "The studio of one, at loudness 3: the same content, every expressive variant.",
+  "lang": "en",
+  "speaker": { "kind": "person", "name": "Alee", "voice": "voice.md" },
+  "loudness": 3,
+  "library": {
+    "work": {
+      "acceptto": { "title": "Acceptto", "summary": "Sign-in without passwords, designed so the safe choice is the easy one.", "year": "2025", "role": "Design lead", "media": { "src": "media/acceptto.svg", "decorative": true } },
+      "freezon": { "title": "Freezon", "summary": "A cold-chain dashboard that shows the one shipment at risk, not all of them.", "year": "2024", "role": "Product design", "media": { "src": "media/freezon.svg", "decorative": true } },
+      "evercover": { "title": "Evercover", "summary": "Insurance that explains itself in one sentence before it asks for anything.", "year": "2023", "role": "Design and front end", "media": { "src": "media/evercover.svg", "decorative": true } }
+    }
+  },
+  "sections": [
+    { "block": "hero", "id": "top", "variant": "film", "eyebrow": "Design engineer", "title": "I design interfaces that compose themselves.", "lede": "Products that show the next necessary thing, and websites that answer back.", "media": { "src": "media/studio-reel.svg", "alt": "A warm, dark studio, one lamp on the desk" }, "starters": ["Show me the work", "Can I hire you?", "What are you on now?"], "actions": [{ "label": "See the work", "href": "#work" }], "motion": { "enter": "mask" } },
+    { "block": "statement", "id": "line", "variant": "marquee", "title": "Semantics in, the right experience out.", "motion": { "direction": "left" } },
+    { "block": "work", "id": "work", "variant": "stack", "title": "Selected work", "items": ["acceptto", "freezon", "evercover"], "scale": "l", "motion": { "enter": "mask" } },
+    { "block": "statement", "id": "belief", "variant": "fill", "title": "The best interface is the one that shows up only when it is needed, and then gets out of the way.", "scale": "m" },
+    { "block": "numbers", "id": "proof", "variant": "lead", "title": "In numbers", "tone": "block-1", "items": [{ "value": 12, "unit": "years", "label": "designing products" }, { "value": 40, "unit": "%", "label": "fewer support tickets at Acceptto" }, { "value": 3, "label": "design systems shipped" }] },
+    { "block": "process", "id": "process", "variant": "pinned", "title": "How I work", "steps": [{ "title": "Find the sentence", "body": "Every product fits in one sentence. We write it first." }, { "title": "Design the floor", "body": "Accessibility, speed and states before effects." }, { "title": "Build the ceiling", "body": "Then the motion and the craft people remember." }], "scroll": { "snap": true } },
+    { "block": "case", "id": "case", "variant": "scale", "title": "Acceptto", "body": "Passwordless sign-in for 2 million people. The safe path became the default path.", "media": { "src": "media/studio-desk.svg", "alt": "The Acceptto sign-in, on a desk in the studio" }, "facts": [{ "label": "Role", "value": "Design lead" }, { "label": "Result", "value": "40% fewer tickets" }] },
+    { "block": "quote", "id": "quote", "variant": "rail", "text": "Alee made the hard part feel obvious, and then made it beautiful.", "by": "Mara Ellis", "role": "VP Product, Acceptto", "items": [{ "text": "The system did the boring parts so we could do the interesting ones.", "by": "Jun Park", "role": "Design lead, Freezon" }, { "text": "Every screen arrived with its empty, loading and error states already designed.", "by": "Sam Okafor", "role": "CTO, Evercover" }] },
+    { "block": "statement", "id": "now", "variant": "swap", "title": "Interfaces that feel {word}.", "words": ["obvious", "calm", "inevitable"], "tone": "inverse", "scale": "l" },
+    { "block": "timeline", "id": "path", "variant": "horizontal", "title": "Along the way", "items": [{ "when": "2019", "what": "Joined Acceptto as the first designer." }, { "when": "2023", "what": "Shipped Evercover, from one sentence to a launch." }, { "when": "2025", "what": "Started the system that composes itself." }] },
+    { "block": "logos", "id": "clients", "variant": "marquee", "title": "Worked with", "items": [{ "name": "Acceptto" }, { "name": "Freezon" }, { "name": "Evercover" }, { "name": "Godpip" }, { "name": "Qooe" }, { "name": "Seed" }] },
+    { "block": "offer", "id": "hire", "variant": "table", "title": "Ways to work together", "items": [{ "name": "A product sprint", "price": "Two weeks", "body": "One problem, designed and prototyped.", "href": "https://cal.example.com/alee" }, { "name": "A design system", "price": "Six weeks", "body": "Tokens, components and the gates that keep them.", "href": "https://cal.example.com/alee" }] },
+    { "block": "contact", "id": "contact", "title": "Let's talk", "body": "I read every message myself.", "actions": [{ "label": "Write to me", "href": "mailto:hello@example.com" }, { "label": "Book a call", "href": "https://cal.example.com/alee" }], "align": "center", "scale": "xl", "tone": "block-2", "motion": { "enter": "scramble" } }
+  ],
+  "scenes": {
+    "work": { "ask": "Show me the work", "line": "Acceptto is the one I'd show you first.", "blocks": [{ "block": "case", "title": "Acceptto", "body": "Passwordless sign-in for 2 million people. The safe path became the default path.", "facts": [{ "label": "Role", "value": "Design lead" }, { "label": "Result", "value": "40% fewer tickets" }] }], "asks": ["How did you build it?", "Can I hire you?"] },
+    "hire": { "ask": "Can I hire you?", "line": "Yes, from January. What are you hiring for?", "blocks": [{ "block": "offer", "title": "Ways to work together", "items": [{ "name": "A product sprint", "price": "Two weeks", "body": "One problem, designed and prototyped." }, { "name": "A design system", "price": "Six weeks", "body": "Tokens, components and the gates that keep them." }] }], "asks": ["What does a sprint cost?", "Book a call"] },
+    "now": { "ask": "What are you on now?", "line": "A design system that composes itself from intent.", "blocks": [{ "block": "statement", "title": "Semantics in, the right experience out." }], "asks": ["Show me the work"] },
+    "contact": { "ask": "Book a call", "line": "Pick a time that suits you. I'll be there.", "blocks": [{ "block": "contact", "actions": [{ "label": "Book a call", "href": "https://cal.example.com/alee" }] }] }
+  },
+  "living": { "anchor": "reader", "fold": true, "prepared": ["work", "hire", "now", "contact"] },
+  "nav": { "brand": "Alee", "items": [{ "label": "Work", "href": "#work" }, { "label": "How I work", "href": "#process" }, { "label": "In numbers", "href": "#proof" }, { "label": "Contact", "href": "#contact" }] },
+  "footer": { "variant": "reveal", "wordmark": "Alee", "links": [{ "label": "Work", "href": "#work" }, { "label": "Contact", "href": "#contact" }], "note": "Built from one feather.page document." },
+  "notFound": { "variant": "type", "title": "This page went somewhere else", "body": "The link may be old, or the page has moved. The work is still here.", "home": [{ "label": "Back to the work", "href": "/" }] },
+  "transition": "circle"
+}

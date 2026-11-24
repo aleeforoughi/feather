@@ -6,6 +6,7 @@ import { Loader, OverlayMenu, SoundToggle } from "@aleeforoughi/feather-expressi
 import { LivingPage, PreparedSceneView, createRegistry, useLivingAsk, type AskHandler, type Block, type BlockKind, type PreparedScene, type Speaker } from "@aleeforoughi/feather-living"
 import { defaultBlocks, type BlockProps } from "./blocks/index"
 import { Footer, NotFound } from "./blocks/edges"
+import { PageContext, type PageContextValue } from "./blocks/knobs"
 import { resolveRefs } from "./core/validate"
 import type { BlockName, PageBlock, PageDocument } from "./core/types"
 
@@ -42,6 +43,7 @@ export function FeatherPage({ page, tokens, blocks, onAsk }: FeatherPageProps) {
   const library = React.useMemo(() => ({ ...defaultBlocks, ...blocks }) as BlockLibrary, [blocks])
   const brand = tokens ?? (typeof page.brand === "object" ? (page.brand as unknown as BrandTokens) : undefined)
   const theme = React.useMemo(() => (brand ? buildTheme(brand) : null), [brand])
+  const context = usePageContext(resolved)
   if (theme && !theme.ok) throw new Error(`FeatherPage: the brand does not compile:\n- ${theme.problems.join("\n- ")}`)
 
   const base = resolved.sections.map((block, i) => (
@@ -50,14 +52,7 @@ export function FeatherPage({ page, tokens, blocks, onAsk }: FeatherPageProps) {
     </div>
   ))
 
-  const head = theme?.ok ? (
-    <>
-      <style data-feather-theme="">{theme.css}</style>
-      {theme.preload.map((p) => (
-        <link key={p.href} rel="preload" href={p.href} as={p.as} type={p.type} crossOrigin={p.crossorigin} />
-      ))}
-    </>
-  ) : null
+  const head = <ThemeHead theme={theme} />
 
   const content = !resolved.living || !resolved.speaker ? base : (
     <LivingPageFor page={resolved} library={library} onAsk={onAsk}>
@@ -65,9 +60,48 @@ export function FeatherPage({ page, tokens, blocks, onAsk }: FeatherPageProps) {
     </LivingPageFor>
   )
   return (
-    <PageFrame page={resolved} head={head}>
-      {content}
-    </PageFrame>
+    <PageContext.Provider value={context}>
+      <PageFrame page={resolved} head={head}>
+        {content}
+      </PageFrame>
+    </PageContext.Provider>
+  )
+}
+
+/** The brand's open-font faces (theme.fonts): its @font-face rules, without the `@import` lines, which are bundler paths
+ * for the foundation families (a product's stylesheet already carries those faces). Null when the brand has none. */
+export function fontFaces(fonts: string | undefined): string | null {
+  if (!fonts || !fonts.includes("@font-face")) return null
+  return fonts
+    .split("\n")
+    .filter((line) => !/^\s*@import\s/.test(line))
+    .join("\n")
+    .trim()
+}
+
+/** The theme in the head: its variables, its open-font faces, and the preloads of those fonts. */
+function ThemeHead({ theme }: { theme: ReturnType<typeof buildTheme> | null }) {
+  if (!theme?.ok) return null
+  const faces = fontFaces(theme.fonts)
+  return (
+    <>
+      <style data-feather-theme="">{theme.css}</style>
+      {faces ? <style data-feather-fonts="">{faces}</style> : null}
+      {theme.preload.map((p) => (
+        <link key={p.href} rel="preload" href={p.href} as={p.as} type={p.type} crossOrigin={p.crossorigin} />
+      ))}
+    </>
+  )
+}
+
+/** What the blocks may know about the page: its defaults and the index of its titled sections (the index hero). */
+function usePageContext(page: PageDocument): PageContextValue {
+  return React.useMemo(
+    () => ({
+      ...(page.defaults ? { defaults: page.defaults } : {}),
+      index: page.sections.filter((b): b is typeof b & { id: string; title: string } => typeof b.id === "string" && typeof b.title === "string").map((b) => ({ id: b.id, title: b.title })),
+    }),
+    [page]
   )
 }
 
@@ -91,7 +125,7 @@ function PageFrame({ page, head, children }: { page: PageDocument; head: React.R
           items={page.nav.items}
           brand={
             name ? (
-              <a href="/" data-slot="page-brand" className="inline-flex min-h-12 items-center type-label text-fg-primary focus-ring">
+              <a href="/" data-slot="page-brand" className="inline-flex min-h-12 min-w-12 items-center type-label text-fg-primary focus-ring">
                 {name}
               </a>
             ) : undefined
@@ -99,7 +133,8 @@ function PageFrame({ page, head, children }: { page: PageDocument; head: React.R
           actions={bed ? <SoundToggle src={bed} /> : undefined}
         />
       ) : null}
-      <main data-page="" className={reveal ? "relative z-10 bg-surface-base" : undefined}>
+      {/* The page's loudness is a ceiling every block and expression component under main reads (data-loudness). */}
+      <main data-page="" data-loudness={page.loudness} className={reveal ? "relative z-10 bg-surface-base" : undefined}>
         {children}
       </main>
       {page.footer ? <Footer footer={page.footer} name={name} /> : null}
@@ -116,7 +151,7 @@ export interface PageNotFoundProps {
 export function PageNotFound({ page, tokens }: PageNotFoundProps) {
   const brand = tokens ?? (typeof page.brand === "object" ? (page.brand as unknown as BrandTokens) : undefined)
   const theme = React.useMemo(() => (brand ? buildTheme(brand) : null), [brand])
-  const head = theme?.ok ? <style data-feather-theme="">{theme.css}</style> : null
+  const head = <ThemeHead theme={theme} />
   return (
     <PageFrame page={{ ...page, loader: undefined }} head={head}>
       <NotFound notFound={page.notFound ?? {}} />
@@ -163,6 +198,7 @@ export function PreparedPage({ page, intent, tokens, blocks, href }: PreparedPag
   const resolved = React.useMemo(() => resolveRefs(page), [page])
   const library = React.useMemo(() => ({ ...defaultBlocks, ...blocks }) as BlockLibrary, [blocks])
   const registry = React.useMemo(() => livingRegistry(library), [library])
+  const context = usePageContext(resolved)
   const scenes = pageScenes(resolved)
   const scene = scenes.find((s) => s.intent === intent)
   if (!scene) throw new Error(`PreparedPage: "${intent}" is not a prepared scene of this page`)
@@ -170,9 +206,11 @@ export function PreparedPage({ page, intent, tokens, blocks, href }: PreparedPag
   const theme = brand ? buildTheme(brand) : null
   return (
     <>
-      {theme?.ok ? <style data-feather-theme="">{theme.css}</style> : null}
-      <main data-page="" data-intent={intent}>
-        <PreparedSceneView scene={scene} speaker={resolved.speaker as Speaker} registry={registry} scenes={scenes} href={href} headingLevel={1} />
+      <ThemeHead theme={theme} />
+      <main data-page="" data-intent={intent} data-loudness={page.loudness}>
+        <PageContext.Provider value={context}>
+          <PreparedSceneView scene={scene} speaker={resolved.speaker as Speaker} registry={registry} scenes={scenes} href={href} headingLevel={1} />
+        </PageContext.Provider>
       </main>
     </>
   )

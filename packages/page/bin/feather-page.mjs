@@ -1,11 +1,13 @@
 #!/usr/bin/env node
-// feather-page: websites from a feather.page/0 document.
+// feather-page: websites from a feather.page/0 or /1 document.
 //
 //   feather-page validate <page.json>            every issue, with its JSON pointer; exit 1 when invalid
 //   feather-page routes <page.json>              the static routes: the base page and one per prepared scene
-//   feather-page build <page.json> --out <dir> [--css <href>] [--base </>]
+//   feather-page build <page.json> --out <dir> [--css <href>] [--base </>] [--runtime <href>]
 //                                                writes index.html, <intent>/index.html and (with notFound) 404.html,
-//                                                readable with no script
+//                                                readable with no script. With --runtime (the release's
+//                                                feather-page-runtime.js), each page also carries its document and
+//                                                brand and hydrates: motion, the loader, the menu, the Living Page.
 //
 // `brand` in the page is read relative to the page file: a feather-tokens file, or a reference theme ({ tokens }).
 // Deterministic: no network, no model.
@@ -45,8 +47,9 @@ if (command === "validate") {
   const out = flag("--out")
   if (!out) usage()
   const css = flag("--css")
+  const runtime = flag("--runtime")
   const React = await import("react")
-  const { renderToStaticMarkup } = await import("react-dom/server")
+  const { renderToStaticMarkup, renderToString } = await import("react-dom/server")
   let tokens
   if (typeof page.brand === "string") {
     const brand = JSON.parse(fs.readFileSync(path.resolve(path.dirname(file), page.brand), "utf8"))
@@ -59,19 +62,31 @@ if (command === "validate") {
   const crossDocument = transition !== undefined && transition !== "none"
   const routeAttr = transition === "view" || transition === "push" ? ` data-route-transition="${transition}"` : ""
   const vt = crossDocument ? `<style>@media (prefers-reduced-motion: no-preference){@view-transition{navigation:auto}}</style>\n` : ""
+  // With a runtime, the markup is rendered for hydration and wrapped with the data the runtime boots from. JSON in a
+  // script is escaped so no "</script>" or "<!--" inside the document can end it.
+  const json = (v) => JSON.stringify(v).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029")
+  const render = (element, data) =>
+    runtime
+      ? `<div data-feather-page-root>${renderToString(element)}</div>\n<script type="application/json" data-feather-page>${json({ ...data, tokens })}</script>\n<script type="module" src="${esc(runtime)}"></script>`
+      : renderToStaticMarkup(element)
   const html = (title, body) =>
     `<!doctype html>\n<html lang="${esc(page.lang ?? "en")}"${routeAttr}>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(title)}</title>\n${page.description ? `<meta name="description" content="${esc(page.description)}">\n<meta property="og:title" content="${esc(title)}">\n<meta property="og:description" content="${esc(page.description)}">\n` : ""}${css ? `<link rel="stylesheet" href="${esc(css)}">\n` : ""}${vt}</head>\n<body>\n${body}\n</body>\n</html>\n`
   const href = (intent) => `${root}${intent}`
   fs.mkdirSync(out, { recursive: true })
-  fs.writeFileSync(path.join(out, "index.html"), html(page.title ?? "", renderToStaticMarkup(React.createElement(lib.FeatherPage, { page, tokens }))))
+  // A static build has no runtime to mount the loader (it would hold at 0%), so the static pages never carry it. With
+  // --runtime the base page keeps it: the runtime runs it.
+  const { loader: _loader, ...staticPage } = page
+  void _loader
+  const basePage = runtime ? page : staticPage
+  fs.writeFileSync(path.join(out, "index.html"), html(page.title ?? "", render(React.createElement(lib.FeatherPage, { page: basePage, tokens }), { page: basePage })))
   for (const s of scenes) {
     fs.mkdirSync(path.join(out, s.intent), { recursive: true })
     const title = `${s.ask}${page.title ? ` — ${page.title}` : ""}`
-    fs.writeFileSync(path.join(out, s.intent, "index.html"), html(title, renderToStaticMarkup(React.createElement(lib.PreparedPage, { page, intent: s.intent, tokens, href }))))
+    fs.writeFileSync(path.join(out, s.intent, "index.html"), html(title, render(React.createElement(lib.PreparedPage, { page: staticPage, intent: s.intent, tokens, href }), { page: staticPage, intent: s.intent, base: root })))
   }
   if (page.notFound) {
     const title = `${page.notFound.title ?? "Not found"}${page.title ? ` — ${page.title}` : ""}`
-    fs.writeFileSync(path.join(out, "404.html"), html(title, renderToStaticMarkup(React.createElement(lib.PageNotFound, { page, tokens }))))
+    fs.writeFileSync(path.join(out, "404.html"), html(title, render(React.createElement(lib.PageNotFound, { page: staticPage, tokens }), { page: staticPage, notFound: true })))
   }
   console.log(`built ${routes.length + (page.notFound ? 1 : 0)} routes into ${out}`)
 } else usage()

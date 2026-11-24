@@ -28,14 +28,14 @@ describe("validatePage", () => {
   it.each([
     ["wrong schema", (d: Doc) => (d.schema = "feather.page/2"), "/schema wrong-schema"],
     ["no sections", (d: Doc) => (d.sections = []), "/sections too-few"],
-    ["unknown block", (d: Doc) => d.sections.push({ block: "carousel" }), "/sections/6/block unknown-block"],
+    ["unknown block", (d: Doc) => d.sections.push({ block: "carousel" }), "/sections/7/block unknown-block"],
     ["missing title", (d: Doc) => delete d.sections[0].title, "/sections/0/title missing"],
     ["unknown field", (d: Doc) => (d.sections[0].color = "red"), "/sections/0/color unknown-field"],
     ["unknown work ref", (d: Doc) => d.sections[1].items.push("nope"), "/sections/1/items/3 unknown-ref"],
-    ["javascript href", (d: Doc) => (d.sections[5].actions[0].href = "javascript:alert(1)"), "/sections/5/actions/0/href bad-href"],
+    ["javascript href", (d: Doc) => (d.sections[6].actions[0].href = "javascript:alert(1)"), "/sections/6/actions/0/href bad-href"],
     ["media without alt", (d: Doc) => (d.sections[0].media = { src: "/hero.avif" }), "/sections/0/media/alt missing"],
     ["duplicate id", (d: Doc) => (d.sections[1].id = "top"), "/sections/1/id duplicate-id"],
-    ["too many numbers", (d: Doc) => d.sections[2].items.push(...d.sections[2].items), "/sections/2/items too-many"],
+    ["too many numbers", (d: Doc) => d.sections[3].items.push(...d.sections[3].items), "/sections/3/items too-many"],
     ["four blocks in a scene", (d: Doc) => d.scenes.now.blocks.push({ block: "statement", title: "a" }, { block: "statement", title: "b" }, { block: "statement", title: "c" }), "/scenes/now/blocks too-many"],
     ["prepared scene missing", (d: Doc) => d.living.prepared.push("pricing"), "/living/prepared/4 unknown-scene"],
     ["living without a speaker", (d: Doc) => delete d.speaker, "/speaker no-speaker"],
@@ -83,7 +83,9 @@ describe("feather.page/1: the page edges", () => {
     expect(issues(edges())).toEqual([])
   })
   it("keeps /0 exactly as it was: edges need the /1 schema", () => {
-    expect(codes({ ...edges(), schema: "feather.page/0" })).toEqual(["/nav needs-schema-1", "/footer needs-schema-1", "/notFound needs-schema-1", "/transition needs-schema-1", "/loader needs-schema-1", "/sound needs-schema-1"])
+    // The reference page as it was before the knobs (src/test), so only the edges are /1 here.
+    const sections = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../test/studio-of-one-0.page.json"), "utf8")).sections
+    expect(codes({ ...edges(), schema: "feather.page/0", sections })).toEqual(["/nav needs-schema-1", "/footer needs-schema-1", "/notFound needs-schema-1", "/transition needs-schema-1", "/loader needs-schema-1", "/sound needs-schema-1"])
   })
   it("refuses an unknown variant, an unsafe link and a missing bed", () => {
     const doc = edges()

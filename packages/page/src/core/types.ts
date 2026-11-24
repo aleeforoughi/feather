@@ -12,23 +12,72 @@ export interface WorkItem {
   role?: string
 }
 
-interface Base {
+/** The knobs (feather.page/1, wave 2). spec.ts says what each means and which blocks take which values. */
+export type Loudness = 0 | 1 | 2 | 3
+export type BlockTone = "base" | "subtle" | "raised" | "inverse" | "block-1" | "block-2" | "block-3" | "block-4"
+export type BlockSpace = "s" | "m" | "l" | "xl"
+export type BlockAlign = "start" | "center" | "offset" | "split"
+export type BlockScale = "s" | "m" | "l" | "xl"
+export type BlockCrop = "none" | "edge" | "bleed"
+export type MotionEnter = "none" | "fade" | "rise" | "mask" | "skew" | "oval" | "blink" | "scramble"
+export type ScrollPattern = "reveal" | "parallax" | "stack" | "horizontal" | "scale" | "pin"
+export interface BlockMotion {
+  enter?: MotionEnter
+  /** 0 to 1: scales the travel of the reveal, never its duration. */
+  intensity?: number
+  direction?: "up" | "down" | "left" | "right"
+  stagger?: "none" | "tight" | "default" | "loose"
+}
+export interface BlockScroll {
+  pattern?: ScrollPattern
+  /** Pin length in viewport heights, 1 to 4 (pinned patterns). */
+  length?: number
+  /** Settle on a pin's steps. */
+  snap?: boolean
+}
+export interface Knobs {
+  loudness?: Loudness
+  tone?: BlockTone
+  space?: BlockSpace
+  align?: BlockAlign
+  scale?: BlockScale
+  crop?: BlockCrop
+  motion?: BlockMotion
+  scroll?: BlockScroll
+}
+
+interface Base extends Knobs {
   id?: string
   title?: string
 }
+export type HeroVariant = "stacked" | "giant-type" | "split" | "film" | "product" | "index" | "interactive"
+export type StatementVariant = "plain" | "centred" | "offset" | "marquee" | "fill" | "swap"
+export type WorkVariant = "grid" | "hover-list" | "stack" | "rail"
+export type CaseVariant = "editorial" | "scale"
+export type NumbersVariant = "counter" | "plain" | "lead"
+export type TimelineVariant = "list" | "horizontal"
+export type ProcessVariant = "list" | "pinned" | "rows"
+export type LogosVariant = "grid" | "marquee"
+export type QuoteVariant = "large" | "rail" | "pull"
+export type OfferVariant = "cards" | "table"
+export interface QuoteItem {
+  text: string
+  by: string
+  role?: string
+}
 export type PageBlock =
-  | (Base & { block: "hero"; title: string; eyebrow?: string; lede?: string; media?: Media; starters?: string[] })
-  | (Base & { block: "statement"; title: string; body?: string })
-  | (Base & { block: "work"; items: Array<string | WorkItem> })
-  | (Base & { block: "case"; title: string; body?: string; media?: Media; facts?: { label: string; value: string }[] })
-  | (Base & { block: "numbers"; items: { value: number; unit?: string; label: string }[] })
-  | (Base & { block: "timeline"; items: { when: string; what: string }[] })
-  | (Base & { block: "process"; steps: { title: string; body?: string }[] })
-  | (Base & { block: "logos"; items: { name: string; src?: Media }[] })
-  | (Base & { block: "quote"; text: string; by: string; role?: string })
-  | (Base & { block: "offer"; items: { name: string; price?: string; body?: string; href?: string }[] })
-  | (Base & { block: "faq"; items: { q: string; a: string }[] })
-  | (Base & { block: "contact"; body?: string; actions?: { label: string; href: string }[] })
+  | (Base & { block: "hero"; variant?: HeroVariant; title: string; eyebrow?: string; lede?: string; media?: Media; starters?: string[]; facts?: { label: string; value: string }[]; actions?: PageLink[] })
+  | (Base & { block: "statement"; variant?: StatementVariant; title: string; body?: string; words?: string[] })
+  | (Base & { block: "work"; variant?: WorkVariant; items: Array<string | WorkItem> })
+  | (Base & { block: "case"; variant?: CaseVariant; title: string; body?: string; media?: Media; facts?: { label: string; value: string }[] })
+  | (Base & { block: "numbers"; variant?: NumbersVariant; items: { value: number; unit?: string; label: string }[] })
+  | (Base & { block: "timeline"; variant?: TimelineVariant; items: { when: string; what: string }[] })
+  | (Base & { block: "process"; variant?: ProcessVariant; steps: { title: string; body?: string }[] })
+  | (Base & { block: "logos"; variant?: LogosVariant; items: { name: string; src?: Media }[] })
+  | (Base & { block: "quote"; variant?: QuoteVariant; text: string; by: string; role?: string; items?: QuoteItem[] })
+  | (Base & { block: "offer"; variant?: OfferVariant; items: { name: string; price?: string; body?: string; href?: string }[] })
+  | (Base & { block: "faq"; variant?: "list"; items: { q: string; a: string }[] })
+  | (Base & { block: "contact"; variant?: "plain"; body?: string; actions?: { label: string; href: string }[] })
   | (Base & { block: "signature"; body?: string; media?: Media; variant?: string })
 
 export type BlockName = PageBlock["block"]
@@ -74,7 +123,7 @@ export interface LoaderEdge {
   label?: string
   sound?: boolean
 }
-export type RouteVariant = "none" | "fade" | "view" | "push" | "columns"
+export type RouteVariant = "none" | "fade" | "view" | "push" | "slide" | "sheets" | "circle" | "columns"
 
 export interface PageDocument {
   schema: "feather.page/0" | "feather.page/1"
@@ -95,12 +144,23 @@ export interface PageDocument {
   /** How a route arrives (default "fade"). */
   transition?: RouteVariant
   sound?: { bed: Media }
+  /** The page's loudness (feather.page/1): a ceiling every block inherits unless it sets its own. */
+  loudness?: Loudness
+  /** Defaults a block takes when it sets none (an align or crop a block does not take is ignored for it). */
+  defaults?: PageDefaults
+}
+
+export interface PageDefaults {
+  space?: BlockSpace
+  align?: BlockAlign
+  scale?: BlockScale
+  crop?: BlockCrop
 }
 
 export interface PageIssue {
   /** A JSON pointer into the document. */
   path: string
-  code: "wrong-schema" | "needs-schema-1" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker"
+  code: "wrong-schema" | "needs-schema-1" | "unknown-variant" | "out-of-range" | "unsupported" | "contradiction" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker"
   message: string
 }
 

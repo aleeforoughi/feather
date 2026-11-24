@@ -1,6 +1,6 @@
 // The JSON Schema of feather.page/0, built from spec.ts (for editors and other languages). The validator stays the
 // authority: it also checks references, scenes and the honesty floor, which a schema cannot.
-import { ANCHORS, BLOCKS, EDGES, ROUTE_VARIANTS, SPEAKER_KINDS, type FieldSpec, type Fields } from "../src/core/spec.ts"
+import { ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, PAGE_KNOBS, ROUTE_VARIANTS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "../src/core/spec.ts"
 
 type Json = Record<string, unknown>
 
@@ -9,11 +9,13 @@ function field(spec: FieldSpec): Json {
     case "text":
       return { type: "string", ...(spec.max ? { maxLength: spec.max } : {}) }
     case "number":
-      return { type: "number" }
+      return { type: spec.integer ? "integer" : "number", ...(spec.min !== undefined ? { minimum: spec.min } : {}), ...(spec.max !== undefined ? { maximum: spec.max } : {}) }
     case "boolean":
       return { type: "boolean" }
     case "enum":
       return { enum: [...spec.values] }
+    case "object":
+      return object(spec.of)
     case "href":
       return { type: "string", not: { pattern: "^\\s*(javascript|data|vbscript):" } }
     case "media":
@@ -35,10 +37,14 @@ function object(fields: Fields, extra: Json = {}, required: string[] = []): Json
 
 /** The JSON Schema of one version: 0 (the sections, scenes and living layer) or 1 (also the page edges). */
 export function pageJsonSchema(version: 0 | 1 = 1): Json {
-  const blocks = Object.entries(BLOCKS).map(([name, { fields, doc }]) => ({
-    description: doc,
-    ...object({ title: { kind: "text", max: 160 }, ...fields }, { block: { const: name }, id: { type: "string", pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }, ["block"]),
-  }))
+  const blocks = Object.entries(BLOCKS).map(([name, { doc }]) => {
+    const range = BLOCK_RANGE[name]
+    const knobs = version === 1 ? ` Variants: ${range.variants ? range.variants.join(", ") : "the brand's own (free text)"}${range.variants ? ` (default ${range.variants[0]})` : ""}. Align: ${range.aligns.join(", ")}. Scroll: ${range.scroll.join(", ")}.` : ""
+    return {
+      description: `${doc}${knobs}`,
+      ...object(blockFields(name, version), { block: { const: name }, id: { type: "string", pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }, ["block"]),
+    }
+  })
   return {
     $schema: "https://json-schema.org/draft/2020-12/schema",
     $id: `https://github.com/aleeforoughi/feather/schema/feather.page-${version}.json`,
@@ -62,7 +68,13 @@ export function pageJsonSchema(version: 0 | 1 = 1): Json {
         additionalProperties: { type: "object", additionalProperties: false, required: ["ask", "line", "blocks"], properties: { ask: { type: "string" }, line: { type: "string" }, blocks: { type: "array", minItems: 1, maxItems: 3, items: { $ref: "#/$defs/block" } }, asks: { type: "array", maxItems: 3, items: { type: "string" } } } },
       },
       living: { type: "object", additionalProperties: false, properties: { anchor: { enum: [...ANCHORS] }, fold: { type: "boolean" }, prepared: { type: "array", items: { type: "string" } }, disclosure: { type: "string" } } },
-      ...(version === 1 ? { ...Object.fromEntries(Object.entries(EDGES).map(([k, { fields, doc }]) => [k, { description: doc, ...object(fields) }])), transition: { enum: [...ROUTE_VARIANTS] } } : {}),
+      ...(version === 1
+        ? {
+            ...Object.fromEntries(Object.entries(EDGES).map(([k, { fields, doc }]) => [k, { description: doc, ...object(fields) }])),
+            transition: { enum: [...ROUTE_VARIANTS] },
+            ...Object.fromEntries(Object.entries(PAGE_KNOBS).map(([k, spec]) => [k, field(spec)])),
+          }
+        : {}),
     },
     $defs: {
       media: {
