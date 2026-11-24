@@ -2,8 +2,10 @@
 // Living Page layered on when the document has one. Deterministic: the same page, brand and host give the same DOM.
 import * as React from "react"
 import { buildTheme, type BrandTokens } from "@aleeforoughi/feather-tokens"
+import { Loader, OverlayMenu, SoundToggle } from "@aleeforoughi/feather-expression"
 import { LivingPage, PreparedSceneView, createRegistry, useLivingAsk, type AskHandler, type Block, type BlockKind, type PreparedScene, type Speaker } from "@aleeforoughi/feather-living"
 import { defaultBlocks, type BlockProps } from "./blocks/index"
+import { Footer, NotFound } from "./blocks/edges"
 import { resolveRefs } from "./core/validate"
 import type { BlockName, PageBlock, PageDocument } from "./core/types"
 
@@ -57,23 +59,68 @@ export function FeatherPage({ page, tokens, blocks, onAsk }: FeatherPageProps) {
     </>
   ) : null
 
-  if (!resolved.living || !resolved.speaker) {
-    return (
-      <>
-        {head}
-        <main data-page="">{base}</main>
-      </>
-    )
-  }
+  const content = !resolved.living || !resolved.speaker ? base : (
+    <LivingPageFor page={resolved} library={library} onAsk={onAsk}>
+      {base}
+    </LivingPageFor>
+  )
+  return (
+    <PageFrame page={resolved} head={head}>
+      {content}
+    </PageFrame>
+  )
+}
+
+/** The text of a media field (a path or { src }). */
+const srcOf = (m: unknown): string | undefined => (typeof m === "string" ? m : m && typeof m === "object" && "src" in m ? String((m as { src: unknown }).src) : undefined)
+
+/** The page edges around the main content (feather.page/1): the loader, the nav, the footer. A page without edges
+ * renders exactly as a /0 page did. */
+function PageFrame({ page, head, children }: { page: PageDocument; head: React.ReactNode; children: React.ReactNode }) {
+  const name = page.nav?.brand ?? page.title
+  const bed = srcOf(page.sound?.bed)
+  const reveal = page.footer?.variant === "reveal"
   return (
     <>
       {head}
-      <main data-page="">
-        <LivingPageFor page={resolved} library={library} onAsk={onAsk}>
-          {base}
-        </LivingPageFor>
+      {page.loader ? <Loader variant={page.loader.variant ?? "counter"} label={page.loader.label ?? `Loading ${page.title ?? "the page"}`} sound={page.loader.sound === true && !!bed} /> : null}
+      {page.nav ? (
+        <OverlayMenu
+          className="page-inset"
+          label={page.nav.label}
+          items={page.nav.items}
+          brand={
+            name ? (
+              <a href="/" data-slot="page-brand" className="inline-flex min-h-12 items-center type-label text-fg-primary focus-ring">
+                {name}
+              </a>
+            ) : undefined
+          }
+          actions={bed ? <SoundToggle src={bed} /> : undefined}
+        />
+      ) : null}
+      <main data-page="" className={reveal ? "relative z-10 bg-surface-base" : undefined}>
+        {children}
       </main>
+      {page.footer ? <Footer footer={page.footer} name={name} /> : null}
     </>
+  )
+}
+
+export interface PageNotFoundProps {
+  page: PageDocument
+  tokens?: BrandTokens
+}
+
+/** The page's 404 route: its nav, the notFound scene and its footer, in the brand. */
+export function PageNotFound({ page, tokens }: PageNotFoundProps) {
+  const brand = tokens ?? (typeof page.brand === "object" ? (page.brand as unknown as BrandTokens) : undefined)
+  const theme = React.useMemo(() => (brand ? buildTheme(brand) : null), [brand])
+  const head = theme?.ok ? <style data-feather-theme="">{theme.css}</style> : null
+  return (
+    <PageFrame page={{ ...page, loader: undefined }} head={head}>
+      <NotFound notFound={page.notFound ?? {}} />
+    </PageFrame>
   )
 }
 

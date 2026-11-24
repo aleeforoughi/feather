@@ -1,5 +1,5 @@
 {
-  "schema": "feather.page/0",
+  "schema": "feather.page/1",
   "brand": "brand/tokens.json",
   "title": "Alee — design engineer",
   "description": "Interfaces that compose themselves from intent, and the websites around them.",
@@ -26,5 +26,9 @@
     "now": { "ask": "What are you on now?", "line": "A design system that composes itself from intent.", "blocks": [{ "block": "statement", "title": "Semantics in, the right experience out." }], "asks": ["Show me the work"] },
     "contact": { "ask": "Book a call", "line": "Pick a time that suits you. I'll be there.", "blocks": [{ "block": "contact", "actions": [{ "label": "Book a call", "href": "https://cal.example.com/alee" }] }] }
   },
-  "living": { "anchor": "reader", "fold": true, "prepared": ["work", "hire", "now", "contact"] }
+  "living": { "anchor": "reader", "fold": true, "prepared": ["work", "hire", "now", "contact"] },
+  "nav": { "brand": "Alee", "items": [{ "label": "Work", "href": "#work" }, { "label": "How I work", "href": "#process" }, { "label": "In numbers", "href": "#proof" }, { "label": "Contact", "href": "#contact" }] },
+  "footer": { "variant": "wordmark", "wordmark": "Alee", "links": [{ "label": "Work", "href": "#work" }, { "label": "Contact", "href": "#contact" }], "note": "Built from one feather.page document." },
+  "notFound": { "variant": "type", "title": "This page went somewhere else", "body": "The link may be old, or the page has moved. The work is still here.", "home": [{ "label": "Back to the work", "href": "/" }] },
+  "transition": "view"
 }

@@ -13,3 +13,6 @@ export { Magnetic, Cursor, type MagneticProps, type CursorProps } from "./compon
 export { ScrollProvider, useScroll, ScrollProgress, type ScrollProviderProps, type ScrollContextValue } from "./components/scroll"
 export { TransitionProvider, useTransitions, PersistentSlot, type TransitionProviderProps, type PersistentSlotProps } from "./components/transition"
 export { World, type WorldProps } from "./components/world"
+export { Loader, type LoaderProps } from "./components/loader"
+export { SoundToggle, type SoundToggleProps } from "./components/sound-toggle"
+export { OverlayMenu, type OverlayMenuItem, type OverlayMenuProps } from "./components/overlay-menu"

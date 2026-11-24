@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-living",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "description": "Feather's Living Page shell: the Composer (disclosed before the first word), the Turn and its placement, Presence, the block registry and prepared scenes. The host owns the model; Feather renders what it says.",
   "license": "UNLICENSED",
   "type": "module",

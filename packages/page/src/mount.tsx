@@ -3,11 +3,15 @@
 // breaks the 200ms TBT budget (docs/visual-system.md section 14.4). Rendering in a transition lets React yield to
 // the main thread every few milliseconds while it builds, so input and paint are never held for long.
 import { startTransition, type ReactNode } from "react"
+import { flushSync } from "react-dom"
 import { createRoot, type Root } from "react-dom/client"
 
 export interface MountedPage {
   /** Renders a new node into the same root (also in a transition). */
   render(node: ReactNode): void
+  /** Renders a new node at once, committed before it returns: the update of a route change, run inside
+   * createTransitions().go(), so the view transition captures the new page. */
+  swap(node: ReactNode): void
   unmount(): void
 }
 
@@ -16,5 +20,5 @@ export function mountPage(container: Element, node: ReactNode): MountedPage {
   const root: Root = createRoot(container)
   const render = (next: ReactNode) => startTransition(() => root.render(next))
   render(node)
-  return { render, unmount: () => root.unmount() }
+  return { render, swap: (next) => flushSync(() => root.render(next)), unmount: () => root.unmount() }
 }

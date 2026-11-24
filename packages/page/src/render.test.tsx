@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderToStaticMarkup } from "react-dom/server"
 import { validatePage } from "./core/validate"
-import { FeatherPage, PreparedPage, pageScenes } from "./render"
+import { FeatherPage, PageNotFound, PreparedPage, pageScenes } from "./render"
 import type { PageDocument } from "./core/types"
 
 const themes = path.join(import.meta.dirname, "../../tokens/themes")
@@ -66,5 +66,42 @@ describe("PreparedPage", () => {
   it("lists only the prepared scenes", () => {
     expect(pageScenes(doc()).map((s) => s.intent)).toEqual(["work", "hire", "now", "contact"])
     expect(() => renderToStaticMarkup(<PreparedPage page={doc()} intent="pricing" />)).toThrow(/not a prepared scene/)
+  })
+})
+
+describe("the page edges (feather.page/1)", () => {
+  it("renders a page without edges exactly as /0 did: no header, no footer, no loader", () => {
+    const { nav, footer, notFound, transition, ...plain } = doc()
+    void [nav, footer, notFound, transition]
+    const html = renderToStaticMarkup(<FeatherPage page={{ ...plain, schema: "feather.page/0" }} tokens={theme("studio")} />)
+    expect(html).not.toContain('data-slot="overlay-menu"')
+    expect(html).not.toContain('data-slot="page-footer"')
+    expect(html).not.toContain('data-slot="loader"')
+  })
+
+  it("puts the nav before main and the footer after it, every link in the HTML", () => {
+    const html = renderToStaticMarkup(<FeatherPage page={doc()} tokens={theme("seed")} />)
+    const nav = html.indexOf('data-slot="overlay-menu"')
+    const main = html.indexOf("<main")
+    const footer = html.indexOf('data-slot="page-footer"')
+    expect(nav).toBeGreaterThan(-1)
+    expect(nav).toBeLessThan(main)
+    expect(footer).toBeGreaterThan(main)
+    for (const item of doc().nav!.items) expect(html).toContain(`href="${item.href}"`)
+  })
+
+  it("renders the loader in the HTML only when the page asks for one, hidden without script and under reduced motion", () => {
+    const html = renderToStaticMarkup(<FeatherPage page={{ ...doc(), loader: { variant: "dock" } }} tokens={theme("portrait")} />)
+    expect(html).toMatch(/data-slot="loader"[^>]*/)
+    expect(html).toContain("noscript:hidden")
+    expect(html).toContain("motion-reduce:hidden")
+  })
+
+  it("serves the 404 with one h1 and the way home, in the page's chrome", () => {
+    render(<PageNotFound page={doc()} tokens={theme("studio")} />)
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("This page went somewhere else")
+    expect(screen.getByRole("link", { name: "Back to the work" }).getAttribute("href")).toBe("/")
+    expect(document.querySelector('[data-slot="loader"]')).toBeNull()
   })
 })

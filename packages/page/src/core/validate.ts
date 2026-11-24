@@ -1,6 +1,6 @@
-// validatePage: a feather.page/0 document in, the page or every issue out. Deterministic, no dependencies. Reads the
+// validatePage: a feather.page/0 or /1 document in, the page or every issue out. Deterministic, no dependencies. Reads the
 // block table in spec.ts, so a block is described once.
-import { ANCHORS, BLOCKS, PAGE_SCHEMA, SPEAKER_KINDS, type FieldSpec, type Fields } from "./spec"
+import { ANCHORS, BLOCKS, EDGES, PAGE_SCHEMAS, ROUTE_VARIANTS, SPEAKER_KINDS, type FieldSpec, type Fields } from "./spec"
 import type { PageDocument, PageIssue, PageResult } from "./types"
 
 const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v)
@@ -21,11 +21,18 @@ export function validatePage(input: unknown): PageResult {
   const add = (path: string, code: PageIssue["code"], message: string) => issues.push({ path, code, message })
   if (!isObject(input)) return { ok: false, issues: [{ path: "", code: "not-object", message: "a page is a JSON object" }] }
   const doc = input
-  if (doc.schema !== PAGE_SCHEMA) add("/schema", "wrong-schema", `schema must be "${PAGE_SCHEMA}"`)
+  if (!(PAGE_SCHEMAS as readonly unknown[]).includes(doc.schema)) add("/schema", "wrong-schema", `schema must be one of ${PAGE_SCHEMAS.map((s) => `"${s}"`).join(", ")}`)
   if (typeof doc.brand !== "string" && !isObject(doc.brand)) add("/brand", "missing", "brand is a path to the brand's tokens, or the tokens inline")
   for (const k of ["title", "description", "lang"]) if (doc[k] !== undefined && typeof doc[k] !== "string") add(`/${k}`, "type", `${k} must be text`)
   const known = new Set(["schema", "brand", "title", "description", "lang", "speaker", "library", "sections", "scenes", "living"])
-  for (const k of Object.keys(doc)) if (!known.has(k)) add(`/${esc(k)}`, "unknown-field", `${k} is not a page field`)
+  const edges = new Set([...Object.keys(EDGES), "transition"])
+  for (const k of Object.keys(doc)) {
+    if (known.has(k)) continue
+    if (!edges.has(k)) add(`/${esc(k)}`, "unknown-field", `${k} is not a page field`)
+    else if (doc.schema === "feather.page/0") add(`/${esc(k)}`, "needs-schema-1", `${k} is a page edge of feather.page/1; set "schema": "feather.page/1"`)
+  }
+  for (const [k, { fields }] of Object.entries(EDGES)) if (doc[k] !== undefined) checkFields(`/${k}`, doc[k], fields, {}, add)
+  if (doc.transition !== undefined) checkField("/transition", doc.transition, { kind: "enum", values: ROUTE_VARIANTS }, {}, add)
 
   if (doc.speaker !== undefined) {
     const s = doc.speaker
@@ -127,6 +134,12 @@ function checkField(path: string, v: unknown, spec: FieldSpec, library: Record<s
       return
     case "number":
       if (typeof v !== "number" || !Number.isFinite(v)) add(path, "type", "expected a number")
+      return
+    case "boolean":
+      if (typeof v !== "boolean") add(path, "type", "expected true or false")
+      return
+    case "enum":
+      if (typeof v !== "string" || !spec.values.includes(v)) add(path, "type", `expected one of ${spec.values.join(", ")}`)
       return
     case "href":
       if (typeof v !== "string" || !isSafeHref(v)) add(path, "bad-href", "a link is http(s), mailto:, tel:, a path or an anchor")

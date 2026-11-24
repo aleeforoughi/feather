@@ -26,7 +26,7 @@ describe("validatePage", () => {
   })
 
   it.each([
-    ["wrong schema", (d: Doc) => (d.schema = "feather.page/1"), "/schema wrong-schema"],
+    ["wrong schema", (d: Doc) => (d.schema = "feather.page/2"), "/schema wrong-schema"],
     ["no sections", (d: Doc) => (d.sections = []), "/sections too-few"],
     ["unknown block", (d: Doc) => d.sections.push({ block: "carousel" }), "/sections/6/block unknown-block"],
     ["missing title", (d: Doc) => delete d.sections[0].title, "/sections/0/title missing"],
@@ -68,10 +68,40 @@ describe("validatePage", () => {
   })
 })
 
-describe("schema/feather.page-0.json", () => {
-  it("is generated from the spec (run `pnpm --filter @aleeforoughi/feather-page generate`)", () => {
-    const file = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../../schema/feather.page-0.json"), "utf8"))
-    expect(file).toEqual(pageJsonSchema())
+describe("feather.page/1: the page edges", () => {
+  const edges = (): Doc => ({
+    ...example(),
+    schema: "feather.page/1",
+    nav: { brand: "Alee", items: [{ label: "Work", href: "#work" }, { label: "Contact", href: "#contact" }] },
+    footer: { variant: "reveal", wordmark: "Alee", links: [{ label: "Email", href: "mailto:hi@example.com" }], note: "Made with care" },
+    notFound: { variant: "type", title: "This page went somewhere else", home: [{ label: "Back to the work", href: "/" }] },
+    loader: { variant: "dock", label: "Loading Alee", sound: true },
+    transition: "columns",
+    sound: { bed: "audio/room.mp3" },
+  })
+  it("accepts every edge on a /1 page", () => {
+    expect(issues(edges())).toEqual([])
+  })
+  it("keeps /0 exactly as it was: edges need the /1 schema", () => {
+    expect(codes({ ...edges(), schema: "feather.page/0" })).toEqual(["/nav needs-schema-1", "/footer needs-schema-1", "/notFound needs-schema-1", "/transition needs-schema-1", "/loader needs-schema-1", "/sound needs-schema-1"])
+  })
+  it("refuses an unknown variant, an unsafe link and a missing bed", () => {
+    const doc = edges()
+    doc.footer.variant = "parallax"
+    doc.transition = "spin"
+    doc.nav.items[0].href = "javascript:alert(1)"
+    doc.loader.sound = "yes"
+    doc.sound = {}
+    expect(codes(doc)).toEqual(["/nav/items/0/href bad-href", "/footer/variant type", "/loader/sound type", "/sound/bed missing", "/transition type"])
+  })
+})
+
+describe("schema/feather.page-0.json and feather.page-1.json", () => {
+  it("are generated from the spec (run `pnpm --filter @aleeforoughi/feather-page generate`)", () => {
+    for (const v of [0, 1] as const) {
+      const file = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, `../../schema/feather.page-${v}.json`), "utf8"))
+      expect(file).toEqual(pageJsonSchema(v))
+    }
   })
   it("offers one schema per block", () => {
     const blocks = (pageJsonSchema().$defs as { block: { oneOf: { properties: { block: { const: string } } }[] } }).block.oneOf

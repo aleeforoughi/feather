@@ -7,6 +7,10 @@
 @import "../fonts/jetbrains-mono.css";
 
 @custom-variant dark (&:is(.dark *));
+/* The no-JS tier (website layer): `scripting:` styles apply only when script runs, `noscript:` only when it does not,
+   so an enhanced block (a menu panel, a loader) can be the plain, complete thing without script. */
+@custom-variant scripting (@media (scripting: enabled));
+@custom-variant noscript (@media (scripting: none));
 
 @theme inline {
     /* Selection indicators (the active tab line, a selected rail): 2px, the weight of the focus ring
@@ -370,6 +374,11 @@
     --scale-media: 1.03;
     --spring-bounce: 0.1;
     --sequence-cap: 1200ms;
+    /* The page-change curves, read from the 2026 winners' own code (Qooler file 27 section 7): a wipe or fill, a
+       route change, and the parallax push. House constants, the same in every brand. */
+    --ease-wipe: cubic-bezier(0.76, 0, 0.24, 1);
+    --ease-route: cubic-bezier(0.625, 0.05, 0, 1);
+    --ease-push: cubic-bezier(0.7, 0.05, 0.13, 1);
     --duration-reduced: 150ms;
     --reduced-reveal: fade;
     --reduced-media: fade;
@@ -854,6 +863,59 @@
   transition-duration: var(--duration-hover-out);
   transition-timing-function: var(--ease-signature);
 }
+/* Route transitions (createTransitions().go(update, { variant })): the variant is set on <html> for the length of one
+   view transition, so each one is only CSS on the view-transition pseudo-elements. `view`: the old page recedes
+   (scale 0.9, dimmed) while the new one wipes up. `push`: the old page drifts up a quarter screen under a dark veil
+   while the new one rises from below. Both end within the 1.2s sequence cap. Under reduced motion the runtime skips
+   the view transition, and this block makes sure a cross-document one (@view-transition) does not move either. */
+@keyframes feather-route-recede {
+  to {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+@keyframes feather-route-wipe {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes feather-route-push-out {
+  to {
+    transform: translateY(-25vh);
+    filter: brightness(0.2);
+  }
+}
+@keyframes feather-route-push-in {
+  from {
+    transform: translateY(100vh);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+html[data-route-transition="view"]::view-transition-old(root) {
+  animation: feather-route-recede 800ms var(--ease-wipe) both;
+}
+html[data-route-transition="view"]::view-transition-new(root) {
+  animation: feather-route-wipe 950ms var(--ease-wipe) both;
+}
+html[data-route-transition="push"]::view-transition-old(root) {
+  animation: feather-route-push-out 1200ms var(--ease-push) both;
+}
+html[data-route-transition="push"]::view-transition-new(root) {
+  animation: feather-route-push-in 1200ms var(--ease-push) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-route-transition]::view-transition-group(*),
+  html[data-route-transition]::view-transition-old(*),
+  html[data-route-transition]::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* The marquee: the track holds two copies, so moving by half its width loops seamlessly. The duration is inline. */
 @keyframes feather-marquee {
   from {
@@ -906,6 +968,13 @@
   display: grid;
   grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
   column-gap: var(--layout-gutter);
+  width: 100%;
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding-inline: var(--layout-margin);
+}
+/* The page grid's inline measures without the grid: page chrome (a menu bar, a footer row) lines up with the content. */
+@utility page-inset {
   width: 100%;
   max-width: var(--layout-max);
   margin-inline: auto;

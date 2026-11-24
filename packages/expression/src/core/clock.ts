@@ -38,6 +38,9 @@ const browserFrames = (): Frames | null =>
     ? { request: (cb) => window.requestAnimationFrame(cb), cancel: (id) => window.cancelAnimationFrame(id) }
     : null
 
+/** The longest frame time a tick ever sees, in ms (1/20s). */
+export const MAX_DELTA = 50
+
 /** A new clock. Products use the shared `clock`; tests make their own with a fake frame source. */
 export function createClock(frames: Frames | null = browserFrames()): Clock {
   const ticks = new Set<Tick>()
@@ -46,7 +49,8 @@ export function createClock(frames: Frames | null = browserFrames()): Clock {
   let external: Ticker | null = null
 
   const run = (time: number) => {
-    const delta = last === null ? 0 : Math.max(0, time - last)
+    // Clamped to 1/20s: a frame after a stall or a hidden tab never teleports what moves.
+    const delta = last === null ? 0 : Math.min(MAX_DELTA, Math.max(0, time - last))
     last = time
     for (const tick of [...ticks]) tick(time, delta)
   }

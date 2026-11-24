@@ -4,7 +4,8 @@
 //   feather-page validate <page.json>            every issue, with its JSON pointer; exit 1 when invalid
 //   feather-page routes <page.json>              the static routes: the base page and one per prepared scene
 //   feather-page build <page.json> --out <dir> [--css <href>] [--base </>]
-//                                                writes index.html and <intent>/index.html, readable with no script
+//                                                writes index.html, <intent>/index.html and (with notFound) 404.html,
+//                                                readable with no script
 //
 // `brand` in the page is read relative to the page file: a feather-tokens file, or a reference theme ({ tokens }).
 // Deterministic: no network, no model.
@@ -37,7 +38,7 @@ const root = base.endsWith("/") ? base : `${base}/`
 const routes = [{ path: root, intent: null, title: page.title ?? "" }, ...scenes.map((s) => ({ path: `${root}${s.intent}`, intent: s.intent, title: s.blocks.find((b) => typeof b.title === "string")?.title ?? s.ask }))]
 
 if (command === "validate") {
-  console.log(`${file}: valid feather.page/0, ${page.sections.length} sections, ${scenes.length} prepared scenes`)
+  console.log(`${file}: valid ${page.schema}, ${page.sections.length} sections, ${scenes.length} prepared scenes`)
 } else if (command === "routes") {
   console.log(JSON.stringify(routes, null, 2))
 } else if (command === "build") {
@@ -52,8 +53,14 @@ if (command === "validate") {
     tokens = brand.tokens ?? brand
   }
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
+  // Route transitions between the static pages are the browser's own cross-document View Transitions: no script, off
+  // under reduced motion. view and push are styled by foundation.css; columns needs script, so a static site fades.
+  const transition = page.transition
+  const crossDocument = transition !== undefined && transition !== "none"
+  const routeAttr = transition === "view" || transition === "push" ? ` data-route-transition="${transition}"` : ""
+  const vt = crossDocument ? `<style>@media (prefers-reduced-motion: no-preference){@view-transition{navigation:auto}}</style>\n` : ""
   const html = (title, body) =>
-    `<!doctype html>\n<html lang="${esc(page.lang ?? "en")}">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(title)}</title>\n${page.description ? `<meta name="description" content="${esc(page.description)}">\n<meta property="og:title" content="${esc(title)}">\n<meta property="og:description" content="${esc(page.description)}">\n` : ""}${css ? `<link rel="stylesheet" href="${esc(css)}">\n` : ""}</head>\n<body>\n${body}\n</body>\n</html>\n`
+    `<!doctype html>\n<html lang="${esc(page.lang ?? "en")}"${routeAttr}>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(title)}</title>\n${page.description ? `<meta name="description" content="${esc(page.description)}">\n<meta property="og:title" content="${esc(title)}">\n<meta property="og:description" content="${esc(page.description)}">\n` : ""}${css ? `<link rel="stylesheet" href="${esc(css)}">\n` : ""}${vt}</head>\n<body>\n${body}\n</body>\n</html>\n`
   const href = (intent) => `${root}${intent}`
   fs.mkdirSync(out, { recursive: true })
   fs.writeFileSync(path.join(out, "index.html"), html(page.title ?? "", renderToStaticMarkup(React.createElement(lib.FeatherPage, { page, tokens }))))
@@ -62,5 +69,9 @@ if (command === "validate") {
     const title = `${s.ask}${page.title ? ` — ${page.title}` : ""}`
     fs.writeFileSync(path.join(out, s.intent, "index.html"), html(title, renderToStaticMarkup(React.createElement(lib.PreparedPage, { page, intent: s.intent, tokens, href }))))
   }
-  console.log(`built ${routes.length} routes into ${out}`)
+  if (page.notFound) {
+    const title = `${page.notFound.title ?? "Not found"}${page.title ? ` — ${page.title}` : ""}`
+    fs.writeFileSync(path.join(out, "404.html"), html(title, renderToStaticMarkup(React.createElement(lib.PageNotFound, { page, tokens }))))
+  }
+  console.log(`built ${routes.length + (page.notFound ? 1 : 0)} routes into ${out}`)
 } else usage()

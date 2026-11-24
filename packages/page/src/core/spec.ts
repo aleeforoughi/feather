@@ -3,12 +3,18 @@
 // `scripts/generate.ts` writes `schema/feather.page-0.json` from it. The block set is the Living Page library (Qooler
 // file 22 §3) and matches @aleeforoughi/feather-living's BLOCK_KINDS.
 
-export const PAGE_SCHEMA = "feather.page/0"
+/** The schema a new page is written in. `feather.page/1` adds the page edges (EDGES) to /0; every /0 page is valid. */
+export const PAGE_SCHEMA = "feather.page/1"
+/** Every schema the validator reads. */
+export const PAGE_SCHEMAS = ["feather.page/0", "feather.page/1"] as const
 
 /** A field's shape. Kept small on purpose: what a page needs, nothing a renderer would have to guess. */
 export type FieldSpec =
   | { kind: "text"; max?: number }
   | { kind: "number" }
+  | { kind: "boolean" }
+  /** One of a fixed set of names (a variant). */
+  | { kind: "enum"; values: readonly string[] }
   | { kind: "media" }
   | { kind: "href" }
   | { kind: "texts"; min?: number; max?: number }
@@ -42,6 +48,34 @@ export const BLOCKS: Record<string, { fields: Fields; doc: string }> = {
 }
 
 export const BLOCK_NAMES = Object.keys(BLOCKS)
+
+/** The ways a route can arrive (createTransitions in @aleeforoughi/feather-expression). */
+export const ROUTE_VARIANTS = ["none", "fade", "view", "push", "columns"] as const
+
+const LINK: Fields = { label: text(40, true), href: { kind: "href", required: true } }
+
+/**
+ * The page edges (feather.page/1): the chrome around the sections, which the 2026 award winners finish as carefully
+ * as the page itself (Qooler file 27 sections 6 and 7: page transitions, loaders, the overlay menu, the footer and the
+ * 404 are their most named moves). Each is a top-level field of the page, never a section, so the Living Page's
+ * block library stays the same.
+ */
+export const EDGES: Record<string, { fields: Fields; doc: string }> = {
+  nav: { doc: "The overlay menu: a minimal bar whose Menu opens a full-screen list of large links.", fields: { brand: text(60), label: text(40), items: { kind: "list", of: LINK, min: 1, max: 8 } } },
+  footer: {
+    doc: "The last scene. plain: links and a note. wordmark: the name set as large as the width allows. reveal: the footer waits behind the page and is uncovered as it ends.",
+    fields: { variant: { kind: "enum", values: ["plain", "wordmark", "reveal"] }, wordmark: text(40), body: text(240), links: { kind: "list", of: LINK, max: 12 }, note: text(160) },
+  },
+  notFound: {
+    doc: "The 404, as a small scene with a clear way home. type: the number as display type. minimal: the words alone.",
+    fields: { variant: { kind: "enum", values: ["type", "minimal"] }, title: text(120), body: BODY, home: { kind: "list", of: LINK, max: 1 } },
+  },
+  loader: {
+    doc: "Arrival. counter: an honest percentage that lifts off. dock: a bar that fills and becomes the header. Never shown without script or under reduced motion.",
+    fields: { variant: { kind: "enum", values: ["counter", "dock"] }, label: text(80), sound: { kind: "boolean" } },
+  },
+  sound: { doc: "One ambient bed, off until the person turns it on; the toggle sits in the nav.", fields: { bed: { kind: "media", required: true } } },
+}
 
 /** Top-level fields. */
 export const SPEAKER_KINDS = ["person", "company", "product"] as const
