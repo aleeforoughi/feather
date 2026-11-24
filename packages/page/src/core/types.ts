@@ -42,8 +42,42 @@ export interface Scene {
   asks?: string[]
 }
 
+export interface PageLink {
+  label: string
+  href: string
+}
+
+/** The page edges (feather.page/1). */
+export interface NavEdge {
+  /** The wordmark in the bar (default the page title). */
+  brand?: string
+  /** The landmark's name (default "Site"). */
+  label?: string
+  items: PageLink[]
+}
+export interface FooterEdge {
+  variant?: "plain" | "wordmark" | "reveal"
+  wordmark?: string
+  body?: string
+  links?: PageLink[]
+  note?: string
+}
+export interface NotFoundEdge {
+  variant?: "type" | "minimal"
+  title?: string
+  body?: string
+  /** At most one link; default the site root. */
+  home?: PageLink[]
+}
+export interface LoaderEdge {
+  variant?: "counter" | "dock"
+  label?: string
+  sound?: boolean
+}
+export type RouteVariant = "none" | "fade" | "view" | "push" | "columns"
+
 export interface PageDocument {
-  schema: "feather.page/0"
+  schema: "feather.page/0" | "feather.page/1"
   /** A path to the brand's feather-tokens file, or the tokens inline. */
   brand: string | Record<string, unknown>
   title?: string
@@ -54,12 +88,19 @@ export interface PageDocument {
   sections: PageBlock[]
   scenes?: Record<string, Scene>
   living?: { anchor?: "reader" | "end"; fold?: boolean; prepared?: string[]; disclosure?: string }
+  nav?: NavEdge
+  footer?: FooterEdge
+  notFound?: NotFoundEdge
+  loader?: LoaderEdge
+  /** How a route arrives (default "fade"). */
+  transition?: RouteVariant
+  sound?: { bed: Media }
 }
 
 export interface PageIssue {
   /** A JSON pointer into the document. */
   path: string
-  code: "wrong-schema" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker"
+  code: "wrong-schema" | "needs-schema-1" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker"
   message: string
 }
 
