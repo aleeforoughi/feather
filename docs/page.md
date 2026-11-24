@@ -1,4 +1,4 @@
-# Websites from a schema: `feather.page/0`
+# Websites from a schema: `feather.page/0` and `/1`
 
 `@aleeforoughi/feather-page` turns one JSON document into a complete, themeable website, with the Living Page
 layered on. Changing `brand` restyles all of it, which is how the showcase proves the range: the same document,
@@ -46,6 +46,19 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   chrome around it) in a React transition, so the long first render yields to the main thread instead of holding it
   in one task. A plain `root.render` of a full page breaks the 200ms mobile TBT budget on a throttled phone; the
   showcase sites mount this way and the website gate measures them.
+- **The page edges (`feather.page/1`).** `/1` adds top-level fields for the chrome around the sections; every `/0`
+  page is still valid, and an edge on a `/0` page is reported as `needs-schema-1`. Each is in `EDGES` in
+  `spec.ts`, and `schema/feather.page-1.json` is generated beside `-0`:
+  - `nav`: `{ brand?, label?, items: [{ label, href }] }`, the overlay menu;
+  - `footer`: `{ variant: plain | wordmark | reveal, wordmark?, body?, links?, note? }`;
+  - `notFound`: `{ variant: type | minimal, title?, body?, home?: [{ label, href }] }`, served by `PageNotFound`
+    and written as `404.html` by `feather-page build`;
+  - `loader`: `{ variant: counter | dock, label?, sound? }`;
+  - `transition`: `none | fade | view | push | columns`. A host passes it to `createTransitions().go()`, with
+    `mountPage(...).swap(node)` as the update. `feather-page build` turns on cross-document View Transitions for the
+    static routes (`view` and `push` styled by foundation.css, off under reduced motion; `columns` needs script, so
+    a static site fades);
+  - `sound`: `{ bed }`, one looping bed, off until the person turns it on with the toggle in the nav.
 - `scenes` are the prepared answers. With `living.prepared`, each becomes a static, indexable route that works with
   the model off.
 

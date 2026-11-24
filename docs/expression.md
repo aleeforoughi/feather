@@ -25,7 +25,30 @@ other packages.
 | `Magnetic`, `Cursor` | Optional; a pull of 0.15 and a follower | `(pointer: fine)` only; the native cursor always stays; off under reduced motion |
 | `ScrollProvider` | One scroll engine: native, CSS timelines, or Lenis driven by the GSAP ticker | lerp 0.1, native on touch, `lagSmoothing(0)`; no smoothing under reduced motion |
 | `TransitionProvider`, `PersistentSlot` | View Transitions with Taxi-style cleanup (`onLeave`), and a persistent slot | Content always arrives; motion is optional |
-| `World` | One GPU canvas slot, owned by the brand's renderer | DPR capped per tier (2, 1.5, 1), quality tiers, render on demand, paused off screen and in a hidden tab, a still under reduced motion or without WebGL, `aria-hidden` |
+| `World` | One GPU canvas slot, owned by the brand's renderer | DPR capped per tier (2, 1.5, 1) and a pixel budget, the capability gate and a quality ladder, render on demand, paused off screen and in a hidden tab, a still under reduced motion or without WebGL, `aria-hidden` |
+| `Loader` | Arrival: `counter` (an honest percentage that lifts off) or `dock` (a bar that fills and becomes the header, `[data-loader-dock]`); optionally asks Sound on / Sound off | `role="status"` with a label; never shown without script or under reduced motion; the page is `inert` and still while it shows; ends by the cap |
+| `OverlayMenu` | A minimal bar whose Menu opens a full-screen list of large links | Without script a plain list; a modal dialog with focus trapped, Escape, the page `inert`, focus returned; a fade under reduced motion |
+| `SoundToggle` | One ambient bed, off until the person turns it on | `aria-pressed`; remembered; silent while the tab is hidden; static under reduced motion |
+
+## The edge runtime (wave 1)
+
+The runtime under the page edges and every heavy effect, in `core/`. The values are read from the 2026 award
+winners' shipped code (Qooler file 27 §7); Feather takes the techniques and values, never their code.
+
+| Piece | What it does |
+|---|---|
+| `MAX_DELTA` | The clock hands no tick more than 1/20s, so nothing teleports after a stall or a hidden tab. |
+| `cappedPixelRatio(quality, dpr, width, height)`, `PIXEL_BUDGET` | The tier's DPR cap and a pixel budget: a canvas never draws more than 2560×1440 pixels, never below a 0.5 ratio. |
+| `createQualityLadder` | Fed the frames a scene renders: steps down below 50fps (measured over 1s), tries one step up after 10s of comfort (doubling after a failed try), never measures while hidden, and reports when even the last level struggles. The World runs one: through the renderer's `levels`/`setLevel`, or by lowering its pixel ratio in three steps. |
+| `capabilityGate`, `retire` | Heavy tier only with more than 4 cores and 4 GB, a fine pointer, WebGL, no data saver and no reduced motion; a retired effect stays light for 30 days. Unknown hints count as capable. `World` gates itself (`gate` prop). |
+| `perFrame` | One task per frame on the clock; a World's `prewarm()` compiles shaders this way, behind the loader. |
+| `honestProgress` | The lesser of real readiness and elapsed over a minimum (2.4s first visit, 1.4s on return), capped at 8s; clock time, so it waits in a hidden tab. |
+| `createSoundPreference`, `sound`, `playBed` | Off by default, remembered, never audible while hidden; one looping bed with a 500ms fade. |
+| `createTransitions().go(update, { variant })` | Route changes: `view` (the old page recedes, the new one wipes up, 0.8/0.95s on `--ease-wipe`), `push` (the old page drifts up 25vh under a veil, the new one rises, 1.2s on `--ease-push`), `columns` (four columns cover and lift, 0.06s stagger, each leg within the 1.2s cap), `fade`, `none`. Instant under reduced motion; then focus moves to the new `h1` and its title is announced. |
+
+The curves are house constants in foundation.css: `--ease-wipe` (.76,0,.24,1), `--ease-route` (.625,.05,0,1),
+`--ease-push` (.7,.05,.13,1). The `scripting:` and `noscript:` variants make the no-script tier of an enhanced block
+(a menu panel, a loader) a plain part of the HTML.
 
 ## One clock
 
