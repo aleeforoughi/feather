@@ -7,6 +7,7 @@ import { defineConfig } from "vite"
 export default defineConfig({
   base: "./",
   plugins: [react(), tailwindcss()],
-  // index.html is the product showcase; sites.html is the website layer (one page schema, three brands).
-  build: { rolldownOptions: { input: { index: "index.html", sites: "sites.html" } } },
+  // index.html is the product showcase; sites.html is the website layer (one page schema, three brands); fit.html is
+  // the fit gate's stress page (e2e/fit.spec.ts).
+  build: { rolldownOptions: { input: { index: "index.html", sites: "sites.html", fit: "fit.html" } } },
 })
