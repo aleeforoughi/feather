@@ -130,7 +130,7 @@ describe("feather-page init", () => {
       expect(r.code, r.stderr).toBe(0)
       const doc = JSON.parse(fs.readFileSync(path.join(dir, `pages/${name}.json`), "utf8"))
       expect(doc.brand).toBe("../themes/portrait.json")
-      if (doc.scheme) expect(doc.scheme.colors.background).toBe("#241f21")
+      if (doc.scheme) expect(doc.scheme.colors.background.toLowerCase()).toBe("#241f21")
       const built = cli(dir, ["build", `pages/${name}.json`, "--out", `out/${name}`])
       expect(built.code, built.stderr).toBe(0)
       const index = fs.readFileSync(path.join(dir, `out/${name}/index.html`), "utf8")
