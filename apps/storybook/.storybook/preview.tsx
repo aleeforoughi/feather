@@ -60,6 +60,8 @@ const preview: Preview = {
           "Website",
           "Living",
           "Pages",
+          // Whole pages, the last level: atoms, molecules, organisms, blocks (Pages), then templates.
+          "Templates",
         ],
       },
     },
