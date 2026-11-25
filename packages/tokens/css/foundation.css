@@ -113,6 +113,8 @@
     --color-block-4-ink: var(--block-4-ink);
     --color-media-scrim: var(--media-scrim);
     --color-ink-on-media: var(--ink-on-media);
+    /* The hairline rule (border-rule, divide-rule): 15% of the ink it sits in. */
+    --color-rule: var(--rule);
 }
 
 /* The primitives a brand's theme overrides (feather-brand writes them at :root:root). Neutral defaults, so Feather
@@ -323,6 +325,18 @@
 /* Density defaults (section 3): "default" (the brand axis "comfortable"). feather-brand writes the brand's own at
    :root:root, and any element with data-density="tight|default|spacious" overrides them for its subtree. */
 @layer base {
+  /* On a page (feather-page), titles are balanced, body is set pretty and figures in tables and outputs are tabular
+     (measured, Qooler file 28 section 1: text-wrap balance on 126 winners, pretty on 89, tabular figures on 138). The
+     brand's features (typography.features, on by default) set the values; a utility on the element still wins. */
+  :where([data-page]) :where(h1, h2, h3, h4) {
+    text-wrap: var(--title-wrap);
+  }
+  :where([data-page]) :where(p, li, dd, blockquote, figcaption) {
+    text-wrap: var(--body-wrap);
+  }
+  :where([data-page]) :where(td, output, time, [data-slot$="-value"], [data-slot$="-price"]) {
+    font-variant-numeric: var(--numeric-figures);
+  }
   :root {
     --opacity-disabled: 0.5;
     --elevation-1: 0 1px 2px rgb(0 0 0 / 0.06);
@@ -431,6 +445,15 @@
     /* Opacity roles (opacity-dim, opacity-muted, opacity-disabled): the only opacities a component sets. */
     --opacity-dim: 0.6;
     --opacity-muted: 0.72;
+    /* The hairline rule (measured, Qooler file 28 section 3: dividers are hairlines, not boxes; 6 to 8 one-pixel rules
+       on the median page, 1px solid at 10 to 20% opacity on 352 of 476 winners' stylesheets). 15% of the ink of the
+       element it is drawn on (currentColor, resolved where it is used), so it follows every tone and ground. Decoration:
+       never the only thing that tells two things apart. */
+    --rule: color-mix(in oklab, currentColor 15%, transparent);
+    --rule-width: 1px;
+    /* Capitals are opened up (measured, Qooler file 28 sections 1 and 8: 162 winners pair uppercase with +0.08 to
+       +0.12em). Eyebrows (type-caps) and any label set in capitals take the middle, +0.1em. */
+    --caps-tracking: 0.1em;
   }
   /* The colour blocks and the media scrim for a brand that is not /4: pairs of roles the engine already holds to their
      floors (primary on its foreground, the inverse surface, the accent tint and muted under text-primary). Declared
@@ -850,7 +873,7 @@
   font-size: 0.75rem;
   line-height: 1rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--caps-tracking);
   text-transform: uppercase;
 }
 
@@ -1117,17 +1140,19 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   margin-inline: auto;
   padding-inline: var(--layout-margin);
 }
+/* Section rhythm on a phone is about 0.7 of desktop (measured, Qooler file 28 sections 2 and 7: 96 px against 120 px
+   on the winners, never to nothing): each step's 390 px padding is about 0.7 of its 1440 px one. */
 @utility section-space-s {
-  padding-block: clamp(3rem, 2.6667rem + 1.4815vw, 4rem);
+  padding-block: clamp(2.75rem, 2.3333rem + 1.8519vw, 4rem);
 }
 @utility section-space-m {
   padding-block: clamp(4rem, 3.3333rem + 2.963vw, 6rem);
 }
 @utility section-space-l {
-  padding-block: clamp(6rem, 5.3333rem + 2.963vw, 8rem);
+  padding-block: clamp(5.5rem, 4.6667rem + 3.7037vw, 8rem);
 }
 @utility section-space-xl {
-  padding-block: clamp(8rem, 7.3333rem + 2.963vw, 10rem);
+  padding-block: clamp(7rem, 6rem + 4.4444vw, 10rem);
 }
 /* Outer radius = inner radius + padding: set --concentric-pad to the padding between the two. */
 @utility rounded-concentric {
@@ -1151,6 +1176,31 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   background-color: transparent;
   background-image: none;
 }
+/* The page's rows are hairlines (--rule, measured, Qooler file 28 section 3): the list, index and timeline rows, the
+   questions, the journal and the places, and the footer's top edge. The blocks keep their markup; the rule is drawn
+   here, so a brand restyles every one at once. */
+:where([data-page], [data-slot="page-footer"])
+  :where(
+    [data-slot="faq-item"],
+    [data-slot="journal-entry"],
+    [data-slot="journal"],
+    [data-slot="process-step"],
+    [data-slot="hero-index-item"],
+    [data-slot="timeline-item"],
+    [data-slot="places-item"],
+    [data-slot="work-item"]:not([data-variant="panel"]),
+    [data-slot="gallery-item"]
+  ) {
+  border-color: var(--rule);
+}
+[data-slot="page-footer"] {
+  border-block-start: var(--rule-width) solid var(--rule);
+}
+/* A label set in capitals (a button, a link, a tab) is opened up like an eyebrow. */
+:where(button, a, [role="button"], [role="tab"]):where(.uppercase, [data-caps]) {
+  letter-spacing: var(--caps-tracking);
+}
+
 /* Page layouts (feather.page/1 `layout`, docs/page.md). FeatherPage puts the layout on <main data-page data-layout>,
    and on each section's wrapper what it decides per section (data-ground, data-hang). Structure only: grid placement,
    rhythm, rules and grounds. Every colour below is a theme token re-pointed, never a value; a block a layout cannot
@@ -1189,7 +1239,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   --shadow-lg: none;
   --shadow-xl: none;
 }
-/* swiss: a strict grid. A hairline in the strong border opens every section on the grid's measure, and each block
+/* swiss: a strict grid. The hairline rule (--rule) opens every section on the grid's measure, and each block
    title carries its section's number in tabular figures (decoration: `/ ""` keeps it out of the heading's name). */
 [data-page][data-layout="swiss"] {
   counter-reset: feather-section;
@@ -1199,10 +1249,10 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 [data-page][data-layout="swiss"] [data-living-section] > [data-slot="section"] > .page-grid[data-slot="section-content"] {
   padding-block-start: var(--group-gap);
-  background-image: linear-gradient(var(--border-primary), var(--border-primary));
+  background-image: linear-gradient(var(--rule), var(--rule));
   background-repeat: no-repeat;
   background-position: var(--layout-margin) 0;
-  background-size: calc(100% - 2 * var(--layout-margin)) 1px;
+  background-size: calc(100% - 2 * var(--layout-margin)) var(--rule-width);
 }
 [data-page][data-layout="swiss"] [data-slot="block-title"]::before {
   content: counter(feather-section, decimal-leading-zero) / "";

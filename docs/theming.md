@@ -165,6 +165,26 @@ Product UI keeps the calm product roles. Websites use the expression layer, whic
 | `playful` | snappy | quint-out, with overshoot |
 | `cinematic` | cinematic | expo-out |
 
+### The measured craft defaults (from 1.23)
+
+What a brand leaves unset comes from the award winners, measured: 29 clean winners rendered at 1440 and 390px, the
+stylesheets of 476 and the served HTML of 392 (Qooler file 28). A brand that sets a value keeps it. The type defaults
+are `feather-tokens/4` only, so a `/2` or `/3` brand renders as it did; the foundation's rule, capitals and rhythm reach
+every brand.
+
+| Default | Value | Where | Source |
+|---|---|---|---|
+| Heading weight (`--heading-weight`), when `headingWeight` is unset | serif and mono 400, grotesk 500, rounded 600, by the display face's class (`FOUNDATION_FACE_CLASSES`; a custom face by its `generic`) | engine, `/4` | (measured, Qooler file 28): display weight 400 on 15 of 29 winners, 500 on 5; size and space make the hierarchy, not weight |
+| Display weight, when neither `contrast` nor `headingWeight` is set | the same as the heading weight | engine, `/4` | (measured, Qooler file 28) |
+| Display leading | xl 0.96, l 1.0, m 1.04, s 1.08 (graded toward body) | engine, `/4` | (measured, Qooler file 28): median 1.0 (0.95 to 1.1) |
+| Display tracking, phone to desktop size | grotesk and rounded xl −0.01 to −0.03em (l −0.01/−0.025, m −0.008/−0.02, s −0.005/−0.015); serif xl −0.005 to −0.02em (l −0.005/−0.016, m −0.004/−0.012, s −0.002/−0.008); mono 0. `contrast: bold` tightens it 1.25× | engine, `/4` | (measured, Qooler file 28): −0.02em the most common value on 476 stylesheets; −0.01em median on the clean set |
+| Display size on a phone | each step's 390px size is a share of its desktop size: xl 0.45, l 0.5, m 0.55, s 0.6 (minima 3.9, 2.9, 2.4, 1.75rem; maxima unchanged). A container still caps any step a line cannot hold | engine, `/4` | (measured, Qooler file 28): display shrinks to about 0.58 (0.45 to 0.73); xl takes the bottom of the middle half, where a long word would overrun a phone |
+| Capitals | `--caps-tracking` +0.1em on `type-caps` (eyebrows) and on any button, link or tab label set in capitals (`.uppercase` or `data-caps`) | foundation | (measured, Qooler file 28): 162 winners pair uppercase with +0.08 to +0.12em |
+| The hairline rule | `--rule`: `color-mix(in oklab, currentColor 15%, transparent)`, `--rule-width` 1px; `border-rule` in Tailwind. Drawn on the page's list, index, timeline, questions, journal and places rows, the footer's top edge and the swiss layout's hairline. Decoration only, so it is not held to a contrast floor | foundation | (measured, Qooler file 28): hairlines, not boxes; 6 to 8 one-pixel rules a page; 1px at 10 to 20% on 352 of 476 stylesheets |
+| Section rhythm on a phone | each `section-space-*` step at 390px is about 0.7 of its 1440px padding (s 2.75→4rem, m 4→6rem, l 5.5→8rem, xl 7→10rem) | foundation | (measured, Qooler file 28): 96px against 120px, about 0.7, never to nothing |
+| Side margin on a phone | 16px (`--layout-margin`, unchanged: it already meets the floor) | foundation | (measured, Qooler file 28): about 17px (13 to 20); never under 16 |
+| Titles, body and figures | `typography.features` stay on by default; on a page, every heading takes `text-wrap: var(--title-wrap)` (balance), paragraphs, list items and captions `var(--body-wrap)` (pretty), and tables, outputs, times and values `var(--numeric-figures)` (tabular), in the base layer so a utility still wins | engine and foundation | (measured, Qooler file 28): balance on 126 winners, pretty on 89, tabular figures on 138 |
+
 ### Loudness
 
 `loudness` (0 to 3) is how much the website patterns may move. A brand sets its default; a page or a block overrides it

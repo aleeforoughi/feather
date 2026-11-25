@@ -50,6 +50,77 @@ export const DISPLAY_DEFAULTS = {
   m: { size: { min: 2, max: 4.5 }, tracking: { min: -0.015, max: -0.035 }, leading: 1 },
   s: { size: { min: 1.5, max: 3 }, tracking: { min: -0.01, max: -0.025 }, leading: 1.05 },
 }
+/**
+ * feather-tokens/4: the display scale a brand that sets nothing gets, measured on the award winners (measured, Qooler
+ * file 28 sections 1 and 7: 29 clean winners rendered at 1440 and 390 px). By the display face's class (FACE_CLASSES):
+ * - Leading: display is set tight and calm, a median of 1.0 (0.95 to 1.1). xl takes 0.96, the middle of the 0.95–0.98
+ *   asked for the largest step; l, m and s grade toward body (1.25) at 1.0, 1.04 and 1.08.
+ * - Tracking: negative at large sizes, -0.02em the most common value in 476 winners' stylesheets. Grotesk runs -0.01em
+ *   at the phone size to -0.03em at the desktop size on xl; serif half as tight (-0.005 to -0.02), since its contrast
+ *   and serifs already close the word; mono 0, since its advance widths are fixed. The smaller steps loosen toward 0.
+ *   The contrast axis's tighten (bold 1.25×) still applies on top, as it does to the /3 defaults.
+ * - Size on a phone: display shrinks to about 0.58 of its desktop size (0.45 to 0.73), body by about 2px. The maxima
+ *   stay the house's; the minima are set so that at 390px each step is a share of its desktop size graded from the
+ *   bottom of the measured middle half on xl (0.45: the giant step is where a long word would overrun a phone) to 0.6
+ *   on s. A container still caps any step a line cannot hold.
+ */
+export const FACE_CLASSES = ["grotesk", "serif", "mono", "rounded"]
+/** The class of each foundation family. A custom face is serif or mono by its `generic`, otherwise grotesk. */
+export const FOUNDATION_FACE_CLASSES = {
+  Geist: "grotesk",
+  Inter: "grotesk",
+  Sora: "grotesk",
+  "Space Grotesk": "grotesk",
+  "DM Sans": "grotesk",
+  "Plus Jakarta Sans": "grotesk",
+  Outfit: "grotesk",
+  Fraunces: "serif",
+  Manrope: "grotesk",
+  Nunito: "rounded",
+  "Playfair Display": "serif",
+  "JetBrains Mono": "mono",
+  "Geist Mono": "mono",
+  Figtree: "grotesk",
+  Poppins: "grotesk",
+}
+/**
+ * The heading and display weight a /4 brand that sets neither `headingWeight` nor `contrast` gets, by face class: the
+ * winners' display type is regular weight (400 on 15 of 29 clean winners, 500 on 5; measured, Qooler file 28 section
+ * 1). Serif and mono at 400, grotesk at 500 (a grotesk at 400 reads thin at display sizes on a phone), rounded at 600
+ * (rounded terminals soften the stem, so it needs the weight to hold).
+ */
+export const FACE_WEIGHTS = { serif: 400, mono: 400, grotesk: 500, rounded: 600 }
+const PHONE_SHARE = { xl: 0.45, l: 0.5, m: 0.55, s: 0.6 }
+const MEASURED_LEADING = { xl: 0.96, l: 1, m: 1.04, s: 1.08 }
+/** Tracking (em) at the phone and the desktop size, per class and step. */
+const MEASURED_TRACKING = {
+  grotesk: { xl: [-0.01, -0.03], l: [-0.01, -0.025], m: [-0.008, -0.02], s: [-0.005, -0.015] },
+  rounded: { xl: [-0.01, -0.03], l: [-0.01, -0.025], m: [-0.008, -0.02], s: [-0.005, -0.015] },
+  serif: { xl: [-0.005, -0.02], l: [-0.005, -0.016], m: [-0.004, -0.012], s: [-0.002, -0.008] },
+  mono: { xl: [0, 0], l: [0, 0], m: [0, 0], s: [0, 0] },
+}
+/** The minimum that puts a step at `share` of its maximum at 390px (rounded to 0.05rem). */
+const phoneMin = (max, share) => {
+  const t = (390 - FLUID_VIEWPORT[0]) / (FLUID_VIEWPORT[1] - FLUID_VIEWPORT[0])
+  return Math.round(((share * max - t * max) / (1 - t)) * 20) / 20
+}
+/** The measured display defaults for a face class (feather-tokens/4). */
+export function measuredDisplay(cls) {
+  const tracking = MEASURED_TRACKING[cls] ?? MEASURED_TRACKING.grotesk
+  return Object.fromEntries(
+    DISPLAY_STEPS.map((step) => {
+      const max = DISPLAY_DEFAULTS[step].size.max
+      return [step, { size: { min: phoneMin(max, PHONE_SHARE[step]), max }, tracking: { min: tracking[step][0], max: tracking[step][1] }, leading: MEASURED_LEADING[step] }]
+    })
+  )
+}
+/** The class of a face as a brand names it: a foundation family by its table, an open font by its `generic`. */
+export function faceClass(value) {
+  if (typeof value === "string") return FOUNDATION_FACE_CLASSES[value] ?? (/\bMono\b/.test(value) ? "mono" : "grotesk")
+  if (value && typeof value === "object") return value.generic === "serif" ? "serif" : value.generic === "monospace" ? "mono" : "grotesk"
+  return "grotesk"
+}
+
 /** What a brand may set: no display text under 1rem or over 14rem, tracking from -0.08em to 0.02em, leading 0.72 to 1.15. */
 export const DISPLAY_BOUNDS = { size: [1, 14], tracking: [-0.08, 0.02], leading: [0.72, 1.15] }
 
@@ -199,7 +270,7 @@ export function fontFaces(font, defaultDisplay) {
 }
 
 /** The display scale, the brand's partial values merged over the house defaults, checked against DISPLAY_BOUNDS. */
-export function resolveDisplay(input, tighten, problems) {
+export function resolveDisplay(input, tighten, problems, defaults = DISPLAY_DEFAULTS) {
   if (input !== undefined && (input === null || typeof input !== "object" || Array.isArray(input))) {
     problems.push(`typography.display must be an object keyed ${DISPLAY_STEPS.join(", ")}`)
     return null
@@ -208,7 +279,7 @@ export function resolveDisplay(input, tighten, problems) {
   const out = {}
   for (const step of DISPLAY_STEPS) {
     const given = input?.[step] ?? {}
-    const d = DISPLAY_DEFAULTS[step]
+    const d = defaults[step]
     const tracking = given.tracking ? { ...d.tracking, ...given.tracking } : { min: d.tracking.min * tighten, max: d.tracking.max * tighten }
     const s = { size: { ...d.size, ...given.size }, tracking, leading: given.leading ?? d.leading }
     const at = `typography.display.${step}`
@@ -261,7 +332,10 @@ export function expressionTheme(tokens, ctx, problems) {
     if (!["tabularNums", "balanceTitles", "prettyBody"].includes(k)) problems.push(`typography.features.${k} is not a type feature (tabularNums, balanceTitles, prettyBody)`)
     else if (typeof v !== "boolean") problems.push(`typography.features.${k} must be true or false`)
   }
-  const display = resolveDisplay(t.display, CONTRASTS[contrastAxis]?.tighten ?? 1, problems)
+  // feather-tokens/4: what the brand leaves unset comes from the winners' measurements, by the display face's class.
+  const face = faceClass(ctx.fonts.display ?? ctx.fonts.body)
+  const display = resolveDisplay(t.display, CONTRASTS[contrastAxis]?.tighten ?? 1, problems, ctx.measured ? measuredDisplay(face) : DISPLAY_DEFAULTS)
+  const displayWeight = ctx.measured && tokens.contrast === undefined && t.headingWeight === undefined ? FACE_WEIGHTS[face] : CONTRASTS[contrastAxis]?.weight
 
   // Fonts: the slots the engine already checked as strings come in as `ctx.fonts`; open fonts are checked here.
   const slots = { ...ctx.fonts }
@@ -306,7 +380,7 @@ export function expressionTheme(tokens, ctx, problems) {
     ...(open.has("body") ? { "--brand-font-body": stacks.body } : {}),
     ...(stacks.voice ? { "--brand-font-voice": stacks.voice } : {}),
     ...(stacks.mono ? { "--brand-font-mono": stacks.mono } : {}),
-    "--display-weight": String(CONTRASTS[contrastAxis].weight),
+    "--display-weight": String(displayWeight),
     ...Object.fromEntries(
       DISPLAY_STEPS.flatMap((step) => [
         [`--display-${step}-size`, fluidClamp(display[step].size.min, display[step].size.max)],

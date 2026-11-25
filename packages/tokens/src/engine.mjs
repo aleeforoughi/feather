@@ -3,7 +3,7 @@
 // component reads, plus the font imports the brand needs. Deterministic: no network, no dependencies, no Node
 // built-ins, so it runs the same in Node (the feather-brand CLI) and in the browser (Storybook, the playground).
 import { migrateTokens, KNOWN_SCHEMAS, LATEST_SCHEMA, TOKEN_SCHEMA } from "./schema.mjs"
-import { expressionTheme } from "./expression.mjs"
+import { expressionTheme, faceClass, FACE_WEIGHTS } from "./expression.mjs"
 import { applyPersonality, checkLoudness, rangeTheme } from "./range.mjs"
 import { FOUNDATION_FALLBACKS } from "./fallbacks.mjs"
 
@@ -440,7 +440,7 @@ export function buildTheme(input) {
   const expression = v3
     ? expressionTheme(
         tokens,
-        { fonts: { display, body, mono: fonts.mono, voice: tokens.typography?.voiceFace }, foundation: FONTS, familyName: fontFamilyName, generic: fallback, accent, primary, on, contrast, fallbacks: v4 ? FOUNDATION_FALLBACKS : undefined },
+        { fonts: { display, body, mono: fonts.mono, voice: tokens.typography?.voiceFace }, foundation: FONTS, familyName: fontFamilyName, generic: fallback, accent, primary, on, contrast, fallbacks: v4 ? FOUNDATION_FALLBACKS : undefined, measured: v4 },
         problems
       )
     : null
@@ -544,7 +544,7 @@ export function buildTheme(input) {
     "--ease-standard": EASE_STANDARD,
     "--motion-duration": "var(--duration-base)",
     "--motion-ease": "var(--ease-standard)",
-    ...(headingWeight !== undefined ? { "--heading-weight": String(headingWeight) } : {}),
+    ...(headingWeight !== undefined ? { "--heading-weight": String(headingWeight) } : v4 ? { "--heading-weight": String(FACE_WEIGHTS[faceClass(display)]) } : {}),
     ...(expression?.vars ?? {}),
     ...(range?.vars ?? {}),
   }

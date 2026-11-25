@@ -4,6 +4,8 @@ import path from "node:path"
 import { describe, expect, it } from "vitest"
 import {
   BLOCK_COUNT,
+  FACE_WEIGHTS,
+  measuredDisplay,
   LAYERS,
   LOUDNESS,
   OPACITY,
@@ -57,13 +59,61 @@ const brands = REFERENCES.map((n): [string, () => BrandTokens] => [n, () => {
   return v4(t, { focus: t.focus ?? "primary" })
 }])
 
+describe("feather-tokens/4: the measured defaults (Qooler file 28)", () => {
+  const vars = (css: string) => Object.fromEntries([...css.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]))
+  const theme = (typography: Record<string, unknown>, extra: Record<string, unknown> = {}) => vars(built({ schema: "feather-tokens/4", colors: { primary: "#1f3fd1", background: "#ffffff", surface: "#f5f5f5", text: "#111111" }, typography, ...extra }).css)
+
+  it("sets the heading and display weight by the display face's class, where the brand sets neither", () => {
+    expect(FACE_WEIGHTS).toEqual({ serif: 400, mono: 400, grotesk: 500, rounded: 600 })
+    for (const [face, weight] of [["Fraunces", "400"], ["JetBrains Mono", "400"], ["Inter", "500"], ["Nunito", "600"]]) {
+      const v = theme({ fontFamily: { display: face, body: "Inter" } })
+      expect([face, v["--heading-weight"], v["--display-weight"]]).toEqual([face, weight, weight])
+    }
+    // A brand that sets either keeps it: headingWeight for headings, contrast for display.
+    const set = theme({ fontFamily: { display: "Fraunces", body: "Inter" }, headingWeight: 700 }, { contrast: "bold" })
+    expect([set["--heading-weight"], set["--display-weight"]]).toEqual(["700", "700"])
+    expect(theme({ fontFamily: { display: "Fraunces", body: "Inter" } }, { contrast: "quiet" })["--display-weight"]).toBe("500")
+  })
+
+  it("writes the measured display scale for what the brand leaves unset, and keeps what it sets", () => {
+    const grotesk = measuredDisplay("grotesk")
+    expect(grotesk.xl.leading).toBeGreaterThanOrEqual(0.95)
+    expect(grotesk.xl.leading).toBeLessThanOrEqual(0.98)
+    expect([grotesk.xl.tracking.min, grotesk.xl.tracking.max]).toEqual([-0.01, -0.03])
+    expect(measuredDisplay("serif").xl.tracking).toEqual({ min: -0.005, max: -0.02 })
+    expect(measuredDisplay("mono").xl.tracking).toEqual({ min: 0, max: 0 })
+    // Graded toward body, step by step.
+    const leading = (["xl", "l", "m", "s"] as const).map((k) => grotesk[k].leading)
+    expect([...leading].sort((a, b) => a - b)).toEqual(leading)
+    const v = theme({ fontFamily: { display: "Inter", body: "Inter" }, display: { xl: { leading: 0.86, size: { min: 3.5, max: 10 } } } })
+    expect(v["--display-xl-leading"]).toBe("0.86")
+    expect(v["--display-l-leading"]).toBe("1")
+  })
+
+  it("puts each step on a phone (390 px) at about 0.45 to 0.6 of its desktop size", () => {
+    const at = (min: number, max: number, w: number) => min + ((max - min) * (w - 360)) / 1080
+    for (const [step, share] of [["xl", 0.45], ["l", 0.5], ["m", 0.55], ["s", 0.6]] as const) {
+      const { size } = measuredDisplay("grotesk")[step]
+      expect(at(size.min, size.max, 390) / size.max, step).toBeCloseTo(share, 1)
+    }
+  })
+
+  it("gives a /3 brand none of them: its display scale and weights stay the house's", () => {
+    const v = vars(built({ ...json("golden/v3-brands.json").portrait }).css)
+    expect(v["--heading-weight"]).toBeUndefined()
+    expect(v["--display-xl-leading"]).toBe("0.9")
+  })
+})
+
 describe("feather-tokens/4 is additive", () => {
   it.each(["studio", "portrait", "seed"])("writes the %s theme as its /3 theme plus exactly the new variables", (name) => {
     const v3 = json("golden/v3-brands.json")[name]
-    // The one deliberate change in an existing line: /4 adds each foundation family's metric-matched fallback face to
-    // the font stacks (src/fallbacks.mjs). Without it, the theme is the /3 theme plus the new variables.
-    const unmatched = (css: string) => css.replace(/, "[^"]+ Fallback"/g, "")
-    const [before, after] = [built(v3).css, unmatched(built({ ...v3, schema: "feather-tokens/4" }).css)]
+    // The deliberate changes in existing lines: /4 adds each foundation family's metric-matched fallback face to the
+    // font stacks (src/fallbacks.mjs), and what the brand leaves unset of the display scale and the heading weight is
+    // the measured defaults (the next describe). Without them, the theme is the /3 theme plus the new variables.
+    const measured = (css: string) => css.split("\n").filter((l) => !/^\s*--(display-(xl|l|m|s)-(size|tracking|leading)|display-weight|heading-weight):/.test(l)).join("\n")
+    const unmatched = (css: string) => measured(css.replace(/, "[^"]+ Fallback"/g, ""))
+    const [before, after] = [measured(built(v3).css), unmatched(built({ ...v3, schema: "feather-tokens/4" }).css)]
     const added = after.split("\n").filter((line) => !before.split("\n").includes(line))
     expect(added.map((l) => l.trim().split(":")[0])).toEqual(NEW_VARS)
     // Remove the new lines and the theme is the /3 theme, byte for byte.
