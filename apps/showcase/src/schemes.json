@@ -1,0 +1,5 @@
+{
+  "studio": { "background": "#FBF5EE", "surface": "#FFFFFF", "text": "#1C130C", "primary": "#A8410C", "primaryText": "#FFFFFF", "accent": "#A8410C", "accentText": "#FFFFFF" },
+  "portrait": { "background": "#1A1718", "surface": "#242021", "text": "#F1ECE3", "primary": "#F1ECE3", "primaryText": "#1A1718", "accent": "#D9A86A", "accentText": "#1A1718" },
+  "seed": { "background": "#0E0F16", "surface": "#171925", "text": "#F1F2F8", "primary": "#A3A4FF", "primaryText": "#0E0F16", "accent": "#A3A4FF", "accentText": "#0E0F16" }
+}

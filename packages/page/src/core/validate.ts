@@ -2,6 +2,7 @@
 // block table in spec.ts, so a block is described once.
 import { ALIGNS, ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, KINETIC_ENTERS, MOVING_TREATMENTS, OPTION_FIELDS, PAGE_BLOCKS, PAGE_KNOBS, PAGE_SCHEMAS, PINNED_PATTERNS, ROUTE_VARIANTS, SCENE_KINDS, SCENE_PRESETS, SCROLL_PATTERNS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "./spec"
 import type { PageDocument, PageIssue, PageResult } from "./types"
+import { checkFlowBlock, checkScheme, checkViews } from "./validate-flows"
 
 const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v)
 const esc = (k: string | number) => String(k).replace(/~/g, "~0").replace(/\//g, "~1")
@@ -78,6 +79,7 @@ export function validatePage(input: unknown): PageResult {
   for (const [k, { fields }] of Object.entries(EDGES)) if (doc[k] !== undefined) checkFields(`/${k}`, doc[k], fields, {}, add)
   if (doc.transition !== undefined) checkField("/transition", doc.transition, { kind: "enum", values: ROUTE_VARIANTS }, {}, add)
   for (const [k, spec] of Object.entries(PAGE_KNOBS)) if (doc[k] !== undefined) checkField(`/${k}`, doc[k], spec, {}, add)
+  if (doc.schema !== "feather.page/0") checkScheme(doc, add)
   const ctx: BlockContext = { v1: doc.schema !== "feather.page/0", pageLoudness: typeof doc.loudness === "number" ? doc.loudness : undefined }
   widthsAllowed = ctx.v1
 
@@ -206,6 +208,8 @@ function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx:
   if (isObject(b.scene)) checkScene(`${path}/scene`, kind, variant, b, b.scene, level, add)
   checkTreatment(path, kind, b.treatment, level, add)
   checkPageBlock(path, kind, variant, b, add)
+  checkFlowBlock(path, kind, b, add)
+  checkViews(path, b, add)
 
   if (motion) {
     const enter = motion.enter
@@ -382,6 +386,11 @@ function checkField(path: string, v: unknown, spec: FieldSpec, library: Record<s
     }
     case "texts":
       if (!Array.isArray(v) || v.some((x) => typeof x !== "string")) return add(path, "type", "expected a list of text")
+      if (spec.min !== undefined && v.length < spec.min) add(path, "too-few", `at least ${spec.min}`)
+      if (spec.max !== undefined && v.length > spec.max) add(path, "too-many", `at most ${spec.max}`)
+      return
+    case "numbers":
+      if (!Array.isArray(v) || v.some((x) => typeof x !== "number" || !Number.isFinite(x))) return add(path, "type", "expected a list of numbers")
       if (spec.min !== undefined && v.length < spec.min) add(path, "too-few", `at least ${spec.min}`)
       if (spec.max !== undefined && v.length > spec.max) add(path, "too-many", `at most ${spec.max}`)
       return

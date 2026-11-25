@@ -5,7 +5,7 @@ import path from "node:path"
 import { describe, expect, it } from "vitest"
 import { BLOCK_KINDS } from "../../../living/src/core/blocks"
 import { pageJsonSchema } from "../../scripts/json-schema"
-import { BLOCK_NAMES, BLOCK_RANGE, PAGE_BLOCK_NAMES, TREATMENTS } from "./spec"
+import { BLOCK_NAMES, BLOCK_RANGE, FLOW_BLOCKS, PAGE_BLOCK_NAMES, TREATMENTS } from "./spec"
 import { validatePage } from "./validate"
 
 const hero = { block: "hero", title: "Hello" }
@@ -21,13 +21,18 @@ const form = (fields: unknown[], extra: Record<string, unknown> = {}) => ({ bloc
 describe("the page blocks", () => {
   it("are /1 blocks beside the Living Page's library, which stays as it was", () => {
     expect(BLOCK_NAMES).toEqual([...BLOCK_KINDS])
-    expect(PAGE_BLOCK_NAMES).toEqual(["gallery", "comparison", "story", "testimonials", "journal", "form", "showreel"])
+    expect(PAGE_BLOCK_NAMES).toEqual(["gallery", "comparison", "story", "testimonials", "journal", "form", "showreel", "quiz", "booking", "calculator", "chart", "places", "podcast"])
     for (const name of PAGE_BLOCK_NAMES) expect(BLOCK_RANGE[name].variants?.length, name).toBeGreaterThan(0)
   })
 
   it("need feather.page/1, and never stand in an answer", () => {
     expect(issues({ schema: "feather.page/0", brand: "b.json", sections: [hero, gallery()] })).toEqual(["/sections/1/block needs-schema-1"])
     expect(issues(page([], { scenes: { look: { ask: "Show me", line: "Here.", blocks: [gallery()] } } }))).toEqual(["/scenes/look/blocks/0/block unknown-block"])
+    // The product flows are page blocks too.
+    const chart = { block: "chart", title: "C", summary: "S", series: [{ label: "A" }], rows: [{ label: "1", values: [1] }, { label: "2", values: [2] }] }
+    expect(issues(page([chart]))).toEqual([])
+    expect(issues(page([], { scenes: { numbers: { ask: "Show me", line: "Here.", blocks: [chart] } } }))).toEqual(["/scenes/numbers/blocks/0/block unknown-block"])
+    expect(issues({ schema: "feather.page/0", brand: "b.json", sections: [hero, chart] })).toEqual(["/sections/1/block needs-schema-1"])
   })
 
   it("take every one of their variants, and refuse others", () => {
@@ -141,6 +146,6 @@ describe("the media reference page", () => {
     const doc = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../../examples/studio-of-one-media.page.json"), "utf8"))
     expect(issues(doc)).toEqual([])
     const kinds = new Set((doc.sections as { block: string }[]).map((b) => b.block))
-    for (const kind of PAGE_BLOCK_NAMES.filter((k) => k !== "showreel")) expect(kinds.has(kind), kind).toBe(true)
+    for (const kind of PAGE_BLOCK_NAMES.filter((k) => k !== "showreel" && !(k in FLOW_BLOCKS))) expect(kinds.has(kind), kind).toBe(true)
   })
 })

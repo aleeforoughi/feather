@@ -22,6 +22,13 @@ import { JournalBlock } from "./journal"
 import { ShowreelBlock } from "./showreel"
 import { StoryBlock } from "./story"
 import { TestimonialsBlock } from "./testimonials"
+// Product flows (wave 5 part B): page blocks too.
+import { BookingBlock } from "./booking"
+import { CalculatorBlock } from "./calculator"
+import { ChartBlock } from "./chart"
+import { PlacesBlock } from "./places"
+import { PodcastBlock } from "./podcast"
+import { QuizBlock } from "./quiz"
 
 export type { BlockProps, BlockOf } from "./shared"
 export { mediaProps, mediaSrc, type FrameMedia } from "./media"
@@ -29,6 +36,7 @@ export { HeroBlock, StatementBlock, WorkBlock, CaseBlock, NumbersBlock, Timeline
 export { GalleryBlock, ComparisonBlock, StoryBlock, TestimonialsBlock, JournalBlock, FormBlock, ShowreelBlock }
 export { fieldProblem } from "./form"
 export { journalDate } from "./journal"
+export { QuizBlock, BookingBlock, CalculatorBlock, ChartBlock, PlacesBlock, PodcastBlock }
 
 /** The default block library: one component per kind of block (the /0 library, then the /1 page blocks). A brand may
  * replace any of them. */
@@ -54,4 +62,11 @@ export const defaultBlocks: { [K in BlockName]: React.ComponentType<BlockProps<K
   journal: JournalBlock,
   form: FormBlock,
   showreel: ShowreelBlock,
+  // Product flows (wave 5 part B): page blocks too.
+  quiz: QuizBlock,
+  booking: BookingBlock,
+  calculator: CalculatorBlock,
+  chart: ChartBlock,
+  places: PlacesBlock,
+  podcast: PodcastBlock,
 }

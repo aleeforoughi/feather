@@ -85,6 +85,11 @@ export const MEDIA_SIZES = {
   // journal: the featured entry's picture (half from lg) and a row's thumbnail (3 of 12, shown from md).
   "journal.featured": contentSizes({ base: 1, lg: 0.5 }),
   "journal.list.part": contentSizes({ base: 0.25, md: 0.25 }),
+  // Product flows: the places map (half the grid from lg, or the whole body beside a split title), and the work view
+  // switch's list thumbnail (w-24, sm:w-32).
+  "places.map": contentSizes({ base: 1, lg: 0.5 }),
+  "places.map.split": contentSizes({ base: 1, lg: 8 / 12 }),
+  "work.views-list.part": "(min-width: 640px) 8rem, 6rem",
 } as const
 
 export type MediaPlace = keyof typeof MEDIA_SIZES

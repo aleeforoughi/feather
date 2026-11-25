@@ -31,6 +31,8 @@ function field(spec: FieldSpec): Json {
       return { $ref: "#/$defs/media" }
     case "texts":
       return { type: "array", items: { type: "string" }, ...(spec.min !== undefined ? { minItems: spec.min } : {}), ...(spec.max !== undefined ? { maxItems: spec.max } : {}) }
+    case "numbers":
+      return { type: "array", items: { type: "number" }, ...(spec.min !== undefined ? { minItems: spec.min } : {}), ...(spec.max !== undefined ? { maxItems: spec.max } : {}) }
     case "vector":
       return { type: "array", minItems: spec.length, maxItems: spec.length, items: { type: "number", ...(spec.min !== undefined ? { minimum: spec.min } : {}), ...(spec.max !== undefined ? { maximum: spec.max } : {}) } }
     case "map":

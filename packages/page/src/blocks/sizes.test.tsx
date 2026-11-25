@@ -71,6 +71,10 @@ const CASES: Case[] = [
   ["story pinned", { ...BLOCKS.story, steps: BLOCKS.story.steps.map((s) => ({ ...s, media: wide(s.media) })) }, "story.pinned"],
   ["story stacked", { ...BLOCKS.story, variant: "stacked", steps: BLOCKS.story.steps.map((s) => ({ ...s, media: wide(s.media) })) }, "story.stacked"],
   ["journal featured", { ...BLOCKS.journal, variant: "featured", items: BLOCKS.journal.items.map((e) => ({ ...e, media: wide(e.media) })) }, "journal.featured"],
+  ["places map", { ...BLOCKS.places, variant: "map", media: wide(PLACEHOLDER.src, "A map") }, "places.map"],
+  ["places map, split", { ...BLOCKS.places, variant: "map", align: "split", media: wide(PLACEHOLDER.src, "A map") }, "places.map.split"],
+  ["work views, list", { ...BLOCKS.work, views: "list", items: work }, "work.views-list.part"],
+  ["work views, grid", { ...BLOCKS.work, views: "grid", items: work }, "work.grid.3"],
   ["journal list", { ...BLOCKS.journal, items: BLOCKS.journal.items.map((e) => ({ ...e, media: wide(e.media) })) }, "journal.list.part"],
 ]
 

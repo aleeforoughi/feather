@@ -17,3 +17,10 @@ export { GalleryBlock, ComparisonBlock, StoryBlock, TestimonialsBlock, JournalBl
 export { MEDIA_SIZES, contentSizes, sizesOf, type MediaPlace, type Share } from "./blocks/sizes"
 export { srcsetOf } from "./blocks/media"
 export type { MediaSrcset } from "./core/types"
+// Product flows in a page (wave 5).
+export { QuizBlock, BookingBlock, CalculatorBlock, ChartBlock, PlacesBlock, PodcastBlock } from "./blocks/index"
+export { FLOW_BLOCKS, FLOW_RANGE, FLOW_PAGE_KNOBS, QUIZ_SCORING, CALCULATOR_INPUTS, VIEW_MODES, VIEW_BLOCKS, SCHEME_TOGGLES, SCHEME_COLORS } from "./core/spec"
+export { parseFormula, evaluateFormula, formulaValue, priceOf, formatAmount, quizResult, quizScore, niceScale, FORMULA_FUNCTIONS, type FormulaNode, type ParsedFormula } from "./core/flows"
+export { SchemeToggle, SCHEME_KEY, schemeScript, schemeCss, type SchemeChoice } from "./blocks/scheme"
+export { ViewSwitch, useViewMode, viewKey, VIEW_OPTIONS } from "./blocks/views"
+export type { FlowBlock, PageScheme, ViewMode, ChartVariant, QuizQuestionSpec, QuizOptionSpec, QuizResultSpec, BookingService, BookingDay, CalculatorInputSpec, PlaceItem, PodcastEpisode } from "./core/types"

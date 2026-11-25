@@ -25,7 +25,7 @@ describe("the knobs validate", () => {
               : kind === "offer" && variant === "toggle"
                 ? { periods: ["Monthly", "Yearly"], items: [{ name: "A", prices: ["1", "10"] }] }
                 : {}
-        const media = ["split", "film", "product", "scale"].includes(variant) ? { media: "a.jpg" } : {}
+        const media = (BLOCK_RANGE[kind].needsMedia ?? []).includes(variant) ? { media: "a.jpg" } : {}
         const base = { block: kind, ...minimal(kind), ...media, ...extra, variant }
         ok(page(kind === "hero" ? [base] : [hero, base]))
       }
@@ -174,6 +174,13 @@ function minimal(kind: string): Record<string, unknown> {
     journal: { items: [{ date: "2026-01-02", title: "A", href: "/a" }] },
     form: { action: "/contact", fields: [{ name: "name", label: "Name" }] },
     showreel: { media: { src: "reel.mp4", alt: "Reel", poster: "reel.jpg" } },
+    // Product flows (wave 5 part B).
+    quiz: { title: "Q", questions: [{ id: "a", q: "A?", options: [{ id: "x", label: "X", result: "r" }, { id: "y", label: "Y", result: "r" }] }], results: [{ id: "r", title: "R" }] },
+    booking: { title: "B", services: [{ id: "s", name: "S" }], days: [{ date: "2026-12-01", slots: ["09:00"] }], action: "/book" },
+    calculator: { title: "C", inputs: [{ id: "n", label: "N", kind: "number", min: 0, max: 10 }], formula: "n * 2" },
+    chart: { title: "C", summary: "S", series: [{ label: "A" }], rows: [{ label: "1", values: [1] }, { label: "2", values: [2] }] },
+    places: { title: "P", items: [{ name: "A", address: "1 Road" }] },
+    podcast: { title: "P", episodes: [{ id: "e", title: "E", audio: "e.mp3", transcript: [{ text: "Hello" }] }] },
   }
   expect(Object.keys(req).sort()).toEqual([...Object.keys(BLOCKS), ...Object.keys(PAGE_BLOCKS)].sort())
   return req[kind]
