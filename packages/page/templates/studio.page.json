@@ -11,6 +11,7 @@
       "parking": { "title": "Resident parking", "summary": "A permit in four minutes instead of four weeks, for a city of 300,000.", "year": "2026", "role": "Service design and build", "href": "#case", "media": { "src": "media/studio-work-1.svg", "alt": "The permit flow on a phone: one question per screen" } },
       "admissions": { "title": "School admissions", "summary": "One form for every school in the county, with the deadline on every page.", "year": "2025", "role": "Product design", "href": "#work", "media": { "src": "media/studio-work-2.svg", "alt": "A ranked list of six schools, the first one highlighted" } },
       "letters": { "title": "Outpatient letters", "summary": "Hospital letters rewritten so the time, the place and what to bring come first.", "year": "2025", "role": "Content and typography", "href": "#work", "media": { "src": "media/studio-work-3.svg", "alt": "A hospital letter with the appointment set large at the top" } },
+      "bins": { "title": "Bin day", "summary": "One text the night before, for 140,000 homes: which bin, and only when it changes.", "year": "2024", "role": "Service design", "href": "#work", "media": { "src": "media/studio-work-5.svg", "alt": "A phone showing one message: blue bin tomorrow" } },
       "wayfinding": { "title": "Library wayfinding", "summary": "Signs, a type family and an app for eleven branch libraries.", "year": "2024", "role": "Identity and wayfinding", "href": "#work", "media": { "src": "media/studio-work-4.svg", "alt": "A tall library sign with floor numbers in a bold sans" } }
     }
   },
@@ -41,7 +42,7 @@
       "id": "work",
       "variant": "bento",
       "title": "Selected work",
-      "items": ["parking", "admissions", "letters", "wayfinding"]
+      "items": ["parking", "admissions", "letters", "wayfinding", "bins"]
     },
     {
       "block": "case",

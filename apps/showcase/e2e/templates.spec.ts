@@ -171,7 +171,9 @@ test.describe("the exit test: launch at loudness 3", () => {
         const file = new URL(route.request().url()).pathname
         if (file === "/") return route.fulfill({ status: 200, contentType: "text/html; charset=utf-8", body: files.index })
         if (file === "/404.html") return route.fulfill({ status: 404, contentType: "text/html; charset=utf-8", body: files.notFound })
-        return route.fulfill({ path: path.join(import.meta.dirname, file.startsWith("/media/") ? "../public" : "../dist", file) })
+        const at = path.join(import.meta.dirname, file.startsWith("/media/") ? "../public" : "../dist", file)
+        // A file the site does not have is a 404, never a request left open (the page's load would wait on it).
+        return fs.existsSync(at) ? route.fulfill({ path: at }) : route.fulfill({ status: 404, body: "" })
       })
       const page = await context.newPage()
       await page.goto("https://feather.test/")
