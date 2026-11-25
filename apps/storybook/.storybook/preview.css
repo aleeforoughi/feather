@@ -18,6 +18,8 @@
 @source "../../../packages/living/src";
 @source not "../../../packages/living/src/**/*.test.tsx";
 @source "../../../packages/page/src";
+@source "../../../packages/scene/src";
+@source not "../../../packages/scene/src/**/*.test.ts";
 @source not "../../../packages/page/src/**/*.test.tsx";
 
 /* The Foundations docs pages (apps/storybook/src). */
