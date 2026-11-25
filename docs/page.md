@@ -62,7 +62,8 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
 - **Knobs and variants (`feather.page/1`, from 1.20).** A Qooler direction is a choice of blocks, their variants and a
   few bounded knobs, themed by the brand. Every knob is an enum or a bounded number, checked by `validatePage` with a
   JSON pointer and a code, and listed in `schema/feather.page-1.json`. A knob on a `/0` page reports `needs-schema-1`.
-  - Page: `loudness` (0–3) and `defaults: { space, align, scale, crop }` (a default a block does not take is ignored
+  - Page: `loudness` (0–3), `cursor` (`native` by default, or `follower`: work links then say View) and
+    `defaults: { space, align, scale, crop }` (a default a block does not take is ignored
     for it).
   - Every block: `variant`; `loudness`; `tone` (base, subtle, raised, inverse, block-1 to block-4, from the brand's
     `/4` colour blocks); `space` and `scale` (s, m, l, xl); `align` (start, center, offset, split, as each block

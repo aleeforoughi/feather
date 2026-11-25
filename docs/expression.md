@@ -30,6 +30,20 @@ other packages.
 | `OverlayMenu` | A minimal bar whose Menu opens a full-screen list of large links | Without script a plain list; a modal dialog with focus trapped, Escape, the page `inert`, focus returned; a fade under reduced motion |
 | `SoundToggle` | One ambient bed, off until the person turns it on | `aria-pressed`; remembered; silent while the tab is hidden; static under reduced motion |
 
+## Wave 3: sound and pointer
+
+| Piece | What it does | Floor it keeps |
+|---|---|---|
+| `createMixer`, `getMixer` | One Web Audio graph: `bed`, `effects` and `ui` buses → master → low-pass → compressor (-6 dB, ratio 12); `load`, `play` (5 a second per sound at most), `loop` with `fade`, `duck`, `muffle` (20 kHz → 100 Hz over 400ms), `bands(n)` for audio-reactive visuals | Off until the person turns it on; no context before a gesture; silent at once when the tab hides; every call a safe no-op without Web Audio |
+| `SoundToggle` | The one mute: through the page's mixer, its bars follow `bands(4)` | `aria-pressed`, remembered, always in the nav when a page has sound |
+| `SoundScene` | A section's loop fades in while it fills the view | Only with sound on, a fine pointer, motion allowed and loudness 2+ |
+| `useSoundCue`, `useMuffleWhile` | A hover or press sound on any control; a muffle while an overlay is open (the OverlayMenu uses it) | Never on touch hover or key repeat; nothing when silent |
+| `Cursor` states | Elements say `data-cursor="view|drag|play|link"`; the follower grows and labels them | The native cursor stays; never on fields; fine pointer, motion allowed, loudness 2+ |
+| `PointerTilt`, `PointerField`, `PointerTrail` | A card leans toward the pointer (8° default, 12° at most); items yield within 300px (falloff 1-(d/r)²); images trail the pointer from a pool of 8 to 12 | Keyboard focus lifts instead of tilting; off on touch and reduced motion; loudness 2+ (the trail 3) |
+| `UnderlineLink`, `RollText` | An underline that draws in and out; a label that rolls to its copy | On focus-visible too; one accessible name; colour only under reduced motion |
+
+Product UI's micro-motion layer is in `@aleeforoughi/feather-react` (docs/visual-system.md §10, "Micro-motion").
+
 ## Wave 2: type, scroll and loudness
 
 | Piece | What it does | Floor it keeps |

@@ -1,5 +1,67 @@
 # Feather — changelog
 
+## 1.21.0 — 2026-11-25
+
+**Wave 3: sound, the pointer, and micro-motion on every atom.** Sound that is off until the person turns it on,
+pointer interactions that never hide the native cursor, and a finished press, toggle, loading, success and error on
+every interactive atom of product UI, with no box moving and nothing changing at rest. Values come from the award
+winners' shipped code (Qooler file 27 sections 7 and 8); the code is Feather's own, on the Web Audio API with no new
+dependency.
+
+### Sound (`@aleeforoughi/feather-expression`)
+- **`createMixer` / `getMixer`:** one Web Audio graph with three buses (`bed`, `effects`, `ui`), a master, a low-pass
+  and a compressor (-6 dB, ratio 12).
+  - Files load once, in stages.
+  - One-shots are rate-limited to 5 a second.
+  - Loops fade, buses duck, and an overlay muffles everything (20 kHz to 100 Hz over 400ms).
+  - `bands(n)` drives audio-reactive visuals.
+- **When it sounds:** nothing exists before a gesture, the tab going hidden silences it at once, and every call is a
+  safe no-op without Web Audio.
+- **`SoundToggle`** now goes through the page's mixer, and its bars follow the sound. It is the one mute, always in
+  the nav when a page has sound.
+- **`SoundScene`:** a section's loop fades in while the section fills the view.
+- **Hooks:** `useSoundCue` gives hover and press sounds (never on touch hover or key repeat). `useMuffleWhile` muffles
+  while an overlay is open, and the OverlayMenu uses it.
+
+### Pointer
+- **`Cursor` states:** any element can say `data-cursor="view|drag|play|link"` with an optional label. The follower
+  grows and labels it, never on fields, and the native cursor always stays.
+- **New components:**
+  - `PointerTilt`: leans toward the pointer, 8° by default and 12° at most; keyboard focus lifts it instead;
+  - `PointerField`: items yield within 300px, with falloff 1-(d/r)²;
+  - `PointerTrail`: a pool of 8 to 12 decorative images follows the pointer, at loudness 3;
+  - `UnderlineLink` and `RollText`.
+- **Where they run:** only on fine pointers, with motion allowed, from loudness 2.
+
+### Micro-motion on every interactive atom (`@aleeforoughi/feather-react`)
+- **Press:** goes in fast and releases over the hover duration; transform only.
+- **Toggles:**
+  - checkbox checks draw on, and radio dots grow in;
+  - switch thumbs spring with the brand's bounce only where its theme overshoots (playful brands); everywhere else they
+    keep the one curve;
+  - tabs and accordion chevrons move on the motion roles.
+- **Loading:** `Button` `loading` (`aria-busy`, still focusable, presses ignored, its box unchanged, a spinner in its
+  own colour).
+- **Errors:** fields shake once by 3px as `aria-invalid` arrives, and `FieldError` fades in.
+- **Success:** the new `FieldSuccess` (`role="status"`) draws its check.
+- **Menus:** menu marks draw on, and the success toast's icon draws.
+- **Tooltip:** leaves on its fast duration.
+- **Proof:**
+  - every touched atom's existing stories are pixel-identical at rest (296 compared);
+  - the rendered audit passes on all 79 touched stories in all 7 themes (553 runs: no box moves on hover or focus);
+  - reduced motion keeps the feedback as colour and an instant press.
+- **New stories:** `States` stories show each moment.
+
+### Pages
+- **`cursor` page knob:** `native` by default, or `follower`, which labels the work links. A page without it renders
+  byte for byte as before.
+- **The loud reference page** has a sound bed (a pad generated for the showcase) and the follower.
+- **e2e:**
+  - sound is off by default;
+  - the toggle is in the nav, reached by Tab, and remembered;
+  - the follower labels work links and never hides the native cursor;
+  - there is no follower under reduced motion.
+
 ## 1.20.0 — 2026-11-25
 
 **Wave 2: type, scroll, variety and a product you can pick up.** Kinetic type, scroll choreography, three more route
