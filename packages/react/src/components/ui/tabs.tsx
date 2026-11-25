@@ -3,6 +3,7 @@
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../../lib/cn"
+import { pressMotion } from "../../lib/micro"
 
 function Tabs({
   className,
@@ -53,15 +54,17 @@ function TabsList({
 }
 
 // A tab that stands as a control: the density's height and padding, the control radius and the label role. The active line
-// of the line variant is drawn by ::before (2px), so ::after stays the hit area (`hit-area`).
+// of the line variant is drawn by ::before (2px), so ::after stays the hit area (`hit-area`). It presses like a control
+// (section 10, "Micro-motion") and its selection fades over `motion-toggle`.
 function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
   return (
     <TabsPrimitive.Tab
       data-slot="tabs-trigger"
       className={cn(
-        "hit-area inline-flex h-control flex-1 items-center justify-center gap-2 rounded-control border border-transparent px-control type-label whitespace-nowrap text-fg-secondary motion-state group-data-vertical/tabs:w-full group-data-vertical/tabs:flex-none group-data-vertical/tabs:justify-start not-disabled:not-aria-disabled:hover:text-fg-primary disabled:cursor-not-allowed disabled:opacity-disabled aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled group-data-[variant=default]/tabs-list:data-active:shadow-1 group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-icon-slot",
+        "hit-area inline-flex h-control flex-1 items-center justify-center gap-2 rounded-control border border-transparent px-control type-label whitespace-nowrap text-fg-secondary motion-toggle group-data-vertical/tabs:w-full group-data-vertical/tabs:flex-none group-data-vertical/tabs:justify-start not-disabled:not-aria-disabled:hover:text-fg-primary disabled:cursor-not-allowed disabled:opacity-disabled aria-disabled:cursor-not-allowed aria-disabled:opacity-disabled group-data-[variant=default]/tabs-list:data-active:shadow-1 group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-icon-slot",
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:rounded-none group-data-[variant=line]/tabs-list:data-active:bg-transparent",
         "data-active:bg-surface-raised data-active:text-fg-primary",
+        pressMotion,
         "before:absolute before:bg-fg-primary before:opacity-0 before:motion-state group-data-horizontal/tabs:before:inset-x-0 group-data-horizontal/tabs:before:bottom-0 group-data-horizontal/tabs:before:h-indicator group-data-vertical/tabs:before:inset-y-0 group-data-vertical/tabs:before:right-0 group-data-vertical/tabs:before:w-indicator group-data-[variant=line]/tabs-list:data-active:before:opacity-100",
         className
       )}

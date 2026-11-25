@@ -39,7 +39,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="alert-title"
       className={cn(
-        "type-label group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-fg-primary",
+        "type-label group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-4 [&_a]:motion-hover [&_a]:hover:text-fg-primary",
         className
       )}
       {...props}
@@ -55,7 +55,7 @@ function AlertDescription({
     <div
       data-slot="alert-description"
       className={cn(
-        "type-body-sm text-balance text-fg-secondary md:text-pretty [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-fg-primary [&_p:not(:last-child)]:mb-4",
+        "type-body-sm text-balance text-fg-secondary md:text-pretty [&_a]:underline [&_a]:underline-offset-4 [&_a]:motion-hover [&_a]:hover:text-fg-primary [&_p:not(:last-child)]:mb-4",
         className
       )}
       {...props}

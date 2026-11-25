@@ -58,7 +58,7 @@ function NavigationMenuItem({
 // A trigger is a control in the frame: the density's height and padding, the control radius and the label role.
 const navigationMenuTriggerStyle = (props?: { className?: string }) =>
   cn(
-    "group/navigation-menu-trigger hit-area inline-flex h-control w-max items-center justify-center gap-2 rounded-control px-control type-label text-fg-primary motion-state hover:bg-surface-hover focus:bg-surface-hover disabled:pointer-events-none disabled:opacity-disabled data-popup-open:bg-surface-hover data-open:bg-surface-hover",
+    "group/navigation-menu-trigger hit-area inline-flex h-control w-max items-center justify-center gap-2 rounded-control px-control type-label text-fg-primary motion-state hover:bg-surface-hover focus:bg-surface-hover active:bg-surface-pressed disabled:pointer-events-none disabled:opacity-disabled data-popup-open:bg-surface-hover data-open:bg-surface-hover",
     props?.className
   )
 
@@ -134,7 +134,7 @@ function NavigationMenuLink({
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        "flex items-center gap-2 rounded-control min-h-control px-3 py-2 type-body-sm text-fg-primary motion-hover hover:bg-surface-hover focus:bg-surface-hover data-active:bg-surface-selected [&_svg:not([class*='size-'])]:size-4",
+        "flex items-center gap-2 rounded-control min-h-control px-3 py-2 type-body-sm text-fg-primary motion-hover hover:bg-surface-hover focus:bg-surface-hover active:bg-surface-pressed data-active:bg-surface-selected [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

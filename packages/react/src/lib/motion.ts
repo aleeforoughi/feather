@@ -67,3 +67,31 @@ export function useThemeMotion(role?: MotionRole): { duration: number; ease: Eas
   const m = themeMotion(role)
   return reduced ? { duration: 0, ease: m.ease, reduced } : { ...m, reduced }
 }
+
+/**
+ * Whether the theme lets a toggle overshoot, and how much: a brand with `overshoot: true` (the playful personality) writes
+ * an --ease-overshoot whose y leaves [0, 1], and its --spring-bounce (0 to 0.25). Product UI reads this for one thing only,
+ * the switch thumb (docs/visual-system.md section 10, "Micro-motion"); every other role keeps --ease-standard.
+ */
+export function themeSpring(): { overshoot: boolean; bounce: number } {
+  if (typeof window === "undefined") return { overshoot: false, bounce: 0 }
+  const css = getComputedStyle(document.documentElement)
+  const points = /cubic-bezier\(([^)]+)\)/.exec(css.getPropertyValue("--ease-overshoot"))?.[1]?.split(",").map((n) => Number.parseFloat(n))
+  return springFrom(points, Number.parseFloat(css.getPropertyValue("--spring-bounce")))
+}
+
+/** The overshoot and bounce a curve's control points and a bounce value allow (pure, so it can be tested). */
+export function springFrom(points: number[] | undefined, bounce: number): { overshoot: boolean; bounce: number } {
+  const overshoot = !!points && points.length === 4 && points.every(Number.isFinite) && [points[1], points[3]].some((y) => y < 0 || y > 1)
+  return { overshoot, bounce: overshoot && Number.isFinite(bounce) ? Math.min(Math.max(bounce, 0), 0.25) : 0 }
+}
+
+/** A toggle's travel: a spring with the brand's bounce where it overshoots, else the role's duration on the one curve. */
+export type ToggleTransition = { duration: number; ease?: Ease } | { type: "spring"; visualDuration: number; bounce: number }
+
+export function toggleTransition(m: { duration: number; ease: Ease; reduced: boolean }, spring: { overshoot: boolean; bounce: number }): ToggleTransition {
+  if (m.reduced) return { duration: 0 }
+  if (spring.overshoot && spring.bounce > 0) return { type: "spring", visualDuration: m.duration, bounce: spring.bounce }
+  return { duration: m.duration, ease: m.ease }
+}
+

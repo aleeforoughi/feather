@@ -6,7 +6,7 @@ import { cn } from "../../lib/cn"
 // A chip: a pill (the pill-semantic part, so `rounded-full`) 24px tall with the caption role. A badge that is a link reaches 44 x 44px
 // through `hit-area`. The icon sits in a 16px slot, 8px from the label.
 const badgeVariants = cva(
-  "group/badge [a]:hit-area inline-flex h-6 w-fit shrink-0 items-center justify-center gap-2 rounded-full border border-transparent px-3 type-caption font-medium whitespace-nowrap motion-hover has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 aria-invalid:border-destructive [&>svg]:pointer-events-none [&>svg]:size-4",
+  "group/badge [a]:hit-area inline-flex h-6 w-fit shrink-0 items-center justify-center gap-2 rounded-full border border-transparent px-3 type-caption font-medium whitespace-nowrap motion-hover [a]:active:press [a]:active:motion-press has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 aria-invalid:border-destructive [&>svg]:pointer-events-none [&>svg]:size-4",
   {
     variants: {
       variant: {

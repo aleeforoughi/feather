@@ -2,7 +2,10 @@
 
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { CheckIcon } from "lucide-react"
 import { cn } from "../../lib/cn"
+
+import { Icon } from "./icon"
 
 import { Label } from "./label"
 import { Separator } from "./separator"
@@ -173,6 +176,8 @@ function FieldSeparator({
   )
 }
 
+// The outcome of a field (section 10, "Micro-motion"). An error is announced (role="alert") and fades in as the control's
+// aria-invalid shakes it; a success is announced politely (role="status") with a check that draws on from the inline start.
 function FieldError({
   className,
   children,
@@ -216,10 +221,26 @@ function FieldError({
     <div
       role="alert"
       data-slot="field-error"
-      className={cn("type-body-sm text-destructive", className)}
+      className={cn("type-body-sm text-destructive motion-state starting:opacity-0", className)}
       {...props}
     >
       {content}
+    </div>
+  )
+}
+
+/** What went right with a field ("Username available", "Saved"): announced, with a check that draws on. Nothing when empty. */
+function FieldSuccess({ className, children, ...props }: React.ComponentProps<"div">) {
+  if (children === undefined || children === null || children === false || children === "") return null
+  return (
+    <div
+      role="status"
+      data-slot="field-success"
+      className={cn("flex items-center gap-2 type-body-sm text-fg-secondary motion-state starting:opacity-0", className)}
+      {...props}
+    >
+      <Icon icon={CheckIcon} size={16} aria-hidden="true" data-slot="field-success-mark" className="text-success motion-draw starting:draw-start" />
+      <span data-slot="field-success-text">{children}</span>
     </div>
   )
 }
@@ -229,6 +250,7 @@ export {
   FieldLabel,
   FieldDescription,
   FieldError,
+  FieldSuccess,
   FieldGroup,
   FieldLegend,
   FieldSeparator,

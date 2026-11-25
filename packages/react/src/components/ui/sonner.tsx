@@ -8,7 +8,8 @@ import { Icon } from "./icon"
  * Sonner injects its own unlayered stylesheet (13px text, 24px buttons, a shadow). The `!` modifiers put the system's
  * values on top of it: the type roles, the control frame and shadow level 2. The `toast` motion role (duration and curve)
  * and the focus ring are set in foundation.css, against Sonner's selectors, without `!important` so reduced motion still
- * wins. Sonner decides the enter and exit distances itself, because its stacking depends on them.
+ * wins. Sonner decides the enter and exit distances itself, because its stacking depends on them. The success icon draws
+ * on as the toast arrives (section 10, "Micro-motion"); the toast's own live region announces the text.
  */
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
@@ -18,7 +19,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       icons={{
-        success: <Icon icon={CircleCheckIcon} size={16} />,
+        success: <Icon icon={CircleCheckIcon} size={16} className="motion-draw starting:draw-start" />,
         info: <Icon icon={InfoIcon} size={16} />,
         warning: <Icon icon={TriangleAlertIcon} size={16} />,
         error: <Icon icon={OctagonXIcon} size={16} />,
