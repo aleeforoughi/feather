@@ -1,0 +1,116 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand.json",
+  "title": "Kettle Lane Cycles — bicycle servicing and repairs",
+  "description": "A two-bench bicycle workshop. Book a service online, drop the bike off on the way to work, and collect it the same evening.",
+  "lang": "en",
+  "loudness": 1,
+  "layout": "colour-blocking",
+  "nav": {
+    "brand": "Kettle Lane Cycles",
+    "items": [
+      { "label": "Services", "href": "#services" },
+      { "label": "Book", "href": "#book" },
+      { "label": "Find us", "href": "#find" },
+      { "label": "Questions", "href": "#faq" }
+    ]
+  },
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "variant": "split",
+      "eyebrow": "Bicycle workshop",
+      "title": "In by nine, riding home by six.",
+      "lede": "Drop your bike off on the way to work and collect it the same evening, serviced, cleaned and with a note of everything we did.",
+      "actions": [
+        { "label": "Book a service", "href": "#book" },
+        { "label": "See the prices", "href": "#services" }
+      ],
+      "media": { "src": "media/service-bench.svg", "alt": "A road bike on a workshop stand, its rear wheel off and tools laid out on the bench" }
+    },
+    {
+      "block": "offer",
+      "id": "services",
+      "variant": "cards",
+      "title": "Services and prices",
+      "items": [
+        { "name": "Safety check", "price": "£25", "body": "Brakes, gears, tyres and bolts checked and adjusted. Twenty minutes, while you wait.", "href": "#book" },
+        { "name": "Full service", "price": "£85", "body": "Everything in the check, plus wheels trued, drivetrain cleaned and cables replaced where worn.", "href": "#book" },
+        { "name": "Rebuild", "price": "£180", "body": "Stripped to the frame, every bearing serviced, built back up. Allow three days.", "href": "#book" }
+      ]
+    },
+    {
+      "block": "booking",
+      "id": "book",
+      "title": "Book a service",
+      "body": "Choose the service and a drop-off time. We confirm by email within the hour.",
+      "services": [
+        { "id": "check", "name": "Safety check", "duration": "20 minutes", "price": "£25", "body": "While you wait." },
+        { "id": "service", "name": "Full service", "duration": "Same day", "price": "£85", "body": "Drop off by 9:00, collect after 17:00." },
+        { "id": "rebuild", "name": "Rebuild", "duration": "Three days", "price": "£180", "body": "We call when it is ready." }
+      ],
+      "days": [
+        { "date": "2026-12-01", "slots": ["08:00", "08:30", "09:00", "12:30"] },
+        { "date": "2026-12-02", "slots": ["08:00", "09:00", "13:00"] },
+        { "date": "2026-12-03", "slots": ["08:30", "12:00", "16:00"] },
+        { "date": "2026-12-05", "label": "Saturday", "slots": ["09:00", "10:00", "11:00"] }
+      ],
+      "zone": "Times are in UK time.",
+      "ask": { "phone": true, "note": true },
+      "mailto": "workshop@example.com",
+      "confirm": "Request this time"
+    },
+    {
+      "block": "testimonials",
+      "id": "voices",
+      "variant": "grid",
+      "title": "From the people who ride in",
+      "items": [
+        { "text": "Dropped it off at 8:15, picked it up at 5:30 with a list of what they did and what can wait until spring.", "by": "Callum R.", "role": "Commutes 14 miles a day" },
+        { "text": "They told me the expensive part did not need replacing yet. That is why I keep coming back.", "by": "Aisha M.", "role": "Rides a 1989 steel tourer" },
+        { "text": "The only workshop that explains the problem on the bike, with the bike, before charging for it.", "by": "Joe and Frances", "role": "Tandem riders" }
+      ]
+    },
+    {
+      "block": "places",
+      "id": "find",
+      "title": "Find us",
+      "body": "Two benches, one street apart. Both take bookings and walk-ins.",
+      "items": [
+        { "name": "Kettle Lane", "address": "3 Kettle Lane\nYork YO1 7AA", "hours": "Monday to Friday, 8:00 to 18:00", "phone": "+44 1904 000000", "directions": "https://maps.example.com/kettle-lane", "note": "Bike parking for drop-offs at the door." },
+        { "name": "The Arches", "address": "Arch 6, Station Rise\nYork YO1 6AA", "hours": "Saturday, 9:00 to 16:00", "directions": "https://maps.example.com/the-arches" }
+      ]
+    },
+    {
+      "block": "faq",
+      "id": "faq",
+      "title": "Questions",
+      "items": [
+        { "q": "Do you work on electric bikes?", "a": "Yes, on the bike itself: brakes, gears, wheels and tyres. Motors and batteries go back to their maker, and we can send them for you." },
+        { "q": "What if it needs more than the service?", "a": "We stop and call you with a price before we do anything that costs more than £15." },
+        { "q": "Can I leave it overnight?", "a": "Yes, at no charge, indoors and insured. Most rebuilds stay with us for three nights." },
+        { "q": "Do you sell bikes?", "a": "A few second-hand ones we have rebuilt ourselves, each with a year's free safety checks." }
+      ]
+    },
+    {
+      "block": "contact",
+      "id": "contact",
+      "title": "Not sure what it needs?",
+      "body": "Send a photo and a sentence about the noise it makes. We will tell you which service, or whether it needs one at all.",
+      "actions": [
+        { "label": "Email the workshop", "href": "mailto:workshop@example.com" },
+        { "label": "Call the workshop", "href": "tel:+441904000000" }
+      ]
+    }
+  ],
+  "footer": {
+    "variant": "plain",
+    "links": [
+      { "label": "Book", "href": "#book" },
+      { "label": "Find us", "href": "#find" }
+    ],
+    "note": "Kettle Lane Cycles is an independent workshop. Prices include VAT and parts up to £10."
+  },
+  "transition": "fade"
+}

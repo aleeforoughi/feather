@@ -1,0 +1,127 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand.json",
+  "title": "Ondine — the help desk for teams of two to fifty",
+  "description": "Ondine answers the questions your customers ask most, from your own help pages, and hands the rest to a person with the whole conversation attached. Priced per seat, with no setup fee.",
+  "lang": "en",
+  "loudness": 1,
+  "layout": "two-colour",
+  "nav": {
+    "brand": "Ondine",
+    "items": [
+      { "label": "What changes", "href": "#proof" },
+      { "label": "Pricing", "href": "#pricing" },
+      { "label": "Plans", "href": "#plans" },
+      { "label": "Questions", "href": "#faq" }
+    ]
+  },
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "variant": "product",
+      "eyebrow": "Help desk",
+      "title": "Answer the same question once.",
+      "lede": "Ondine replies to the questions your customers ask every day, in your words, from your help pages, and passes everything else to the right person with the whole thread.",
+      "actions": [
+        { "label": "Start a free month", "href": "#plans" },
+        { "label": "See the pricing", "href": "#pricing" }
+      ],
+      "facts": [
+        { "label": "Setup", "value": "An afternoon" },
+        { "label": "Free trial", "value": "30 days, no card" }
+      ],
+      "media": { "src": "media/product-inbox.svg", "alt": "Ondine's inbox: three answered conversations and one waiting for a person" }
+    },
+    {
+      "block": "chart",
+      "id": "proof",
+      "variant": "area",
+      "title": "What changes in the first six months",
+      "summary": "Across 120 teams in their first six months, conversations a person had to answer fell from 1,900 a month to 780, while answered-on-their-own rose to 1,320.",
+      "series": [{ "label": "Answered by a person" }, { "label": "Answered by Ondine" }],
+      "rows": [
+        { "label": "Month 1", "values": [1900, 240] },
+        { "label": "Month 2", "values": [1610, 520] },
+        { "label": "Month 3", "values": [1320, 790] },
+        { "label": "Month 4", "values": [1080, 1010] },
+        { "label": "Month 5", "values": [900, 1190] },
+        { "label": "Month 6", "values": [780, 1320] }
+      ],
+      "axis": "Month",
+      "source": "Ondine customers who started in 2025, median per team."
+    },
+    {
+      "block": "comparison",
+      "id": "compare",
+      "title": "The same inbox, a month apart",
+      "body": "Before Ondine, every refund question waited for a person. After, only the unusual ones do. Drag the divider, or use the arrow keys.",
+      "before": { "src": "media/product-before.svg", "alt": "An inbox of forty unread conversations, most of them about refunds" },
+      "after": { "src": "media/product-after.svg", "alt": "The same inbox with six conversations left, each marked for a person" },
+      "beforeLabel": "Before",
+      "afterLabel": "A month later"
+    },
+    {
+      "block": "calculator",
+      "id": "pricing",
+      "variant": "split",
+      "title": "What it costs your team",
+      "body": "Priced per person who answers customers. Ondine's own answers are included, however many there are.",
+      "inputs": [
+        { "id": "seats", "label": "People answering", "kind": "range", "min": 1, "max": 50, "step": 1, "value": 5, "unit": "seats" },
+        { "id": "plan", "label": "Plan", "kind": "radio", "options": [{ "label": "Team, €12 a seat", "value": 12 }, { "label": "Business, €24 a seat", "value": 24 }] },
+        { "id": "yearly", "label": "Pay yearly", "kind": "toggle", "help": "Two months free." }
+      ],
+      "lines": [
+        { "id": "seat_cost", "label": "Seats", "formula": "seats * plan" },
+        { "id": "saving", "label": "Yearly saving", "formula": "0 - yearly * seats * plan / 6" }
+      ],
+      "formula": "round(seat_cost + saving)",
+      "prefix": "€",
+      "suffix": " a month",
+      "note": "Before VAT. Cancel any month; a yearly plan is refunded for the months left."
+    },
+    {
+      "block": "offer",
+      "id": "plans",
+      "variant": "table",
+      "title": "Plans",
+      "items": [
+        { "name": "Team", "price": "€12 a seat, a month", "body": "Answers from your help pages, one inbox, email and chat, and a person always one click away.", "href": "https://app.example.com/start?plan=team" },
+        { "name": "Business", "price": "€24 a seat, a month", "body": "Everything in Team, plus several inboxes, working hours, a sandbox to test answers, and single sign-on.", "href": "https://app.example.com/start?plan=business" },
+        { "name": "Charity", "price": "Free for up to 5 seats", "body": "Team, free, for registered charities and schools.", "href": "mailto:hello@example.com" }
+      ]
+    },
+    {
+      "block": "faq",
+      "id": "faq",
+      "title": "Questions",
+      "items": [
+        { "q": "What does Ondine answer from?", "a": "Only your own help pages and the replies your team marks as good. It never answers from anything else, and it says so when it does not know." },
+        { "q": "Can customers always reach a person?", "a": "Yes. Every answer ends with a way to a person, and asking for one skips Ondine entirely." },
+        { "q": "Where is our data kept?", "a": "In the EU, encrypted at rest. We never train a model on your conversations." },
+        { "q": "How long does setup take?", "a": "Most teams connect their help pages and their inbox in an afternoon, then turn answers on one topic at a time." }
+      ]
+    },
+    {
+      "block": "contact",
+      "id": "contact",
+      "title": "See it on your own inbox",
+      "body": "Thirty minutes with someone who has set up a hundred of them. Bring a week of your real questions.",
+      "actions": [
+        { "label": "Book a walkthrough", "href": "https://cal.example.com/ondine" },
+        { "label": "Start a free month", "href": "https://app.example.com/start" }
+      ]
+    }
+  ],
+  "footer": {
+    "variant": "plain",
+    "links": [
+      { "label": "Pricing", "href": "#pricing" },
+      { "label": "Plans", "href": "#plans" },
+      { "label": "Questions", "href": "#faq" }
+    ],
+    "note": "Ondine is made by a team of nine in Lisbon and Ghent."
+  },
+  "transition": "fade"
+}

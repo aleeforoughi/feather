@@ -67,3 +67,94 @@ describe("feather-page build", () => {
     for (const p of build({})) expect(p.html, p.file).not.toContain("feather-scheme")
   })
 })
+
+const bin = path.join(root, "bin/feather-page.mjs")
+/** Runs the CLI in a folder, returning its exit code and output (never throwing on a non-zero exit). */
+function cli(cwd: string, args: string[]) {
+  try {
+    const stdout = execFileSync(process.execPath, [bin, ...args], { cwd, stdio: "pipe", encoding: "utf8" })
+    return { code: 0, stdout, stderr: "" }
+  } catch (e) {
+    const err = e as { status: number; stdout: string; stderr: string }
+    return { code: err.status, stdout: String(err.stdout), stderr: String(err.stderr) }
+  }
+}
+const NAMES = ["launch", "studio", "editorial", "service", "product", "creator"]
+
+describe("feather-page init", () => {
+  it("--list lists the six templates with a line each", () => {
+    const r = cli(work, ["init", "--list"])
+    expect(r.code).toBe(0)
+    for (const name of NAMES) expect(r.stdout).toMatch(new RegExp(`^  ${name}\\s+\\S.+$`, "m"))
+  })
+
+  it("an unknown template exits non-zero with the list", () => {
+    const r = cli(work, ["init", "portfolio"])
+    expect(r.code).toBe(1)
+    expect(r.stderr).toContain('there is no template "portfolio"')
+    for (const name of NAMES) expect(r.stderr).toContain(name)
+    const none = cli(work, ["init"])
+    expect(none.code).toBe(2)
+    expect(none.stderr).toContain("launch")
+  })
+
+  it("writes the template's document, valid, to <name>.page.json or --out", () => {
+    const dir = fs.mkdtempSync(path.join(work, "init-"))
+    const r = cli(dir, ["init", "studio"])
+    expect(r.code, r.stderr).toBe(0)
+    const doc = JSON.parse(fs.readFileSync(path.join(dir, "studio.page.json"), "utf8"))
+    expect(doc).toEqual(JSON.parse(fs.readFileSync(path.join(root, "templates/studio.page.json"), "utf8")))
+    expect(r.stdout).toContain("--theme")
+    expect(cli(dir, ["validate", "studio.page.json"]).code).toBe(0)
+    expect(cli(dir, ["init", "launch", "--out", "site/page.json"]).code).toBe(0)
+    expect(fs.existsSync(path.join(dir, "site/page.json"))).toBe(true)
+  })
+
+  it("never overwrites a file without --force", () => {
+    const dir = fs.mkdtempSync(path.join(work, "init-"))
+    fs.writeFileSync(path.join(dir, "page.json"), "mine")
+    const r = cli(dir, ["init", "editorial", "--out", "page.json"])
+    expect(r.code).toBe(1)
+    expect(r.stderr).toContain("--force")
+    expect(fs.readFileSync(path.join(dir, "page.json"), "utf8")).toBe("mine")
+    expect(cli(dir, ["init", "editorial", "--out", "page.json", "--force"]).code).toBe(0)
+    expect(JSON.parse(fs.readFileSync(path.join(dir, "page.json"), "utf8")).layout).toBe("editorial")
+  })
+
+  it("with --theme, every template builds in the brand as it is written: brand points at the theme, a scheme gets its other set", () => {
+    const dir = fs.mkdtempSync(path.join(work, "init-"))
+    fs.mkdirSync(path.join(dir, "themes"))
+    fs.copyFileSync(path.join(root, "../tokens/themes/portrait.json"), path.join(dir, "themes/portrait.json"))
+    for (const name of NAMES) {
+      const r = cli(dir, ["init", name, "--out", `pages/${name}.json`, "--theme", "themes/portrait.json"])
+      expect(r.code, r.stderr).toBe(0)
+      const doc = JSON.parse(fs.readFileSync(path.join(dir, `pages/${name}.json`), "utf8"))
+      expect(doc.brand).toBe("../themes/portrait.json")
+      if (doc.scheme) expect(doc.scheme.colors.background).toBe("#241f21")
+      const built = cli(dir, ["build", `pages/${name}.json`, "--out", `out/${name}`])
+      expect(built.code, built.stderr).toBe(0)
+      const index = fs.readFileSync(path.join(dir, `out/${name}/index.html`), "utf8")
+      expect(index, name).toContain(`data-layout="${doc.layout}"`)
+      expect(index.match(/<h1[\s>]/g), name).toHaveLength(1)
+    }
+    expect(cli(dir, ["init", "launch", "--theme", "themes/missing.json"]).code).toBe(1)
+  })
+})
+
+describe("feather-page build and the layouts", () => {
+  it("refuses a layout the brand's colours cannot carry, as a contradiction at /layout", () => {
+    const dir = fs.mkdtempSync(path.join(work, "layout-"))
+    // #767676 reads at 4.54:1 on white, so the engine takes the pair; its secondary tint (80%) does not.
+    const tokens = { schema: "feather-tokens/4", colors: { primary: "#1f3fd1", background: "#ffffff", surface: "#f5f5f5", text: "#111111", blocks: [{ surface: "#ffffff", ink: "#767676" }] }, typography: { fontFamily: { display: "Inter", body: "Inter" } } }
+    fs.writeFileSync(path.join(dir, "brand.json"), JSON.stringify(tokens))
+    fs.writeFileSync(path.join(dir, "page.json"), JSON.stringify({ schema: "feather.page/1", brand: "brand.json", layout: "colour-blocking", sections: [{ block: "hero", title: "One" }, { block: "statement", title: "Two" }] }))
+    const r = cli(dir, ["build", "page.json", "--out", "out"])
+    expect(r.code).toBe(1)
+    expect(r.stderr).toMatch(/- \/layout contradiction: colour-blocking puts sections on block-1/)
+    expect(fs.existsSync(path.join(dir, "out"))).toBe(false)
+    // The same page in a brand whose blocks read builds, with the ground on the second section.
+    fs.writeFileSync(path.join(dir, "brand.json"), JSON.stringify({ ...tokens, colors: { ...tokens.colors, blocks: undefined } }))
+    expect(cli(dir, ["build", "page.json", "--out", "out"]).code).toBe(0)
+    expect(fs.readFileSync(path.join(dir, "out/index.html"), "utf8")).toMatch(/data-living-section="section-2" data-ground="block-1"/)
+  })
+})

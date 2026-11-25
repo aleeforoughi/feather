@@ -15,6 +15,7 @@
       "default": "./dist/index.js"
     },
     "./schema/*": "./schema/*",
+    "./templates/*": "./templates/*",
     "./package.json": "./package.json"
   },
   "files": [
@@ -22,6 +23,7 @@
     "src",
     "schema",
     "bin",
+    "templates",
     "!src/**/*.stories.tsx",
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
