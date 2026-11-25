@@ -2,6 +2,7 @@ import { DisplayTitle, MediaFrame, Section, Stage } from "@aleeforoughi/feather-
 import type { StoryStep, StoryVariant } from "../core/types"
 import { KnobTitle, sizeOf, useKnobs } from "./knobs"
 import { mediaProps } from "./media"
+import { sizesOf } from "./sizes"
 import { useRegion, type BlockProps } from "./shared"
 
 const num = (i: number) => String(i + 1).padStart(2, "0")
@@ -46,7 +47,7 @@ export function StoryBlock({ block }: BlockProps<"story">) {
         <ol data-slot="story-steps" role="list" className="col-span-full flex flex-col gap-16">
           {steps.map((step, i) => (
             <li key={step.title} data-slot="story-item" className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 lg:gap-12">
-              <MediaFrame aspect="4/3" {...mediaProps(step.media)} treatment={knobs.treatment} />
+              <MediaFrame aspect="4/3" {...mediaProps(step.media, undefined, sizesOf("story.stacked"))} treatment={knobs.treatment} />
               <StepText step={step} i={i} />
             </li>
           ))}
@@ -80,7 +81,7 @@ export function StoryBlock({ block }: BlockProps<"story">) {
                 radius="none"
                 className="absolute! inset-0 h-full motion-media starting:opacity-0"
                 style={{ aspectRatio: "auto" }}
-                {...mediaProps(step.media)}
+                {...mediaProps(step.media, undefined, sizesOf("story.pinned"))}
                 treatment={knobs.treatment}
               />
             </div>

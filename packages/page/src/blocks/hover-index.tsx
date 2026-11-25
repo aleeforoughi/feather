@@ -5,6 +5,7 @@ import * as React from "react"
 import { MediaFrame, useReducedMotion } from "@aleeforoughi/feather-expression"
 import type { Media } from "../core/types"
 import { mediaProps, mediaSrc } from "./media"
+import { sizesOf } from "./sizes"
 
 export interface HoverIndexEntry {
   key: string
@@ -14,10 +15,10 @@ export interface HoverIndexEntry {
 }
 
 /** The thumbnail a row shows on touch (and never on a fine pointer, where the preview follows instead). */
-export function HoverThumb({ media, slot }: { media: Media; slot: string }) {
+export function HoverThumb({ media, slot }: { media: Media; slot: "work" | "gallery" }) {
   return (
     <span data-slot={`${slot}-thumb`} className="w-24 shrink-0 pointer-fine:hidden">
-      <MediaFrame aspect="4/3" radius="control" {...mediaProps(media)} decorative />
+      <MediaFrame aspect="4/3" radius="control" {...mediaProps(media, undefined, sizesOf(`${slot}.hover-list.part`))} decorative />
     </span>
   )
 }

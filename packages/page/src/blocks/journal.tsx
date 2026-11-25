@@ -2,6 +2,7 @@ import { MediaFrame, Section, type MediaTreatment } from "@aleeforoughi/feather-
 import type { JournalEntry, JournalVariant } from "../core/types"
 import { KnobBody, KnobTitle, useKnobs } from "./knobs"
 import { mediaProps } from "./media"
+import { sizesOf } from "./sizes"
 import { join, useCursorLabel, useRegion, type BlockProps } from "./shared"
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -18,7 +19,7 @@ function Entry({ entry, lead, treatment }: { entry: JournalEntry; lead: boolean;
     <article data-slot="journal-entry" data-variant={lead ? "lead" : "row"} className={join("grid grid-cols-1 gap-6 border-t border-line-primary py-8", lead ? "lg:grid-cols-2 lg:items-end lg:gap-12" : "md:grid-cols-12 md:items-baseline")}>
       {lead && entry.media ? (
         <div data-slot="journal-media">
-          <MediaFrame aspect="16/9" {...mediaProps(entry.media)} decorative treatment={treatment} />
+          <MediaFrame aspect="16/9" {...mediaProps(entry.media, undefined, sizesOf("journal.featured"))} decorative treatment={treatment} />
         </div>
       ) : null}
       <div data-slot="journal-words" className={lead ? "flex flex-col gap-3" : "contents"}>
@@ -40,7 +41,7 @@ function Entry({ entry, lead, treatment }: { entry: JournalEntry; lead: boolean;
       </div>
       {!lead && entry.media ? (
         <div data-slot="journal-thumb" className="hidden md:col-span-3 md:block">
-          <MediaFrame aspect="4/3" radius="control" {...mediaProps(entry.media)} decorative treatment={treatment} />
+          <MediaFrame aspect="4/3" radius="control" {...mediaProps(entry.media, undefined, sizesOf("journal.list.part"))} decorative treatment={treatment} />
         </div>
       ) : null}
     </article>

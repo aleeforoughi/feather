@@ -13,3 +13,7 @@ export { SceneLayer, type SceneLayerProps } from "./blocks/scene"
 export { PAGE_BLOCKS, PAGE_BLOCK_NAMES, TREATMENTS, MOVING_TREATMENTS, FORM_FIELD_TYPES } from "./core/spec"
 export type { MediaTreatmentKnob, GalleryVariant, GalleryItem, StoryVariant, StoryStep, TestimonialsVariant, JournalVariant, JournalEntry, FormVariant, FormField, FormFieldType, PageOnlyBlock } from "./core/types"
 export { GalleryBlock, ComparisonBlock, StoryBlock, TestimonialsBlock, JournalBlock, FormBlock, ShowreelBlock, fieldProblem, journalDate } from "./blocks/index"
+// Image widths: the sizes Feather derives for a media srcset, by where the image sits.
+export { MEDIA_SIZES, contentSizes, sizesOf, type MediaPlace, type Share } from "./blocks/sizes"
+export { srcsetOf } from "./blocks/media"
+export type { MediaSrcset } from "./core/types"

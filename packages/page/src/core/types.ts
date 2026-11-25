@@ -1,6 +1,9 @@
 // The feather.page/0 document, as TypeScript. Mirrors spec.ts by hand (the validator is the authority).
 
-export type Media = string | { src: string; alt?: string; poster?: string; sources?: { src: string; type: string }[]; decorative?: boolean }
+/** An image's widths: Qooler's 800, 1600 and 2400 renditions, say. A list of { src, w } (w in px), or the same as a
+ * srcset string ("a-800.jpg 800w, a-1600.jpg 1600w"). The `sizes` is Feather's, from where the image sits. */
+export type MediaSrcset = string | { src: string; w: number }[]
+export type Media = string | { src: string; alt?: string; poster?: string; sources?: { src: string; type: string; srcset?: MediaSrcset }[]; decorative?: boolean; srcset?: MediaSrcset }
 
 export interface WorkItem {
   id: string
@@ -245,7 +248,7 @@ export interface PageDefaults {
 export interface PageIssue {
   /** A JSON pointer into the document. */
   path: string
-  code: "wrong-schema" | "needs-schema-1" | "unknown-variant" | "out-of-range" | "unsupported" | "contradiction" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker"
+  code: "wrong-schema" | "needs-schema-1" | "unknown-variant" | "out-of-range" | "unsupported" | "contradiction" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker" | "bad-srcset"
   message: string
 }
 

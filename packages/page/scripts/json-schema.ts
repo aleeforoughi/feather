@@ -4,6 +4,15 @@ import { ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, PAGE_BLOCKS, PAGE_KNOBS, ROUTE_VAR
 
 type Json = Record<string, unknown>
 
+/** An image's widths (/1): 1 to 8 { src, w }, or a srcset string of w descriptors. Feather writes the sizes. */
+const SRCSET: Json = {
+  description: "The image's widths: a list of { src, w } (w in px), or a srcset string of w descriptors (\"a-800.jpg 800w, a-1600.jpg 1600w\"). Feather derives the sizes from where the image sits.",
+  anyOf: [
+    { type: "string", pattern: "^\\s*\\S+\\s+[1-9][0-9]*w\\s*(,\\s*\\S+\\s+[1-9][0-9]*w\\s*){0,7}$" },
+    { type: "array", minItems: 1, maxItems: 8, items: { type: "object", additionalProperties: false, required: ["src", "w"], properties: { src: { type: "string" }, w: { type: "integer", minimum: 1, maximum: 10000 } } } },
+  ],
+}
+
 function field(spec: FieldSpec): Json {
   switch (spec.kind) {
     case "text":
@@ -87,7 +96,19 @@ export function pageJsonSchema(version: 0 | 1 = 1): Json {
       media: {
         anyOf: [
           { type: "string" },
-          { type: "object", required: ["src"], additionalProperties: false, properties: { src: { type: "string" }, alt: { type: "string" }, poster: { type: "string" }, decorative: { type: "boolean" }, sources: { type: "array", items: { type: "object", required: ["src", "type"], properties: { src: { type: "string" }, type: { type: "string" } } } } } },
+          {
+            type: "object",
+            required: ["src"],
+            additionalProperties: false,
+            properties: {
+              src: { type: "string" },
+              alt: { type: "string" },
+              poster: { type: "string" },
+              decorative: { type: "boolean" },
+              sources: { type: "array", items: { type: "object", required: ["src", "type"], properties: { src: { type: "string" }, type: { type: "string" }, ...(version === 1 ? { srcset: SRCSET } : {}) } } },
+              ...(version === 1 ? { srcset: SRCSET } : {}),
+            },
+          },
         ],
       },
       block: { oneOf: [...blocks, ...pageBlocks] },

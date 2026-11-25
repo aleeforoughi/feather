@@ -2,7 +2,7 @@
 // and its states; the new work and offer variants; and the film hero's poster.
 import { act, fireEvent, render, screen, within } from "@testing-library/react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest"
 import { BLOCKS, GALLERY, VARIANT_EXTRAS, WORK } from "./fixtures"
 import { ComparisonBlock } from "./comparison"
 import { FormBlock, fieldProblem } from "./form"
@@ -28,6 +28,12 @@ const poster = (m: unknown) => (m as { poster: string }).poster
 afterEach(() => vi.unstubAllGlobals())
 
 describe("gallery", () => {
+  // The lightbox's lazy chunk, fetched ahead as a pointer or focus on an image does. Its first load in jsdom (the whole
+  // feather-react module graph, cold, beside every other package's tests) is slow, and is not what is tested here.
+  beforeAll(async () => {
+    await import("./react-parts")
+  }, 60_000)
+
   it.each(["rail", "masonry", "grid", "hover-list"] as const)("%s: every image is a link to its file, with its alt text", (variant) => {
     const doc = parse(renderToStaticMarkup(<GalleryBlock block={{ ...BLOCKS.gallery, variant }} />))
     const links = [...doc.querySelectorAll<HTMLAnchorElement>('[data-slot="gallery-open"]')]
@@ -38,8 +44,6 @@ describe("gallery", () => {
   })
 
   it("opens the lightbox at the image, steps through all of them, and offers no download", async () => {
-    // The lazy chunk, fetched ahead as a pointer or focus reaches an image does (its first load in jsdom is slow).
-    await import("./react-parts")
     render(<GalleryBlock block={{ ...BLOCKS.gallery, variant: "grid" }} />)
     fireEvent.click(screen.getByRole("link", { name: GALLERY[1].media.alt }))
     await settle()

@@ -2,7 +2,8 @@ import * as React from "react"
 import { DisplayTitle, MediaFrame, Magnetic, ScrollLayers, Section, prefersSaveData, useReducedMotion } from "@aleeforoughi/feather-expression"
 import type { HeroVariant, Media, PageLink } from "../core/types"
 import { EDGE_START, PageContext, alignClass, sizeOf, useKnobs, type ResolvedKnobs } from "./knobs"
-import { ON_MEDIA, mediaProps } from "./media"
+import { ON_MEDIA, mediaProps, srcsetOf } from "./media"
+import { sizesOf } from "./sizes"
 import { SceneLayer } from "./scene"
 import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
 
@@ -82,7 +83,8 @@ function Lede({ text, className = "max-w-prose" }: { text?: string; className?: 
  * section pins. Both rest still under reduced motion and below loudness 2. */
 function FlowMedia({ media, alt, priority, knobs, pattern, className }: { media: Media; alt: string; priority: boolean; knobs: ResolvedKnobs<HeroVariant>; pattern?: string; className: string }) {
   const cropped = knobs.crop !== "none"
-  const frame = <MediaFrame aspect="21/9" priority={priority} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(media, alt)} treatment={knobs.treatment} />
+  const sizes = sizesOf(knobs.variant === "stacked" ? "hero.stacked" : "hero.giant-type", cropped)
+  const frame = <MediaFrame aspect="21/9" priority={priority} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(media, alt, sizes)} treatment={knobs.treatment} />
   const moved =
     pattern === "parallax" ? (
       <ScrollLayers variant="parallax">
@@ -90,7 +92,7 @@ function FlowMedia({ media, alt, priority, knobs, pattern, className }: { media:
       </ScrollLayers>
     ) : pattern === "scale" ? (
       <ScrollLayers variant="scale" length={2}>
-        <MediaFrame aspect="16/9" radius="none" priority={priority} {...mediaProps(media, alt)} treatment={knobs.treatment} />
+        <MediaFrame aspect="16/9" radius="none" priority={priority} {...mediaProps(media, alt, sizesOf("hero.stacked", true))} treatment={knobs.treatment} />
       </ScrollLayers>
     ) : (
       frame
@@ -171,6 +173,7 @@ function Film({ media, alt, priority }: { media: Media; alt: string; priority: b
           data-slot="hero-film-poster"
           className="block size-full object-cover"
           src={still}
+          {...(typeof media === "object" && media.srcset ? { srcSet: srcsetOf(media.srcset), sizes: sizesOf("hero.film") } : {})}
           alt={p.decorative ? "" : (p.alt ?? "")}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
@@ -306,7 +309,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
               {copy}
             </div>
             <div data-slot="hero-media" data-crop={knobs.crop}>
-              <MediaFrame aspect="4/5" radius="none" priority={priority} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
+              <MediaFrame aspect="4/5" radius="none" priority={priority} {...mediaProps(block.media, block.title, sizesOf("hero.split", true))} treatment={knobs.treatment} />
             </div>
           </div>
         </Section>
@@ -319,7 +322,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
             {copy}
           </div>
           <div data-slot="hero-media" className="lg:col-span-6">
-            <MediaFrame aspect="4/5" priority={priority} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
+            <MediaFrame aspect="4/5" priority={priority} {...mediaProps(block.media, block.title, sizesOf("hero.split"))} treatment={knobs.treatment} />
           </div>
         </div>
       </Section>
@@ -365,7 +368,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
         <div data-slot="hero-product" className="col-span-full mt-12 grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
           <Facts facts={facts.slice(0, half)} className="order-2 flex flex-col gap-6 lg:order-1 lg:col-span-3" />
           <div data-slot="hero-media" className="order-1 mx-auto w-full max-w-xl lg:order-2 lg:col-span-6">
-            <MediaFrame aspect="1/1" priority={priority} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
+            <MediaFrame aspect="1/1" priority={priority} {...mediaProps(block.media, block.title, sizesOf("hero.product"))} treatment={knobs.treatment} />
           </div>
           <Facts facts={facts.slice(half)} className="order-3 flex flex-col gap-6 lg:col-span-3 lg:text-end" />
         </div>
@@ -397,7 +400,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
     // and the title keeps its own entrance.
     return (
       <Section id={id} data-block="hero" aria-labelledby={titleId} {...knobs.section} {...(model ? {} : { reveal: false, className: "isolate overflow-hidden" })}>
-        {model ? null : <SceneLayer scene={block.scene} media={block.media} label={block.title} placement="behind" priority={priority} />}
+        {model ? null : <SceneLayer scene={block.scene} media={block.media} label={block.title} placement="behind" priority={priority} sizes={sizesOf("hero.interactive")} />}
         <div data-slot="hero-copy" className="col-span-full flex flex-col gap-8">
           <Eyebrow text={block.eyebrow} />
           {title("xl", "text-balance", block.motion?.enter ? knobs.title.effect : "mask")}
@@ -408,7 +411,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
             {acts("flex flex-wrap gap-3 lg:justify-end")}
           </div>
         </div>
-        {model ? <SceneLayer scene={block.scene} media={block.media} label={block.title} aspect="16/9" priority={priority} className="col-span-full mt-16" /> : null}
+        {model ? <SceneLayer scene={block.scene} media={block.media} label={block.title} aspect="16/9" priority={priority} sizes={sizesOf("hero.giant-type")} className="col-span-full mt-16" /> : null}
       </Section>
     )
   }

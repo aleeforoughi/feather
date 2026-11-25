@@ -2,14 +2,14 @@
   "schema": "feather.page/1",
   "brand": "brand/tokens.json",
   "title": "Alee — the studio, in pictures",
-  "description": "The studio of one, told in media: a gallery, a before and after, a story in steps, the archive on a wheel, writing, a price that switches, and a form that works with no script.",
+  "description": "The studio of one, told in media: a hero picture in three widths, a gallery, a before and after, a story in steps, the archive on a wheel, writing, a price that switches, and a form that works with no script.",
   "lang": "en",
   "loudness": 2,
   "sections": [
     {
       "block": "hero",
       "id": "top",
-      "variant": "giant-type",
+      "variant": "split",
       "eyebrow": "Design engineer",
       "title": "The work, in pictures.",
       "lede": "Products, sites and the system behind them, as they were made.",
@@ -18,7 +18,25 @@
           "label": "Start a project",
           "href": "#enquiry"
         }
-      ]
+      ],
+      "media": {
+        "src": "media/hero-1600.svg",
+        "alt": "The studio's desk, with the work laid out in pictures",
+        "srcset": [
+          {
+            "src": "media/hero-800.svg",
+            "w": 800
+          },
+          {
+            "src": "media/hero-1600.svg",
+            "w": 1600
+          },
+          {
+            "src": "media/hero-2400.svg",
+            "w": 2400
+          }
+        ]
+      }
     },
     {
       "block": "gallery",

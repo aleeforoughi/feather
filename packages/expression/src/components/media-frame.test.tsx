@@ -224,3 +224,23 @@ describe("MediaFrame treatments", () => {
     expect(container.querySelector('[data-slot="media-frame"]')!.hasAttribute("data-treatment")).toBe(false)
   })
 })
+
+describe("MediaFrame widths", () => {
+  it("writes srcset and sizes on the image, and on a picture source with its own widths", () => {
+    stubMotion(false)
+    const { container } = render(<MediaFrame src="/a.jpg" alt="x" priority srcSet="/a-800.jpg 800w, /a-1600.jpg 1600w" sizes="100vw" sources={[{ src: "/a.avif", type: "image/avif", srcSet: "/a-800.avif 800w" }]} />)
+    expect(img(container).getAttribute("srcset")).toBe("/a-800.jpg 800w, /a-1600.jpg 1600w")
+    expect(img(container).getAttribute("sizes")).toBe("100vw")
+    expect(img(container).getAttribute("fetchpriority")).toBe("high")
+    const source = container.querySelector("source")!
+    expect(source.getAttribute("srcset")).toBe("/a-800.avif 800w")
+    expect(source.getAttribute("sizes")).toBe("100vw")
+  })
+
+  it("writes no sizes without a srcset", () => {
+    stubMotion(false)
+    const { container } = render(<MediaFrame src="/a.jpg" alt="x" sizes="100vw" />)
+    expect(img(container).hasAttribute("sizes")).toBe(false)
+    expect(img(container).hasAttribute("srcset")).toBe(false)
+  })
+})

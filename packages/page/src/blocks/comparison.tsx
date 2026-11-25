@@ -2,6 +2,7 @@ import * as React from "react"
 import { MediaFrame, Section } from "@aleeforoughi/feather-expression"
 import { EDGE_START, KnobBody, KnobTitle, useKnobs } from "./knobs"
 import { mediaProps } from "./media"
+import { sizesOf } from "./sizes"
 import { join, useRegion, type BlockProps } from "./shared"
 
 /** Where the divider starts, in percent from the start edge, when the page does not say. */
@@ -37,11 +38,11 @@ export function ComparisonBlock({ block }: BlockProps<"comparison">) {
       style={{ ["--split" as string]: `${value}%` }}
     >
       <div data-slot="comparison-before" className="relative aspect-square min-w-0 scripting:aspect-video">
-        <MediaFrame aspect="16/9" className="h-full" style={{ aspectRatio: "auto" }} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.before, before)} />
+        <MediaFrame aspect="16/9" className="h-full" style={{ aspectRatio: "auto" }} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.before, before, sizesOf("comparison.slider", cropped))} />
         <Chip>{before}</Chip>
       </div>
       <div data-slot="comparison-after" className="relative aspect-square min-w-0 scripting:absolute scripting:inset-0 scripting:aspect-auto scripting:[clip-path:inset(0_0_0_var(--split))]">
-        <MediaFrame aspect="16/9" className="h-full" style={{ aspectRatio: "auto" }} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.after, after)} />
+        <MediaFrame aspect="16/9" className="h-full" style={{ aspectRatio: "auto" }} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.after, after, sizesOf("comparison.slider", cropped))} />
         <Chip end>{after}</Chip>
       </div>
       {/* The divider and its grip: decoration that follows the range. */}

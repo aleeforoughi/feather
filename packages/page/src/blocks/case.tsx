@@ -2,6 +2,7 @@ import { DisplayTitle, MediaFrame, ScrollLayers, Section, Split } from "@aleefor
 import type { CaseVariant } from "../core/types"
 import { EDGE_START, alignClass, sizeOf, useKnobs } from "./knobs"
 import { mediaProps } from "./media"
+import { sizesOf } from "./sizes"
 import { SceneLayer } from "./scene"
 import { useRegion, type BlockProps } from "./shared"
 
@@ -47,7 +48,7 @@ export function CaseBlock({ block }: BlockProps<"case">) {
     return (
       <Section id={id} data-block="case" aria-labelledby={titleId} grid={false} {...knobs.section}>
         <ScrollLayers variant="scale" caption={text} {...(block.scroll?.length ? { length: block.scroll.length } : {})}>
-          <MediaFrame aspect="16/9" radius="none" {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
+          <MediaFrame aspect="16/9" radius="none" {...mediaProps(block.media, block.title, sizesOf("case.scale"))} treatment={knobs.treatment} />
         </ScrollLayers>
       </Section>
     )
@@ -55,8 +56,9 @@ export function CaseBlock({ block }: BlockProps<"case">) {
   const pattern = block.scroll?.pattern
   const scene = block.scene
   const frame = (radius?: "none") => {
-    if (scene) return <SceneLayer scene={scene} media={block.media} label={block.title} />
-    const media = block.media ? <MediaFrame aspect="4/3" {...(radius ? { radius } : {})} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} /> : null
+    const sizes = sizesOf("case.editorial", knobs.crop !== "none")
+    if (scene) return <SceneLayer scene={scene} media={block.media} label={block.title} sizes={sizes} />
+    const media = block.media ? <MediaFrame aspect="4/3" {...(radius ? { radius } : {})} {...mediaProps(block.media, block.title, sizes)} treatment={knobs.treatment} /> : null
     return pattern === "parallax" && media ? (
       <ScrollLayers variant="parallax">
         <ScrollLayers.Layer depth={0.9}>{media}</ScrollLayers.Layer>

@@ -15,7 +15,7 @@ import { allows, capabilityGate, loudnessOf, onReducedMotionChange, pickQuality,
 import { depthImage, shaderBackground, useScene, type SceneRenderer, type ShaderPreset } from "@aleeforoughi/feather-scene"
 import type { ObjectViewer, ScreenHotspot } from "@aleeforoughi/feather-scene/three"
 import type { BlockScene, Media } from "../core/types"
-import { mediaProps } from "./media"
+import { mediaProps, srcsetOf } from "./media"
 import { BUTTON_QUIET, join } from "./shared"
 
 export interface SceneLayerProps {
@@ -30,6 +30,8 @@ export interface SceneLayerProps {
   aspect?: "4/3" | "16/9" | "1/1"
   /** The poster is the page's LCP: it loads eagerly, at high priority. */
   priority?: boolean
+  /** How wide the poster is drawn (sizes.ts), for the media's srcset. */
+  sizes?: string
   className?: string
 }
 
@@ -74,11 +76,13 @@ const FIELDS: Record<ShaderPreset | "default", string> = {
 const srcOf = (m: Media | undefined): string | undefined => (m === undefined ? undefined : typeof m === "string" ? m : m.src)
 
 /** The poster: the block's image (or its video's poster), else the theme's field. */
-function Poster({ scene, media, priority }: { scene: BlockScene; media?: Media; priority: boolean }) {
+function Poster({ scene, media, priority, sizes }: { scene: BlockScene; media?: Media; priority: boolean; sizes?: string }) {
   const p = media ? mediaProps(media) : null
   const image = p ? (p.video ? (typeof media === "object" ? media.poster : undefined) : p.src) : undefined
+  // The media's widths (its poster's, for a video), with the place's sizes; nothing is written without them.
+  const widths = typeof media === "object" && media.srcset ? { srcSet: srcsetOf(media.srcset), ...(sizes ? { sizes } : {}) } : {}
   if (image) {
-    return <img data-slot="scene-poster" data-variant="media" src={image} alt="" decoding="async" className="size-full object-cover" {...(priority ? { loading: "eager" as const, fetchPriority: "high" as const } : { loading: "lazy" as const })} />
+    return <img data-slot="scene-poster" data-variant="media" src={image} {...widths} alt="" decoding="async" className="size-full object-cover" {...(priority ? { loading: "eager" as const, fetchPriority: "high" as const } : { loading: "lazy" as const })} />
   }
   const field = scene.kind === "shader" ? FIELDS[(scene.preset as ShaderPreset | undefined) ?? "gradient-noise"] ?? FIELDS.default : FIELDS.default
   return <div data-slot="scene-poster" data-variant="field" className="size-full" style={{ background: field }} />
@@ -209,7 +213,7 @@ function useScrollDrive(ref: React.RefObject<HTMLElement | null>, renderer: Scen
  * its parts as buttons over the canvas and its finishes as a radio group; everything else is a field behind the words
  * or in the block's frame. A scene that moves on its own has a pause control (WCAG 2.2.2).
  */
-export function SceneLayer({ scene, media, label, placement = "frame", aspect = "4/3", priority = false, className }: SceneLayerProps) {
+export function SceneLayer({ scene, media, label, placement = "frame", aspect = "4/3", priority = false, sizes, className }: SceneLayerProps) {
   const root = React.useRef<HTMLDivElement>(null)
   const quality = useSceneQuality(root, scene.quality)
   const live = quality !== "static"
@@ -220,7 +224,7 @@ export function SceneLayer({ scene, media, label, placement = "frame", aspect = 
   const [paused, setPaused] = React.useState(false)
   const running = renderer !== null && world.quality !== "static"
   const moves = scene.kind !== "rail"
-  const still = <Poster scene={scene} media={media} priority={priority} />
+  const still = <Poster scene={scene} media={media} priority={priority} sizes={sizes} />
   const p = media ? mediaProps(media) : null
   const description = p && !p.decorative ? p.alt : undefined
   // The label says what a press does (as the film hero's control does), so it is not also a pressed toggle.

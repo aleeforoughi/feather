@@ -144,6 +144,26 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   painted over the media scrim until it decodes, so the copy over it (held at 4.5:1 by the scrim) reads from the first
   paint. The film arrives after mount, only with motion allowed and off data saver; under reduced motion and on data
   saver the poster stays alone with a visible Play control (Pause while it plays). With no script it is the poster.
+- **Image widths (`srcset`, from 1.23).** A media object (and each of its `sources`) takes `srcset`: a list of 1 to 8
+  `{ src, w }` (`w` a whole number of px), or the same as a srcset string of `w` descriptors
+  (`"hero-800.jpg 800w, hero-1600.jpg 1600w"`). Each URL is checked as a media `src`. The `sizes` is never the
+  caller's: Feather derives it from where the image sits (`MEDIA_SIZES` in `src/blocks/sizes.ts`, one table: the
+  block, its variant, its crop, and the page grid's content width at each breakpoint, capped at 1344px). Examples:
+  - a split hero is half the grid from 1024px (`(min-width: 1440px) 672px, …, calc(100vw - 2rem)`), or 50vw when
+    cropped;
+  - anything full bleed, the film hero and the pinned story are `100vw`;
+  - work's grid cards go by their column count;
+  - the gallery's rail is `(min-width: 640px) 24rem, 20rem`, its wheel 20rem, and masonry and grid go by their
+    columns.
+
+  The server writes `<img srcset sizes>` (and `<source srcset sizes>`); the LCP image keeps `fetchpriority="high"`.
+  A video's `srcset` is its poster's (the film hero's and a scene's poster use it). Without a srcset the markup is
+  exactly as before. Codes:
+  - `bad-srcset`: a rendition that is not `{ src, w }`, a src that is not a safe path, a width that is not a whole
+    number from 1 to 10000 or is given twice, or a string candidate that is not `url Nw`;
+  - `too-few` and `too-many`: the count of renditions;
+  - `type`: neither a list nor a string;
+  - `needs-schema-1`: a srcset on a `/0` page.
 - **MediaFrame's placeholder (from 1.23).** Every frame is painted from the theme until its media decodes: the subtle
   surface, or the media scrim for film. It is a CSS background (so it holds with no script, and nothing shifts: the
   frame's box is its aspect), and the frame drops it once its media is ready.
@@ -160,4 +180,4 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
 ## Codes
 
 `wrong-schema`, `not-object`, `missing`, `type`, `too-long`, `unknown-block`, `unknown-field`, `too-few`, `too-many`,
-`bad-href`, `bad-media`, `unknown-ref`, `unknown-scene`, `duplicate-id`, `no-speaker`.
+`bad-href`, `bad-media`, `unknown-ref`, `unknown-scene`, `duplicate-id`, `no-speaker`, `bad-srcset`.

@@ -35,7 +35,8 @@ async function scrollThrough(page: Page) {
 
 /** Brings a block to the top of the view (by script: a page with pins never counts as stable for Playwright's own). */
 async function scrollTo(page: Page, selector: string) {
-  await page.evaluate((s) => document.querySelector(s)?.scrollIntoView({ block: "start" }), selector)
+  // Instantly: the page scrolls smoothly by default, and a measure taken mid-scroll would be stale.
+  await page.evaluate((s) => document.querySelector(s)?.scrollIntoView({ block: "start", behavior: "instant" }), selector)
   await page.waitForTimeout(300)
 }
 
@@ -303,5 +304,33 @@ test.describe("form", () => {
     await page.locator('#enquiry [data-slot="form-submit"]').click()
     await expect.poll(() => posts.length).toBe(1)
     expect(Object.fromEntries(new URLSearchParams(posts[0]))).toMatchObject({ name: "Ada", email: "ada@example.com", budget: "Over €30k", start: "This month", message: "A calmer bank." })
+  })
+})
+
+test.describe("hero widths", () => {
+  test("on a phone the hero picks its smallest rendition, at high priority, from the sizes Feather derives", async ({ browser }) => {
+    // A 390px phone at 2x: the split hero is drawn 358px wide (the grid's 1rem margins), so 716 device pixels, which
+    // the 800w file covers. Without sizes the browser would assume 100vw.
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })
+    const page = await context.newPage()
+    const files: string[] = []
+    page.on("request", (r) => /hero-\d+\.svg/.test(r.url()) && files.push(new URL(r.url()).pathname.split("/").pop()!))
+    await page.goto(url("studio"), { waitUntil: "networkidle" })
+    const img = page.locator('#top [data-slot="hero-media"] img')
+    await expect(img).toHaveAttribute("sizes", /calc\(100vw - 2rem\)$/)
+    await expect(img).toHaveAttribute("fetchpriority", "high")
+    expect(await img.evaluate((el) => (el as HTMLImageElement).currentSrc)).toMatch(/hero-800\.svg$/)
+    expect(await img.evaluate((el) => Math.round(el.getBoundingClientRect().width))).toBe(358)
+    expect(files).toEqual(["hero-800.svg"])
+    await context.close()
+  })
+
+  test("on a wide screen it takes the rendition half the grid needs", async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 })
+    const page = await context.newPage()
+    await page.goto(url("portrait"), { waitUntil: "networkidle" })
+    // Half of the 1344px content: 672px, which the 800w file covers at 1x.
+    expect(await page.locator('#top [data-slot="hero-media"] img').evaluate((el) => (el as HTMLImageElement).currentSrc)).toMatch(/hero-800\.svg$/)
+    await context.close()
   })
 })

@@ -16,6 +16,50 @@ export function isSafeMedia(v: string): boolean {
   return !/^\s*(javascript|vbscript):/i.test(v) && /^(https:\/\/|\/(?!\/)|\.{1,2}\/|[A-Za-z0-9_-])/.test(v)
 }
 
+/** Whether media may carry a srcset: the document is /1 (set at the start of each validatePage, which is synchronous). */
+let widthsAllowed = true
+
+/** The most renditions a srcset lists, and the widest a w descriptor may be (px). */
+export const SRCSET_MAX = 8
+export const SRCSET_MAX_WIDTH = 10000
+
+/** An image's widths (`srcset`): a list of 1 to 8 { src, w }, or the same as a srcset string of w descriptors. Each URL
+ * is checked as a media src; each width is a whole number of px, given once. A malformed entry is `bad-srcset`. */
+function checkSrcset(path: string, v: unknown, add: Add) {
+  if (!widthsAllowed) return add(path, "needs-schema-1", 'srcset is a field of feather.page/1; set "schema": "feather.page/1"')
+  const seen = new Set<number>()
+  const width = (at: string, w: unknown) => {
+    if (typeof w !== "number" || !Number.isInteger(w) || w < 1 || w > SRCSET_MAX_WIDTH) return add(at, "bad-srcset", `a width is a whole number of px, 1 to ${SRCSET_MAX_WIDTH}`)
+    if (seen.has(w)) add(at, "bad-srcset", `the width ${w} is listed twice`)
+    seen.add(w)
+  }
+  const count = (n: number) => {
+    if (n < 1) add(path, "too-few", "at least 1")
+    if (n > SRCSET_MAX) add(path, "too-many", `at most ${SRCSET_MAX}`)
+  }
+  if (Array.isArray(v)) {
+    count(v.length)
+    v.forEach((c, i) => {
+      if (!isObject(c)) return add(`${path}/${i}`, "bad-srcset", "a rendition is { src, w }")
+      for (const k of Object.keys(c)) if (k !== "src" && k !== "w") add(`${path}/${i}/${esc(k)}`, "bad-srcset", "a rendition is { src, w }")
+      if (typeof c.src !== "string" || !isSafeMedia(c.src) || /[\s,]/.test(c.src)) add(`${path}/${i}/src`, "bad-srcset", "a rendition's src is a path or an https URL, with no spaces or commas")
+      width(`${path}/${i}/w`, c.w)
+    })
+    return
+  }
+  if (typeof v !== "string") return add(path, "type", "srcset is a list of { src, w }, or a srcset string (\"a-800.jpg 800w, a-1600.jpg 1600w\")")
+  const candidates = v.split(",").map((c) => c.trim())
+  count(candidates.filter(Boolean).length)
+  for (const c of candidates) {
+    const m = /^(\S+)\s+([1-9]\d*)w$/.exec(c)
+    if (!m || !isSafeMedia(m[1])) {
+      add(path, "bad-srcset", `"${c}" is not a candidate: a path or an https URL, a space, and its width ("a-800.jpg 800w")`)
+      continue
+    }
+    width(path, Number(m[2]))
+  }
+}
+
 export function validatePage(input: unknown): PageResult {
   const issues: PageIssue[] = []
   const add = (path: string, code: PageIssue["code"], message: string) => issues.push({ path, code, message })
@@ -35,6 +79,7 @@ export function validatePage(input: unknown): PageResult {
   if (doc.transition !== undefined) checkField("/transition", doc.transition, { kind: "enum", values: ROUTE_VARIANTS }, {}, add)
   for (const [k, spec] of Object.entries(PAGE_KNOBS)) if (doc[k] !== undefined) checkField(`/${k}`, doc[k], spec, {}, add)
   const ctx: BlockContext = { v1: doc.schema !== "feather.page/0", pageLoudness: typeof doc.loudness === "number" ? doc.loudness : undefined }
+  widthsAllowed = ctx.v1
 
   if (doc.speaker !== undefined) {
     const s = doc.speaker
@@ -331,6 +376,8 @@ function checkField(path: string, v: unknown, spec: FieldSpec, library: Record<s
       const src = typeof v === "string" ? v : isObject(v) ? v.src : undefined
       if (typeof src !== "string" || !isSafeMedia(src)) return add(path, "bad-media", "media is a path or an https URL, or { src, alt, poster, sources }")
       if (isObject(v) && v.alt === undefined && v.decorative !== true) add(`${path}/alt`, "missing", "media needs alt text, or decorative: true")
+      if (isObject(v) && v.srcset !== undefined) checkSrcset(`${path}/srcset`, v.srcset, add)
+      if (isObject(v) && Array.isArray(v.sources)) v.sources.forEach((s, i) => isObject(s) && s.srcset !== undefined && checkSrcset(`${path}/sources/${i}/srcset`, s.srcset, add))
       return
     }
     case "texts":

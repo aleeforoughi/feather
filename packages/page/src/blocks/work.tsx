@@ -3,17 +3,18 @@ import type { WorkItem, WorkVariant } from "../core/types"
 import { KnobBody, KnobTitle, useKnobs } from "./knobs"
 import { HoverIndex, HoverThumb } from "./hover-index"
 import { ON_MEDIA, mediaProps } from "./media"
+import { sizesOf } from "./sizes"
 import { BlockTitle, CardBody, join, useCursorLabel, useRegion, type BlockProps } from "./shared"
 
 const toItem = (item: string | WorkItem): WorkItem => (typeof item === "string" ? { id: item, title: item } : item)
 const metaOf = (item: WorkItem) => [item.role, item.year].filter(Boolean).join(" · ")
 
-function WorkCard({ item, treatment = "clean" }: { item: WorkItem; treatment?: MediaTreatment }) {
+function WorkCard({ item, treatment = "clean", sizes }: { item: WorkItem; treatment?: MediaTreatment; sizes?: string }) {
   const meta = metaOf(item)
   return (
     <article data-slot="work-item" className="min-w-0">
       <CardBody {...(item.href ? { href: item.href } : {})}>
-        {item.media ? <MediaFrame aspect="4/3" {...mediaProps(item.media)} treatment={treatment} /> : null}
+        {item.media ? <MediaFrame aspect="4/3" {...mediaProps(item.media, undefined, sizes)} treatment={treatment} /> : null}
         <div data-slot="work-meta" className="mt-4 flex flex-col gap-2">
           <h3 data-slot="work-title" className="type-title text-fg-primary">
             {item.title}
@@ -43,7 +44,7 @@ function WorkPanel({ item, wide, treatment }: { item: WorkItem; wide: boolean; t
         <div data-slot="work-panel" className={join("grid grid-cols-1 gap-6", wide && "lg:grid-cols-12 lg:items-center")}>
           {item.media ? (
             <div data-slot="work-panel-media" className={wide ? "lg:col-span-7" : undefined}>
-              <MediaFrame aspect="4/3" {...mediaProps(item.media)} treatment={treatment} />
+              <MediaFrame aspect="4/3" {...mediaProps(item.media, undefined, sizesOf(wide ? "work.stack" : "work.rail"))} treatment={treatment} />
             </div>
           ) : null}
           <div data-slot="work-meta" className={join("flex flex-col gap-3", wide && "lg:col-span-5")}>
@@ -138,7 +139,7 @@ function FullscreenCase({ item, treatment }: { item: WorkItem; treatment: MediaT
   )
   return (
     <article data-slot="work-item" data-variant="case" className="relative isolate flex min-h-svh flex-col justify-end overflow-hidden text-ink-on-media media-placeholder-scrim" style={ON_MEDIA}>
-      {item.media ? <MediaFrame aspect="16/9" radius="none" placeholder="scrim" {...mediaProps(item.media)} treatment={treatment} className="absolute! inset-0 h-full" style={{ aspectRatio: "auto" }} /> : null}
+      {item.media ? <MediaFrame aspect="16/9" radius="none" placeholder="scrim" {...mediaProps(item.media, undefined, sizesOf("work.fullscreen-cases"))} treatment={treatment} className="absolute! inset-0 h-full" style={{ aspectRatio: "auto" }} /> : null}
       <div data-slot="work-case-scrim" aria-hidden="true" className="absolute inset-0 bg-media-scrim" />
       {item.href ? (
         <a href={item.href} data-slot="work-link" className="group relative flex min-h-svh flex-col justify-end focus-ring">
@@ -168,6 +169,9 @@ function bentoCell(i: number, n: number): { span: number; rows: number } {
   return BENTO[i < BENTO.length ? i : 3 + ((i - 3) % 5)]
 }
 
+/** The sizes place of a bento cell, by its span of 12. */
+const bentoPlace = (cell: { span: number; rows: number }) => (cell.rows > 1 ? "work.bento.lead" : cell.span >= 12 ? "work.bento.full" : cell.span >= 6 ? "work.bento.half" : "work.bento.third")
+
 /** bento: the work as a mosaic (expression's Bento), the first piece leading. */
 function WorkBento({ items, treatment }: { items: WorkItem[]; treatment: MediaTreatment }) {
   return (
@@ -181,7 +185,7 @@ function WorkBento({ items, treatment }: { items: WorkItem[]; treatment: MediaTr
             <article data-slot="work-item" data-variant={lead ? "lead" : "cell"} className="h-full min-w-0">
               <CardBody {...(item.href ? { href: item.href } : {})}>
                 <div data-slot="work-cell" className="flex h-full flex-col gap-4">
-                  {item.media ? <MediaFrame aspect={lead ? "4/3" : "16/9"} {...mediaProps(item.media)} treatment={treatment} /> : null}
+                  {item.media ? <MediaFrame aspect={lead ? "4/3" : "16/9"} {...mediaProps(item.media, undefined, sizesOf(bentoPlace(cell)))} treatment={treatment} /> : null}
                   <div data-slot="work-meta" className="mt-auto flex flex-col gap-2">
                     <h3 data-slot="work-title" className={lead ? "type-heading-1 text-fg-primary" : "type-title text-fg-primary"}>
                       {item.title}
@@ -228,7 +232,7 @@ export function WorkBlock({ block }: BlockProps<"work">) {
         {block.title ? <BlockTitle id={titleId}>{block.title}</BlockTitle> : null}
         <Grid columns={items.length === 1 || items.length === 2 || items.length === 4 ? 2 : 3}>
           {items.map((item) => (
-            <WorkCard key={item.id} item={item} />
+            <WorkCard key={item.id} item={item} sizes={sizesOf(items.length === 1 || items.length === 2 || items.length === 4 ? "work.grid.2" : "work.grid.3")} />
           ))}
         </Grid>
       </Section>
@@ -239,6 +243,7 @@ export function WorkBlock({ block }: BlockProps<"work">) {
       {block.title}
     </KnobTitle>
   ) : null
+  const columns = knobs.align === "split" ? 2 : items.length === 1 || items.length === 2 || items.length === 4 ? 2 : 3
   if (v === "fullscreen-cases") {
     return (
       <Section id={id} data-block="work" {...labelled} grid={false} {...knobs.section}>
@@ -280,9 +285,9 @@ export function WorkBlock({ block }: BlockProps<"work">) {
         ) : v === "bento" ? (
           <WorkBento items={items} treatment={knobs.treatment} />
         ) : (
-          <Grid columns={knobs.align === "split" ? 2 : items.length === 1 || items.length === 2 || items.length === 4 ? 2 : 3}>
+          <Grid columns={columns}>
             {items.map((item) => (
-              <WorkCard key={item.id} item={item} treatment={knobs.treatment} />
+              <WorkCard key={item.id} item={item} treatment={knobs.treatment} sizes={sizesOf(columns === 2 ? "work.grid.2" : "work.grid.3")} />
             ))}
           </Grid>
         )}

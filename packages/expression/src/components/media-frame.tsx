@@ -37,6 +37,8 @@ export interface MediaSource {
   src: string
   /** The MIME type: image/avif, image/webp, video/mp4; codecs="hvc1", video/webm; codecs="vp9"... */
   type: string
+  /** An image source's widths ("a-800.avif 800w, a-1600.avif 1600w"), chosen with the frame's `sizes`. */
+  srcSet?: string
 }
 
 export interface MediaVideo {
@@ -71,6 +73,10 @@ export interface MediaFrameProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   placeholder?: MediaPlaceholder
   /** An image treatment (images only: a video is always clean). */
   treatment?: MediaTreatment
+  /** The image's widths ("a-800.jpg 800w, a-1600.jpg 1600w"): the browser picks the smallest that fills the frame. */
+  srcSet?: string
+  /** How wide the frame is drawn, for `srcSet` (its caller knows where the frame sits). Written only with a srcSet. */
+  sizes?: string
 }
 
 const PAUSE_AFTER = 5
@@ -136,7 +142,7 @@ type TreatmentState = "css" | "script" | null
  * (poster and a play button). `treatment` adds an image treatment (MediaTreatment).
  */
 export const MediaFrame = React.forwardRef<HTMLDivElement, MediaFrameProps>(function MediaFrame(
-  { aspect = "16/9", radius = "card", priority = false, src, sources, alt, decorative = false, video, width, height, placeholder = "surface", treatment = "clean", className, style, ...props },
+  { aspect = "16/9", radius = "card", priority = false, src, sources, alt, decorative = false, video, width, height, placeholder = "surface", treatment = "clean", srcSet, sizes, className, style, ...props },
   forwarded
 ) {
   const root = React.useRef<HTMLDivElement>(null)
@@ -261,7 +267,7 @@ export const MediaFrame = React.forwardRef<HTMLDivElement, MediaFrameProps>(func
       ) : (
         <picture data-slot="media-frame-picture">
           {sources?.map((s) => (
-            <source key={s.src + s.type} data-slot="media-frame-source" srcSet={s.src} type={s.type} />
+            <source key={s.src + s.type} data-slot="media-frame-source" srcSet={s.srcSet ?? s.src} {...(s.srcSet && sizes ? { sizes } : {})} type={s.type} />
           ))}
           <img
             ref={image}
@@ -269,6 +275,7 @@ export const MediaFrame = React.forwardRef<HTMLDivElement, MediaFrameProps>(func
             className={mediaClass}
             style={mediaStyle}
             src={src}
+            {...(srcSet ? { srcSet, ...(sizes ? { sizes } : {}) } : {})}
             alt={decorative ? "" : (alt ?? "")}
             width={width}
             height={height}

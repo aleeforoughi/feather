@@ -5,6 +5,7 @@ import type { GalleryItem, GalleryVariant } from "../core/types"
 import { HoverIndex, HoverThumb } from "./hover-index"
 import { KnobBody, KnobTitle, scrollAllowed, useKnobs } from "./knobs"
 import { mediaProps, mediaSrc } from "./media"
+import { sizesOf } from "./sizes"
 import { join, useRegion, type BlockProps } from "./shared"
 
 // feather-react's Lightbox comes from the page's lazy chunk of parts (react-parts.tsx), on the first open; a pointer
@@ -82,7 +83,7 @@ function Rail({ items, onOpen, treatment, label, loop }: VariantProps & { loop: 
         {items.map((item, i) => (
           <figure key={i} data-slot="gallery-item" className="flex w-xs flex-col gap-3 sm:w-sm">
             <Opener item={item} index={i} onOpen={onOpen} className="rounded-card">
-              <MediaFrame aspect="4/5" {...mediaProps(item.media)} treatment={treatment} />
+              <MediaFrame aspect="4/5" {...mediaProps(item.media, undefined, sizesOf("gallery.rail"))} treatment={treatment} />
             </Opener>
             <Caption item={item} />
           </figure>
@@ -99,7 +100,7 @@ function Masonry({ items, onOpen, treatment }: VariantProps) {
         <li key={i} data-slot="gallery-item" className="mb-6 break-inside-avoid">
           <figure data-slot="gallery-figure" className="flex flex-col gap-3">
             <Opener item={item} index={i} onOpen={onOpen} className="rounded-card">
-              <MediaFrame aspect={MASONRY[i % MASONRY.length]} {...mediaProps(item.media)} treatment={treatment} />
+              <MediaFrame aspect={MASONRY[i % MASONRY.length]} {...mediaProps(item.media, undefined, sizesOf("gallery.masonry"))} treatment={treatment} />
             </Opener>
             <Caption item={item} />
           </figure>
@@ -118,7 +119,7 @@ function GridVariant({ items, onOpen, treatment }: VariantProps) {
         <li key={i} data-slot="gallery-item" className="min-w-0">
           <figure data-slot="gallery-figure" className="group relative">
             <Opener item={item} index={i} onOpen={onOpen} className="rounded-card">
-              <MediaFrame aspect="1/1" {...mediaProps(item.media)} treatment={treatment} />
+              <MediaFrame aspect="1/1" {...mediaProps(item.media, undefined, sizesOf("gallery.grid"))} treatment={treatment} />
             </Opener>
             {item.title || item.caption ? (
               <figcaption
@@ -270,7 +271,7 @@ function Wheel({ items, onOpen, treatment, label }: VariantProps) {
                 style={{ transform: `rotateY(${i * angle}deg) translateZ(${radius}rem)`, backfaceVisibility: "hidden" }}
               >
                 <Opener item={item} index={i} onOpen={onOpen} className="h-full rounded-card" draggable={false}>
-                  <MediaFrame aspect="4/5" {...mediaProps(item.media)} treatment={treatment} />
+                  <MediaFrame aspect="4/5" {...mediaProps(item.media, undefined, sizesOf("gallery.wheel"))} treatment={treatment} />
                 </Opener>
               </li>
             )
