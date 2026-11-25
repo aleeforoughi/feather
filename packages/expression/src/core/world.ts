@@ -96,6 +96,9 @@ export interface WorldRenderer {
   /** Work to do before the first frame (compile each material, build geometry), one task per frame behind the
    * loader: pass `world.prewarm()` to the loader's tasks. */
   prewarm?(): FrameTask[]
+  /** Whether the last frame really drew the scene. While it is false (a photo or a model still loading) the World
+   * keeps showing its still, never an empty canvas. Without it, the first frame counts as ready. */
+  readonly drawn?: boolean
 }
 
 export interface WorldController {

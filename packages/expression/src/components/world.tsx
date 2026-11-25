@@ -57,8 +57,10 @@ export const World = React.forwardRef<HTMLDivElement, WorldProps>(function World
       frame(frame) {
         if (pausedRef.current) return false
         const more = renderer.frame(frame)
-        setReady(true)
-        return more
+        // A renderer that says it has not drawn yet (an asset still loading) keeps the still up.
+        if (renderer.drawn !== false) setReady(true)
+        // Keep asking for frames until it has drawn, so the still hands over as soon as it can.
+        return more || renderer.drawn === false
       },
       resize: renderer.resize ? (frame) => renderer.resize?.(frame) : undefined,
       dispose: () => renderer.dispose?.(),
