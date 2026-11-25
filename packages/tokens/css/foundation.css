@@ -1138,6 +1138,19 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   outline: 1px solid color-mix(in oklab, var(--text-primary) 10%, transparent);
   outline-offset: -1px;
 }
+/* MediaFrame's placeholder (feather-expression): until its media decodes, the frame is painted from the theme, so it
+   is never an empty box: the subtle surface (bg-surface-subtle), or for film the media scrim over the inverse
+   surface, the ground its copy reads on before the first frame. A background, so it holds with no script; once the
+   media is ready (data-state, set by script) the frame drops it, unless the duotone needs it as an ink. */
+@utility media-placeholder-scrim {
+  background-color: var(--surface-inverse);
+  background-image: linear-gradient(var(--media-scrim), var(--media-scrim));
+}
+[data-slot="media-frame"][data-state="ready"]:not([data-treatment="duotone"]),
+[data-slot="hero-film"][data-state="ready"] {
+  background-color: transparent;
+  background-image: none;
+}
 /* Glass (surface axis): for overlays only. Without the glass surface the blur is 0 and the fill opaque. */
 @utility overlay-surface {
   background-color: var(--overlay-fill);

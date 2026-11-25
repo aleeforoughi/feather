@@ -3,6 +3,8 @@ import { cn } from "../cn"
 import { useReducedMotion } from "../hooks"
 import { onReducedMotionChange } from "../core/motion"
 
+const useIsoLayoutEffect = typeof window === "undefined" ? React.useEffect : React.useLayoutEffect
+
 /** The duration (s) used before the content has been measured, and where it cannot be (no layout). */
 const FALLBACK_SECONDS = 40
 
@@ -101,25 +103,71 @@ export interface ReelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "c
   "aria-label": string
   previousLabel?: string
   nextLabel?: string
+  /** An endless reel: a copy of the items on each side, hidden from assistive technology and never focusable, and
+   * the track moved back by one set (instantly) whenever it settles in a copy. Tab still leaves it, and the copies
+   * come only after mount, so with no script it is the plain reel. */
+  loop?: boolean
 }
 
 /** Reel: a horizontal scroll reel with snap points. Keyboard scrollable, with previous and next buttons. It never
  * moves on its own, so it needs no pause. */
-export const Reel = React.forwardRef<HTMLDivElement, ReelProps>(function Reel({ children, previousLabel = "Previous", nextLabel = "Next", className, "aria-label": label, ...props }, ref) {
+export const Reel = React.forwardRef<HTMLDivElement, ReelProps>(function Reel({ children, previousLabel = "Previous", nextLabel = "Next", loop = false, className, "aria-label": label, ...props }, ref) {
   const scroller = React.useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = React.useState(true)
+  const [looping, setLooping] = React.useState(false)
   React.useEffect(() => {
     const read = () => setReduced(typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches || !!scroller.current?.closest('[data-motion="reduced"]'))
     read()
     return onReducedMotionChange(read)
   }, [])
+  const count = React.Children.count(children)
+  React.useEffect(() => setLooping(loop && count > 1), [loop, count])
+
+  // The width of one set of items, and where the real set starts.
+  const measure = React.useCallback(() => {
+    const el = scroller.current
+    const items = el ? [...el.querySelectorAll<HTMLElement>(':scope > [data-slot="reel-item"]')] : []
+    if (!el || items.length < count * 3) return null
+    return { start: items[count].offsetLeft - items[0].offsetLeft, set: items[count * 2].offsetLeft - items[count].offsetLeft }
+  }, [count])
+
+  useIsoLayoutEffect(() => {
+    const el = scroller.current
+    const m = measure()
+    if (!looping || !el || !m) return
+    el.scrollLeft = m.start
+    // Settled inside a copy: move back (or on) by one set, with no animation, so the same item stays in view.
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const settle = () => {
+      const now = measure()
+      if (!now || now.set <= 0) return
+      if (el.scrollLeft < now.start - 1) el.scrollLeft += now.set
+      else if (el.scrollLeft >= now.start + now.set - 1) el.scrollLeft -= now.set
+    }
+    const onScroll = () => {
+      clearTimeout(timer)
+      timer = setTimeout(settle, 120)
+    }
+    el.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      clearTimeout(timer)
+      el.removeEventListener("scroll", onScroll)
+    }
+  }, [looping, measure])
+
   const by = (direction: 1 | -1) => {
     const el = scroller.current
     if (!el) return
     el.scrollBy?.({ left: direction * el.clientWidth * 0.8, behavior: reduced ? "auto" : "smooth" })
   }
+  const items = (copy: boolean) =>
+    React.Children.map(children, (child) => (
+      <div data-slot="reel-item" data-variant={copy ? "copy" : undefined} aria-hidden={copy ? true : undefined} inert={copy ? true : undefined} className="shrink-0 snap-start">
+        {child}
+      </div>
+    ))
   return (
-    <div ref={ref} data-slot="reel" className={cn("flex flex-col gap-4", className)} {...props}>
+    <div ref={ref} data-slot="reel" data-variant={looping ? "loop" : undefined} className={cn("flex flex-col gap-4", className)} {...props}>
       <div
         ref={scroller}
         data-slot="reel-track"
@@ -128,11 +176,9 @@ export const Reel = React.forwardRef<HTMLDivElement, ReelProps>(function Reel({ 
         tabIndex={0}
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto focus-ring"
       >
-        {React.Children.map(children, (child) => (
-          <div data-slot="reel-item" className="shrink-0 snap-start">
-            {child}
-          </div>
-        ))}
+        {looping ? items(true) : null}
+        {items(false)}
+        {looping ? items(true) : null}
       </div>
       <div data-slot="reel-controls" className="flex gap-2">
         <button type="button" data-slot="reel-previous" className={BUTTON} onClick={() => by(-1)}>

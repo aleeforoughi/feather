@@ -138,3 +138,89 @@ describe("MediaFrame video", () => {
     expect(container.querySelector('[data-slot="media-frame"]')!.getAttribute("data-variant")).toBe("video")
   })
 })
+
+describe("MediaFrame placeholder", () => {
+  it("paints the theme's surface until the image is ready, with no script (a class on the frame)", async () => {
+    stubMotion(false)
+    const { container } = render(<MediaFrame src="/a.jpg" alt="x" />)
+    const frame = container.querySelector('[data-slot="media-frame"]')!
+    expect(frame.className).toContain("bg-surface-subtle")
+    await settle()
+    // Mounted, not yet decoded: loading; the load event makes it ready (foundation.css then drops the background).
+    expect(frame.getAttribute("data-state")).toBe("loading")
+    fireEvent.load(img(container))
+    expect(frame.getAttribute("data-state")).toBe("ready")
+  })
+
+  it("is ready at once when the image decoded before the script ran", async () => {
+    stubMotion(false)
+    const complete = vi.spyOn(HTMLImageElement.prototype, "complete", "get").mockReturnValue(true)
+    const width = vi.spyOn(HTMLImageElement.prototype, "naturalWidth", "get").mockReturnValue(800)
+    const { container } = render(<MediaFrame src="/a.jpg" alt="x" />)
+    await settle()
+    expect(container.querySelector('[data-slot="media-frame"]')!.getAttribute("data-state")).toBe("ready")
+    complete.mockRestore()
+    width.mockRestore()
+  })
+
+  it("film frames take the scrim", () => {
+    stubMotion(false)
+    const { container } = render(<MediaFrame src="/a.jpg" alt="x" placeholder="scrim" />)
+    const frame = container.querySelector('[data-slot="media-frame"]')!
+    expect(frame.className).toContain("media-placeholder-scrim")
+    expect(frame.className).not.toContain("bg-surface-subtle")
+    expect(frame.getAttribute("data-placeholder")).toBe("scrim")
+  })
+})
+
+describe("MediaFrame treatments", () => {
+  it("clean writes nothing extra", async () => {
+    stubMotion(false)
+    const { container } = render(<MediaFrame src="/a.jpg" alt="x" treatment="clean" />)
+    await settle()
+    const frame = container.querySelector('[data-slot="media-frame"]')!
+    expect(frame.hasAttribute("data-treatment")).toBe(false)
+    expect(container.querySelector("style")).toBeNull()
+  })
+
+  it("duotone and grain are still layers over the image, hidden from assistive technology", async () => {
+    stubMotion(false)
+    const duo = render(<MediaFrame src="/a.jpg" alt="x" treatment="duotone" />)
+    expect(duo.container.querySelector('[data-slot="media-frame-duotone"]')?.getAttribute("aria-hidden")).toBe("true")
+    expect(img(duo.container).className).toContain("grayscale")
+    duo.unmount()
+    const grain = render(<MediaFrame src="/a.jpg" alt="x" treatment="grain" />)
+    const layer = grain.container.querySelector<HTMLElement>('[data-slot="media-frame-grain"]')!
+    expect(layer.className).toContain("film-grain")
+    expect(layer.style.opacity).toContain("0.16")
+    expect(img(grain.container).getAttribute("alt")).toBe("x")
+  })
+
+  it("the moving ones rest under reduced motion and on the LCP image", async () => {
+    stubMotion(true)
+    const reduced = render(<MediaFrame src="/a.jpg" alt="x" treatment="clip-reveal" />)
+    await settle()
+    expect(reduced.container.querySelector('[data-slot="media-frame"]')!.hasAttribute("data-treatment-state")).toBe(false)
+    reduced.unmount()
+    stubMotion(false)
+    const lcp = render(<MediaFrame src="/a.jpg" alt="x" treatment="inner-parallax" priority />)
+    await settle()
+    expect(lcp.container.querySelector('[data-slot="media-frame"]')!.hasAttribute("data-treatment-state")).toBe(false)
+  })
+
+  it("clip-reveal runs on the reveal role where the browser has no scroll timeline", async () => {
+    stubMotion(false)
+    const { container } = render(<MediaFrame src="/a.jpg" alt="x" treatment="clip-reveal" />)
+    await settle()
+    const frame = container.querySelector('[data-slot="media-frame"]')!
+    expect(frame.getAttribute("data-treatment")).toBe("clip-reveal")
+    expect(frame.getAttribute("data-treatment-state")).toBe("script")
+  })
+
+  it("a video is always clean", async () => {
+    stubMotion(false)
+    const { container } = render(<MediaFrame src="/c.mp4" alt="x" video={{}} treatment="duotone" />)
+    await settle()
+    expect(container.querySelector('[data-slot="media-frame"]')!.hasAttribute("data-treatment")).toBe(false)
+  })
+})

@@ -6,7 +6,7 @@ export { Section, type SectionProps, type SectionSpace, type SectionTone } from 
 export { Stage, STAGE_MAX_LENGTH, type StageProps } from "./components/stage"
 export { Split, Grid, Bento, BentoCell, type SplitProps, type SplitRatio, type GridProps, type GridColumns, type BentoProps, type BentoCellProps } from "./components/layout"
 export { DisplayTitle, type DisplayEffect, type DisplayTitleProps, type DisplaySize, type DisplaySplit } from "./components/display-title"
-export { MediaFrame, type MediaFrameProps, type MediaAspect, type MediaRadius, type MediaSource, type MediaVideo } from "./components/media-frame"
+export { MediaFrame, MEDIA_TREATMENTS, INNER_PARALLAX, MEDIA_GRAIN, type MediaFrameProps, type MediaAspect, type MediaRadius, type MediaSource, type MediaVideo, type MediaPlaceholder, type MediaTreatment } from "./components/media-frame"
 export { Marquee, Reel, type MarqueeProps, type ReelProps } from "./components/marquee"
 export { Counter, type CounterProps } from "./components/counter"
 export { Magnetic, Cursor, type MagneticProps, type CursorProps } from "./components/magnetic"

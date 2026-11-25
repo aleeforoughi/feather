@@ -28,3 +28,24 @@ export const ReducedMotion: Story = {
   args: Video.args,
   render: (args) => <div data-motion="reduced"><MediaFrame {...args} /></div>,
 }
+
+/** The placeholder: the frame is painted from the theme (the subtle surface) until its image decodes. This image never
+ * arrives, so the placeholder is what stays. */
+export const Placeholder: Story = { args: { src: "/never-arrives.jpg", alt: "A photograph still on its way" } }
+/** The film placeholder: the media scrim over the inverse surface, the ground copy over a film reads on. */
+export const PlaceholderScrim: Story = { args: { src: "/never-arrives.jpg", alt: "A film still on its way", placeholder: "scrim" } }
+
+const TREATMENTS = ["clip-reveal", "inner-parallax", "blur-to-sharp", "duotone", "grain"] as const
+/** Every image treatment, side by side (the moving ones rest under reduced motion). */
+export const Treatments: Story = {
+  render: (args) => (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {TREATMENTS.map((t) => (
+        <figure key={t} className="flex flex-col gap-2">
+          <MediaFrame {...args} aspect="4/3" treatment={t} />
+          <figcaption className="type-caption text-fg-secondary">{t}</figcaption>
+        </figure>
+      ))}
+    </div>
+  ),
+}

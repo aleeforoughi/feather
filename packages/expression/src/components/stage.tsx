@@ -162,13 +162,14 @@ export const Stage = React.forwardRef<HTMLElement, StageProps>(function Stage({ 
             <div ref={frame} data-slot="stage-frame" className="sticky top-0 col-start-1 row-start-1 h-dvh w-full self-start overflow-hidden" style={{ ["--stage-progress" as string]: 1 }}>
               {visual(progress, active)}
             </div>
+            {/* One step per row (each starts at the first column), so the steps pass one at a time. */}
             <ol ref={list} data-slot="stage-steps" className="pointer-events-none relative col-start-1 row-start-1 page-grid">
               {steps.map((content, i) => (
                 <li
                   key={i}
                   data-slot="stage-step"
                   data-state={i === active ? "active" : "inactive"}
-                  className={cn("col-span-full flex items-end pb-12 sm:col-span-6 sm:items-center sm:pb-0 lg:col-span-5", snap && "snap-center")}
+                  className={cn("col-span-full flex items-end pb-12 sm:col-span-6 sm:col-start-1 sm:items-center sm:pb-0 lg:col-span-5", snap && "snap-center")}
                   style={{ minHeight: slot }}
                 >
                   <div data-slot="stage-step-panel" className="pointer-events-auto w-full rounded-card bg-surface-raised p-6 text-fg-primary shadow-2">

@@ -50,6 +50,12 @@ export function pickQuality(h: DeviceHints): Quality {
 }
 
 /** The hints of this browser. */
+/** Whether the visitor asked to save data (Save-Data, `navigator.connection.saveData`): heavy media then stays a poster. */
+export function prefersSaveData(): boolean {
+  if (typeof navigator === "undefined") return false
+  return (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true
+}
+
 export function deviceHints(): DeviceHints {
   if (typeof window === "undefined") return { reducedMotion: true }
   const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number }
@@ -62,7 +68,7 @@ export function deviceHints(): DeviceHints {
   }
   return {
     reducedMotion: prefersReducedMotion(),
-    saveData: nav.connection?.saveData === true,
+    saveData: prefersSaveData(),
     webgl,
     cores: nav.hardwareConcurrency,
     memory: nav.deviceMemory,
