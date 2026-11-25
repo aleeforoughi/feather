@@ -2,6 +2,8 @@
 // Seed. Only the tokens change. The model is off: the starters play the prepared scenes.
 //   ?brand=studio|portrait|seed   the brand
 //   ?page=loud                    the loud reference page (loudness 3, the expressive variants); default the reference page
+//   ?page=media                   the media reference page (loudness 2: gallery, comparison, story, testimonials, the
+//                                 wheel, journal, the toggle offer and the form)
 //   ?view=404                     the page's 404 route (PageNotFound)
 //   ?loader=counter|dock          adds the page's loader (wave 1 e2e; the budget pages run without one)
 //   ?sound=1                      adds an ambient bed (the nav's toggle) and the loader's sound choice
@@ -19,12 +21,13 @@ import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
 import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
 import reference from "../../../packages/page/examples/studio-of-one.page.json"
 import loud from "../../../packages/page/examples/studio-of-one-loud.page.json"
+import media from "../../../packages/page/examples/studio-of-one-media.page.json"
 import "./sites.css"
 
 const BRANDS: Record<string, { dark: boolean; tokens: unknown }> = { studio, portrait, seed }
 const params = new URLSearchParams(location.search)
 const loader = params.get("loader")
-const doc = params.get("page") === "loud" ? loud : reference
+const doc = params.get("page") === "loud" ? loud : params.get("page") === "media" ? media : reference
 
 const withSound = params.get("sound") === "1"
 const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && "scene" in b && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
