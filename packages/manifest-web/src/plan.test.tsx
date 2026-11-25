@@ -166,22 +166,21 @@ describe("focus", () => {
     expect(document.activeElement).toBe(document.body)
   })
 
-  it("lands on plan.focus and nowhere else, for every fixture in every context", () => {
-    for (const { name, ir } of FIXTURES) {
-      for (const [context, { context: ctx }] of Object.entries(REFERENCE_CONTEXTS)) {
-        const composed = compose(ir, ctx)
-        if (!composed.ok) throw new Error(`${name} is invalid`)
-        const { container, unmount } = render(<FeatherExperience experience={ir} context={ctx} onReply={vi.fn()} />)
-        const at = `${name} in ${context}`
-        if (composed.plan.focus === null || composed.plan.manifestation !== "web") {
-          expect(document.activeElement, at).toBe(document.body)
-        } else {
-          const host = container.querySelector(`[data-feather-node="${composed.plan.focus}"]`)
-          expect(host?.contains(document.activeElement), at).toBe(true)
-          expect(document.activeElement, at).not.toBe(host)
-        }
-        unmount()
+  // One test per fixture, each in every context, so a busy runner times one fixture, not the whole corpus at once.
+  it.each(FIXTURES.map((f) => [f.name, f.ir] as const))("lands on plan.focus and nowhere else: %s, in every context", (name, ir) => {
+    for (const [context, { context: ctx }] of Object.entries(REFERENCE_CONTEXTS)) {
+      const composed = compose(ir, ctx)
+      if (!composed.ok) throw new Error(`${name} is invalid`)
+      const { container, unmount } = render(<FeatherExperience experience={ir} context={ctx} onReply={vi.fn()} />)
+      const at = `${name} in ${context}`
+      if (composed.plan.focus === null || composed.plan.manifestation !== "web") {
+        expect(document.activeElement, at).toBe(document.body)
+      } else {
+        const host = container.querySelector(`[data-feather-node="${composed.plan.focus}"]`)
+        expect(host?.contains(document.activeElement), at).toBe(true)
+        expect(document.activeElement, at).not.toBe(host)
       }
+      unmount()
     }
   })
 
