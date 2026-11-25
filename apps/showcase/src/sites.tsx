@@ -6,6 +6,8 @@
 //                                 wheel, journal, the toggle offer and the form)
 //   ?page=flows                   the product-flows page (wave 5): quiz, calculator, charts, booking, podcast, places, the
 //                                 work's view switch and the colour scheme toggle (each brand with its other colour set)
+//   ?template=<name>              one of the six page templates (wave 5: launch, studio, editorial, service, product,
+//                                 creator), each with its own layout; overrides ?page
 //   ?view=404                     the page's 404 route (PageNotFound)
 //   ?loader=counter|dock          adds the page's loader (wave 1 e2e; the budget pages run without one)
 //   ?sound=1                      adds an ambient bed (the nav's toggle) and the loader's sound choice
@@ -25,6 +27,12 @@ import reference from "../../../packages/page/examples/studio-of-one.page.json"
 import loud from "../../../packages/page/examples/studio-of-one-loud.page.json"
 import media from "../../../packages/page/examples/studio-of-one-media.page.json"
 import flows from "../../../packages/page/examples/studio-of-one-flows.page.json"
+import launch from "../../../packages/page/templates/launch.page.json"
+import studioTemplate from "../../../packages/page/templates/studio.page.json"
+import editorial from "../../../packages/page/templates/editorial.page.json"
+import service from "../../../packages/page/templates/service.page.json"
+import product from "../../../packages/page/templates/product.page.json"
+import creator from "../../../packages/page/templates/creator.page.json"
 import schemes from "./schemes.json"
 import "./sites.css"
 
@@ -32,7 +40,10 @@ const BRANDS: Record<string, { dark: boolean; tokens: unknown }> = { studio, por
 const params = new URLSearchParams(location.search)
 const loader = params.get("loader")
 const pageParam = params.get("page")
-const doc = (pageParam === "loud" ? loud : pageParam === "flows" ? flows : pageParam === "media" ? media : reference) as typeof reference
+const TEMPLATES: Record<string, unknown> = { launch, studio: studioTemplate, editorial, service, product, creator }
+const template = params.get("template")
+if (template !== null && !TEMPLATES[template]) throw new Error(`?template=${template}: the templates are ${Object.keys(TEMPLATES).join(", ")}`)
+const doc = (template ? TEMPLATES[template] : pageParam === "loud" ? loud : pageParam === "flows" ? flows : pageParam === "media" ? media : reference) as typeof reference
 
 const withSound = params.get("sound") === "1"
 const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && "scene" in b && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
