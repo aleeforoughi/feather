@@ -35,7 +35,8 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   - scenes bring one to three blocks;
   - `living.prepared` names real scenes;
   - the honesty floor: a page with a living layer names its speaker, and a custom disclosure must say it is an AI
-    agent.
+    agent. Without one (from 1.23) a living page shows "An AI agent speaking for {speaker.name}" (`pageDisclosure`),
+    which holds to the same rule (`DISCLOSURE_RULE`).
 - **The block library** is the Living Page's (Qooler file 22 §3): `hero`, `statement`, `work`, `case`, `numbers`,
   `timeline`, `process`, `logos`, `quote`, `offer`, `faq`, `contact`, and one `signature` block per brand. It is the
   same set as `@aleeforoughi/feather-living`'s `BLOCK_KINDS`, and a test holds them equal. An answer is built only
