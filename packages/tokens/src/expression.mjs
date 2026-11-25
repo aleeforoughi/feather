@@ -167,6 +167,21 @@ export function checkFont(slot, value, foundation, problems, { preloadable = fal
   return { kind: "open", ...value, files }
 }
 
+/** Each local fallback face and its metric-compatible twins: the same advance widths and vertical metrics under another
+ * name, so a fallback still matches where the original is not installed (Liberation and Croscore fonts ship on
+ * Linux, ChromeOS and most containers; Arial and Times do not). */
+export const LOCAL_TWINS = {
+  Arial: ["Arial", "Liberation Sans", "Arimo"],
+  Helvetica: ["Helvetica", "Arial", "Liberation Sans", "Arimo"],
+  "Helvetica Neue": ["Helvetica Neue", "Helvetica", "Arial", "Liberation Sans", "Arimo"],
+  "Times New Roman": ["Times New Roman", "Liberation Serif", "Tinos"],
+  Georgia: ["Georgia", "Gelasio"],
+  "Courier New": ["Courier New", "Liberation Mono", "Cousine"],
+}
+
+/** The `src` of a fallback face: the local face, then its twins. */
+export const localSources = (face) => (LOCAL_TWINS[face] ?? [face]).map((f) => `local("${f}")`).join(", ")
+
 /** The family stack of an open font: the face, its metric-matched fallback, then the generic family. */
 export const openStack = (font, generic) => `"${font.family}", "${font.family} Fallback", ${font.generic ?? generic}`
 
@@ -178,7 +193,7 @@ export function fontFaces(font, defaultDisplay) {
   })
   const fb = font.fallback
   faces.push(
-    `@font-face {\n  font-family: "${font.family} Fallback";\n  src: local("${fb.family}");\n  size-adjust: ${fb.sizeAdjust}%;\n  ascent-override: ${fb.ascentOverride}%;\n  descent-override: ${fb.descentOverride}%;\n  line-gap-override: ${fb.lineGapOverride ?? 0}%;\n}`
+    `@font-face {\n  font-family: "${font.family} Fallback";\n  src: ${localSources(fb.family)};\n  size-adjust: ${fb.sizeAdjust}%;\n  ascent-override: ${fb.ascentOverride}%;\n  descent-override: ${fb.descentOverride}%;\n  line-gap-override: ${fb.lineGapOverride ?? 0}%;\n}`
   )
   return faces
 }
@@ -267,7 +282,7 @@ export function expressionTheme(tokens, ctx, problems) {
         // shifts nothing. Older documents keep their stack byte for byte.
         stacks[slot] = `"${name}", "${name} Fallback", ${slot === "mono" ? "monospace" : generic}`
         open.add(slot)
-        const face = `@font-face {\n  font-family: "${name} Fallback";\n  src: local("${fb.family}");\n  size-adjust: ${fb.sizeAdjust}%;\n  ascent-override: ${fb.ascentOverride}%;\n  descent-override: ${fb.descentOverride}%;\n  line-gap-override: ${fb.lineGapOverride}%;\n}`
+        const face = `@font-face {\n  font-family: "${name} Fallback";\n  src: ${localSources(fb.family)};\n  size-adjust: ${fb.sizeAdjust}%;\n  ascent-override: ${fb.ascentOverride}%;\n  descent-override: ${fb.descentOverride}%;\n  line-gap-override: ${fb.lineGapOverride}%;\n}`
         if (!faces.includes(face)) faces.push(face)
       } else stacks[slot] = `"${name}", ${slot === "mono" ? "monospace" : generic}`
       continue
