@@ -4,14 +4,16 @@
 // (--surface-base, --text-primary, …) inside the section, it never writes a colour.
 import * as React from "react"
 import { DisplayTitle, HOUSE, allows, loudnessOf, reveal, type DisplayEffect, type DisplaySize, type MediaTreatment, type SectionSpace, type SectionTone } from "@aleeforoughi/feather-expression"
-import { BLOCK_RANGE, KINETIC_ENTERS } from "../core/spec"
-import type { BlockAlign, BlockCrop, BlockMotion, BlockScale, BlockTone, Knobs, PageDefaults } from "../core/types"
+import { BLOCK_RANGE, KINETIC_ENTERS, SECONDARY_INK } from "../core/spec"
+import type { BlockAlign, BlockCrop, BlockMotion, BlockScale, BlockTone, Knobs, PageDefaults, PageLayout } from "../core/types"
 import { BlockTitle, join } from "./shared"
 
 /** What a block may know about the page around it: the page's defaults, and the index of its sections (the index
  * hero lists them). FeatherPage provides it; a block rendered alone sees none. */
 export interface PageContextValue {
   defaults?: PageDefaults
+  /** The page's layout: a two-colour page gives its images the duotone treatment unless they name another. */
+  layout?: PageLayout
   index?: { id: string; title: string }[]
 }
 export const PageContext = React.createContext<PageContextValue>({})
@@ -27,7 +29,7 @@ function scope(ground: string, ink: string): Vars {
     "--surface-raised": `color-mix(in oklab, ${ink} 10%, ${ground})`,
     "--surface-hover": `color-mix(in oklab, ${ink} 14%, ${ground})`,
     "--text-primary": ink,
-    "--text-secondary": `color-mix(in oklab, ${ink} 80%, ${ground})`,
+    "--text-secondary": `color-mix(in oklab, ${ink} ${SECONDARY_INK}%, ${ground})`,
     "--border-primary": `color-mix(in oklab, ${ink} 28%, ${ground})`,
     "--primary": ink,
     "--primary-foreground": ground,
@@ -147,7 +149,7 @@ export function useKnobs<V extends string>(kind: string, block: Knobs & { varian
     scale,
     crop,
     section,
-    treatment: range.treatment ? (block.treatment ?? "clean") : "clean",
+    treatment: range.treatment ? (block.treatment ?? (page.layout === "two-colour" ? "duotone" : "clean")) : "clean",
     title: { effect: titleEffect(block.motion), ...(stillTitle(block.motion) ? { "data-loudness": "0" } : {}) },
     any,
   }

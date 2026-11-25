@@ -324,7 +324,11 @@ export interface PageDocument {
   defaults?: PageDefaults
   /** The colour scheme toggle (wave 5): light, dark and system. */
   scheme?: PageScheme
+  /** The page's layout (wave 5 part C): a structural expression over every block (LAYOUTS in spec.ts). */
+  layout?: PageLayout
 }
+
+export type PageLayout = "editorial" | "swiss" | "brutalist" | "poster" | "colour-blocking" | "two-colour"
 
 export interface PageDefaults {
   space?: BlockSpace

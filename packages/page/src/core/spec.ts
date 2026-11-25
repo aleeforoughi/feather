@@ -416,6 +416,36 @@ export const BLOCK_RANGE: Record<string, BlockRange> = {
   signature: { variants: null, aligns: ["start", "center"], scroll: ["reveal", "parallax"], crop: true, scale: true, treatment: true },
 }
 
+/**
+ * The page layouts (feather.page/1 `layout`, wave 5 part C; range proposal section 5 G). Each is structure, never a
+ * colour: grid placement, alignment, rhythm, section grounds and rules, written in foundation.css against
+ * `main[data-layout]` and the theme's own tokens. Every block works under every layout; where a block cannot follow
+ * one, it keeps its own form (LAYOUT_SKIPS).
+ * - editorial: asymmetric. From 1024px every other section hangs from column 4, so the reading line steps across the
+ *   page; the block titles are set larger.
+ * - swiss: a strict grid. A hairline rule on the grid's measure opens every section, a numbered index beside each
+ *   title (decoration: the numbers are not read), square corners and no shadows.
+ * - brutalist: heavy rules in the ink between sections, every border in the ink, square corners, no shadows, a
+ *   thicker focus ring and the titles in the brand's mono face.
+ * - poster: every section a full screen, its content set in the middle, the block titles at display size.
+ * - colour-blocking: every other section on the next of the theme's colour blocks (block-1 to block-4, in turn). Each
+ *   pair is measured (the ink and the secondary ink on the ground, 4.5:1); a brand that cannot meet it is a
+ *   `contradiction`.
+ * - two-colour: the ground and one ink only (with the ink's own tints, as in two-colour print): the brand's primary
+ *   where it and its secondary tint read at 4.5:1 on the ground, else the text colour. Images take the duotone
+ *   treatment unless they name another. State colours (an error) keep their own.
+ */
+export const LAYOUTS = ["editorial", "swiss", "brutalist", "poster", "colour-blocking", "two-colour"] as const
+/** The colour blocks colour-blocking takes in turn. */
+export const LAYOUT_GROUNDS = ["block-1", "block-2", "block-3", "block-4"] as const
+/** Where a block keeps its own ground under colour-blocking: native controls (inputs, ranges, radios, a player's
+ * scrubber) are drawn against the page ground's measured borders, so their blocks stay on it. */
+export const LAYOUT_SKIPS: Record<"colour-blocking", readonly string[]> = {
+  "colour-blocking": ["form", "booking", "calculator", "quiz", "podcast", "comparison", "showreel"],
+}
+/** The share of the ink in a ground's secondary text (the knobs' tone scope, and the layouts' grounds). */
+export const SECONDARY_INK = 80
+
 /** Page-level knobs (feather.page/1): the page's loudness, and defaults a block takes when it sets none. A default
  * align or crop a block does not take is ignored for that block. */
 export const PAGE_KNOBS: Fields = {
@@ -426,7 +456,10 @@ export const PAGE_KNOBS: Fields = {
   cursor: { kind: "enum", values: ["native", "follower"] },
   // The colour scheme toggle (wave 5, FLOW_PAGE_KNOBS above).
   ...FLOW_PAGE_KNOBS,
+  /** The page's layout (wave 5 part C, LAYOUTS above): a structural expression over every block. */
+  layout: { kind: "enum", values: LAYOUTS, code: "unknown-variant" },
 }
+
 
 /** A block's fields in a schema version: /0 is the table above; /1 adds the knobs and the block's /1 fields. */
 export function blockFields(name: string, version: 0 | 1): Fields {

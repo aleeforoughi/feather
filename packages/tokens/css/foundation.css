@@ -1151,6 +1151,199 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   background-color: transparent;
   background-image: none;
 }
+/* Page layouts (feather.page/1 `layout`, docs/page.md). FeatherPage puts the layout on <main data-page data-layout>,
+   and on each section's wrapper what it decides per section (data-ground, data-hang). Structure only: grid placement,
+   rhythm, rules and grounds. Every colour below is a theme token re-pointed, never a value; a block a layout cannot
+   reach (full-bleed media off the page grid) keeps its own form. */
+
+/* editorial: asymmetric. From 1024px every other section hangs from column 4 of 12 (a quarter of the measure, plus a
+   quarter gutter), so the reading line steps across the page; the block titles are set in the display face. */
+@media (min-width: 1024px) {
+  [data-page][data-layout="editorial"] [data-hang] > [data-slot="section"] > .page-grid[data-slot="section-content"] {
+    padding-inline-start: calc(var(--layout-margin) + (min(100%, var(--layout-max)) - 2 * var(--layout-margin) + var(--layout-gutter)) / 4);
+  }
+}
+[data-page][data-layout="editorial"] [data-slot="block-title"] {
+  font-family: var(--brand-font-display, var(--brand-font-body));
+  font-size: var(--display-s-size);
+  line-height: var(--display-s-leading);
+  letter-spacing: var(--display-s-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+
+/* swiss, brutalist: square corners and no shadows (the shadow and radius roles, re-pointed for the page). */
+[data-page]:is([data-layout="swiss"], [data-layout="brutalist"]) {
+  --radius-xs: 0px;
+  --radius-control: 0px;
+  --radius-card: 0px;
+  --radius-dialog: 0px;
+  --radius-step: 0px;
+  --radius: 0px;
+  --shadow-1: none;
+  --shadow-2: none;
+  --shadow-3: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+}
+/* swiss: a strict grid. A hairline in the strong border opens every section on the grid's measure, and each block
+   title carries its section's number in tabular figures (decoration: `/ ""` keeps it out of the heading's name). */
+[data-page][data-layout="swiss"] {
+  counter-reset: feather-section;
+}
+[data-page][data-layout="swiss"] [data-living-section] {
+  counter-increment: feather-section;
+}
+[data-page][data-layout="swiss"] [data-living-section] > [data-slot="section"] > .page-grid[data-slot="section-content"] {
+  padding-block-start: var(--group-gap);
+  background-image: linear-gradient(var(--border-primary), var(--border-primary));
+  background-repeat: no-repeat;
+  background-position: var(--layout-margin) 0;
+  background-size: calc(100% - 2 * var(--layout-margin)) 1px;
+}
+[data-page][data-layout="swiss"] [data-slot="block-title"]::before {
+  content: counter(feather-section, decimal-leading-zero) / "";
+  display: block;
+  margin-block-end: var(--gap);
+  font-family: var(--brand-font-body);
+  /* type-caption's size, at the label weight. */
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+/* brutalist: every border in the ink, a heavy rule in the ink between sections, a thicker focus ring, and the block
+   titles in the mono face, set in capitals. */
+[data-page][data-layout="brutalist"] {
+  --border-primary: var(--text-primary);
+  --border-secondary: var(--text-primary);
+  --border-tertiary: var(--text-primary);
+  --border: var(--text-primary);
+  --input: var(--text-primary);
+  --ring-width: 3px;
+}
+[data-page][data-layout="brutalist"] [data-living-section] + [data-living-section] > [data-slot="section"] {
+  border-block-start: 3px solid var(--text-primary);
+}
+[data-page][data-layout="brutalist"] [data-slot="block-title"] {
+  font-family: var(--brand-font-mono, ui-monospace, monospace);
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+/* poster: every section a full screen (the small viewport, so nothing moves as the browser's bars do), its content in
+   the middle, the block titles at display size. */
+[data-page][data-layout="poster"] [data-living-section] > [data-slot="section"] {
+  min-block-size: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+[data-page][data-layout="poster"] [data-slot="block-title"] {
+  font-family: var(--brand-font-display, var(--brand-font-body));
+  font-size: var(--display-m-size);
+  line-height: var(--display-m-leading);
+  letter-spacing: var(--display-m-tracking);
+  font-weight: var(--display-weight);
+  text-wrap: var(--title-wrap);
+}
+
+/* colour-blocking: a section on a colour block (data-ground, every other section in turn) takes the block's pair as
+   its ground and ink, and every role inside it reads on them, as a block-N tone does. Each pair is measured at 4.5:1,
+   with its secondary tint (packages/page/src/core/layouts.ts). */
+[data-page][data-layout="colour-blocking"] [data-ground="block-1"] {
+  --ground: var(--block-1);
+  --ground-ink: var(--block-1-ink);
+}
+[data-page][data-layout="colour-blocking"] [data-ground="block-2"] {
+  --ground: var(--block-2);
+  --ground-ink: var(--block-2-ink);
+}
+[data-page][data-layout="colour-blocking"] [data-ground="block-3"] {
+  --ground: var(--block-3);
+  --ground-ink: var(--block-3-ink);
+}
+[data-page][data-layout="colour-blocking"] [data-ground="block-4"] {
+  --ground: var(--block-4);
+  --ground-ink: var(--block-4-ink);
+}
+[data-page][data-layout="colour-blocking"] [data-ground] {
+  --surface-base: var(--ground);
+  --surface-subtle: color-mix(in oklab, var(--ground-ink) 6%, var(--ground));
+  --surface-raised: color-mix(in oklab, var(--ground-ink) 10%, var(--ground));
+  --surface-hover: color-mix(in oklab, var(--ground-ink) 14%, var(--ground));
+  --text-primary: var(--ground-ink);
+  --text-secondary: color-mix(in oklab, var(--ground-ink) 80%, var(--ground));
+  --text-tertiary: color-mix(in oklab, var(--ground-ink) 80%, var(--ground));
+  --border-primary: color-mix(in oklab, var(--ground-ink) 28%, var(--ground));
+  --border: color-mix(in oklab, var(--ground-ink) 16%, var(--ground));
+  --primary: var(--ground-ink);
+  --primary-foreground: var(--ground);
+  --accent: color-mix(in oklab, var(--ground-ink) 10%, var(--ground));
+  --accent-foreground: var(--ground-ink);
+  --foreground: var(--ground-ink);
+  --muted-foreground: color-mix(in oklab, var(--ground-ink) 80%, var(--ground));
+  --card: color-mix(in oklab, var(--ground-ink) 10%, var(--ground));
+  --card-foreground: var(--ground-ink);
+  --ring: var(--ground-ink);
+}
+
+/* two-colour: the ground and one ink, with the ink's tints, as in two-colour print. The ink is the brand's primary or
+   its text colour, whichever FeatherPage measured to read (data-ink); everything that would bring a third colour (the
+   accent, the colour blocks, the inverse, the chart series) is re-pointed at the ink or the ground for the whole
+   document, nav and footer too. State colours (an error) keep their own. */
+:root:root:has([data-page][data-layout="two-colour"][data-ink="primary"]) {
+  --two-ink: var(--primary);
+  --text-primary: var(--two-ink);
+}
+:root:root:has([data-page][data-layout="two-colour"][data-ink="text"]) {
+  --two-ink: var(--text-primary);
+  --primary: var(--two-ink);
+}
+:root:root:has([data-page][data-layout="two-colour"]) {
+  --primary-foreground: var(--background);
+  --text-secondary: color-mix(in oklab, var(--two-ink) 80%, var(--background));
+  --text-tertiary: color-mix(in oklab, var(--two-ink) 80%, var(--background));
+  --text-inverse: var(--background);
+  --surface-subtle: color-mix(in oklab, var(--two-ink) 6%, var(--background));
+  --surface-raised: color-mix(in oklab, var(--two-ink) 10%, var(--background));
+  --surface-hover: color-mix(in oklab, var(--two-ink) 14%, var(--background));
+  --surface-pressed: color-mix(in oklab, var(--two-ink) 18%, var(--background));
+  --surface-selected: color-mix(in oklab, var(--two-ink) 14%, var(--background));
+  --surface-inverse: var(--two-ink);
+  --card: var(--background);
+  --popover: var(--background);
+  --muted: color-mix(in oklab, var(--two-ink) 6%, var(--background));
+  --secondary: color-mix(in oklab, var(--two-ink) 10%, var(--background));
+  --accent: color-mix(in oklab, var(--two-ink) 10%, var(--background));
+  --accent-foreground: var(--two-ink);
+  --border-primary: var(--two-ink);
+  --border-secondary: color-mix(in oklab, var(--two-ink) 28%, var(--background));
+  --border-tertiary: color-mix(in oklab, var(--two-ink) 16%, var(--background));
+  --border-inverse: color-mix(in oklab, var(--background) 28%, var(--two-ink));
+  --input: var(--two-ink);
+  --ring: var(--two-ink);
+  --ring-inverse: var(--background);
+  --block-1: var(--two-ink);
+  --block-1-ink: var(--background);
+  --block-2: var(--two-ink);
+  --block-2-ink: var(--background);
+  --block-3: var(--two-ink);
+  --block-3-ink: var(--background);
+  --block-4: var(--two-ink);
+  --block-4-ink: var(--background);
+  --chart-1: var(--two-ink);
+  --chart-2: var(--two-ink);
+  --chart-3: var(--two-ink);
+  --chart-4: var(--two-ink);
+  --chart-5: var(--two-ink);
+}
+
 /* Glass (surface axis): for overlays only. Without the glass surface the blur is 0 and the fill opaque. */
 @utility overlay-surface {
   background-color: var(--overlay-fill);

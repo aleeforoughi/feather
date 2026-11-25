@@ -454,6 +454,16 @@
       "required": [
         "colors"
       ]
+    },
+    "layout": {
+      "enum": [
+        "editorial",
+        "swiss",
+        "brutalist",
+        "poster",
+        "colour-blocking",
+        "two-colour"
+      ]
     }
   },
   "$defs": {
