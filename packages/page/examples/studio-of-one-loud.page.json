@@ -8,9 +8,9 @@
   "loudness": 3,
   "library": {
     "work": {
-      "acceptto": { "title": "Acceptto", "summary": "Sign-in without passwords, designed so the safe choice is the easy one.", "year": "2025", "role": "Design lead", "media": { "src": "media/acceptto.svg", "decorative": true } },
-      "freezon": { "title": "Freezon", "summary": "A cold-chain dashboard that shows the one shipment at risk, not all of them.", "year": "2024", "role": "Product design", "media": { "src": "media/freezon.svg", "decorative": true } },
-      "evercover": { "title": "Evercover", "summary": "Insurance that explains itself in one sentence before it asks for anything.", "year": "2023", "role": "Design and front end", "media": { "src": "media/evercover.svg", "decorative": true } }
+      "acceptto": { "href": "#case", "title": "Acceptto", "summary": "Sign-in without passwords, designed so the safe choice is the easy one.", "year": "2025", "role": "Design lead", "media": { "src": "media/acceptto.svg", "decorative": true } },
+      "freezon": { "href": "#proof", "title": "Freezon", "summary": "A cold-chain dashboard that shows the one shipment at risk, not all of them.", "year": "2024", "role": "Product design", "media": { "src": "media/freezon.svg", "decorative": true } },
+      "evercover": { "href": "#hire", "title": "Evercover", "summary": "Insurance that explains itself in one sentence before it asks for anything.", "year": "2023", "role": "Design and front end", "media": { "src": "media/evercover.svg", "decorative": true } }
     }
   },
   "sections": [
@@ -38,5 +38,7 @@
   "nav": { "brand": "Alee", "items": [{ "label": "Work", "href": "#work" }, { "label": "How I work", "href": "#process" }, { "label": "In numbers", "href": "#proof" }, { "label": "Contact", "href": "#contact" }] },
   "footer": { "variant": "reveal", "wordmark": "Alee", "links": [{ "label": "Work", "href": "#work" }, { "label": "Contact", "href": "#contact" }], "note": "Built from one feather.page document." },
   "notFound": { "variant": "type", "title": "This page went somewhere else", "body": "The link may be old, or the page has moved. The work is still here.", "home": [{ "label": "Back to the work", "href": "/" }] },
-  "transition": "circle"
+  "transition": "circle",
+  "cursor": "follower",
+  "sound": { "bed": "media/room.wav" }
 }

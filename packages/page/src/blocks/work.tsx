@@ -3,7 +3,7 @@ import { Grid, MediaFrame, ScrollLayers, Section, useReducedMotion } from "@alee
 import type { WorkItem, WorkVariant } from "../core/types"
 import { KnobBody, KnobTitle, useKnobs } from "./knobs"
 import { mediaProps, mediaSrc } from "./media"
-import { BlockTitle, CardBody, join, useRegion, type BlockProps } from "./shared"
+import { BlockTitle, CardBody, join, useCursorLabel, useRegion, type BlockProps } from "./shared"
 
 const toItem = (item: string | WorkItem): WorkItem => (typeof item === "string" ? { id: item, title: item } : item)
 const metaOf = (item: WorkItem) => [item.role, item.year].filter(Boolean).join(" · ")
@@ -72,6 +72,7 @@ function WorkPanel({ item, wide }: { item: WorkItem; wide: boolean }) {
  * the pointer; on touch each row carries its own thumbnail. The floating image is decoration (the row is the link).
  */
 function HoverList({ items }: { items: WorkItem[] }) {
+  const cursor = useCursorLabel("view")
   const list = React.useRef<HTMLUListElement>(null)
   const preview = React.useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion(list)
@@ -113,7 +114,7 @@ function HoverList({ items }: { items: WorkItem[] }) {
           return (
             <li key={item.id} data-slot="work-item" data-state={active === i ? "active" : "idle"} className="border-t border-line-primary" onPointerEnter={(e) => { setActive(i); place(e) }} onPointerMove={place} onFocus={() => setActive(i)} onBlur={() => setActive(null)}>
               {item.href ? (
-                <a href={item.href} data-slot="work-link" className="group block focus-ring">
+                <a href={item.href} data-slot="work-link" {...cursor} className="group block focus-ring">
                   {row}
                 </a>
               ) : (

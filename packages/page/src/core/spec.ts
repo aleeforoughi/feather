@@ -201,6 +201,9 @@ export const BLOCK_RANGE: Record<string, BlockRange> = {
 export const PAGE_KNOBS: Fields = {
   loudness: { kind: "number", min: 0, max: 3, integer: true },
   defaults: { kind: "object", of: { space: { kind: "enum", values: SPACES }, align: { kind: "enum", values: ALIGNS }, scale: { kind: "enum", values: SCALES }, crop: { kind: "enum", values: CROPS } } },
+  /** The pointer: the native cursor alone (default), or a follower that grows and labels what it is over (work items
+   * say View). The native cursor always stays; the follower is off on touch, under reduced motion and below loudness 2. */
+  cursor: { kind: "enum", values: ["native", "follower"] },
 }
 
 /** A block's fields in a schema version: /0 is the table above; /1 adds the knobs and the block's /1 fields. */
