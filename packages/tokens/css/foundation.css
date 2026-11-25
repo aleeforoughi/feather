@@ -1256,8 +1256,9 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 
 /* colour-blocking: a section on a colour block (data-ground, every other section in turn) takes the block's pair as
-   its ground and ink, and every role inside it reads on them, as a block-N tone does. Each pair is measured at 4.5:1,
-   with its secondary tint (packages/page/src/core/layouts.ts). */
+   its ground and ink, and every role inside it reads on them. The grounds are solid: a card is the ground itself,
+   drawn apart by its rule, the secondary text is the ink, and the one tint is the hover (8%). Each pair is measured at
+   4.5:1, on the ground and on the hover (packages/page/src/core/layouts.ts). */
 [data-page][data-layout="colour-blocking"] [data-ground="block-1"] {
   --ground: var(--block-1);
   --ground-ink: var(--block-1-ink);
@@ -1276,29 +1277,30 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 [data-page][data-layout="colour-blocking"] [data-ground] {
   --surface-base: var(--ground);
-  --surface-subtle: color-mix(in oklab, var(--ground-ink) 6%, var(--ground));
-  --surface-raised: color-mix(in oklab, var(--ground-ink) 10%, var(--ground));
-  --surface-hover: color-mix(in oklab, var(--ground-ink) 14%, var(--ground));
+  --surface-subtle: var(--ground);
+  --surface-raised: var(--ground);
+  --surface-hover: color-mix(in oklab, var(--ground-ink) 8%, var(--ground));
   --text-primary: var(--ground-ink);
-  --text-secondary: color-mix(in oklab, var(--ground-ink) 80%, var(--ground));
-  --text-tertiary: color-mix(in oklab, var(--ground-ink) 80%, var(--ground));
+  --text-secondary: var(--ground-ink);
+  --text-tertiary: var(--ground-ink);
   --border-primary: color-mix(in oklab, var(--ground-ink) 28%, var(--ground));
   --border: color-mix(in oklab, var(--ground-ink) 16%, var(--ground));
   --primary: var(--ground-ink);
   --primary-foreground: var(--ground);
-  --accent: color-mix(in oklab, var(--ground-ink) 10%, var(--ground));
+  --accent: var(--ground);
   --accent-foreground: var(--ground-ink);
   --foreground: var(--ground-ink);
-  --muted-foreground: color-mix(in oklab, var(--ground-ink) 80%, var(--ground));
-  --card: color-mix(in oklab, var(--ground-ink) 10%, var(--ground));
+  --muted-foreground: var(--ground-ink);
+  --card: var(--ground);
   --card-foreground: var(--ground-ink);
   --ring: var(--ground-ink);
 }
 
-/* two-colour: the ground and one ink, with the ink's tints, as in two-colour print. The ink is the brand's primary or
-   its text colour, whichever FeatherPage measured to read (data-ink); everything that would bring a third colour (the
-   accent, the colour blocks, the inverse, the chart series) is re-pointed at the ink or the ground for the whole
-   document, nav and footer too. State colours (an error) keep their own. */
+/* two-colour: the ground and one ink, with the ink's tints for rules and the hover, as in two-colour print; text is
+   the ink, never a tint. The ink is the brand's primary or its text colour, whichever FeatherPage measured to read (data-ink);
+   everything that would bring a third colour (the accent, the colour blocks, the inverse, the chart series) is
+   re-pointed at the ink or the ground for the whole document, nav and footer too. Surfaces are the ground, drawn apart
+   by their rules. State colours (an error) keep their own. */
 :root:root:has([data-page][data-layout="two-colour"][data-ink="primary"]) {
   --two-ink: var(--primary);
   --text-primary: var(--two-ink);
@@ -1309,20 +1311,20 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 :root:root:has([data-page][data-layout="two-colour"]) {
   --primary-foreground: var(--background);
-  --text-secondary: color-mix(in oklab, var(--two-ink) 80%, var(--background));
-  --text-tertiary: color-mix(in oklab, var(--two-ink) 80%, var(--background));
+  --text-secondary: var(--two-ink);
+  --text-tertiary: var(--two-ink);
   --text-inverse: var(--background);
-  --surface-subtle: color-mix(in oklab, var(--two-ink) 6%, var(--background));
-  --surface-raised: color-mix(in oklab, var(--two-ink) 10%, var(--background));
-  --surface-hover: color-mix(in oklab, var(--two-ink) 14%, var(--background));
-  --surface-pressed: color-mix(in oklab, var(--two-ink) 18%, var(--background));
-  --surface-selected: color-mix(in oklab, var(--two-ink) 14%, var(--background));
+  --surface-subtle: var(--background);
+  --surface-raised: var(--background);
+  --surface-hover: color-mix(in oklab, var(--two-ink) 8%, var(--background));
+  --surface-pressed: color-mix(in oklab, var(--two-ink) 8%, var(--background));
+  --surface-selected: color-mix(in oklab, var(--two-ink) 8%, var(--background));
   --surface-inverse: var(--two-ink);
   --card: var(--background);
   --popover: var(--background);
-  --muted: color-mix(in oklab, var(--two-ink) 6%, var(--background));
-  --secondary: color-mix(in oklab, var(--two-ink) 10%, var(--background));
-  --accent: color-mix(in oklab, var(--two-ink) 10%, var(--background));
+  --muted: var(--background);
+  --secondary: var(--background);
+  --accent: var(--background);
   --accent-foreground: var(--two-ink);
   --border-primary: var(--two-ink);
   --border-secondary: color-mix(in oklab, var(--two-ink) 28%, var(--background));

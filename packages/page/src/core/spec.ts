@@ -429,10 +429,10 @@ export const BLOCK_RANGE: Record<string, BlockRange> = {
  *   thicker focus ring and the titles in the mono face (font-mono).
  * - poster: every section a full screen, its content set in the middle, the block titles at display size.
  * - colour-blocking: every other section on the next of the theme's colour blocks (block-1 to block-4, in turn). Each
- *   pair is measured (the ink and the secondary ink on the ground, 4.5:1); a brand that cannot meet it is a
+ *   pair is measured (the ink on the ground and on its hover tint, 4.5:1); a brand that cannot meet it is a
  *   `contradiction`.
- * - two-colour: the ground and one ink only (with the ink's own tints, as in two-colour print): the brand's primary
- *   where it and its secondary tint read at 4.5:1 on the ground, else the text colour. Images take the duotone
+ * - two-colour: the ground and one ink only (with the ink's own tints for rules and the hover, as in two-colour
+ *   print): the brand's primary where it reads at 4.5:1 on the ground, else the text colour. Images take the duotone
  *   treatment unless they name another. State colours (an error) keep their own.
  */
 export const LAYOUTS = ["editorial", "swiss", "brutalist", "poster", "colour-blocking", "two-colour"] as const
@@ -443,7 +443,7 @@ export const LAYOUT_GROUNDS = ["block-1", "block-2", "block-3", "block-4"] as co
 export const LAYOUT_SKIPS: Record<"colour-blocking", readonly string[]> = {
   "colour-blocking": ["form", "booking", "calculator", "quiz", "podcast", "comparison", "showreel"],
 }
-/** The share of the ink in a ground's secondary text (the knobs' tone scope, and the layouts' grounds). */
+/** The share of the ink in a toned block's secondary text (the knobs' tone scope; a layout's ground uses the ink itself). */
 export const SECONDARY_INK = 80
 
 /** Page-level knobs (feather.page/1): the page's loudness, and defaults a block takes when it sets none. A default

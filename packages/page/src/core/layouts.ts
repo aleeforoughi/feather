@@ -3,7 +3,7 @@
 // two-colour page prints in, and whether the brand's own colours can carry the grounds a layout introduces. Pure and
 // deterministic: the same page and theme give the same plan.
 import { contrastRatio, oklabMix } from "@aleeforoughi/feather-tokens"
-import { LAYOUT_GROUNDS, LAYOUT_SKIPS, SECONDARY_INK } from "./spec"
+import { LAYOUT_GROUNDS, LAYOUT_SKIPS } from "./spec"
 import type { PageBlock, PageIssue, PageLayout } from "./types"
 
 /** The text floor every ground a layout introduces is held to (WCAG 2.2 AA, 1.4.3). */
@@ -96,13 +96,17 @@ export function resolveColor(value: string | undefined, vars: Record<string, str
 
 const read = (name: string, vars: Record<string, string>) => resolveColor(vars[name] ?? BLOCK_DEFAULTS[name], vars)
 
-/** The worst of an ink and its secondary tint (SECONDARY_INK % of it, mixed into the ground) on a ground; null when
- * either cannot be measured. */
+/** The one tint a layout's ground gives a surface: what is under the pointer (LAYOUT_HOVER % of the ink). Cards,
+ * subtle and raised surfaces on a layout's ground are the ground itself, drawn apart by their rules, so text never
+ * sits on a tint it was not measured on. */
+export const LAYOUT_HOVER = 8
+
+/** The worst of an ink on a ground and on the ground's hover tint; null when either cannot be measured. A layout's
+ * ground has one ink: its secondary text is the ink itself, so nothing reads lighter than what is measured here. */
 function pairFloor(ink: string | null, ground: string | null): number | null {
   if (!ink || !ground) return null
-  const a = contrastRatio(ink, ground)
-  const b = contrastRatio(oklabMix(ink, ground, SECONDARY_INK), ground)
-  return a === null || b === null ? null : Math.min(a, b)
+  const ratios = [ground, oklabMix(ink, ground, LAYOUT_HOVER)].map((g) => contrastRatio(ink, g))
+  return ratios.some((r) => r === null) ? null : Math.min(...(ratios as number[]))
 }
 
 export interface LayoutPlan {
@@ -132,12 +136,12 @@ export function layoutPlan(layout: PageLayout | undefined, sections: readonly Pa
     for (const [i, vars] of sets.entries())
       for (const g of used) {
         const floor = pairFloor(read(`--${g}-ink`, vars), read(`--${g}`, vars))
-        if (floor === null || floor < LAYOUT_FLOOR) fail(`colour-blocking puts sections on ${g}, whose ink (or its secondary tint) ${ratio(floor)} on it${i ? " in the scheme's other set" : ""}; the floor is ${LAYOUT_FLOOR}:1. Give the brand's colors.blocks a pair that reads, or choose another layout`)
+        if (floor === null || floor < LAYOUT_FLOOR) fail(`colour-blocking puts sections on ${g}, whose ink ${ratio(floor)} on it (or on its hover tint)${i ? " in the scheme's other set" : ""}; the floor is ${LAYOUT_FLOOR}:1. Give the brand's colors.blocks a pair that reads, or choose another layout`)
       }
     return { sections: placed, issues }
   }
   if (layout === "two-colour") {
-    // The ink on the ground, and the ground on the ink (the page's inverse grounds), each with its secondary tint.
+    // The ink on the ground, and the ground on the ink (the page's inverse grounds), each with its hover tint.
     const reads = (name: string) =>
       sets.every((vars) => {
         const ink = read(name, vars)
@@ -148,7 +152,7 @@ export function layoutPlan(layout: PageLayout | undefined, sections: readonly Pa
     if (sets.length === 0 || reads("--primary")) return { sections: placed, ink: sets.length ? "primary" : "text", issues }
     if (reads("--text-primary")) return { sections: placed, ink: "text", issues }
     const floor = Math.min(...sets.map((vars) => pairFloor(read("--text-primary", vars), read("--background", vars)) ?? 0))
-    fail(`two-colour prints in one ink on the ground, and neither the primary nor the text colour (with its secondary tint) reads at ${LAYOUT_FLOOR}:1 on it (the text ${floor.toFixed(2)}:1); choose another layout`)
+    fail(`two-colour prints in one ink on the ground, and neither the primary nor the text colour reads at ${LAYOUT_FLOOR}:1 on it on it and on its hover tint (the text ${floor.toFixed(2)}:1); choose another layout`)
     return { sections: placed, ink: "text", issues }
   }
   return { sections: placed, issues }

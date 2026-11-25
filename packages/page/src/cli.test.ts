@@ -144,7 +144,7 @@ describe("feather-page init", () => {
 describe("feather-page build and the layouts", () => {
   it("refuses a layout the brand's colours cannot carry, as a contradiction at /layout", () => {
     const dir = fs.mkdtempSync(path.join(work, "layout-"))
-    // #767676 reads at 4.54:1 on white, so the engine takes the pair; its secondary tint (80%) does not.
+    // #767676 reads at 4.54:1 on white, so the engine takes the pair; on the hover tint it does not.
     const tokens = { schema: "feather-tokens/4", colors: { primary: "#1f3fd1", background: "#ffffff", surface: "#f5f5f5", text: "#111111", blocks: [{ surface: "#ffffff", ink: "#767676" }] }, typography: { fontFamily: { display: "Inter", body: "Inter" } } }
     fs.writeFileSync(path.join(dir, "brand.json"), JSON.stringify(tokens))
     fs.writeFileSync(path.join(dir, "page.json"), JSON.stringify({ schema: "feather.page/1", brand: "brand.json", layout: "colour-blocking", sections: [{ block: "hero", title: "One" }, { block: "statement", title: "Two" }] }))

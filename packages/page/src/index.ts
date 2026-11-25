@@ -26,6 +26,6 @@ export { ViewSwitch, useViewMode, viewKey, VIEW_OPTIONS } from "./blocks/views"
 export type { FlowBlock, PageScheme, ViewMode, ChartVariant, QuizQuestionSpec, QuizOptionSpec, QuizResultSpec, BookingService, BookingDay, CalculatorInputSpec, PlaceItem, PodcastEpisode } from "./core/types"
 // Layouts (wave 5 part C): the page's structural expression, and what the brand's colours must carry for it.
 export { LAYOUTS, LAYOUT_GROUNDS, LAYOUT_SKIPS, SECONDARY_INK } from "./core/spec"
-export { LAYOUT_FLOOR, layoutPlan, layoutSections, resolveColor, themeVars, type LayoutPlan, type LayoutSection } from "./core/layouts"
+export { LAYOUT_FLOOR, LAYOUT_HOVER, layoutPlan, layoutSections, resolveColor, themeVars, type LayoutPlan, type LayoutSection } from "./core/layouts"
 export { checkLayout } from "./render"
 export type { PageLayout } from "./core/types"

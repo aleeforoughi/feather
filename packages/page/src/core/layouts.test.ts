@@ -5,8 +5,8 @@ import studio from "@aleeforoughi/feather-tokens/themes/studio.json"
 import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
 import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
 import { describe, expect, it } from "vitest"
-import { LAYOUTS, LAYOUT_SKIPS, PAGE_KNOBS, SECONDARY_INK } from "./spec"
-import { LAYOUT_FLOOR, layoutPlan, layoutSections, resolveColor, themeVars } from "./layouts"
+import { LAYOUTS, LAYOUT_SKIPS, PAGE_KNOBS } from "./spec"
+import { LAYOUT_FLOOR, LAYOUT_HOVER, layoutPlan, layoutSections, resolveColor, themeVars } from "./layouts"
 import { validatePage } from "./validate"
 import type { PageBlock } from "./types"
 
@@ -71,7 +71,7 @@ describe("resolveColor", () => {
 
 describe("layoutPlan in the reference brands", () => {
   for (const [name, brand] of Object.entries(BRANDS)) {
-    it(`${name}: colour-blocking carries all four blocks at ${LAYOUT_FLOOR}:1, with the secondary tint`, () => {
+    it(`${name}: colour-blocking carries all four blocks at ${LAYOUT_FLOOR}:1, on the ground and its hover tint`, () => {
       const sections = blocks("hero", "work", "quote", "faq", "numbers", "case", "logos", "contact")
       const plan = layoutPlan("colour-blocking", sections, [css(brand.tokens)])
       expect(plan.issues).toEqual([])
@@ -80,7 +80,7 @@ describe("layoutPlan in the reference brands", () => {
       for (const n of [1, 2, 3, 4]) {
         const ground = resolveColor(`var(--block-${n})`, vars)!
         const ink = resolveColor(`var(--block-${n}-ink)`, vars)!
-        expect(contrastRatio(oklabMix(ink, ground, SECONDARY_INK), ground), `block-${n}`).toBeGreaterThanOrEqual(LAYOUT_FLOOR)
+        expect(contrastRatio(ink, oklabMix(ink, ground, LAYOUT_HOVER)), `block-${n}`).toBeGreaterThanOrEqual(LAYOUT_FLOOR)
       }
     })
 
