@@ -1218,7 +1218,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   color: var(--text-secondary);
 }
 /* brutalist: every border in the ink, a heavy rule in the ink between sections, a thicker focus ring, and the block
-   titles in the mono face, set in capitals. */
+   titles in the mono face (font-mono), set in capitals. */
 [data-page][data-layout="brutalist"] {
   --border-primary: var(--text-primary);
   --border-secondary: var(--text-primary);
@@ -1231,7 +1231,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   border-block-start: 3px solid var(--text-primary);
 }
 [data-page][data-layout="brutalist"] [data-slot="block-title"] {
-  font-family: var(--brand-font-mono, ui-monospace, monospace);
+  font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0;
 }

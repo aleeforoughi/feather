@@ -426,7 +426,7 @@ export const BLOCK_RANGE: Record<string, BlockRange> = {
  * - swiss: a strict grid. A hairline rule on the grid's measure opens every section, a numbered index beside each
  *   title (decoration: the numbers are not read), square corners and no shadows.
  * - brutalist: heavy rules in the ink between sections, every border in the ink, square corners, no shadows, a
- *   thicker focus ring and the titles in the brand's mono face.
+ *   thicker focus ring and the titles in the mono face (font-mono).
  * - poster: every section a full screen, its content set in the middle, the block titles at display size.
  * - colour-blocking: every other section on the next of the theme's colour blocks (block-1 to block-4, in turn). Each
  *   pair is measured (the ink and the secondary ink on the ground, 4.5:1); a brand that cannot meet it is a
