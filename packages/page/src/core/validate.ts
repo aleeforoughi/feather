@@ -186,6 +186,15 @@ function checkBlock(path: string, b: unknown, library: Record<string, unknown>, 
 
 const has = <T extends string>(list: readonly T[] | undefined, v: unknown): v is T => !!list && (list as readonly unknown[]).includes(v)
 
+/** One filled action per section (feather.page/1): at most one action says `primary: true`. (A hero whose starters
+ * show, on a Living Page, leads with its first starter and renders every action quiet.) */
+function checkActions(path: string, kind: string, b: Record<string, unknown>, add: Add) {
+  if (kind !== "hero" && kind !== "contact") return
+  const actions = Array.isArray(b.actions) ? b.actions : []
+  const filled = actions.filter((a) => isObject(a) && a.primary === true).length
+  if (filled > 1) add(`${path}/actions`, "contradiction", `one filled action per section: ${filled} actions are primary; mark one, and the rest are quiet`)
+}
+
 /** What the field table cannot say: the values a block supports, and the contradictions between knobs. */
 function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx: BlockContext, add: Add) {
   const range = BLOCK_RANGE[kind]
@@ -210,6 +219,7 @@ function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx:
   checkPageBlock(path, kind, variant, b, add)
   checkFlowBlock(path, kind, b, add)
   checkViews(path, b, add)
+  checkActions(path, kind, b, add)
 
   if (motion) {
     const enter = motion.enter

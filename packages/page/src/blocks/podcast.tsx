@@ -27,7 +27,8 @@ const PlayIcon = ({ on }: { on: boolean }) => (
   </svg>
 )
 
-function Episode({ episode, base }: { episode: PodcastEpisode; base: string }) {
+/** `lead`: the first episode, whose Play is the section's one filled action; the others' are quiet. */
+function Episode({ episode, base, lead }: { episode: PodcastEpisode; base: string; lead: boolean }) {
   const audio = React.useRef<HTMLAudioElement>(null)
   const list = React.useRef<HTMLOListElement>(null)
   const [isPlaying, setPlaying] = React.useState(false)
@@ -124,7 +125,7 @@ function Episode({ episode, base }: { episode: PodcastEpisode; base: string }) {
       <audio ref={audio} data-slot="podcast-audio" src={mediaSrc(episode.audio)} preload="none" controls aria-label={`${episode.title}, audio`} className="w-full scripting:hidden" />
       <div data-slot="podcast-player" role="group" aria-label={`Player: ${episode.title}`} className="flex flex-col gap-4 noscript:hidden">
         <div data-slot="podcast-controls" className="flex flex-wrap items-center gap-3">
-          <button type="button" data-slot="podcast-play" data-state={isPlaying ? "playing" : "paused"} onClick={toggle} aria-label={`${isPlaying ? "Pause" : "Play"} ${episode.title}`} className={join(BUTTON_PRIMARY, "gap-2")}>
+          <button type="button" data-slot="podcast-play" data-state={isPlaying ? "playing" : "paused"} onClick={toggle} aria-label={`${isPlaying ? "Pause" : "Play"} ${episode.title}`} data-variant={lead ? "primary" : "quiet"} className={join(lead ? BUTTON_PRIMARY : BUTTON_QUIET, "gap-2")}>
             <PlayIcon on={isPlaying} />
             <span data-slot="podcast-play-label" aria-hidden="true">
               {isPlaying ? "Pause" : "Play"}
@@ -241,8 +242,8 @@ export function PodcastBlock({ block }: BlockProps<"podcast">) {
               {block.body}
             </p>
           ) : null}
-          {block.episodes.map((e) => (
-            <Episode key={e.id} episode={e} base={base} />
+          {block.episodes.map((e, i) => (
+            <Episode key={e.id} episode={e} base={base} lead={i === 0} />
           ))}
         </div>
       </KnobBody>

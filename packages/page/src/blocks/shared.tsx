@@ -41,6 +41,15 @@ export const BUTTON_PRIMARY =
 export const BUTTON_QUIET =
   "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line-primary bg-surface-base px-6 type-label text-fg-primary focus-ring not-disabled:hover:bg-surface-hover motion-hover-out"
 
+/** Which of a section's actions is its one filled action: the one marked `primary: true`; else the first, unless any
+ * says `primary: false` of itself and none is marked (then none). -1 when the section leads with something else. */
+export function filledAction(actions: readonly { primary?: boolean }[], lead = true): number {
+  if (!lead) return -1
+  const marked = actions.findIndex((a) => a.primary === true)
+  if (marked !== -1) return marked
+  return actions.some((a) => a.primary !== undefined) ? -1 : 0
+}
+
 /** Whether the page runs the pointer follower (`cursor: "follower"`): blocks then label their links for it
  * (`data-cursor="view"`). Off by default, so a page without it renders exactly as before. */
 export const CursorLabels = React.createContext(false)

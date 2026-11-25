@@ -142,7 +142,8 @@ export function QuizBlock({ block }: BlockProps<"quiz">) {
             <div data-slot="quiz-actions" className="flex flex-wrap gap-3 noscript:hidden">
               {done ? (
                 <>
-                  <button type="button" data-slot="quiz-restart" onClick={restart} className={BUTTON_PRIMARY}>
+                  {/* One filled action per section: a result's own link leads, and Start again is quiet beside it. */}
+                  <button type="button" data-slot="quiz-restart" onClick={restart} className={result?.href ? BUTTON_QUIET : BUTTON_PRIMARY}>
                     Start again
                   </button>
                   <button type="button" data-slot="quiz-back" onClick={back} className={BUTTON_QUIET}>

@@ -103,7 +103,7 @@ export interface QuoteItem {
   role?: string
 }
 export type PageBlock =
-  | (Base & { block: "hero"; variant?: HeroVariant; title: string; eyebrow?: string; lede?: string; media?: Media; starters?: string[]; facts?: { label: string; value: string }[]; actions?: PageLink[]; scene?: BlockScene })
+  | (Base & { block: "hero"; variant?: HeroVariant; title: string; eyebrow?: string; lede?: string; media?: Media; starters?: string[]; facts?: { label: string; value: string }[]; actions?: ActionLink[]; scene?: BlockScene })
   | (Base & { block: "statement"; variant?: StatementVariant; title: string; body?: string; words?: string[] })
   | (Base & { block: "work"; variant?: WorkVariant; items: Array<string | WorkItem>; views?: ViewMode })
   | (Base & { block: "case"; variant?: CaseVariant; title: string; body?: string; media?: Media; facts?: { label: string; value: string }[]; scene?: BlockScene })
@@ -114,7 +114,7 @@ export type PageBlock =
   | (Base & { block: "quote"; variant?: QuoteVariant; text: string; by: string; role?: string; items?: QuoteItem[] })
   | (Base & { block: "offer"; variant?: OfferVariant; periods?: [string, string]; items: { name: string; price?: string; prices?: [string, string]; body?: string; href?: string }[] })
   | (Base & { block: "faq"; variant?: "list"; items: { q: string; a: string }[] })
-  | (Base & { block: "contact"; variant?: "plain"; body?: string; actions?: { label: string; href: string }[] })
+  | (Base & { block: "contact"; variant?: "plain"; body?: string; actions?: ActionLink[] })
   | (Base & { block: "signature"; body?: string; media?: Media; variant?: string; scene?: BlockScene })
   | PageOnlyBlock
   // Product flows (feather.page/1, wave 5 part B): page blocks too (spec.ts PAGE_BLOCKS).
@@ -266,6 +266,10 @@ export interface Scene {
 export interface PageLink {
   label: string
   href: string
+}
+/** A section's action (feather.page/1): `primary` names the section's one filled action (default the first). */
+export interface ActionLink extends PageLink {
+  primary?: boolean
 }
 
 /** The page edges (feather.page/1). */

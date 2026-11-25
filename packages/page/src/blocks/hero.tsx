@@ -1,11 +1,11 @@
 import * as React from "react"
 import { DisplayTitle, MediaFrame, Magnetic, ScrollLayers, Section, prefersSaveData, useReducedMotion } from "@aleeforoughi/feather-expression"
-import type { HeroVariant, Media, PageLink } from "../core/types"
+import type { ActionLink, HeroVariant, Media } from "../core/types"
 import { EDGE_START, PageContext, alignClass, sizeOf, useKnobs, type ResolvedKnobs } from "./knobs"
 import { ON_MEDIA, mediaProps, srcsetOf } from "./media"
 import { sizesOf } from "./sizes"
 import { SceneLayer } from "./scene"
-import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
+import { BUTTON_PRIMARY, BUTTON_QUIET, filledAction, join, useRegion, type BlockProps } from "./shared"
 
 /** The starters (when the model is on) as buttons, the first leaning toward the pointer. */
 function Starters({ starters, onAsk, className }: { starters: string[]; onAsk?: (s: string) => void; className: string }) {
@@ -28,15 +28,16 @@ function Starters({ starters, onAsk, className }: { starters: string[]; onAsk?: 
   )
 }
 
-/** The hero's real links (feather.page/1): the next act that works with the model off. The first is primary when no
- * starter leads. */
-function Actions({ actions, lead, className }: { actions?: PageLink[]; lead: boolean; className: string }) {
+/** The hero's real links (feather.page/1): the next act that works with the model off. One is filled (filledAction:
+ * the first, or the one marked primary) when no starter leads; the rest are quiet. */
+function Actions({ actions, lead, className }: { actions?: ActionLink[]; lead: boolean; className: string }) {
   if (!actions?.length) return null
+  const filled = filledAction(actions, lead)
   return (
     <ul data-slot="hero-actions" role="list" className={className}>
       {actions.map((a, i) => (
         <li key={a.href} data-slot="hero-action-item">
-          <a href={a.href} data-slot="hero-action" data-variant={lead && i === 0 ? "primary" : "quiet"} className={lead && i === 0 ? BUTTON_PRIMARY : BUTTON_QUIET}>
+          <a href={a.href} data-slot="hero-action" data-variant={i === filled ? "primary" : "quiet"} className={i === filled ? BUTTON_PRIMARY : BUTTON_QUIET}>
             {a.label}
           </a>
         </li>

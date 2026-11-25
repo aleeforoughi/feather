@@ -650,6 +650,9 @@
                     "not": {
                       "pattern": "^\\s*(javascript|data|vbscript):"
                     }
+                  },
+                  "primary": {
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -2851,6 +2854,9 @@
                     "not": {
                       "pattern": "^\\s*(javascript|data|vbscript):"
                     }
+                  },
+                  "primary": {
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -6117,6 +6123,9 @@
                     "not": {
                       "pattern": "^\\s*(javascript|data|vbscript):"
                     }
+                  },
+                  "primary": {
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -8318,6 +8327,9 @@
                     "not": {
                       "pattern": "^\\s*(javascript|data|vbscript):"
                     }
+                  },
+                  "primary": {
+                    "type": "boolean"
                   }
                 },
                 "required": [

@@ -370,7 +370,10 @@ export interface BlockRange {
   treatment?: boolean
 }
 
-const LINKS2: FieldSpec & { required?: boolean } = { kind: "list", of: { label: text(40, true), href: { kind: "href", required: true } }, min: 1, max: 2 }
+/** A section's action (feather.page/1): a link, and whether it is the section's one filled action. One filled action
+ * per section (Qooler file 28 section 3): the first is filled unless one says `primary: true`; the rest are quiet. */
+const ACTION: Fields = { label: text(40, true), href: { kind: "href", required: true }, primary: { kind: "boolean" } }
+const LINKS2: FieldSpec & { required?: boolean } = { kind: "list", of: ACTION, min: 1, max: 2 }
 const FACTS: FieldSpec & { required?: boolean } = { kind: "list", of: { label: text(40, true), value: text(60, true) }, max: 6 }
 
 /** Every block's variants and the knobs that apply to it. */
@@ -412,7 +415,7 @@ export const BLOCK_RANGE: Record<string, BlockRange> = {
     fields: { periods: { kind: "texts", min: 2, max: 2 }, items: { kind: "list", of: { name: text(60, true), price: text(40), prices: { kind: "texts", min: 2, max: 2 }, body: text(240), href: { kind: "href" } }, min: 1, max: 4 } },
   },
   faq: { variants: ["list"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
-  contact: { variants: ["plain"], aligns: ["start", "center", "offset"], scroll: ["reveal"], crop: false, scale: true },
+  contact: { variants: ["plain"], aligns: ["start", "center", "offset"], scroll: ["reveal"], crop: false, scale: true, fields: { actions: { kind: "list", of: ACTION, min: 1, max: 3 } } },
   signature: { variants: null, aligns: ["start", "center"], scroll: ["reveal", "parallax"], crop: true, scale: true, treatment: true },
 }
 
