@@ -2,6 +2,7 @@
 // always stays visible. The magnetic pull is about 0.15 (Carter Ogunsola) and meant for one or two primary controls,
 // never body links. Both lerp on the one clock and stop it at rest.
 import { clock, type Clock } from "./clock"
+import { loudnessOf, type Loudness } from "./loudness"
 import { prefersReducedMotion } from "./motion"
 
 export const MAGNETIC_STRENGTH = 0.15
@@ -87,3 +88,16 @@ export function follow(follower: HTMLElement, { on = clock }: { on?: Clock } = {
     remove?.()
   }
 }
+
+/** Whether the richer pointer patterns (cursor states, tilt, field, trail) may run at `el`: a hovering fine pointer,
+ * motion allowed, and the loudness at least `min`. A touch screen, reduced motion or a quieter page leaves it all off. */
+export function pointerAllowedAt(el: Element | null | undefined, min: Loudness): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return false
+  return !prefersReducedMotion(el) && loudnessOf(el) >= min
+}
+
+/** Fields: the pointer never drives these. */
+export const POINTER_FIELDS = "input, textarea, select, [contenteditable]"
+
+export const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n))
