@@ -10,8 +10,9 @@ export const FIT_MEASURE = 10
 /** Where a text may break: any space but the no-break ones (U+00A0 and U+202F join a number to its unit). */
 const BREAK = /[^\S\u00a0\u202f]+/
 const BREAKS = /([^\S\u00a0\u202f]+)/
-/** Punctuation and symbols at a run's ends ("themselves.", "“Scene”"): narrow, and not what decides the fit. */
-const EDGES = /^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu
+/** Punctuation and symbols at a run's ends ("themselves.", "“Scene”"): narrow, and not what decides the fit. A plain
+ * set, not a Unicode property class: this runs for every word of every title as a page renders. */
+const EDGES = new Set([...".,;:!?'\"‘’‚“”„«»‹›()[]{}<>…–—-/\\|%‰*&#@+=~^_`$€£¥"])
 
 /** The runs of a text that cannot break. */
 export function runs(text: string): string[] {
@@ -20,7 +21,17 @@ export function runs(text: string): string[] {
 
 /** A run's length in characters (code points), without the punctuation at its ends. */
 export function runLength(run: string): number {
-  return [...run.replace(EDGES, "")].length
+  let start = 0
+  let end = run.length
+  while (start < end && EDGES.has(run[start])) start++
+  while (end > start && EDGES.has(run[end - 1])) end--
+  let n = 0
+  // Code points: a surrogate pair (an emoji, a rare letter) counts once.
+  for (let i = start; i < end; i++) {
+    const c = run.charCodeAt(i)
+    if (c < 0xdc00 || c > 0xdfff) n++
+  }
+  return n
 }
 
 /** The longest run of one or more texts (a swap title's sentence and its words), in characters. */
@@ -31,7 +42,7 @@ export function longestRun(...texts: string[]): number {
 /** Whether a run is longer than the measure: it is set as its own unbreakable piece (fit-word), which hyphenates only
  * when it cannot fit even at the floor. */
 export function isLongRun(run: string): boolean {
-  return runLength(run) > FIT_MEASURE
+  return run.length > FIT_MEASURE && runLength(run) > FIT_MEASURE
 }
 
 /** The text split into runs and the spaces between them, so joining the parts gives the text back. */
