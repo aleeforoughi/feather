@@ -805,14 +805,16 @@
 }
 @utility type-heading-1 {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: min(2.5rem, max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-share, 1) * var(--fit-cols, 1) - var(--fit-gap, 0px) - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), 0.01) * var(--display-advance))));
+  --fit-s: min(1, var(--fit-span, 99) / var(--fit-of, var(--layout-columns)));
+  font-size: min(2.5rem, max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-s) * var(--fit-cols, 1) - (1 - var(--fit-s)) * 3rem - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), 0.01) * var(--display-advance))));
   line-height: 3rem;
   font-weight: var(--heading-weight, 700);
   letter-spacing: -0.02em;
 }
 @utility type-heading-2 {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: min(2rem, max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-share, 1) * var(--fit-cols, 1) - var(--fit-gap, 0px) - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), 0.01) * var(--display-advance))));
+  --fit-s: min(1, var(--fit-span, 99) / var(--fit-of, var(--layout-columns)));
+  font-size: min(2rem, max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-s) * var(--fit-cols, 1) - (1 - var(--fit-s)) * 3rem - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), 0.01) * var(--display-advance))));
   line-height: 2.5rem;
   font-weight: var(--heading-weight, 600);
   letter-spacing: -0.015em;
@@ -1084,7 +1086,8 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 @utility type-display-xl {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: min(var(--display-xl-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-share, 1) * var(--fit-cols, 1) - var(--fit-gap, 0px) - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
+  --fit-s: min(1, var(--fit-span, 99) / var(--fit-of, var(--layout-columns)));
+  font-size: min(var(--display-xl-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-s) * var(--fit-cols, 1) - (1 - var(--fit-s)) * 3rem - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-xl-leading);
   letter-spacing: min(var(--display-xl-tracking) + max(0px, var(--display-xl-size) - 1em) * var(--display-fit-tracking), max(var(--display-xl-tracking), 0px));
   font-weight: var(--display-weight);
@@ -1093,7 +1096,8 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 @utility type-display-l {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: min(var(--display-l-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-share, 1) * var(--fit-cols, 1) - var(--fit-gap, 0px) - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
+  --fit-s: min(1, var(--fit-span, 99) / var(--fit-of, var(--layout-columns)));
+  font-size: min(var(--display-l-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-s) * var(--fit-cols, 1) - (1 - var(--fit-s)) * 3rem - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-l-leading);
   letter-spacing: min(var(--display-l-tracking) + max(0px, var(--display-l-size) - 1em) * var(--display-fit-tracking), max(var(--display-l-tracking), 0px));
   font-weight: var(--display-weight);
@@ -1102,7 +1106,8 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 @utility type-display-m {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: min(var(--display-m-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-share, 1) * var(--fit-cols, 1) - var(--fit-gap, 0px) - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
+  --fit-s: min(1, var(--fit-span, 99) / var(--fit-of, var(--layout-columns)));
+  font-size: min(var(--display-m-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-s) * var(--fit-cols, 1) - (1 - var(--fit-s)) * 3rem - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-m-leading);
   letter-spacing: min(var(--display-m-tracking) + max(0px, var(--display-m-size) - 1em) * var(--display-fit-tracking), max(var(--display-m-tracking), 0px));
   font-weight: var(--display-weight);
@@ -1111,7 +1116,8 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 @utility type-display-s {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: min(var(--display-s-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-share, 1) * var(--fit-cols, 1) - var(--fit-gap, 0px) - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
+  --fit-s: min(1, var(--fit-span, 99) / var(--fit-of, var(--layout-columns)));
+  font-size: min(var(--display-s-size), max(var(--display-fit-floor), (var(--fit-box, (min(100vw, var(--display-fit-max)) - 2 * var(--layout-margin)) * var(--fit-s) * var(--fit-cols, 1) - (1 - var(--fit-s)) * 3rem - var(--fit-pad, 0px))) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-s-leading);
   letter-spacing: min(var(--display-s-tracking) + max(0px, var(--display-s-size) - 1em) * var(--display-fit-tracking), max(var(--display-s-tracking), 0px));
   font-weight: var(--display-weight);
@@ -1119,7 +1125,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   overflow-wrap: anywhere;
 }
 /* Fit (section 14.1): display type never runs past its box. Each display step is capped at what fits the box it sits
-   in: the page's content width, times the share of it the column holding the title takes (--fit-share, below), less
+   in: the page's content width, times the share of it the column holding the title takes (--fit-span, below), less
    that column's gutters and padding, or a fixed card width (--fit-box). What must fit is --display-measure characters, or the text's
    longest unbreakable run when it is longer (--fit-chars: DisplayTitle and the page blocks write it, see
    feather-expression's core/fit), at --display-advance em each. The heading roles take the cap only where a text
@@ -1127,313 +1133,374 @@ html[data-route-transition="circle"]::view-transition-new(root) {
    hyphenates (hyphens: auto, in the page's lang) and, as a last resort, breaks anywhere rather than run past its box.
    An ordinary word never breaks: it is one fit-word or inline piece, and overflow-wrap: anywhere only applies to a
    run alone on its line that does not fit. */
-@property --fit-chars {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-/* The share of the content width a title's column takes, declared on the blocks' columns from the spans they already
-   carry (sm:, md: and lg:col-span-N of the page grid's --layout-columns, or of a 12-column grid inside it), never
-   measured: a size container costs a style pass per container on every layout, and a loud page lays out all through
-   its load. A share is the column's fraction of the content width; --fit-gap takes off the gutters it does not span
-   (counted at 3rem, the widest gap a block uses, so the estimate errs small); --fit-cols is an equal-columns grid's
-   share, --fit-pad a column's own inline padding, and --fit-box a card's fixed width. The fit gate
-   (apps/showcase/e2e/fit.spec.ts) holds every variant to these at a phone, a tablet and a desktop width. */
+/* The share of the content width a title's column takes, declared from the spans the blocks' columns already carry
+   (sm:, md: and lg:col-span-N: --fit-span N of --fit-of, the page grid's --layout-columns unless a 12-column grid
+   inside it says otherwise), never measured: a size container costs a style pass per container on every layout, and a
+   loud page lays out all through its load. The display steps turn the span into a share of the content width and take
+   off the gutters it does not span (counted at 3rem, the widest gap a block uses, so the estimate errs small);
+   --fit-cols is an equal-columns grid's share, --fit-pad a column's own inline padding, and --fit-box a card's fixed
+   width. They are set on the titles alone (a display title, a block title, a fill statement, a number, a timeline's
+   moment), never on the columns: a custom property on a column would reach every element inside it and cost each of
+   them its shared style. The fit gate (apps/showcase/e2e/fit.spec.ts) holds every variant to these at a phone, a tablet
+   and a desktop width. */
 @media (min-width: 640px) {
-  [data-slot="hero-copy"][class~="sm:col-span-6"],
-    [data-slot="hero-split-copy"][class~="sm:col-span-6"],
-    [data-slot="statement"][class~="sm:col-span-6"],
-    [data-slot="case-side"][class~="sm:col-span-6"],
-    [data-slot="case-solo"][class~="sm:col-span-6"],
-    [data-slot="contact"][class~="sm:col-span-6"],
-    [data-slot="signature"][class~="sm:col-span-6"],
-    [data-slot="not-found"][class~="sm:col-span-6"],
-    [data-slot="number"][class~="sm:col-span-6"],
-    [data-slot="numbers-rest"][class~="sm:col-span-6"],
-    [data-slot="block-body"][class~="sm:col-span-6"],
-    [data-slot="block-title"][class~="sm:col-span-6"],
-    [data-slot="display-title"][class~="sm:col-span-6"],
-    [data-slot="scroll-layers-caption-panel"][class~="sm:col-span-6"] {
-    --fit-share: min(1, 6 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 6 / var(--layout-columns))) * 3rem);
+  .sm\:col-span-6[data-slot="display-title"],
+    .sm\:col-span-6[data-slot="block-title"],
+    .sm\:col-span-6[data-slot="statement-fill"],
+    .sm\:col-span-6[data-slot="number-value"],
+    .sm\:col-span-6[data-slot="timeline-when"],
+    .sm\:col-span-6 [data-slot="display-title"],
+    .sm\:col-span-6 [data-slot="block-title"],
+    .sm\:col-span-6 [data-slot="statement-fill"],
+    .sm\:col-span-6 [data-slot="number-value"],
+    .sm\:col-span-6 [data-slot="timeline-when"] {
+    --fit-span: 6;
   }
 }
 @media (min-width: 768px) {
-  [data-slot="hero-copy"][class~="md:col-span-8"],
-    [data-slot="hero-split-copy"][class~="md:col-span-8"],
-    [data-slot="statement"][class~="md:col-span-8"],
-    [data-slot="case-side"][class~="md:col-span-8"],
-    [data-slot="case-solo"][class~="md:col-span-8"],
-    [data-slot="contact"][class~="md:col-span-8"],
-    [data-slot="signature"][class~="md:col-span-8"],
-    [data-slot="not-found"][class~="md:col-span-8"],
-    [data-slot="number"][class~="md:col-span-8"],
-    [data-slot="numbers-rest"][class~="md:col-span-8"],
-    [data-slot="block-body"][class~="md:col-span-8"],
-    [data-slot="block-title"][class~="md:col-span-8"],
-    [data-slot="display-title"][class~="md:col-span-8"] {
-    --fit-share: min(1, 8 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 8 / var(--layout-columns))) * 3rem);
+  .md\:col-span-8[data-slot="display-title"],
+    .md\:col-span-8[data-slot="block-title"],
+    .md\:col-span-8[data-slot="statement-fill"],
+    .md\:col-span-8[data-slot="number-value"],
+    .md\:col-span-8[data-slot="timeline-when"],
+    .md\:col-span-8 [data-slot="display-title"],
+    .md\:col-span-8 [data-slot="block-title"],
+    .md\:col-span-8 [data-slot="statement-fill"],
+    .md\:col-span-8 [data-slot="number-value"],
+    .md\:col-span-8 [data-slot="timeline-when"] {
+    --fit-span: 8;
   }
-  [data-slot="hero-copy"][class~="md:col-span-10"],
-    [data-slot="hero-split-copy"][class~="md:col-span-10"],
-    [data-slot="statement"][class~="md:col-span-10"],
-    [data-slot="case-side"][class~="md:col-span-10"],
-    [data-slot="case-solo"][class~="md:col-span-10"],
-    [data-slot="contact"][class~="md:col-span-10"],
-    [data-slot="signature"][class~="md:col-span-10"],
-    [data-slot="not-found"][class~="md:col-span-10"],
-    [data-slot="number"][class~="md:col-span-10"],
-    [data-slot="numbers-rest"][class~="md:col-span-10"],
-    [data-slot="block-body"][class~="md:col-span-10"],
-    [data-slot="block-title"][class~="md:col-span-10"],
-    [data-slot="display-title"][class~="md:col-span-10"] {
-    --fit-share: min(1, 10 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 10 / var(--layout-columns))) * 3rem);
+  .md\:col-span-10[data-slot="display-title"],
+    .md\:col-span-10[data-slot="block-title"],
+    .md\:col-span-10[data-slot="statement-fill"],
+    .md\:col-span-10[data-slot="number-value"],
+    .md\:col-span-10[data-slot="timeline-when"],
+    .md\:col-span-10 [data-slot="display-title"],
+    .md\:col-span-10 [data-slot="block-title"],
+    .md\:col-span-10 [data-slot="statement-fill"],
+    .md\:col-span-10 [data-slot="number-value"],
+    .md\:col-span-10 [data-slot="timeline-when"] {
+    --fit-span: 10;
   }
 }
 @media (min-width: 1024px) {
-  [data-slot="hero-copy"][class~="lg:col-span-4"],
-    [data-slot="hero-split-copy"][class~="lg:col-span-4"],
-    [data-slot="statement"][class~="lg:col-span-4"],
-    [data-slot="case-side"][class~="lg:col-span-4"],
-    [data-slot="case-solo"][class~="lg:col-span-4"],
-    [data-slot="contact"][class~="lg:col-span-4"],
-    [data-slot="signature"][class~="lg:col-span-4"],
-    [data-slot="not-found"][class~="lg:col-span-4"],
-    [data-slot="number"][class~="lg:col-span-4"],
-    [data-slot="numbers-rest"][class~="lg:col-span-4"],
-    [data-slot="block-body"][class~="lg:col-span-4"],
-    [data-slot="block-title"][class~="lg:col-span-4"],
-    [data-slot="display-title"][class~="lg:col-span-4"] {
-    --fit-share: min(1, 4 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 4 / var(--layout-columns))) * 3rem);
+  .lg\:col-span-4[data-slot="display-title"],
+    .lg\:col-span-4[data-slot="block-title"],
+    .lg\:col-span-4[data-slot="statement-fill"],
+    .lg\:col-span-4[data-slot="number-value"],
+    .lg\:col-span-4[data-slot="timeline-when"],
+    .lg\:col-span-4 [data-slot="display-title"],
+    .lg\:col-span-4 [data-slot="block-title"],
+    .lg\:col-span-4 [data-slot="statement-fill"],
+    .lg\:col-span-4 [data-slot="number-value"],
+    .lg\:col-span-4 [data-slot="timeline-when"] {
+    --fit-span: 4;
   }
-  [data-slot="hero-copy"][class~="lg:col-span-5"],
-    [data-slot="hero-split-copy"][class~="lg:col-span-5"],
-    [data-slot="statement"][class~="lg:col-span-5"],
-    [data-slot="case-side"][class~="lg:col-span-5"],
-    [data-slot="case-solo"][class~="lg:col-span-5"],
-    [data-slot="contact"][class~="lg:col-span-5"],
-    [data-slot="signature"][class~="lg:col-span-5"],
-    [data-slot="not-found"][class~="lg:col-span-5"],
-    [data-slot="number"][class~="lg:col-span-5"],
-    [data-slot="numbers-rest"][class~="lg:col-span-5"],
-    [data-slot="block-body"][class~="lg:col-span-5"],
-    [data-slot="block-title"][class~="lg:col-span-5"],
-    [data-slot="display-title"][class~="lg:col-span-5"],
-    [data-slot="scroll-layers-caption-panel"][class~="lg:col-span-5"] {
-    --fit-share: min(1, 5 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 5 / var(--layout-columns))) * 3rem);
+  .lg\:col-span-5[data-slot="display-title"],
+    .lg\:col-span-5[data-slot="block-title"],
+    .lg\:col-span-5[data-slot="statement-fill"],
+    .lg\:col-span-5[data-slot="number-value"],
+    .lg\:col-span-5[data-slot="timeline-when"],
+    .lg\:col-span-5 [data-slot="display-title"],
+    .lg\:col-span-5 [data-slot="block-title"],
+    .lg\:col-span-5 [data-slot="statement-fill"],
+    .lg\:col-span-5 [data-slot="number-value"],
+    .lg\:col-span-5 [data-slot="timeline-when"] {
+    --fit-span: 5;
   }
-  [data-slot="hero-copy"][class~="lg:col-span-6"],
-    [data-slot="hero-split-copy"][class~="lg:col-span-6"],
-    [data-slot="statement"][class~="lg:col-span-6"],
-    [data-slot="case-side"][class~="lg:col-span-6"],
-    [data-slot="case-solo"][class~="lg:col-span-6"],
-    [data-slot="contact"][class~="lg:col-span-6"],
-    [data-slot="signature"][class~="lg:col-span-6"],
-    [data-slot="not-found"][class~="lg:col-span-6"],
-    [data-slot="number"][class~="lg:col-span-6"],
-    [data-slot="numbers-rest"][class~="lg:col-span-6"],
-    [data-slot="block-body"][class~="lg:col-span-6"],
-    [data-slot="block-title"][class~="lg:col-span-6"],
-    [data-slot="display-title"][class~="lg:col-span-6"] {
-    --fit-share: min(1, 6 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 6 / var(--layout-columns))) * 3rem);
+  .lg\:col-span-6[data-slot="display-title"],
+    .lg\:col-span-6[data-slot="block-title"],
+    .lg\:col-span-6[data-slot="statement-fill"],
+    .lg\:col-span-6[data-slot="number-value"],
+    .lg\:col-span-6[data-slot="timeline-when"],
+    .lg\:col-span-6 [data-slot="display-title"],
+    .lg\:col-span-6 [data-slot="block-title"],
+    .lg\:col-span-6 [data-slot="statement-fill"],
+    .lg\:col-span-6 [data-slot="number-value"],
+    .lg\:col-span-6 [data-slot="timeline-when"] {
+    --fit-span: 6;
   }
-  [data-slot="hero-copy"][class~="lg:col-span-7"],
-    [data-slot="hero-split-copy"][class~="lg:col-span-7"],
-    [data-slot="statement"][class~="lg:col-span-7"],
-    [data-slot="case-side"][class~="lg:col-span-7"],
-    [data-slot="case-solo"][class~="lg:col-span-7"],
-    [data-slot="contact"][class~="lg:col-span-7"],
-    [data-slot="signature"][class~="lg:col-span-7"],
-    [data-slot="not-found"][class~="lg:col-span-7"],
-    [data-slot="number"][class~="lg:col-span-7"],
-    [data-slot="numbers-rest"][class~="lg:col-span-7"],
-    [data-slot="block-body"][class~="lg:col-span-7"],
-    [data-slot="block-title"][class~="lg:col-span-7"],
-    [data-slot="display-title"][class~="lg:col-span-7"] {
-    --fit-share: min(1, 7 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 7 / var(--layout-columns))) * 3rem);
+  .lg\:col-span-7[data-slot="display-title"],
+    .lg\:col-span-7[data-slot="block-title"],
+    .lg\:col-span-7[data-slot="statement-fill"],
+    .lg\:col-span-7[data-slot="number-value"],
+    .lg\:col-span-7[data-slot="timeline-when"],
+    .lg\:col-span-7 [data-slot="display-title"],
+    .lg\:col-span-7 [data-slot="block-title"],
+    .lg\:col-span-7 [data-slot="statement-fill"],
+    .lg\:col-span-7 [data-slot="number-value"],
+    .lg\:col-span-7 [data-slot="timeline-when"] {
+    --fit-span: 7;
   }
-  [data-slot="hero-copy"][class~="lg:col-span-8"],
-    [data-slot="hero-split-copy"][class~="lg:col-span-8"],
-    [data-slot="statement"][class~="lg:col-span-8"],
-    [data-slot="case-side"][class~="lg:col-span-8"],
-    [data-slot="case-solo"][class~="lg:col-span-8"],
-    [data-slot="contact"][class~="lg:col-span-8"],
-    [data-slot="signature"][class~="lg:col-span-8"],
-    [data-slot="not-found"][class~="lg:col-span-8"],
-    [data-slot="number"][class~="lg:col-span-8"],
-    [data-slot="numbers-rest"][class~="lg:col-span-8"],
-    [data-slot="block-body"][class~="lg:col-span-8"],
-    [data-slot="block-title"][class~="lg:col-span-8"],
-    [data-slot="display-title"][class~="lg:col-span-8"] {
-    --fit-share: min(1, 8 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 8 / var(--layout-columns))) * 3rem);
+  .lg\:col-span-8[data-slot="display-title"],
+    .lg\:col-span-8[data-slot="block-title"],
+    .lg\:col-span-8[data-slot="statement-fill"],
+    .lg\:col-span-8[data-slot="number-value"],
+    .lg\:col-span-8[data-slot="timeline-when"],
+    .lg\:col-span-8 [data-slot="display-title"],
+    .lg\:col-span-8 [data-slot="block-title"],
+    .lg\:col-span-8 [data-slot="statement-fill"],
+    .lg\:col-span-8 [data-slot="number-value"],
+    .lg\:col-span-8 [data-slot="timeline-when"] {
+    --fit-span: 8;
   }
-  [data-slot="hero-copy"][class~="lg:col-span-9"],
-    [data-slot="hero-split-copy"][class~="lg:col-span-9"],
-    [data-slot="statement"][class~="lg:col-span-9"],
-    [data-slot="case-side"][class~="lg:col-span-9"],
-    [data-slot="case-solo"][class~="lg:col-span-9"],
-    [data-slot="contact"][class~="lg:col-span-9"],
-    [data-slot="signature"][class~="lg:col-span-9"],
-    [data-slot="not-found"][class~="lg:col-span-9"],
-    [data-slot="number"][class~="lg:col-span-9"],
-    [data-slot="numbers-rest"][class~="lg:col-span-9"],
-    [data-slot="block-body"][class~="lg:col-span-9"],
-    [data-slot="block-title"][class~="lg:col-span-9"],
-    [data-slot="display-title"][class~="lg:col-span-9"] {
-    --fit-share: min(1, 9 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 9 / var(--layout-columns))) * 3rem);
+  .lg\:col-span-9[data-slot="display-title"],
+    .lg\:col-span-9[data-slot="block-title"],
+    .lg\:col-span-9[data-slot="statement-fill"],
+    .lg\:col-span-9[data-slot="number-value"],
+    .lg\:col-span-9[data-slot="timeline-when"],
+    .lg\:col-span-9 [data-slot="display-title"],
+    .lg\:col-span-9 [data-slot="block-title"],
+    .lg\:col-span-9 [data-slot="statement-fill"],
+    .lg\:col-span-9 [data-slot="number-value"],
+    .lg\:col-span-9 [data-slot="timeline-when"] {
+    --fit-span: 9;
   }
-  [data-slot="hero-copy"][class~="lg:col-span-10"],
-    [data-slot="hero-split-copy"][class~="lg:col-span-10"],
-    [data-slot="statement"][class~="lg:col-span-10"],
-    [data-slot="case-side"][class~="lg:col-span-10"],
-    [data-slot="case-solo"][class~="lg:col-span-10"],
-    [data-slot="contact"][class~="lg:col-span-10"],
-    [data-slot="signature"][class~="lg:col-span-10"],
-    [data-slot="not-found"][class~="lg:col-span-10"],
-    [data-slot="number"][class~="lg:col-span-10"],
-    [data-slot="numbers-rest"][class~="lg:col-span-10"],
-    [data-slot="block-body"][class~="lg:col-span-10"],
-    [data-slot="block-title"][class~="lg:col-span-10"],
-    [data-slot="display-title"][class~="lg:col-span-10"] {
-    --fit-share: min(1, 10 / var(--layout-columns));
-    --fit-gap: calc((1 - min(1, 10 / var(--layout-columns))) * 3rem);
+  .lg\:col-span-10[data-slot="display-title"],
+    .lg\:col-span-10[data-slot="block-title"],
+    .lg\:col-span-10[data-slot="statement-fill"],
+    .lg\:col-span-10[data-slot="number-value"],
+    .lg\:col-span-10[data-slot="timeline-when"],
+    .lg\:col-span-10 [data-slot="display-title"],
+    .lg\:col-span-10 [data-slot="block-title"],
+    .lg\:col-span-10 [data-slot="statement-fill"],
+    .lg\:col-span-10 [data-slot="number-value"],
+    .lg\:col-span-10 [data-slot="timeline-when"] {
+    --fit-span: 10;
   }
 }
 /* feather-expression's Split: its own 12 columns from 768px, whatever the page grid has there. */
 @media (min-width: 768px) {
-  [data-slot="split-start"][class~="md:col-span-1"],
-  [data-slot="split-end"][class~="md:col-span-1"] {
-    --fit-share: 0.0833;
-    --fit-gap: calc(0.9167 * 3rem);
+  [data-slot="split-start"].md\:col-span-1 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-1 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-1 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-1 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-1 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-1 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-1 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-1 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-1 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-1 [data-slot="timeline-when"] {
+    --fit-span: 1;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-2"],
-  [data-slot="split-end"][class~="md:col-span-2"] {
-    --fit-share: 0.1667;
-    --fit-gap: calc(0.8333 * 3rem);
+  [data-slot="split-start"].md\:col-span-2 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-2 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-2 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-2 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-2 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-2 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-2 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-2 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-2 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-2 [data-slot="timeline-when"] {
+    --fit-span: 2;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-3"],
-  [data-slot="split-end"][class~="md:col-span-3"] {
-    --fit-share: 0.25;
-    --fit-gap: calc(0.7500 * 3rem);
+  [data-slot="split-start"].md\:col-span-3 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-3 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-3 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-3 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-3 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-3 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-3 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-3 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-3 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-3 [data-slot="timeline-when"] {
+    --fit-span: 3;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-4"],
-  [data-slot="split-end"][class~="md:col-span-4"] {
-    --fit-share: 0.3333;
-    --fit-gap: calc(0.6667 * 3rem);
+  [data-slot="split-start"].md\:col-span-4 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-4 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-4 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-4 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-4 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-4 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-4 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-4 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-4 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-4 [data-slot="timeline-when"] {
+    --fit-span: 4;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-5"],
-  [data-slot="split-end"][class~="md:col-span-5"] {
-    --fit-share: 0.4167;
-    --fit-gap: calc(0.5833 * 3rem);
+  [data-slot="split-start"].md\:col-span-5 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-5 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-5 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-5 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-5 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-5 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-5 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-5 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-5 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-5 [data-slot="timeline-when"] {
+    --fit-span: 5;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-6"],
-  [data-slot="split-end"][class~="md:col-span-6"] {
-    --fit-share: 0.5;
-    --fit-gap: calc(0.5000 * 3rem);
+  [data-slot="split-start"].md\:col-span-6 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-6 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-6 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-6 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-6 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-6 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-6 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-6 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-6 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-6 [data-slot="timeline-when"] {
+    --fit-span: 6;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-7"],
-  [data-slot="split-end"][class~="md:col-span-7"] {
-    --fit-share: 0.5833;
-    --fit-gap: calc(0.4167 * 3rem);
+  [data-slot="split-start"].md\:col-span-7 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-7 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-7 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-7 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-7 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-7 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-7 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-7 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-7 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-7 [data-slot="timeline-when"] {
+    --fit-span: 7;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-8"],
-  [data-slot="split-end"][class~="md:col-span-8"] {
-    --fit-share: 0.6667;
-    --fit-gap: calc(0.3333 * 3rem);
+  [data-slot="split-start"].md\:col-span-8 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-8 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-8 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-8 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-8 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-8 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-8 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-8 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-8 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-8 [data-slot="timeline-when"] {
+    --fit-span: 8;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-9"],
-  [data-slot="split-end"][class~="md:col-span-9"] {
-    --fit-share: 0.75;
-    --fit-gap: calc(0.2500 * 3rem);
+  [data-slot="split-start"].md\:col-span-9 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-9 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-9 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-9 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-9 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-9 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-9 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-9 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-9 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-9 [data-slot="timeline-when"] {
+    --fit-span: 9;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-10"],
-  [data-slot="split-end"][class~="md:col-span-10"] {
-    --fit-share: 0.8333;
-    --fit-gap: calc(0.1667 * 3rem);
+  [data-slot="split-start"].md\:col-span-10 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-10 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-10 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-10 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-10 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-10 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-10 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-10 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-10 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-10 [data-slot="timeline-when"] {
+    --fit-span: 10;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-11"],
-  [data-slot="split-end"][class~="md:col-span-11"] {
-    --fit-share: 0.9167;
-    --fit-gap: calc(0.0833 * 3rem);
+  [data-slot="split-start"].md\:col-span-11 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-11 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-11 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-11 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-11 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-11 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-11 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-11 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-11 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-11 [data-slot="timeline-when"] {
+    --fit-span: 11;
+    --fit-of: 12;
   }
-  [data-slot="split-start"][class~="md:col-span-12"],
-  [data-slot="split-end"][class~="md:col-span-12"] {
-    --fit-share: 1.;
-    --fit-gap: calc(0.0000 * 3rem);
+  [data-slot="split-start"].md\:col-span-12 [data-slot="display-title"],
+    [data-slot="split-start"].md\:col-span-12 [data-slot="block-title"],
+    [data-slot="split-start"].md\:col-span-12 [data-slot="statement-fill"],
+    [data-slot="split-start"].md\:col-span-12 [data-slot="number-value"],
+    [data-slot="split-start"].md\:col-span-12 [data-slot="timeline-when"],
+    [data-slot="split-end"].md\:col-span-12 [data-slot="display-title"],
+    [data-slot="split-end"].md\:col-span-12 [data-slot="block-title"],
+    [data-slot="split-end"].md\:col-span-12 [data-slot="statement-fill"],
+    [data-slot="split-end"].md\:col-span-12 [data-slot="number-value"],
+    [data-slot="split-end"].md\:col-span-12 [data-slot="timeline-when"] {
+    --fit-span: 12;
+    --fit-of: 12;
   }
 }
-/* Equal columns (feather-expression's Grid, and a split hero cropped to the edge). */
+/* Equal columns: a number in feather-expression's Grid, and a split hero's copy cropped to the edge. */
 @media (min-width: 768px) {
-  [data-slot="grid"][data-variant="2"] > *,
-  [data-slot="grid"][data-variant="3"] > *,
-  [data-slot="grid"][data-variant="4"] > * {
+  [data-slot="grid"] > [data-slot="number"] > [data-slot="number-value"] {
     --fit-cols: 0.5;
     --fit-pad: 1rem;
   }
 }
 @media (min-width: 1024px) {
-  [data-slot="grid"][data-variant="3"] > * {
+  [data-slot="grid"][data-variant="3"] > [data-slot="number"] > [data-slot="number-value"] {
     --fit-cols: 0.3333;
     --fit-pad: 1.3333rem;
   }
-  [data-slot="grid"][data-variant="4"] > * {
+  [data-slot="grid"][data-variant="4"] > [data-slot="number"] > [data-slot="number-value"] {
     --fit-cols: 0.25;
     --fit-pad: 1.5rem;
   }
-  [data-slot="hero-split"][class~="lg:grid-cols-2"] > * {
+  .lg\:grid-cols-2 > [data-slot="hero-split-copy"] [data-slot="display-title"] {
     --fit-cols: 0.5;
-    --fit-gap: 1.5rem;
   }
   /* A lead's numbers inside a split block's body: the body's 8 columns, then their own of those. */
-  [data-slot="block-body"] [data-slot="number"][class~="lg:col-span-7"] {
-    --fit-share: 0.3889;
+  [data-slot="block-body"] .lg\:col-span-7 [data-slot="number-value"] {
+    --fit-span: 4.6667;
   }
-  [data-slot="block-body"] [data-slot="numbers-rest"][class~="lg:col-span-5"] {
-    --fit-share: 0.2778;
+  [data-slot="block-body"] .lg\:col-span-5 [data-slot="number-value"] {
+    --fit-span: 3.3333;
   }
 }
-/* A column's own padding: the cropped split hero's copy (pe-6, lg:pe-12), the case's side (px-6, lg:pe-12), a scaled
-   case's caption panel (p-6), and a film
-   hero kept inside the grid (its frame is the page inset, and its copy sits on a page grid inside that). */
-[data-slot="hero-split"][class~="lg:grid-cols-2"] > [data-slot="hero-split-copy"],
-[data-slot="case-side"],
-[data-slot="scroll-layers-caption-panel"] {
+/* A column's own padding: the cropped split hero's copy (pe-6, lg:pe-12, and from 1024px half its row's gap), the
+   case's side (px-6, lg:pe-12), a scaled case's caption panel (p-6), and a film hero kept inside the grid (its frame is
+   the page inset, and its copy sits on a page grid inside that). */
+.lg\:grid-cols-2 > [data-slot="hero-split-copy"] [data-slot="display-title"],
+[data-slot="case-side"] [data-slot="display-title"],
+[data-slot="scroll-layers-caption-panel"] [data-slot="display-title"] {
   --fit-pad: 3rem;
 }
-[data-slot="hero-film-inset"] {
+[data-slot="hero-film-inset"] [data-slot="display-title"] {
   --fit-pad: calc(2 * var(--layout-margin));
 }
+@media (min-width: 1024px) {
+  .lg\:grid-cols-2 > [data-slot="hero-split-copy"] [data-slot="display-title"] {
+    --fit-pad: 4.5rem;
+  }
+}
 /* A horizontal timeline's moment is a card of fixed width (w-2xs, sm:w-xs). */
-[data-slot="timeline-item"][class~="w-2xs"] {
+.w-2xs[data-slot="timeline-item"] > [data-slot="timeline-when"] {
   --fit-box: 18rem;
 }
 @media (min-width: 640px) {
-  [data-slot="timeline-item"][class~="sm:w-xs"] {
+  .sm\:w-xs[data-slot="timeline-item"] > [data-slot="timeline-when"] {
     --fit-box: 20rem;
   }
 }
 /* A display line set under 1 hangs its glyphs out of its box by (--display-overhang em - 1lh) / 2 at the top and at the
-   bottom (34px at 160px and leading 0.86). Where a title meets other copy (an eyebrow above, a lede below), that edge
-   reserves it, so the gap is kept from the glyphs and not only from the box. A utility margin still wins. */
+   bottom (34px at 160px and leading 0.86). Where a title meets other copy (the hero's eyebrow above, a lede or a body
+   below), that edge reserves it, so the gap is kept from the glyphs and not only from the box. A utility margin still
+   wins. */
 @layer components {
-  :where(:is([data-slot="display-title"], [data-slot="statement-fill"]):not(:first-child)) {
+  [data-slot="hero-eyebrow"] + [data-slot="display-title"] {
     margin-block-start: max(0px, (var(--display-overhang) * 1em - 1lh) / 2);
   }
-  :where(:is([data-slot="display-title"], [data-slot="statement-fill"]):not(:last-child)) {
+  [data-slot="display-title"]:not(:last-child),
+  [data-slot="statement-fill"]:not(:last-child) {
     margin-block-end: max(0px, (var(--display-overhang) * 1em - 1lh) / 2);
   }
 }
-/* Inside a page block no word runs past its box: copy that is not a title (a label, a fact, a cell) breaks a word too
-   long for its line rather than overflow. Titles fit first (above) and break only at the floor. */
-:where([data-block]) {
+/* No word runs past its box in the copy that sits in a narrow cell beside a title or a figure (a number's label, a
+   fact): it breaks a word too long for its line rather than overflow. Titles fit first (above) and break only at the
+   floor. Set on those elements alone, not inherited through a whole block, so the rest of the page keeps its shared
+   styles. */
+[data-slot="number-label"],
+[data-slot="hero-fact-value"],
+[data-slot="case-fact-label"],
+[data-slot="case-fact-value"] {
   overflow-wrap: anywhere;
 }
 @utility fit-word {

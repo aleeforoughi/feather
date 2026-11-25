@@ -648,8 +648,13 @@ house defaults below live in foundation.css for it.
   - A number keeps its unit on its line (a no-break space) while the pair fits the measure; a longer pair joins with
     a plain space, so the unit wraps under the number (`unitSpace`).
   - A display line set under 1 hangs its glyphs out of its box by `(--display-overhang em − 1lh) / 2` at each edge
-    (1.3: the reference faces measure 1.25 to 1.29). Where a title meets other copy, that edge reserves it, so an
-    eyebrow above or a lede below keeps its gap from the glyphs, not only from the box.
+    (1.3: the reference faces measure 1.25 to 1.29). The edges where a title meets other copy reserve it: below a
+    hero's eyebrow, and above whatever follows the title (a lede, a body), so the gap is kept from the glyphs, not
+    only from the box.
+  - The copy in a narrow cell beside a title or a figure (a number's label, a fact) breaks a word too long for its
+    line rather than overflow (`overflow-wrap: anywhere` on those slots alone).
+  - Every rule is keyed on a class or a slot and sets its properties on the titles alone: nothing is inherited
+    through a whole block, so the page keeps its shared styles (the loud page's mobile TBT budget).
 - **Features**, all on by default: `tabularNums` (`numeric`), `balanceTitles` (`--title-wrap`) and `prettyBody`
   (`text-prose`).
 - **`voiceFace`**: the speaker's face in a Living Page (`font-voice`), so you can see who is speaking.
