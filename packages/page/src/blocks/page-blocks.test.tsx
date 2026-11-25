@@ -38,10 +38,12 @@ describe("gallery", () => {
   })
 
   it("opens the lightbox at the image, steps through all of them, and offers no download", async () => {
+    // The lazy chunk, fetched ahead as a pointer or focus reaches an image does (its first load in jsdom is slow).
+    await import("./react-parts")
     render(<GalleryBlock block={{ ...BLOCKS.gallery, variant: "grid" }} />)
     fireEvent.click(screen.getByRole("link", { name: GALLERY[1].media.alt }))
     await settle()
-    const dialog = await screen.findByRole("dialog")
+    const dialog = await screen.findByRole("dialog", {}, { timeout: 3000 })
     expect(within(dialog).getByRole("heading", { name: GALLERY[1].media.alt })).toBeTruthy()
     expect(within(dialog).getByText(/2 of 6/)).toBeTruthy()
     expect(within(dialog).queryByRole("link", { name: /Download/ })).toBeNull()

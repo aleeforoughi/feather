@@ -297,10 +297,8 @@ test.describe("form", () => {
     await expect(page.getByLabel("Your name")).toHaveAttribute("aria-invalid", "true")
     await page.getByLabel("Your name").fill("Ada")
     await page.getByLabel("Email").fill("ada@example.com")
-    // The select is feather-react's once the script runs: open it and choose.
-    await page.locator("#enquiry-budget").click()
-    await page.getByRole("option", { name: "Over €30k" }).click()
-    await page.getByRole("radio", { name: "This month" }).click()
+    await page.getByLabel("Budget").selectOption("Over €30k")
+    await page.getByRole("radio", { name: "This month" }).check()
     await page.getByLabel(/What are you making/).fill("A calmer bank.")
     await page.locator('#enquiry [data-slot="form-submit"]').click()
     await expect.poll(() => posts.length).toBe(1)

@@ -13,9 +13,9 @@ const dist = path.join(import.meta.dirname, "../dist")
 const version = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../package.json"), "utf8")).version
 
 /** Every file and folder of the web bundle, relative to dist. The Three.js chunk loads only on a page whose 3D scene
- * runs, and the parts chunk only where a gallery opens an image or a form enhances its select or choice, each from
- * beside the runtime; the bundler's own helpers, which the runtime and the parts share, are a file of their own. */
-export const WEB_FILES = ["feather-page.css", "feather-page-runtime.js", "feather-page-three.js", "feather-page-parts.js", "feather-page-rolldown-runtime.js", "fonts"]
+ * runs, and the parts chunk only where a gallery opens an image, each from
+ * beside the runtime. */
+export const WEB_FILES = ["feather-page.css", "feather-page-runtime.js", "feather-page-three.js", "feather-page-parts.js", "fonts"]
 
 const read = (f) => fs.readFileSync(path.join(dist, f), "utf8")
 const kb = (n) => `${(n / 1000).toFixed(1)} kB`

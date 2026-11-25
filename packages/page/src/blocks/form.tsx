@@ -1,18 +1,21 @@
 import * as React from "react"
 import { Section } from "@aleeforoughi/feather-expression"
-import { Field, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, Input, Textarea } from "@aleeforoughi/feather-react"
 import type { FormField, FormVariant } from "../core/types"
 import { useHydrated } from "./hydration"
 import { KnobBody, KnobTitle, alignClass, useKnobs } from "./knobs"
 import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
 
-// The enhanced select and choice, from the page's lazy chunk of feather-react parts (react-parts.tsx).
-const PartSelect = React.lazy(() => import("./react-parts").then((m) => ({ default: m.PartSelect })))
-const PartChoice = React.lazy(() => import("./react-parts").then((m) => ({ default: m.PartChoice })))
-
-// The minimal underline: the field is its baseline, at the control's height, with the focus ring on the control.
-const UNDERLINE = "rounded-none border-0 border-b bg-transparent px-0 focus-ring"
-const NATIVE_SELECT = "h-control w-full min-w-0 appearance-none rounded-none border-0 border-b border-line-primary bg-transparent type-body text-fg-primary focus-ring aria-invalid:border-destructive"
+// The browser's own controls in the house's geometry and tokens: the minimal underline (the field is its baseline, at
+// the control's height), the body type role, the tertiary placeholder, the focus ring on the control and the
+// destructive line while it is invalid. Native controls work with no script, on every device, with its own keyboard
+// and its own pickers, and they keep feather-react off a page's first load.
+const UNDERLINE =
+  "block w-full min-w-0 rounded-none border-0 border-b border-line-primary bg-transparent type-body text-fg-primary placeholder:text-fg-tertiary motion-state focus-ring aria-invalid:border-destructive"
+const INPUT = `${UNDERLINE} h-control`
+const TEXTAREA = `${UNDERLINE} field-sizing-content min-h-24 py-3`
+const SELECT = `${UNDERLINE} h-control cursor-pointer appearance-none pe-8`
+const RADIO = "size-5 shrink-0 cursor-pointer accent-primary focus-ring"
+const LABEL = "type-label text-fg-primary"
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const TEL = /^[+()\d\s.-]{6,}$/
@@ -45,11 +48,19 @@ interface ControlProps {
   field: FormField
   id: string
   error?: string
-  hydrated: boolean
 }
 
-/** One field: its label, its control (feather-react's), its hint and its message. */
-function Control({ field, id, error, hydrated }: ControlProps) {
+/** The chevron of a select: decoration, drawn over the native control's end. */
+function Chevron() {
+  return (
+    <svg data-slot="form-select-chevron" aria-hidden="true" viewBox="0 0 16 16" className="pointer-events-none absolute right-0 top-1/2 size-4 -translate-y-1/2 text-fg-secondary" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M4 6l4 4 4-4" />
+    </svg>
+  )
+}
+
+/** One field: its label, its native control, its hint and its message (in words, announced as it appears). */
+function Control({ field, id, error }: ControlProps) {
   const type = field.type ?? "text"
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
@@ -59,94 +70,85 @@ function Control({ field, id, error, hydrated }: ControlProps) {
     <>
       {field.label}
       {field.required ? null : (
-        <span data-slot="form-optional" className="type-caption text-fg-secondary">
+        <span data-slot="form-optional" className="ms-2 type-caption text-fg-secondary">
           (optional)
         </span>
       )}
     </>
   )
   const hint = field.hint ? (
-    <FieldDescription id={hintId}>
+    <p id={hintId} data-slot="form-hint" className="type-body-sm text-fg-secondary">
       {field.hint}
-    </FieldDescription>
+    </p>
   ) : null
-  const message = <FieldError id={errorId}>{error}</FieldError>
+  const message = error ? (
+    <p id={errorId} role="alert" data-slot="form-error" className="type-body-sm text-destructive">
+      {error}
+    </p>
+  ) : null
 
   if (type === "choice") {
-    const options = field.options ?? []
-    const natives = (
-      <div data-slot="form-choices" className="flex flex-col gap-1">
-        {options.map((o, i) => (
-          <div key={o} data-slot="form-choice" className="flex min-h-12 items-center gap-3">
-            <input type="radio" data-slot="form-radio-native" id={`${id}-${i}`} name={field.name} value={o} required={field.required} className="size-5 accent-primary focus-ring" />
-            <FieldLabel htmlFor={`${id}-${i}`} className="type-body">
-              {o}
-            </FieldLabel>
-          </div>
-        ))}
-      </div>
-    )
     return (
-      <FieldSet data-invalid={error ? true : undefined} aria-describedby={describedBy}>
-        <FieldLegend variant="label">{label}</FieldLegend>
+      <fieldset data-slot="form-field" data-variant="choice" data-invalid={error ? true : undefined} aria-describedby={describedBy} className="flex flex-col gap-2">
+        <legend data-slot="form-label" className={join(LABEL, "mb-2")}>
+          {label}
+        </legend>
         {hint}
-        {/* The native radios are what the server writes, and what shows until the enhanced group has loaded. */}
-        {hydrated ? (
-          <React.Suspense fallback={natives}>
-            <PartChoice id={id} name={field.name} label={field.label} required={field.required} options={options} {...common} />
-          </React.Suspense>
-        ) : (
-          natives
-        )}
+        <div data-slot="form-choices" className="flex flex-col">
+          {(field.options ?? []).map((o, i) => (
+            <div key={o} data-slot="form-choice" className="flex min-h-12 items-center gap-3">
+              <input type="radio" data-slot="form-radio" id={`${id}-${i}`} name={field.name} value={o} required={field.required} aria-invalid={error ? true : undefined} className={RADIO} />
+              <label htmlFor={`${id}-${i}`} data-slot="form-choice-label" className="cursor-pointer type-body text-fg-primary">
+                {o}
+              </label>
+            </div>
+          ))}
+        </div>
         {message}
-      </FieldSet>
+      </fieldset>
     )
   }
 
   let control: React.ReactNode
   if (type === "textarea") {
-    control = <Textarea id={id} name={field.name} required={field.required} maxLength={field.max} placeholder={field.placeholder} autoComplete={field.autocomplete} rows={4} className={join(UNDERLINE, "min-h-24 py-3")} {...common} />
+    control = <textarea id={id} data-slot="form-textarea" name={field.name} required={field.required} maxLength={field.max} placeholder={field.placeholder} autoComplete={field.autocomplete} rows={4} className={TEXTAREA} {...common} />
   } else if (type === "select") {
-    const options = field.options ?? []
-    const native = (
-      <select id={id} data-slot="form-select-native" name={field.name} required={field.required} defaultValue="" className={NATIVE_SELECT} {...common}>
-        <option value="" disabled={field.required}>
-          {field.placeholder ?? "Choose one"}
-        </option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
+    control = (
+      <div data-slot="form-select" className="relative">
+        <select id={id} data-slot="form-select-control" name={field.name} required={field.required} defaultValue="" autoComplete={field.autocomplete} className={SELECT} {...common}>
+          <option value="" disabled={field.required}>
+            {field.placeholder ?? "Choose one"}
           </option>
-        ))}
-      </select>
-    )
-    control = hydrated ? (
-      <React.Suspense fallback={native}>
-        <PartSelect id={id} name={field.name} required={field.required} placeholder={field.placeholder ?? "Choose one"} options={options} className={join(UNDERLINE, "w-full")} {...common} />
-      </React.Suspense>
-    ) : (
-      native
+          {(field.options ?? []).map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+        <Chevron />
+      </div>
     )
   } else {
     const t = type as "text" | "email" | "tel" | "url" | "number"
     const length = t === "number" ? (field.max !== undefined ? { max: field.max } : {}) : field.max !== undefined ? { maxLength: field.max } : {}
-    control = <Input id={id} name={field.name} type={t} required={field.required} placeholder={field.placeholder} autoComplete={field.autocomplete} inputMode={t === "number" ? "decimal" : undefined} className={UNDERLINE} {...length} {...common} />
+    control = <input id={id} data-slot="form-input" name={field.name} type={t} required={field.required} placeholder={field.placeholder} autoComplete={field.autocomplete} inputMode={t === "number" ? "decimal" : undefined} className={INPUT} {...length} {...common} />
   }
   return (
-    <Field data-invalid={error ? true : undefined}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+    <div data-slot="form-field" data-variant={type} data-invalid={error ? true : undefined} className="flex flex-col gap-2">
+      <label htmlFor={id} data-slot="form-label" className={LABEL}>
+        {label}
+      </label>
       {control}
       {hint}
       {message}
-    </Field>
+    </div>
   )
 }
 
 /**
  * A short form that works with no script: a real `<form>` that posts to `action` (an http(s) URL or a path), or, for a
- * `mailto:` action, opens the visitor's mail with the answers (text/plain). Every field is feather-react's (Field,
- * Input, Textarea; a select and a choice are native controls until the script runs, then its Select and RadioGroup,
- * sending the same names). With script the browser's own bubbles give way to messages in words beside each field,
+ * `mailto:` action, opens the visitor's mail with the answers (text/plain). Every field is the browser's own control
+ * (input, textarea, select, a radio group in a fieldset) in the house's underline style and tokens. With script the browser's own bubbles give way to messages in words beside each field,
  * announced as they appear, and a summary of what needs a look; focus goes to the first. Variants (feather.page/1):
  * - underline (the default): the whole form, each field a minimal baseline;
  * - conversational: one question at a time, with its place ("2 of 4") announced, Back and Next, and the send on the
@@ -259,7 +261,7 @@ export function FormBlock({ block }: BlockProps<"form">) {
                 hidden={conversational && hydrated && i !== step ? true : undefined}
                 className={conversational ? "scripting:not-data-[state=active]:hidden" : undefined}
               >
-                <Control field={f} id={fieldId(f)} error={errors[f.name]} hydrated={hydrated} />
+                <Control field={f} id={fieldId(f)} error={errors[f.name]} />
               </div>
             ))}
             <p data-slot="form-status" role="status" aria-live="polite" className="type-body-sm text-fg-secondary">
