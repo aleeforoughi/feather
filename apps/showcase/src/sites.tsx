@@ -2,6 +2,8 @@
 // Seed. Only the tokens change. The model is off: the starters play the prepared scenes.
 //   ?brand=studio|portrait|seed   the brand
 //   ?page=loud                    the loud reference page (loudness 3, the expressive variants); default the reference page
+//   ?page=flows                   the product-flows page (wave 5): quiz, calculator, charts, booking, podcast, places, the
+//                                 work's view switch and the colour scheme toggle (each brand with its other colour set)
 //   ?view=404                     the page's 404 route (PageNotFound)
 //   ?loader=counter|dock          adds the page's loader (wave 1 e2e; the budget pages run without one)
 //   ?sound=1                      adds an ambient bed (the nav's toggle) and the loader's sound choice
@@ -19,12 +21,15 @@ import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
 import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
 import reference from "../../../packages/page/examples/studio-of-one.page.json"
 import loud from "../../../packages/page/examples/studio-of-one-loud.page.json"
+import flows from "../../../packages/page/examples/studio-of-one-flows.page.json"
+import schemes from "./schemes.json"
 import "./sites.css"
 
 const BRANDS: Record<string, { dark: boolean; tokens: unknown }> = { studio, portrait, seed }
 const params = new URLSearchParams(location.search)
 const loader = params.get("loader")
-const doc = params.get("page") === "loud" ? loud : reference
+const pageParam = params.get("page")
+const doc = (pageParam === "loud" ? loud : pageParam === "flows" ? flows : reference) as typeof reference
 
 const withSound = params.get("sound") === "1"
 const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && "scene" in b && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
@@ -39,11 +44,16 @@ const page: PageDocument = result.page
 const variant = (params.get("transition") ?? page.transition ?? "fade") as RouteVariant
 const transitions = createTransitions()
 
+/** A page with a colour scheme toggle takes the brand's own other set (each reference brand has one scheme). */
+const SCHEMES = schemes as Record<string, NonNullable<PageDocument["scheme"]>["colors"]>
+const forBrand = (name: string): PageDocument => (page.scheme ? { ...page, scheme: { ...page.scheme, colors: SCHEMES[name] ?? page.scheme.colors } } : page)
+
 function view(name: string) {
   const brand = BRANDS[name] ?? studio
   document.documentElement.classList.toggle("dark", brand.dark)
   document.documentElement.dataset.brand = name
   const tokens = brand.tokens as BrandTokens
+  const branded = forBrand(name)
   return (
     <StrictMode>
       <nav aria-label="Brands" data-slot="brand-switch" className="flex justify-center gap-4 bg-surface-base p-2 type-caption text-fg-secondary">
@@ -53,7 +63,7 @@ function view(name: string) {
           </a>
         ))}
       </nav>
-      {params.get("view") === "404" ? <PageNotFound page={page} tokens={tokens} /> : <FeatherPage page={page} tokens={tokens} />}
+      {params.get("view") === "404" ? <PageNotFound page={branded} tokens={tokens} /> : <FeatherPage page={branded} tokens={tokens} />}
     </StrictMode>
   )
 }

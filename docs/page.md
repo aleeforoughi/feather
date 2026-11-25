@@ -37,7 +37,8 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   - the honesty floor: a page with a living layer names its speaker, and a custom disclosure must say it is an AI
     agent.
 - **The block library** is the Living Page's (Qooler file 22 §3): `hero`, `statement`, `work`, `case`, `numbers`,
-  `timeline`, `process`, `logos`, `quote`, `offer`, `faq`, `contact`, and one `signature` block per brand. It is
+  `timeline`, `process`, `logos`, `quote`, `offer`, `faq`, `contact`, one `signature` block per brand, and (from
+  1.23, `feather.page/1` only) the product flows `quiz`, `booking`, `calculator`, `chart`, `places` and `podcast`. It is
   the same set as `@aleeforoughi/feather-living`'s `BLOCK_KINDS`, and a test holds them equal. An answer is built
   only from these.
 - `brand` is a path the host resolves (the CLI reads it), or the tokens inline. Any `feather-tokens/3` brand works;
@@ -87,6 +88,10 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
     | offer | cards, table |
     | timeline | list, horizontal |
     | faq, contact | one each |
+    | quiz, booking, podcast | one each (`steps`, `steps`, `list`) |
+    | calculator | split (the total stays beside the inputs on wide screens), stacked |
+    | chart | bar, line, area |
+    | places | list, map (the page's own still map beside the list; needs `media`) |
   - `examples/studio-of-one-loud.page.json` is the reference page at loudness 3, using the expressive variants (the
     showcase serves it at `sites.html?page=loud`).
 - **Scenes (`scene`, from 1.22).** On `hero` (the `interactive` variant), `case` and `signature`:
@@ -106,6 +111,55 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   - Three.js loads only for a page with a model, particles or rail scene, as its own chunk; a page without one never
     downloads it. A product that bundles `@aleeforoughi/feather-page` itself installs `three` (an optional peer) or
     aliases it to an empty module.
+- **Product flows (from 1.23).** Blocks of `feather.page/1` (on a `/0` page each is `needs-schema-1`) that compose
+  native controls, never scripted widgets: each works in full with no script, as a static, honest form, and keeps the
+  person in control (nothing advances, plays or sends on its own).
+
+  | block | fields | with no script |
+  |---|---|---|
+  | `quiz` | `title`, `body?`, `scoring` (`tally` or `score`), 1–8 `questions` `{ id, q, help?, options: 2–6 { id, label, result? \| score? } }`, 1–8 `results` `{ id, title, body?, href?, label?, min?, max?, match? }` | every question at once, and "How the result is decided" listing every result and its rule |
+  | `booking` | `title`, `body?`, 1–8 `services` `{ id, name, duration?, price?, body? }`, 1–14 `days` `{ date (YYYY-MM-DD), label?, slots: 1–16 HH:MM }`, `zone?`, `ask?: { phone?, note? }`, exactly one of `action` (a form handler), `mailto` (an address) or `link` (an https booking page), `confirm?` | one form: services and slots as radios, the details, a submit (or the link) |
+  | `calculator` | `title`, `body?`, 1–8 `inputs` `{ id, label, kind: range \| number \| radio \| toggle, min?, max?, step?, value?, unit?, help?, options? }`, up to 6 `lines` `{ id?, label, formula }`, `formula`, `total?`, `prefix?`, `suffix?`, `decimals?` (0–2), `note?` | the starting prices: the total at the starting choices and what each choice makes it |
+  | `chart` | `title`, `summary` (required), 1–4 `series` `{ label }`, 2–24 `rows` `{ label, values }` (one per series), `axis?`, `unit?`, `prefix?`, `decimals?`, `source?` | the end state (the SVG is the markup) and the table |
+  | `places` | `title`, `body?`, `media?` (a still map), 1–24 `items` `{ name, address, directions?, href?, phone?, hours?, note? }` | the same list and links |
+  | `podcast` | `title`, `body?`, 1–12 `episodes` `{ id, title, audio, duration?, date?, summary?, chapters?: { at, title }[], transcript: { at?, by?, text }[] }` | the browser's own audio controls, the chapters as text, the transcript |
+
+  - The quiz goes one question per step (Next, Back, Start again; focus moves to each step's heading). A result's
+    `match` (question id to option id) wins first; otherwise `tally` gives the result most answers point to (a tie to
+    the one listed first) and `score` the first result whose `min`–`max` holds the total.
+  - The booking flow goes service, date and time, details, then a review where every choice has its Change button.
+    Slots come from the page; days are listed, never a grid. `mailto` opens the person's mail app with the request
+    written out; nothing is sent until they send it.
+  - The calculator's formulas are a small language with no eval: numbers, input and line names, `+ - * /`,
+    parentheses, `min`, `max` and `round(x)` or `round(x, places)`. A line reads the inputs and the lines before it;
+    the total reads all of them. The total and its breakdown are a polite, atomic live region.
+  - The chart draws in the text ink (7:1 on the ground in every brand) with a distinct mark per series (solid, hatch,
+    dots, cross; or solid, dashed, dotted, dash-dot lines), so no series is told apart by colour alone. Its summary is
+    the figure's caption and the data is a table behind a disclosure. It draws in on reveal at loudness 1 and up, never
+    under reduced motion or when already on screen at load.
+  - The podcast never autoplays and loads nothing before play (`preload="none"`); its controls are real buttons, the
+    scrub slider speaks its value as time, chapters seek, one episode plays at a time, and the page's ambient sound is
+    muffled while one does. The transcript can follow playback when the person turns that on.
+  - Codes: `bad-formula` (a formula that does not parse, with the character), `unknown-ref` (a formula name, a tally
+    answer's result or a match that points nowhere), `contradiction` (a scored total no result covers, a formula with
+    no value at an input's bounds, a booking that sends to two places, a chart row that does not fit its series,
+    chapters or transcript out of order), `missing` (a booking with nowhere to send, a transcript, a range input's
+    bounds), `unsupported` (a field of another input kind), `bad-href` and `bad-media` (an episode that is not audio),
+    `duplicate-id`.
+- **The view-mode switch (`views`, from 1.23).** On `work` (and any block in `VIEW_BLOCKS`): `views: grid | list |
+  index` names the view the block starts in, which is its static form; with script, a segmented radio group switches
+  grid, list and index, remembered per page and block. It switches the grid's layout, so another variant, or a stack or
+  horizontal scroll, is a `contradiction`.
+- **The colour scheme toggle (`scheme`, from 1.23).** A page-level knob: `scheme: { toggle?: nav | footer, colors }`,
+  where `colors` is the brand's other set (`background`, `surface`, `text`, `primary` and optionally `primaryText`,
+  `accent`, `accentText`, `destructive`, as `#hex`), compiled by the theme engine beside the brand. `prefers-color-scheme`
+  decides first; the toggle (light, dark, system, a real radio group in the nav's bar or the footer) sets
+  `data-scheme` on `<html>`, remembered for the site. `feather-page build` writes `schemeScript()` into the head, so a
+  remembered choice is on the page before its first paint; with no script the system's preference holds and the toggle
+  is not shown. The validator checks the toggle has an edge to sit in (`missing`), the colours are hex (`type`) and
+  that text reads at 4.5:1 on its ground (`contradiction`); the renderer refuses a set of the same scheme as the brand.
+- `examples/studio-of-one-flows.page.json` is the reference page for the flows (the showcase serves it at
+  `sites.html?page=flows`, with each brand's own other set).
 - **Loudness on a page.** `FeatherPage` sets `data-loudness` on `<main>` from `page.loudness`, and each block's section
   from its own knob; the brand's default is the theme's `--loudness` (`feather-tokens/4`). The expression components
   ask what the level allows: a reveal needs 1, kinetic type, pins, horizontal tracks and scrubbed sequences need 2,
@@ -119,4 +173,6 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
 ## Codes
 
 `wrong-schema`, `not-object`, `missing`, `type`, `too-long`, `unknown-block`, `unknown-field`, `too-few`, `too-many`,
-`bad-href`, `bad-media`, `unknown-ref`, `unknown-scene`, `duplicate-id`, `no-speaker`.
+`bad-href`, `bad-media`, `unknown-ref`, `unknown-scene`, `duplicate-id`, `no-speaker`; for the knobs
+`needs-schema-1`, `unknown-variant`, `out-of-range`, `unsupported` and `contradiction`; for the calculator
+`bad-formula`.
