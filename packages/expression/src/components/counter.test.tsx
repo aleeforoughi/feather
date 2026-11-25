@@ -1,7 +1,10 @@
 import { act, render } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { clock } from "../core/clock"
+import { renderToString } from "react-dom/server"
 import { Counter } from "./counter"
+import { LocaleProvider } from "./locale"
+import { formatCount } from "../core/counter"
 import { mockMedia, REDUCED } from "../test/helpers"
 
 let observers: Array<{ cb: IntersectionObserverCallback; disconnect: () => void }> = []
@@ -70,5 +73,19 @@ describe("Counter", () => {
     enter()
     unmount()
     expect(clock.size).toBe(0)
+  })
+})
+
+describe("the locale numbers are written in", () => {
+  it("is fixed, never the environment's: the server and a Persian browser write the same digits", () => {
+    expect(formatCount(1280, 1280)).toBe("1,280")
+    expect(renderToString(<Counter value={1280} />)).toContain("1,280")
+  })
+
+  it("follows the nearest LocaleProvider (a page's lang), and an own locale wins", () => {
+    expect(renderToString(<LocaleProvider locale="fa"><Counter value={1280} /></LocaleProvider>)).toContain("۱٬۲۸۰")
+    expect(renderToString(<LocaleProvider locale="de"><Counter value={1280} /></LocaleProvider>)).toContain("1.280")
+    expect(renderToString(<LocaleProvider locale="fa"><Counter value={1280} locale="en" /></LocaleProvider>)).toContain("1,280")
+    expect(renderToString(<LocaleProvider locale={undefined}><Counter value={1280} /></LocaleProvider>)).toContain("1,280")
   })
 })
