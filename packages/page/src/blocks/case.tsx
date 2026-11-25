@@ -47,7 +47,7 @@ export function CaseBlock({ block }: BlockProps<"case">) {
     return (
       <Section id={id} data-block="case" aria-labelledby={titleId} grid={false} {...knobs.section}>
         <ScrollLayers variant="scale" caption={text} {...(block.scroll?.length ? { length: block.scroll.length } : {})}>
-          <MediaFrame aspect="16/9" radius="none" {...mediaProps(block.media, block.title)} />
+          <MediaFrame aspect="16/9" radius="none" {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
         </ScrollLayers>
       </Section>
     )
@@ -56,7 +56,7 @@ export function CaseBlock({ block }: BlockProps<"case">) {
   const scene = block.scene
   const frame = (radius?: "none") => {
     if (scene) return <SceneLayer scene={scene} media={block.media} label={block.title} />
-    const media = block.media ? <MediaFrame aspect="4/3" {...(radius ? { radius } : {})} {...mediaProps(block.media, block.title)} /> : null
+    const media = block.media ? <MediaFrame aspect="4/3" {...(radius ? { radius } : {})} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} /> : null
     return pattern === "parallax" && media ? (
       <ScrollLayers variant="parallax">
         <ScrollLayers.Layer depth={0.9}>{media}</ScrollLayers.Layer>

@@ -755,6 +755,9 @@ importers:
       '@aleeforoughi/feather-living':
         specifier: workspace:^
         version: link:../living
+      '@aleeforoughi/feather-react':
+        specifier: workspace:^
+        version: link:../react
       '@aleeforoughi/feather-scene':
         specifier: workspace:^
         version: link:../scene

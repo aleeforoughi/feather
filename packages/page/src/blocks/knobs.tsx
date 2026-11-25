@@ -3,7 +3,7 @@
 // /0 page renders byte for byte as it did. Every colour stays a token: a tone re-points the semantic roles
 // (--surface-base, --text-primary, …) inside the section, it never writes a colour.
 import * as React from "react"
-import { DisplayTitle, HOUSE, allows, loudnessOf, reveal, type DisplayEffect, type DisplaySize, type SectionSpace, type SectionTone } from "@aleeforoughi/feather-expression"
+import { DisplayTitle, HOUSE, allows, loudnessOf, reveal, type DisplayEffect, type DisplaySize, type MediaTreatment, type SectionSpace, type SectionTone } from "@aleeforoughi/feather-expression"
 import { BLOCK_RANGE, KINETIC_ENTERS } from "../core/spec"
 import type { BlockAlign, BlockCrop, BlockMotion, BlockScale, BlockTone, Knobs, PageDefaults } from "../core/types"
 import { BlockTitle, join } from "./shared"
@@ -92,13 +92,15 @@ export interface ResolvedKnobs<V extends string> {
     "data-surface"?: string
     ref?: React.Ref<HTMLElement>
   }
+  /** The image treatment every MediaFrame of the block takes (clean when none is set). */
+  treatment: MediaTreatment
   /** Props for the block's DisplayTitle: its effect and, for none or fade, a still title. */
   title: { effect: DisplayEffect; "data-loudness"?: string }
   /** True when the block sets any knob at all (a /1 block). */
   any: boolean
 }
 
-const KNOB_KEYS = ["variant", "loudness", "tone", "space", "align", "scale", "crop", "motion", "scroll"] as const
+const KNOB_KEYS = ["variant", "loudness", "tone", "space", "align", "scale", "crop", "motion", "scroll", "treatment"] as const
 
 /** Reads a block's knobs, with the page's defaults under them. `fallback` is the block's /0 space and tone. */
 export function useKnobs<V extends string>(kind: string, block: Knobs & { variant?: string }, fallback: { space: SectionSpace; tone?: SectionTone }): ResolvedKnobs<V> {
@@ -145,6 +147,7 @@ export function useKnobs<V extends string>(kind: string, block: Knobs & { varian
     scale,
     crop,
     section,
+    treatment: range.treatment ? (block.treatment ?? "clean") : "clean",
     title: { effect: titleEffect(block.motion), ...(stillTitle(block.motion) ? { "data-loudness": "0" } : {}) },
     any,
   }

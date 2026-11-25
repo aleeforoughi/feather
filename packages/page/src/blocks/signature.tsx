@@ -17,7 +17,7 @@ export function SignatureBlock({ block }: BlockProps<"signature">) {
   const cropped = knobs.crop !== "none"
   const frame = block.scene ? (
     <SceneLayer scene={block.scene} media={block.media} label={block.title ?? "Signature"} aspect="16/9" />
-  ) : block.media ? <MediaFrame aspect="16/9" {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.media, block.title)} /> : null
+  ) : block.media ? <MediaFrame aspect="16/9" {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} /> : null
   const media = frame ? (
     <div data-slot="signature-media" {...(knobs.any ? { "data-crop": knobs.crop } : {})} style={knobs.crop === "edge" ? EDGE_START : undefined}>
       {block.scroll?.pattern === "parallax" && !block.scene ? (

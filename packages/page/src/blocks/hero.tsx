@@ -1,8 +1,8 @@
 import * as React from "react"
-import { DisplayTitle, MediaFrame, Magnetic, ScrollLayers, Section, useReducedMotion } from "@aleeforoughi/feather-expression"
+import { DisplayTitle, MediaFrame, Magnetic, ScrollLayers, Section, prefersSaveData, useReducedMotion } from "@aleeforoughi/feather-expression"
 import type { HeroVariant, Media, PageLink } from "../core/types"
 import { EDGE_START, PageContext, alignClass, sizeOf, useKnobs, type ResolvedKnobs } from "./knobs"
-import { mediaProps } from "./media"
+import { ON_MEDIA, mediaProps } from "./media"
 import { SceneLayer } from "./scene"
 import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
 
@@ -82,7 +82,7 @@ function Lede({ text, className = "max-w-prose" }: { text?: string; className?: 
  * section pins. Both rest still under reduced motion and below loudness 2. */
 function FlowMedia({ media, alt, priority, knobs, pattern, className }: { media: Media; alt: string; priority: boolean; knobs: ResolvedKnobs<HeroVariant>; pattern?: string; className: string }) {
   const cropped = knobs.crop !== "none"
-  const frame = <MediaFrame aspect="21/9" priority={priority} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(media, alt)} />
+  const frame = <MediaFrame aspect="21/9" priority={priority} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(media, alt)} treatment={knobs.treatment} />
   const moved =
     pattern === "parallax" ? (
       <ScrollLayers variant="parallax">
@@ -90,7 +90,7 @@ function FlowMedia({ media, alt, priority, knobs, pattern, className }: { media:
       </ScrollLayers>
     ) : pattern === "scale" ? (
       <ScrollLayers variant="scale" length={2}>
-        <MediaFrame aspect="16/9" radius="none" priority={priority} {...mediaProps(media, alt)} />
+        <MediaFrame aspect="16/9" radius="none" priority={priority} {...mediaProps(media, alt)} treatment={knobs.treatment} />
       </ScrollLayers>
     ) : (
       frame
@@ -124,40 +124,73 @@ function Index({ entries }: { entries: { id: string; title: string }[] }) {
   )
 }
 
-/** The film hero's media: full bleed under a scrim, with a pause control above the scrim. Under reduced motion a video
- * does not autoplay (its poster shows, and the control plays it). The image or poster is the LCP. */
+const noSubscription = () => () => {}
+
+/**
+ * The film hero's media: full bleed under a scrim, with a pause control above the scrim. The poster (or the image) is
+ * the LCP: an eager, high-priority image the server writes, painted over the media scrim until it decodes, so the copy
+ * reads from the first frame. The film itself arrives only after mount, where motion is allowed and the visitor has
+ * not asked to save data: under reduced motion and on data saver the poster stays alone, with a Play control for
+ * whoever wants the film anyway. With no script it is the poster, and the control is not shown.
+ */
 function Film({ media, alt, priority }: { media: Media; alt: string; priority: boolean }) {
   const p = mediaProps(media, alt)
   const box = React.useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion(box)
-  const [playing, setPlaying] = React.useState(false)
   const player = React.useRef<HTMLVideoElement>(null)
+  const reduced = useReducedMotion(box)
+  // Data saver is read after hydration (the server and the hydrating render assume it, as they assume reduced motion).
+  const saving = React.useSyncExternalStore(noSubscription, prefersSaveData, () => true)
+  const [choice, setChoice] = React.useState<"play" | "pause" | null>(null)
+  const [playing, setPlaying] = React.useState(false)
+  const [ready, setReady] = React.useState(false)
+  const poster = p.video?.poster
+  const auto = !!p.video && !reduced && !saving
+  // The film comes when motion allows it or the visitor asks for it, and a pause keeps it; without a poster it is the
+  // only picture, so it is always there.
+  const film = !!p.video && (!poster || auto || choice !== null)
   React.useEffect(() => {
     const v = player.current
     if (!v) return
-    if (!reduced) void v.play?.()?.catch?.(() => {})
+    if (choice === "play" || (choice === null && auto)) void v.play?.()?.catch?.(() => {})
     else v.pause?.()
-  }, [reduced])
+  }, [choice, auto, film])
   const toggle = () => {
-    const v = player.current
-    if (!v) return
-    if (v.paused ?? !playing) void v.play?.()?.catch?.(() => {})
-    else v.pause?.()
+    if (playing) {
+      setChoice("pause")
+      player.current?.pause?.()
+    } else {
+      setChoice("play")
+      void player.current?.play?.()?.catch?.(() => {})
+    }
   }
+  const still = p.video ? poster : p.src
   return (
-    <div ref={box} data-slot="hero-film" className="absolute inset-0">
-      {p.video ? (
+    <div ref={box} data-slot="hero-film" data-state={ready ? "ready" : undefined} className="absolute inset-0 media-placeholder-scrim">
+      {still ? (
+        <img
+          data-slot="hero-film-poster"
+          className="block size-full object-cover"
+          src={still}
+          alt={p.decorative ? "" : (p.alt ?? "")}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          onLoad={() => setReady(true)}
+          {...(priority ? { fetchPriority: "high" as const } : {})}
+        />
+      ) : null}
+      {film && p.video ? (
         <video
           ref={player}
           data-slot="hero-film-media"
-          className="block size-full object-cover"
-          poster={p.video.poster}
+          className="absolute inset-0 block size-full object-cover"
+          poster={poster}
           muted
           loop
           playsInline
-          preload={priority ? "auto" : "metadata"}
-          aria-label={p.decorative ? undefined : p.alt}
-          aria-hidden={p.decorative ? true : undefined}
+          preload={saving || reduced ? "none" : priority ? "auto" : "metadata"}
+          // The poster image carries the alt text; the film over it is the same picture, moving.
+          aria-hidden={still ? true : p.decorative ? true : undefined}
+          aria-label={still || p.decorative ? undefined : p.alt}
           src={p.sources?.length ? undefined : p.src}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
@@ -166,13 +199,11 @@ function Film({ media, alt, priority }: { media: Media; alt: string; priority: b
             <source key={s.src + s.type} data-slot="hero-film-source" src={s.src} type={s.type} />
           ))}
         </video>
-      ) : (
-        <img data-slot="hero-film-media" className="block size-full object-cover" src={p.src} alt={p.decorative ? "" : (p.alt ?? "")} loading={priority ? "eager" : "lazy"} decoding="async" {...(priority ? { fetchPriority: "high" as const } : {})} />
-      )}
+      ) : null}
       {/* The media scrim (feather-tokens/4) holds text-ink-on-media at 4.5:1 over any frame. */}
       <div data-slot="hero-film-scrim" aria-hidden="true" className="absolute inset-0 bg-media-scrim" />
       {p.video ? (
-        <div data-slot="hero-film-control" className="absolute bottom-6 right-6 z-layer-raised">
+        <div data-slot="hero-film-control" className="absolute bottom-6 right-6 z-layer-raised noscript:hidden">
           <button type="button" data-slot="hero-film-toggle" data-variant={playing ? "pause" : "play"} onClick={toggle} className={BUTTON_QUIET}>
             {playing ? "Pause film" : "Play film"}
           </button>
@@ -182,20 +213,6 @@ function Film({ media, alt, priority }: { media: Media; alt: string; priority: b
   )
 }
 
-/** The ink that reads on the media scrim, as the text roles of the copy over it (text-fg-primary and -secondary inside
- * read as text-ink-on-media). */
-const ON_MEDIA = {
-  "--text-primary": "var(--ink-on-media)",
-  "--text-secondary": "var(--ink-on-media)",
-  "--ring": "var(--ink-on-media)",
-  // The primary act is filled with the ink (its label in the inverse surface, the colour opposite the page's ground);
-  // a quiet act sits on the scrim itself, ruled in the ink.
-  "--primary": "var(--ink-on-media)",
-  "--primary-foreground": "var(--surface-inverse)",
-  "--surface-base": "var(--media-scrim)",
-  "--surface-hover": "color-mix(in oklab, var(--ink-on-media) 12%, var(--media-scrim))",
-  "--border-primary": "var(--ink-on-media)",
-} as React.CSSProperties
 
 /**
  * The first view: the page's only h1, one focal point, and the starters when the model is on. Variants (feather.page/1):
@@ -289,7 +306,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
               {copy}
             </div>
             <div data-slot="hero-media" data-crop={knobs.crop}>
-              <MediaFrame aspect="4/5" radius="none" priority={priority} {...mediaProps(block.media, block.title)} />
+              <MediaFrame aspect="4/5" radius="none" priority={priority} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
             </div>
           </div>
         </Section>
@@ -302,7 +319,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
             {copy}
           </div>
           <div data-slot="hero-media" className="lg:col-span-6">
-            <MediaFrame aspect="4/5" priority={priority} {...mediaProps(block.media, block.title)} />
+            <MediaFrame aspect="4/5" priority={priority} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
           </div>
         </div>
       </Section>
@@ -348,7 +365,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
         <div data-slot="hero-product" className="col-span-full mt-12 grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
           <Facts facts={facts.slice(0, half)} className="order-2 flex flex-col gap-6 lg:order-1 lg:col-span-3" />
           <div data-slot="hero-media" className="order-1 mx-auto w-full max-w-xl lg:order-2 lg:col-span-6">
-            <MediaFrame aspect="1/1" priority={priority} {...mediaProps(block.media, block.title)} />
+            <MediaFrame aspect="1/1" priority={priority} {...mediaProps(block.media, block.title)} treatment={knobs.treatment} />
           </div>
           <Facts facts={facts.slice(half)} className="order-3 flex flex-col gap-6 lg:col-span-3 lg:text-end" />
         </div>

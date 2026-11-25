@@ -5,8 +5,10 @@ import { BlockTitle, CardBody, useRegion, type BlockProps } from "./shared"
 
 /**
  * What can be bought or booked, and for how much. Variants (feather.page/1): cards (the default, as /0: up to four;
- * an item with an `href` is one link) and table (a real table to compare them: what, how long or how much, and the
- * link to book).
+ * an item with an `href` is one link), table (a real table to compare them: what, how long or how much, and the
+ * link to book) and toggle (the cards with a radio group over them that switches every price between two `periods`,
+ * monthly and yearly or two plans, each item giving its two `prices`; plain CSS, so it works with no script, and the
+ * prices are a live region).
  */
 export function OfferBlock({ block }: BlockProps<"offer">) {
   const { id, titleId, labelled } = useRegion(block, "Ways to work together")
@@ -17,6 +19,8 @@ export function OfferBlock({ block }: BlockProps<"offer">) {
       {block.title}
     </KnobTitle>
   ) : null
+  const toggle = knobs.variant === "toggle" && block.periods ? block.periods : null
+  const group = `${id ?? titleId.replace(/-title$/, "")}-period`
   const cards = (
     <Grid columns={knobs.align === "split" ? 2 : n === 4 ? 4 : n === 3 ? 3 : 2}>
       {block.items.map((item) => (
@@ -26,7 +30,18 @@ export function OfferBlock({ block }: BlockProps<"offer">) {
               <h3 data-slot="offer-name" className="type-title text-fg-primary">
                 {item.name}
               </h3>
-              {item.price ? (
+              {toggle && item.prices ? (
+                // Both prices are in the document; the checked period shows its own (CSS, so it holds with no
+                // script), and the change is announced.
+                <p data-slot="offer-price" aria-live="polite" className="type-heading-2 numeric text-fg-primary">
+                  <span data-slot="offer-price-first" className="group-has-[[data-period='1']:checked]/offer:hidden">
+                    {item.prices[0]}
+                  </span>
+                  <span data-slot="offer-price-second" className="hidden group-has-[[data-period='1']:checked]/offer:inline">
+                    {item.prices[1]}
+                  </span>
+                </p>
+              ) : item.price ? (
                 <p data-slot="offer-price" className="type-heading-2 numeric text-fg-primary">
                   {item.price}
                 </p>
@@ -55,7 +70,26 @@ export function OfferBlock({ block }: BlockProps<"offer">) {
     <Section id={id} data-block="offer" {...labelled} {...knobs.section}>
       {title}
       <KnobBody knobs={knobs}>
-        {knobs.variant === "table" ? (
+        {toggle ? (
+          <div data-slot="offer-toggle" className="group/offer col-span-full flex flex-col gap-8">
+            <fieldset data-slot="offer-periods" className="flex flex-wrap gap-2">
+              <legend data-slot="offer-periods-legend" className="sr-only">
+                Prices for
+              </legend>
+              {toggle.map((period, i) => (
+                <label
+                  key={period}
+                  data-slot="offer-period"
+                  className="relative inline-flex min-h-12 min-w-12 cursor-pointer items-center justify-center rounded-control border border-line-primary bg-surface-base px-6 type-label text-fg-primary motion-state has-checked:border-primary has-checked:bg-primary has-checked:text-primary-foreground has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring has-[:focus-visible]:outline-solid"
+                >
+                  <input type="radio" data-slot="offer-period-input" data-period={i} name={group} value={period} defaultChecked={i === 0} className="sr-only" />
+                  {period}
+                </label>
+              ))}
+            </fieldset>
+            {cards}
+          </div>
+        ) : knobs.variant === "table" ? (
           <div data-slot="offer-table-box" className="col-span-full overflow-x-auto">
             <table data-slot="offer-table" className="w-full border-collapse text-start">
               <caption className="sr-only" data-slot="offer-caption">

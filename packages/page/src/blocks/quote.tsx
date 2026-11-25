@@ -5,7 +5,8 @@ import { join, useRegion, type BlockProps } from "./shared"
 
 const SIZE = { s: "type-display-s", m: "type-display-m", l: "type-display-l", xl: "type-display-xl" } as const
 
-function By({ q, centre = false }: { q: QuoteItem; centre?: boolean }) {
+/** The attribution under a quote: the name, then the role. */
+export function By({ q, centre = false }: { q: QuoteItem; centre?: boolean }) {
   return (
     <figcaption data-slot="quote-by" className={join("flex flex-col gap-1", centre && "items-center")}>
       <span data-slot="quote-name" className="type-title text-fg-primary">
@@ -17,6 +18,20 @@ function By({ q, centre = false }: { q: QuoteItem; centre?: boolean }) {
         </span>
       ) : null}
     </figcaption>
+  )
+}
+
+export const quoteKey = (q: QuoteItem) => `${q.by}-${q.text.slice(0, 24)}`
+
+/** One quote on its own raised card, its words over its attribution (the rail's, and testimonials'). */
+export function QuoteCard({ q, className }: { q: QuoteItem; className?: string }) {
+  return (
+    <figure data-slot="quote" data-variant="card" className={join("flex h-full flex-col justify-between gap-8 rounded-card border border-line-primary bg-surface-raised p-6", className)}>
+      <blockquote data-slot="quote-text">
+        <p className="type-heading-2 text-fg-primary" data-slot="quote-body">{`“${q.text}”`}</p>
+      </blockquote>
+      <By q={q} />
+    </figure>
   )
 }
 
@@ -37,12 +52,7 @@ export function QuoteBlock({ block }: BlockProps<"quote">) {
         <div data-slot="quote-rail" className="col-span-full">
           <Reel aria-label={block.title ?? "What people say"}>
             {all.map((q) => (
-              <figure key={`${q.by}-${q.text.slice(0, 24)}`} data-slot="quote" data-variant="card" className="flex h-full w-xs flex-col justify-between gap-8 rounded-card border border-line-primary bg-surface-raised p-6 sm:w-sm">
-                <blockquote data-slot="quote-text">
-                  <p className="type-heading-2 text-fg-primary" data-slot="quote-body">{`“${q.text}”`}</p>
-                </blockquote>
-                <By q={q} />
-              </figure>
+              <QuoteCard key={quoteKey(q)} q={q} className="w-xs sm:w-sm" />
             ))}
           </Reel>
         </div>

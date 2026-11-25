@@ -9,3 +9,7 @@ export { Footer, NotFound, type FooterProps, type NotFoundProps } from "./blocks
 export { defaultBlocks, type BlockProps } from "./blocks/index"
 export { mountPage, type MountedPage } from "./mount"
 export { SceneLayer, type SceneLayerProps } from "./blocks/scene"
+// Wave 5 part A: media and the page blocks (feather.page/1 only).
+export { PAGE_BLOCKS, PAGE_BLOCK_NAMES, TREATMENTS, MOVING_TREATMENTS, FORM_FIELD_TYPES } from "./core/spec"
+export type { MediaTreatmentKnob, GalleryVariant, GalleryItem, StoryVariant, StoryStep, TestimonialsVariant, JournalVariant, JournalEntry, FormVariant, FormField, FormFieldType, PageOnlyBlock } from "./core/types"
+export { GalleryBlock, ComparisonBlock, StoryBlock, TestimonialsBlock, JournalBlock, FormBlock, ShowreelBlock, fieldProblem, journalDate } from "./blocks/index"

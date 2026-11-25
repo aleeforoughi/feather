@@ -54,12 +54,20 @@ describe("every variant renders", () => {
     expect(links).toEqual(["#work", "#process", "#contact"])
   })
 
-  it("the film hero keeps its scrim and its copy over the media", () => {
+  it("the film hero keeps its scrim and its copy over the media, its poster as the LCP", () => {
     const html = renderToStaticMarkup(<FeatherPage page={page([{ ...BLOCKS.hero, variant: "film", media: { src: "reel.mp4", alt: "The studio at work", poster: "reel.jpg" } }])} tokens={studio} />)
     const doc = parse(html)
     expect(doc.querySelector('[data-slot="hero-film-scrim"]')?.className).toContain("bg-media-scrim")
-    expect(doc.querySelector("video")?.getAttribute("poster")).toBe("reel.jpg")
-    expect(doc.querySelector('[data-slot="hero-film-toggle"]')).not.toBeNull()
+    // The server writes the poster alone (eager, high priority) over the scrim placeholder; the film comes after mount.
+    const poster = doc.querySelector('[data-slot="hero-film-poster"]')!
+    expect(poster.getAttribute("src")).toBe("reel.jpg")
+    expect(poster.getAttribute("fetchpriority")).toBe("high")
+    expect(poster.getAttribute("loading")).toBe("eager")
+    expect(poster.getAttribute("alt")).toBe("The studio at work")
+    expect(doc.querySelector('[data-slot="hero-film"]')?.className).toContain("media-placeholder-scrim")
+    expect(doc.querySelector("video")).toBeNull()
+    // The control is there for the script, and hidden without it.
+    expect(doc.querySelector('[data-slot="hero-film-control"]')?.className).toContain("noscript:hidden")
   })
 
   it("the swap statement names itself with its first word, and the marquee keeps a real heading", () => {
