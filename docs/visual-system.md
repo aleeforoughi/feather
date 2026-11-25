@@ -636,6 +636,9 @@ house defaults below live in foundation.css for it.
     unbreakable run when it is longer: `--fit-chars`, which DisplayTitle and the page blocks write only then
     (`fitStyle`, `FitText` in `feather-expression`), so ordinary text renders byte for byte as before. The heading
     roles take the cap only where a text writes `--fit-chars`.
+  - The step's tracking is measured for its full size, so a capped title gives some of it back:
+    `--display-fit-tracking` (0.1, the tightest tracking the bounds allow, in em) of each pixel under the step's
+    size. A capped title is never tracked tighter than in proportion to its new size, and never looser than 0.
   - Nothing steps under `--display-fit-floor` (1.5rem). A run that cannot fit even there is a `fit-word`: it
     hyphenates (`hyphens: auto`, in the page's `lang`) and, as a last resort, breaks anywhere. An ordinary word is
     one unbreakable piece and moves to the next line whole.
