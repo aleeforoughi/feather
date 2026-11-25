@@ -1,4 +1,4 @@
-import { Counter, Grid, Section, formatCount } from "@aleeforoughi/feather-expression"
+import { Counter, Grid, Section, formatCount, useLocale } from "@aleeforoughi/feather-expression"
 import type { NumbersVariant } from "../core/types"
 import { KnobBody, KnobTitle, useKnobs } from "./knobs"
 import { BlockTitle, join, useRegion, type BlockProps } from "./shared"
@@ -8,7 +8,7 @@ type Item = BlockProps<"numbers">["block"]["items"][number]
 const NBSP = String.fromCharCode(160)
 
 /** A number as text, the unit after a non-breaking space (as Counter writes it). */
-const plain = (item: Item) => `${formatCount(item.value, item.value)}${item.unit ? `${NBSP}${item.unit}` : ""}`
+const plain = (item: Item, locale: string) => `${formatCount(item.value, item.value, locale)}${item.unit ? `${NBSP}${item.unit}` : ""}`
 
 /**
  * Up to four numbers that prove something. Variants (feather.page/1): counter (the default, as /0: counted in with
@@ -19,7 +19,8 @@ export function NumbersBlock({ block }: BlockProps<"numbers">) {
   const { id, titleId, labelled } = useRegion(block, "In numbers")
   const knobs = useKnobs<NumbersVariant>("numbers", block, { space: "l" })
   const n = block.items.length
-  const value = (item: Item) => (knobs.variant === "plain" ? plain(item) : <Counter value={item.value} {...(item.unit ? { unit: item.unit } : {})} />)
+  const locale = useLocale()
+  const value = (item: Item) => (knobs.variant === "plain" ? plain(item, locale) : <Counter value={item.value} {...(item.unit ? { unit: item.unit } : {})} />)
   if (!knobs.any) {
     return (
       <Section id={id} data-block="numbers" {...labelled} space="l">

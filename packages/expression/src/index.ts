@@ -9,6 +9,7 @@ export { DisplayTitle, type DisplayEffect, type DisplayTitleProps, type DisplayS
 export { MediaFrame, type MediaFrameProps, type MediaAspect, type MediaRadius, type MediaSource, type MediaVideo } from "./components/media-frame"
 export { Marquee, Reel, type MarqueeProps, type ReelProps } from "./components/marquee"
 export { Counter, type CounterProps } from "./components/counter"
+export { LocaleProvider, useLocale } from "./components/locale"
 export { Magnetic, Cursor, type MagneticProps, type CursorProps } from "./components/magnetic"
 export { ScrollProvider, useScroll, ScrollProgress, type ScrollProviderProps, type ScrollContextValue } from "./components/scroll"
 export { TransitionProvider, useTransitions, PersistentSlot, type TransitionProviderProps, type PersistentSlotProps } from "./components/transition"

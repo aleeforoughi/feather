@@ -3,6 +3,7 @@
 // delayed; only what enters later starts hidden. HTML first: with no IntersectionObserver or no script, everything
 // is simply shown. Animations are WAAPI, which the browser runs off the clock, and interruptible.
 import { revealDistance, roleMotion, type ExpressionRole } from "./motion"
+import { guardEntrance } from "./visibility"
 
 export type RevealFrom = "rise" | "mask" | "fade"
 
@@ -68,11 +69,22 @@ export function reveal(el: HTMLElement, options: RevealOptions = {}): () => void
     done()
   }
   hide()
+  // No frames (a hidden tab, a capture that draws none): the end state, never content held hidden.
+  const stalled = () => {
+    observer.disconnect()
+    if (animation) animation.finish()
+    else {
+      el.style.opacity = previous
+      done()
+    }
+  }
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
           play()
+          unguard()
+          unguard = guardEntrance(stalled)
           if (once) observer.disconnect()
         } else if (!once) hide()
       }
@@ -80,7 +92,9 @@ export function reveal(el: HTMLElement, options: RevealOptions = {}): () => void
     { threshold }
   )
   observer.observe(el)
+  let unguard = guardEntrance(stalled)
   return () => {
+    unguard()
     observer.disconnect()
     animation?.cancel()
     el.style.opacity = previous
