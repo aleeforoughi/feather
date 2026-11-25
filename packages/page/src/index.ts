@@ -31,4 +31,6 @@ export type { FlowBlock, PageScheme, ViewMode, ChartVariant, QuizQuestionSpec, Q
 export { LAYOUTS, LAYOUT_GROUNDS, LAYOUT_SKIPS, SECONDARY_INK } from "./core/spec"
 export { LAYOUT_FLOOR, LAYOUT_HOVER, layoutPlan, layoutSections, resolveColor, themeVars, type LayoutPlan, type LayoutSection } from "./core/layouts"
 export { checkLayout } from "./render"
+// The Living Page's disclosure line on a page: its own, or the default for its speaker.
+export { DISCLOSURE_RULE, defaultDisclosure, pageDisclosure } from "./core/disclosure"
 export type { PageLayout } from "./core/types"

@@ -2,6 +2,7 @@
 // the block table in spec.ts, so a block is described once. The product flows' own rules (validate-flows.ts) come in
 // as FlowRules: validate.ts's validatePage always passes them; the release runtime passes them once the flows family
 // it loads for a page with flows has arrived, so a page without flows never downloads them.
+import { DISCLOSURE_RULE } from "./disclosure"
 import { ALIGNS, ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, KINETIC_ENTERS, MOVING_TREATMENTS, OPTION_FIELDS, PAGE_BLOCKS, PAGE_KNOBS, PAGE_SCHEMAS, PINNED_PATTERNS, ROUTE_VARIANTS, SCENE_KINDS, SCENE_PRESETS, SCROLL_PATTERNS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "./spec"
 import type { PageDocument, PageIssue, PageResult } from "./types"
 import type { checkFlowBlock, checkScheme, checkViews } from "./validate-flows"
@@ -140,7 +141,7 @@ export function validateWith(input: unknown, flow: FlowRules | null): PageResult
     else {
       if (l.anchor !== undefined && !(ANCHORS as readonly unknown[]).includes(l.anchor)) add("/living/anchor", "type", `living.anchor must be one of ${ANCHORS.join(", ")}`)
       if (l.fold !== undefined && typeof l.fold !== "boolean") add("/living/fold", "type", "living.fold is true or false")
-      if (l.disclosure !== undefined && (typeof l.disclosure !== "string" || !/\b(AI|agent|automated)\b/i.test(l.disclosure))) add("/living/disclosure", "type", "living.disclosure must say it is an AI agent")
+      if (l.disclosure !== undefined && (typeof l.disclosure !== "string" || !DISCLOSURE_RULE.test(l.disclosure))) add("/living/disclosure", "type", "living.disclosure must say it is an AI agent")
       if (l.prepared !== undefined) {
         if (!Array.isArray(l.prepared)) add("/living/prepared", "type", "living.prepared lists scene intents")
         else l.prepared.forEach((p, i) => typeof p !== "string" || !(p in scenes) ? add(`/living/prepared/${i}`, "unknown-scene", `"${String(p)}" is not a scene in scenes`) : undefined)

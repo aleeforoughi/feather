@@ -11,7 +11,8 @@
 // and no mismatch; mount renders them as lazy components under one Suspense boundary.
 import { lazy, StrictMode, Suspense } from "react"
 import { hydrateRoot } from "react-dom/client"
-import { FeatherPageCore as FeatherPage, loadPageBlocks, mountPage, PageNotFoundCore as PageNotFound, PreparedPage, validateLoaded, type MountedPage, type PageDocument, type PageFamilies, type PageResult } from "@aleeforoughi/feather-page/runtime"
+import { FeatherPageCore as FeatherPage, loadPageBlocks, mountPage, PageNotFoundCore as PageNotFound, PreparedPage, validateLoaded, type MountedPage, type PageDocument, type PageFamilies, type PageResult, type BlockLibrary } from "@aleeforoughi/feather-page/runtime"
+import type { AskHandler } from "@aleeforoughi/feather-living"
 import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 
 /** validatePage with every rule the runtime holds: the core's always, and the product flows' once their family has
@@ -28,6 +29,11 @@ export interface RuntimeOptions {
   /** Render one prepared scene as its route (its intent), with links to the others under `base`. */
   intent?: string
   base?: string
+  /** The host's model, streamed, for the Living Page: an ask (a starter, or one typed) that no prepared scene answers
+   * goes to it. Without one, only the prepared scenes answer. Given to mount, or to hydrate called by the host. */
+  onAsk?: AskHandler
+  /** The brand's own block designs, over the defaults and the families the page loads. */
+  blocks?: Partial<BlockLibrary>
 }
 
 const checked = (doc: unknown): PageDocument => {
@@ -35,17 +41,20 @@ const checked = (doc: unknown): PageDocument => {
   if (!r.ok) throw new Error(`Not a valid feather.page document:\n${r.issues.map((i) => `- ${i.path || "/"} ${i.code}: ${i.message}`).join("\n")}`)
   return r.page
 }
-const element = (page: PageDocument, { tokens, notFound, intent, base = "/" }: RuntimeOptions, { blocks, parts }: PageFamilies) => (
-  <StrictMode>
-    {notFound ? (
-      <PageNotFound page={page} tokens={tokens} parts={parts} />
-    ) : intent ? (
-      <PreparedPage page={page} intent={intent} tokens={tokens} href={(i) => `${base.endsWith("/") ? base : `${base}/`}${i}`} />
-    ) : (
-      <FeatherPage page={page} tokens={tokens} blocks={blocks} parts={parts} />
-    )}
-  </StrictMode>
-)
+const element = (page: PageDocument, { tokens, notFound, intent, base = "/", onAsk, blocks: own }: RuntimeOptions, { blocks: loaded, parts }: PageFamilies) => {
+  const blocks = own ? { ...loaded, ...own } : loaded
+  return (
+    <StrictMode>
+      {notFound ? (
+        <PageNotFound page={page} tokens={tokens} parts={parts} />
+      ) : intent ? (
+        <PreparedPage page={page} intent={intent} tokens={tokens} blocks={blocks} href={(i) => `${base.endsWith("/") ? base : `${base}/`}${i}`} />
+      ) : (
+        <FeatherPage page={page} tokens={tokens} blocks={blocks} parts={parts} onAsk={onAsk} />
+      )}
+    </StrictMode>
+  )
+}
 
 /** Mounts a page document into a container (client rendering, in a transition: see mountPage). An invalid document
  * throws at once; the page appears whole once the block families it uses have loaded, and is checked again then with

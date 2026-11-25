@@ -81,3 +81,35 @@ test("the media page loads the media family, and the lightbox only when an image
   expect(errors).toEqual([])
   await close()
 })
+
+test("mount passes the host's onAsk to the Living Page: pressing a starter no prepared scene answers asks it", async ({ browser }) => {
+  // The reference page with no prepared scenes, so every starter goes to the host's model.
+  const doc = JSON.parse(fs.readFileSync(path.join(repo, "packages/page/examples/studio-of-one.page.json"), "utf8"))
+  const page = { ...doc, brand: "brand.json", living: { ...doc.living, prepared: [] } }
+  const tokens = JSON.parse(fs.readFileSync(path.join(repo, "packages/tokens/themes/studio.json"), "utf8")).tokens
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"></head><body><div id="root"></div><script type="module">
+    import { mount } from "/built/assets/feather-page-runtime.js"
+    window.__asks = []
+    const onAsk = async function* (ask) { window.__asks.push(ask); yield { type: "word", text: "Noted." }; yield { type: "done" } }
+    mount(document.getElementById("root"), ${JSON.stringify(page).replace(/</g, "\\u003c")}, { tokens: ${JSON.stringify(tokens)}, onAsk })
+  </script></body></html>`
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
+  const errors: string[] = []
+  await context.route(/\/built\//, async (route) => {
+    const rel = new URL(route.request().url()).pathname.replace(/^\/built\//, "")
+    if (rel === "index.html") return route.fulfill({ status: 200, body: html, headers: { "content-type": "text/html; charset=utf-8" } })
+    const file = rel.startsWith("assets/") ? path.join(release, rel.slice("assets/".length)) : path.join(import.meta.dirname, "../public", rel)
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) return route.fulfill({ status: 404, body: "" })
+    await route.fulfill({ status: 200, body: fs.readFileSync(file), headers: { "content-type": file.endsWith(".js") ? "text/javascript" : "application/octet-stream" } })
+  })
+  const tab = await context.newPage()
+  tab.on("pageerror", (e) => errors.push(e.message))
+  await tab.goto("/built/index.html", { waitUntil: "networkidle" })
+  const starter = tab.locator('[data-slot="hero-starter"]').first()
+  await expect(starter).toBeVisible()
+  const ask = (await starter.textContent())!.trim()
+  await starter.click()
+  await expect.poll(() => tab.evaluate(() => (window as unknown as { __asks: string[] }).__asks)).toEqual([ask])
+  expect(errors).toEqual([])
+  await context.close()
+})

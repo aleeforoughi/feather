@@ -13,6 +13,7 @@ import { PagePartsContext, type PageParts } from "./blocks/parts"
 import { PageContext, type PageContextValue } from "./blocks/knobs"
 import { resolveRefs } from "./core/validate-core"
 import { layoutPlan, type LayoutPlan } from "./core/layouts"
+import { pageDisclosure } from "./core/disclosure"
 import type { BlockName, PageBlock, PageDocument, PageIssue, PageScheme } from "./core/types"
 
 export type BlockLibrary = { [K in BlockName]: React.ComponentType<BlockProps<K>> }
@@ -271,7 +272,7 @@ function LivingPageFor({ page, library, onAsk, children }: { page: PageDocument;
   const prepared = React.useMemo(() => pageScenes(page), [page])
   const speaker = page.speaker as Speaker
   return (
-    <LivingPage speaker={speaker} registry={registry} prepared={prepared} onAsk={onAsk} disclosure={page.living?.disclosure}>
+    <LivingPage speaker={speaker} registry={registry} prepared={prepared} onAsk={onAsk} disclosure={pageDisclosure(page)}>
       {children}
     </LivingPage>
   )

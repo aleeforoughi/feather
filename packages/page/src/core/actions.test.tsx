@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest"
 import { FeatherPage } from "../render"
 import { FLOW_BLOCKS } from "../blocks/fixtures"
 import { validatePage } from "./validate"
+import { DISCLOSURE_RULE, defaultDisclosure, pageDisclosure } from "./disclosure"
 import type { PageDocument } from "./types"
 
 const doc = (sections: unknown[], schema = "feather.page/1") => ({ schema, brand: "brand.json", sections })
@@ -59,5 +60,30 @@ describe("one filled action per section", () => {
     const second = { ...FLOW_BLOCKS.podcast.episodes[0], id: "two", title: "Two" }
     const d = render([{ ...FLOW_BLOCKS.podcast, episodes: [FLOW_BLOCKS.podcast.episodes[0], second] }])
     expect([...d.querySelectorAll('[data-slot="podcast-play"]')].map((b) => b.getAttribute("data-variant"))).toEqual(["primary", "quiet"])
+  })
+})
+
+describe("the default disclosure", () => {
+  const living = { speaker: { kind: "person", name: "Mara Ellis" }, living: { anchor: "reader" } }
+  it("a living page with a speaker and no disclosure says it is an AI agent speaking for the speaker", () => {
+    expect(defaultDisclosure("Mara Ellis")).toBe("An AI agent speaking for Mara Ellis")
+    expect(pageDisclosure({ ...living } as never)).toBe("An AI agent speaking for Mara Ellis")
+    expect(pageDisclosure({ ...living, living: { disclosure: "An AI agent, in Mara's words" } } as never)).toBe("An AI agent, in Mara's words")
+    expect(pageDisclosure({ speaker: living.speaker } as never)).toBeUndefined()
+  })
+
+  it("holds to the validator's own rule: written out as the page's disclosure, it validates", () => {
+    expect(DISCLOSURE_RULE.test(defaultDisclosure("Mara Ellis"))).toBe(true)
+    const r = validatePage({ ...doc([hero([A("Start")])]), ...living, living: { anchor: "reader", disclosure: defaultDisclosure("Mara Ellis") } })
+    expect(r.ok).toBe(true)
+    const bad = validatePage({ ...doc([hero([A("Start")])]), ...living, living: { anchor: "reader", disclosure: "Speaking for Mara Ellis" } })
+    expect(bad.ok).toBe(false)
+  })
+
+  it("is what the rendered Living Page shows", () => {
+    const r = validatePage({ ...doc([hero([A("Start")])]), ...living })
+    if (!r.ok) throw new Error(r.issues.map((i) => i.code).join())
+    const html = renderToStaticMarkup(<FeatherPage page={r.page as PageDocument} />)
+    expect(html).toContain("An AI agent speaking for Mara Ellis")
   })
 })
