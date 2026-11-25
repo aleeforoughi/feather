@@ -648,6 +648,117 @@
                   "type": "boolean"
                 }
               }
+            },
+            "scene": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "shader",
+                    "particles",
+                    "depth",
+                    "model",
+                    "rail"
+                  ]
+                },
+                "preset": {
+                  "enum": [
+                    "gradient-noise",
+                    "aurora",
+                    "grain-field",
+                    "flow",
+                    "dust",
+                    "field",
+                    "morph"
+                  ]
+                },
+                "quality": {
+                  "enum": [
+                    "auto",
+                    "high",
+                    "medium",
+                    "low",
+                    "poster"
+                  ]
+                },
+                "model": {
+                  "$ref": "#/$defs/media"
+                },
+                "depth": {
+                  "$ref": "#/$defs/media"
+                },
+                "hotspots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "position": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 60
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "position",
+                      "label"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "colors": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 12,
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 60
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "colors"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 6
+                }
+              },
+              "required": [
+                "kind"
+              ]
             }
           },
           "required": [
@@ -1162,6 +1273,117 @@
                   "type": "boolean"
                 }
               }
+            },
+            "scene": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "shader",
+                    "particles",
+                    "depth",
+                    "model",
+                    "rail"
+                  ]
+                },
+                "preset": {
+                  "enum": [
+                    "gradient-noise",
+                    "aurora",
+                    "grain-field",
+                    "flow",
+                    "dust",
+                    "field",
+                    "morph"
+                  ]
+                },
+                "quality": {
+                  "enum": [
+                    "auto",
+                    "high",
+                    "medium",
+                    "low",
+                    "poster"
+                  ]
+                },
+                "model": {
+                  "$ref": "#/$defs/media"
+                },
+                "depth": {
+                  "$ref": "#/$defs/media"
+                },
+                "hotspots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "position": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 60
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "position",
+                      "label"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "colors": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 12,
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 60
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "colors"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 6
+                }
+              },
+              "required": [
+                "kind"
+              ]
             }
           },
           "required": [
@@ -2628,6 +2850,117 @@
                   "type": "boolean"
                 }
               }
+            },
+            "scene": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "shader",
+                    "particles",
+                    "depth",
+                    "model",
+                    "rail"
+                  ]
+                },
+                "preset": {
+                  "enum": [
+                    "gradient-noise",
+                    "aurora",
+                    "grain-field",
+                    "flow",
+                    "dust",
+                    "field",
+                    "morph"
+                  ]
+                },
+                "quality": {
+                  "enum": [
+                    "auto",
+                    "high",
+                    "medium",
+                    "low",
+                    "poster"
+                  ]
+                },
+                "model": {
+                  "$ref": "#/$defs/media"
+                },
+                "depth": {
+                  "$ref": "#/$defs/media"
+                },
+                "hotspots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "position": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 60
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "position",
+                      "label"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "colors": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 12,
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 60
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "colors"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 6
+                }
+              },
+              "required": [
+                "kind"
+              ]
             }
           },
           "required": [

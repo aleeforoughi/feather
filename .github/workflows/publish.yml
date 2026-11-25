@@ -68,10 +68,11 @@ jobs:
           pnpm build:wheel wheel
           gh release upload "v$version" wheel/feather_sdk-$version-py3-none-any.whl
           # Page callers (Qooler) take the page runtime from the release: the feather-page CLI as one Node file, and
-          # the web bundle (feather-page.css with its fonts, and the browser runtime that hydrates a built page).
+          # the web bundle (feather-page.css with its fonts, the browser runtime that hydrates a built page, and the
+          # Three.js chunk it loads from beside itself only for a page with a 3D scene).
           pnpm --filter @feather-apps/release build
           cp apps/release/dist/feather-page.mjs feather-page-$version.mjs
-          (cd apps/release/dist && zip -qr "$GITHUB_WORKSPACE/feather-page-web-$version.zip" feather-page.css feather-page-runtime.js fonts)
+          pnpm --filter @feather-apps/release zip "$GITHUB_WORKSPACE/feather-page-web-$version.zip"
           gh release upload "v$version" feather-page-$version.mjs feather-page-web-$version.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-page",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "description": "feather.page/0: websites from a schema. The validator, the JSON Schema, the default block library built on feather-expression, the renderer (with the Living Page), and the feather-page CLI.",
   "license": "UNLICENSED",
   "type": "module",
@@ -40,11 +40,13 @@
   "dependencies": {
     "@aleeforoughi/feather-expression": "workspace:^",
     "@aleeforoughi/feather-living": "workspace:^",
+    "@aleeforoughi/feather-scene": "workspace:^",
     "@aleeforoughi/feather-tokens": "workspace:^"
   },
   "peerDependencies": {
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "three": ">=0.180.0"
   },
   "devDependencies": {
     "@storybook/react-vite": "10.6.1",
@@ -54,15 +56,22 @@
     "@types/node": "24.19.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@types/three": "0.187.0",
     "@vitejs/plugin-react": "6.1.1",
     "jsdom": "27.0.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "storybook": "10.6.1",
+    "three": "0.187.0",
     "vite": "8.3.1",
     "vitest": "5.0.3"
   },
   "bin": {
     "feather-page": "./bin/feather-page.mjs"
+  },
+  "peerDependenciesMeta": {
+    "three": {
+      "optional": true
+    }
   }
 }

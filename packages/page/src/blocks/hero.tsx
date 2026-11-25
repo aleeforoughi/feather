@@ -3,6 +3,7 @@ import { DisplayTitle, MediaFrame, Magnetic, ScrollLayers, Section, useReducedMo
 import type { HeroVariant, Media, PageLink } from "../core/types"
 import { EDGE_START, PageContext, alignClass, sizeOf, useKnobs, type ResolvedKnobs } from "./knobs"
 import { mediaProps } from "./media"
+import { SceneLayer } from "./scene"
 import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
 
 /** The starters (when the model is on) as buttons, the first leaning toward the pointer. */
@@ -205,7 +206,9 @@ const ON_MEDIA = {
  * - film: full-bleed media under a scrim, the copy on it, and a pause control (crop none keeps it inside the grid);
  * - product: one product centred, its facts around it, the act under it;
  * - index: the title beside an editorial index of the page's sections (giant-type when there are none);
- * - interactive: reserved for wave 4; renders as giant-type.
+ * - interactive: giant-type over its scene (`scene`, loudness 3): a shader, particles, a depth image or a camera rail
+ *   fills the hero behind the words; a model stands in the flow under them. Its poster (the media, or a field in the
+ *   theme's colours) is the LCP and what every device the scene does not run on keeps. Without a scene it is giant-type.
  */
 export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">) {
   const { id, titleId } = useRegion({ ...block, title: block.title }, "Introduction")
@@ -216,7 +219,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
   const facts = block.facts ?? []
   const index = (page.index ?? []).filter((e) => e.id !== block.id)
   let variant = knobs.variant
-  if (variant === "interactive" || (variant === "index" && index.length === 0)) variant = "giant-type"
+  if ((variant === "interactive" && !block.scene) || (variant === "index" && index.length === 0)) variant = "giant-type"
   if ((variant === "split" || variant === "film" || variant === "product") && !block.media) variant = "giant-type"
   const title = (size: "xl" | "l", className?: string, effect = knobs.title.effect) => (
     <DisplayTitle as="h1" size={sizeOf(knobs.scale, size)} id={titleId} {...knobs.title} effect={effect} {...(className ? { className } : {})}>
@@ -370,7 +373,30 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
     )
   }
 
-  // giant-type (and interactive, reserved for wave 4).
+  if (variant === "interactive" && block.scene) {
+    const model = block.scene.kind === "model"
+    // A scene behind the words fills the whole band. The section's own rise would make its content the scene's
+    // containing block while it moves (a transform), resizing the scene under the words: the copy is simply there,
+    // and the title keeps its own entrance.
+    return (
+      <Section id={id} data-block="hero" aria-labelledby={titleId} {...knobs.section} {...(model ? {} : { reveal: false, className: "isolate overflow-hidden" })}>
+        {model ? null : <SceneLayer scene={block.scene} media={block.media} label={block.title} placement="behind" priority={priority} />}
+        <div data-slot="hero-copy" className="col-span-full flex flex-col gap-8">
+          <Eyebrow text={block.eyebrow} />
+          {title("xl", "text-balance", block.motion?.enter ? knobs.title.effect : "mask")}
+        </div>
+        <div data-slot="hero-row" className="col-span-full mt-12 grid grid-cols-1 items-end gap-8 lg:grid-cols-2">
+          <Lede text={block.lede} />
+          <div data-slot="hero-acts" className="flex flex-col gap-3 lg:items-end">
+            {acts("flex flex-wrap gap-3 lg:justify-end")}
+          </div>
+        </div>
+        {model ? <SceneLayer scene={block.scene} media={block.media} label={block.title} aspect="16/9" priority={priority} className="col-span-full mt-16" /> : null}
+      </Section>
+    )
+  }
+
+  // giant-type (and interactive without a scene).
   return (
     <Section id={id} data-block="hero" aria-labelledby={titleId} {...knobs.section}>
       <div data-slot="hero-copy" className="col-span-full flex flex-col gap-8">

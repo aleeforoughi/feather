@@ -2,13 +2,15 @@ import { DisplayTitle, MediaFrame, ScrollLayers, Section, Split } from "@aleefor
 import type { CaseVariant } from "../core/types"
 import { EDGE_START, alignClass, sizeOf, useKnobs } from "./knobs"
 import { mediaProps } from "./media"
+import { SceneLayer } from "./scene"
 import { useRegion, type BlockProps } from "./shared"
 
 /**
  * One piece of work told. Variants (feather.page/1): editorial (the default, as /0: the medium beside the words, the
  * facts as a definition list) and scale (the media grows from an inset frame to full bleed as the section pins, the
  * words on their own surface beside it; ScrollLayers scale, which needs loudness 2 and rests still otherwise). crop
- * edge or bleed takes the editorial media off the grid; scroll.pattern parallax drifts it.
+ * edge or bleed takes the editorial media off the grid; scroll.pattern parallax drifts it. A `scene` (loudness 3) takes
+ * the media's place in the editorial frame: a model to turn and inspect, or a field, over the media as its poster.
  */
 export function CaseBlock({ block }: BlockProps<"case">) {
   const { id, titleId } = useRegion(block, "Case")
@@ -51,7 +53,9 @@ export function CaseBlock({ block }: BlockProps<"case">) {
     )
   }
   const pattern = block.scroll?.pattern
+  const scene = block.scene
   const frame = (radius?: "none") => {
+    if (scene) return <SceneLayer scene={scene} media={block.media} label={block.title} />
     const media = block.media ? <MediaFrame aspect="4/3" {...(radius ? { radius } : {})} {...mediaProps(block.media, block.title)} /> : null
     return pattern === "parallax" && media ? (
       <ScrollLayers variant="parallax">
@@ -61,7 +65,7 @@ export function CaseBlock({ block }: BlockProps<"case">) {
       media
     )
   }
-  if (block.media && knobs.crop !== "none") {
+  if ((block.media || scene) && knobs.crop !== "none") {
     // The media runs off the page's start edge (edge) or both (bleed); the words stay on the grid.
     return (
       <Section id={id} data-block="case" aria-labelledby={titleId} grid={false} {...knobs.section}>
@@ -78,7 +82,7 @@ export function CaseBlock({ block }: BlockProps<"case">) {
   }
   return (
     <Section id={id} data-block="case" aria-labelledby={titleId} {...knobs.section}>
-      {block.media ? (
+      {block.media || scene ? (
         <Split ratio="7:5">
           {frame()}
           {text}

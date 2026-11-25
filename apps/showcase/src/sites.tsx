@@ -6,6 +6,8 @@
 //   ?loader=counter|dock          adds the page's loader (wave 1 e2e; the budget pages run without one)
 //   ?sound=1                      adds an ambient bed (the nav's toggle) and the loader's sound choice
 //   ?transition=<variant>         how a brand switch arrives (default the page's own `transition`)
+//   ?hero=poster                  the loud page's hero scene at quality poster (the scene e2e, so a software-rendered
+//                                 shader does not run while it inspects the model further down)
 // Switching brands is an in-page route change through createTransitions().go(), so every route variant can be seen
 // and tested here; a static site built by `feather-page build` uses cross-document View Transitions instead.
 import { StrictMode } from "react"
@@ -25,8 +27,10 @@ const loader = params.get("loader")
 const doc = params.get("page") === "loud" ? loud : reference
 
 const withSound = params.get("sound") === "1"
+const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && "scene" in b && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
 const result = validatePage({
   ...doc,
+  ...(params.get("hero") === "poster" ? { sections: heroPoster(doc.sections) } : {}),
   ...(loader === "counter" || loader === "dock" ? { loader: { variant: loader, label: "Loading the studio of one", ...(withSound ? { sound: true } : {}) } } : {}),
   ...(withSound ? { sound: { bed: "media/bed.mp3" } } : {}),
 })
