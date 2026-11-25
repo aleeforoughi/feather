@@ -11,6 +11,8 @@ export interface FooterProps {
   footer: FooterEdge
   /** The wordmark when the footer names none (the page title). */
   name?: string
+  /** A control the page places in the footer (the colour scheme toggle). */
+  aside?: React.ReactNode
 }
 
 /** Sets the wordmark as large as the footer's width allows: measured once fonts are in, and on resize. Without
@@ -37,7 +39,7 @@ function useFitText(ref: React.RefObject<HTMLElement | null>, text: string) {
 
 /** The page's footer. `reveal` sits behind the page (sticky at the bottom, under `main`) and is uncovered as the
  * page ends; focus moving into it scrolls the page to its end first, so a focused link is never covered. */
-export function Footer({ footer, name }: FooterProps) {
+export function Footer({ footer, name, aside }: FooterProps) {
   const variant = footer.variant ?? "plain"
   const mark = footer.wordmark ?? name
   const markRef = React.useRef<HTMLParagraphElement>(null)
@@ -78,6 +80,11 @@ export function Footer({ footer, name }: FooterProps) {
           <p data-slot="page-footer-note" className="col-span-full type-caption text-fg-secondary">
             {footer.note}
           </p>
+        ) : null}
+        {aside ? (
+          <div data-slot="page-footer-aside" className="col-span-full">
+            {aside}
+          </div>
         ) : null}
       </div>
     </footer>

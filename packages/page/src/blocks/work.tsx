@@ -4,11 +4,12 @@ import type { WorkItem, WorkVariant } from "../core/types"
 import { KnobBody, KnobTitle, useKnobs } from "./knobs"
 import { mediaProps, mediaSrc } from "./media"
 import { BlockTitle, CardBody, join, useCursorLabel, useRegion, type BlockProps } from "./shared"
+import { useViewMode, ViewSwitch, WorkIndex, WorkList } from "./views"
 
 const toItem = (item: string | WorkItem): WorkItem => (typeof item === "string" ? { id: item, title: item } : item)
 const metaOf = (item: WorkItem) => [item.role, item.year].filter(Boolean).join(" · ")
 
-function WorkCard({ item }: { item: WorkItem }) {
+export function WorkCard({ item }: { item: WorkItem }) {
   const meta = metaOf(item)
   return (
     <article data-slot="work-item" className="min-w-0">
@@ -151,6 +152,7 @@ export function WorkBlock({ block }: BlockProps<"work">) {
   const pattern = block.scroll?.pattern
   const stack = v === "stack" || (v === "grid" && pattern === "stack")
   const rail = v === "rail" || (v === "grid" && pattern === "horizontal")
+  if (block.views) return <WorkViews block={block} items={items} />
   if (!knobs.any) {
     return (
       <Section id={id} data-block="work" {...labelled} space="l">
@@ -201,6 +203,40 @@ export function WorkBlock({ block }: BlockProps<"work">) {
             ))}
           </Grid>
         )}
+      </KnobBody>
+    </Section>
+  )
+}
+
+/** Work with the view-mode switch (`views`, wave 5): grid, list or index, the person's choice remembered for this page.
+ * The view the block names is the one a page without script shows. */
+function WorkViews({ block, items }: { block: BlockProps<"work">["block"]; items: WorkItem[] }) {
+  const { id, titleId, labelled } = useRegion(block, "Selected work")
+  const knobs = useKnobs<WorkVariant>("work", block, { space: "l" })
+  const key = id ?? titleId.replace(/-title$/, "")
+  const [mode, setMode] = useViewMode(key, block.views ?? "grid")
+  return (
+    <Section id={id} data-block="work" data-view={mode} {...labelled} {...knobs.section}>
+      {block.title ? (
+        <KnobTitle id={titleId} knobs={knobs} motion={block.motion}>
+          {block.title}
+        </KnobTitle>
+      ) : null}
+      <KnobBody knobs={knobs}>
+        <div data-slot="work-views" className="col-span-full flex flex-col gap-8">
+          <ViewSwitch block={key} value={mode} onChange={setMode} />
+          {mode === "list" ? (
+            <WorkList items={items} />
+          ) : mode === "index" ? (
+            <WorkIndex items={items} />
+          ) : (
+            <Grid columns={knobs.align === "split" ? 2 : items.length === 1 || items.length === 2 || items.length === 4 ? 2 : 3}>
+              {items.map((item) => (
+                <WorkCard key={item.id} item={item} />
+              ))}
+            </Grid>
+          )}
+        </div>
       </KnobBody>
     </Section>
   )

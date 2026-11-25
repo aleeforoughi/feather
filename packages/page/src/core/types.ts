@@ -99,7 +99,7 @@ export interface QuoteItem {
 export type PageBlock =
   | (Base & { block: "hero"; variant?: HeroVariant; title: string; eyebrow?: string; lede?: string; media?: Media; starters?: string[]; facts?: { label: string; value: string }[]; actions?: PageLink[]; scene?: BlockScene })
   | (Base & { block: "statement"; variant?: StatementVariant; title: string; body?: string; words?: string[] })
-  | (Base & { block: "work"; variant?: WorkVariant; items: Array<string | WorkItem> })
+  | (Base & { block: "work"; variant?: WorkVariant; items: Array<string | WorkItem>; views?: ViewMode })
   | (Base & { block: "case"; variant?: CaseVariant; title: string; body?: string; media?: Media; facts?: { label: string; value: string }[]; scene?: BlockScene })
   | (Base & { block: "numbers"; variant?: NumbersVariant; items: { value: number; unit?: string; label: string }[] })
   | (Base & { block: "timeline"; variant?: TimelineVariant; items: { when: string; what: string }[] })
@@ -110,8 +110,94 @@ export type PageBlock =
   | (Base & { block: "faq"; variant?: "list"; items: { q: string; a: string }[] })
   | (Base & { block: "contact"; variant?: "plain"; body?: string; actions?: { label: string; href: string }[] })
   | (Base & { block: "signature"; body?: string; media?: Media; variant?: string; scene?: BlockScene })
+  // Product flows (feather.page/1, wave 5).
+  | FlowBlock
 
 export type BlockName = PageBlock["block"]
+
+// ---- Product flows (feather.page/1, wave 5; the flows section of spec.ts says what each field means) ------------------------------
+export type ViewMode = "grid" | "list" | "index"
+export interface QuizOptionSpec {
+  id: string
+  label: string
+  result?: string
+  score?: number
+}
+export interface QuizQuestionSpec {
+  id: string
+  q: string
+  help?: string
+  options: QuizOptionSpec[]
+}
+export interface QuizResultSpec {
+  id: string
+  title: string
+  body?: string
+  href?: string
+  label?: string
+  min?: number
+  max?: number
+  match?: Record<string, string>
+}
+export interface BookingService {
+  id: string
+  name: string
+  duration?: string
+  price?: string
+  body?: string
+}
+export interface BookingDay {
+  /** YYYY-MM-DD. */
+  date: string
+  /** The day in words (default "Monday 1 December", in English). */
+  label?: string
+  /** Times of day, HH:MM. */
+  slots: string[]
+}
+export interface CalculatorInputSpec {
+  id: string
+  label: string
+  kind: "range" | "number" | "radio" | "toggle"
+  min?: number
+  max?: number
+  step?: number
+  value?: number
+  unit?: string
+  help?: string
+  options?: { label: string; value: number }[]
+}
+export interface PlaceItem {
+  name: string
+  address: string
+  directions?: string
+  href?: string
+  phone?: string
+  hours?: string
+  note?: string
+}
+export interface PodcastEpisode {
+  id: string
+  title: string
+  audio: Media
+  duration?: string
+  date?: string
+  summary?: string
+  chapters?: { at: number; title: string }[]
+  transcript: { at?: number; by?: string; text: string }[]
+}
+export type ChartVariant = "bar" | "line" | "area"
+export type FlowBlock =
+  | (Base & { block: "quiz"; variant?: "steps"; title: string; body?: string; scoring?: "tally" | "score"; questions: QuizQuestionSpec[]; results: QuizResultSpec[] })
+  | (Base & { block: "booking"; variant?: "steps"; title: string; body?: string; services: BookingService[]; days: BookingDay[]; zone?: string; ask?: { phone?: boolean; note?: boolean }; action?: string; mailto?: string; link?: string; confirm?: string })
+  | (Base & { block: "calculator"; variant?: "split" | "stacked"; title: string; body?: string; inputs: CalculatorInputSpec[]; lines?: { id?: string; label: string; formula: string }[]; formula: string; total?: string; prefix?: string; suffix?: string; decimals?: number; note?: string })
+  | (Base & { block: "chart"; variant?: ChartVariant; title: string; summary: string; series: { label: string }[]; rows: { label: string; values: number[] }[]; axis?: string; unit?: string; prefix?: string; decimals?: number; source?: string })
+  | (Base & { block: "places"; variant?: "list" | "map"; title: string; body?: string; media?: Media; items: PlaceItem[] })
+  | (Base & { block: "podcast"; variant?: "list"; title: string; body?: string; episodes: PodcastEpisode[] })
+/** The page's colour scheme toggle: the brand's other colour set, and where the toggle sits. */
+export interface PageScheme {
+  toggle?: "nav" | "footer"
+  colors: { background: string; surface: string; text: string; primary: string; primaryText?: string; accent?: string; accentText?: string; destructive?: string }
+}
 
 export interface Scene {
   /** The starter label, in the visitor's words. */
@@ -181,6 +267,8 @@ export interface PageDocument {
   loudness?: Loudness
   /** Defaults a block takes when it sets none (an align or crop a block does not take is ignored for it). */
   defaults?: PageDefaults
+  /** The colour scheme toggle (wave 5): light, dark and system. */
+  scheme?: PageScheme
 }
 
 export interface PageDefaults {
@@ -193,7 +281,7 @@ export interface PageDefaults {
 export interface PageIssue {
   /** A JSON pointer into the document. */
   path: string
-  code: "wrong-schema" | "needs-schema-1" | "unknown-variant" | "out-of-range" | "unsupported" | "contradiction" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker"
+  code: "wrong-schema" | "needs-schema-1" | "unknown-variant" | "out-of-range" | "unsupported" | "contradiction" | "not-object" | "missing" | "type" | "too-long" | "unknown-block" | "unknown-field" | "too-few" | "too-many" | "bad-href" | "bad-media" | "unknown-ref" | "unknown-scene" | "duplicate-id" | "no-speaker" | "bad-formula"
   message: string
 }
 

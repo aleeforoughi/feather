@@ -7,9 +7,10 @@ import { LivingPage, PreparedSceneView, createRegistry, useLivingAsk, type AskHa
 import { defaultBlocks, type BlockProps } from "./blocks/index"
 import { Footer, NotFound } from "./blocks/edges"
 import { CursorLabels } from "./blocks/shared"
+import { SchemeToggle, isDarkTheme, schemeCss } from "./blocks/scheme"
 import { PageContext, type PageContextValue } from "./blocks/knobs"
 import { resolveRefs } from "./core/validate"
-import type { BlockName, PageBlock, PageDocument } from "./core/types"
+import type { BlockName, PageBlock, PageDocument, PageScheme } from "./core/types"
 
 export type BlockLibrary = { [K in BlockName]: React.ComponentType<BlockProps<K>> }
 
@@ -45,6 +46,7 @@ export function FeatherPage({ page, tokens, blocks, onAsk }: FeatherPageProps) {
   const brand = tokens ?? (typeof page.brand === "object" ? (page.brand as unknown as BrandTokens) : undefined)
   const theme = React.useMemo(() => (brand ? buildTheme(brand) : null), [brand])
   const context = usePageContext(resolved)
+  const scheme = useSchemeCss(brand, theme, page.scheme)
   if (theme && !theme.ok) throw new Error(`FeatherPage: the brand does not compile:\n- ${theme.problems.join("\n- ")}`)
 
   const base = resolved.sections.map((block, i) => (
@@ -53,7 +55,7 @@ export function FeatherPage({ page, tokens, blocks, onAsk }: FeatherPageProps) {
     </div>
   ))
 
-  const head = <ThemeHead theme={theme} />
+  const head = <ThemeHead theme={theme} scheme={scheme} />
 
   const content = !resolved.living || !resolved.speaker ? base : (
     <LivingPageFor page={resolved} library={library} onAsk={onAsk}>
@@ -80,13 +82,27 @@ export function fontFaces(fonts: string | undefined): string | null {
     .trim()
 }
 
-/** The theme in the head: its variables, its open-font faces, and the preloads of those fonts. */
-function ThemeHead({ theme }: { theme: ReturnType<typeof buildTheme> | null }) {
+/** The page's other colour scheme (`scheme`, wave 5): the brand's tokens with the scheme's colours, compiled by the
+ * same engine, as the CSS that applies it (schemeCss). Null without a scheme or a brand. */
+function useSchemeCss(brand: BrandTokens | undefined, theme: ReturnType<typeof buildTheme> | null, scheme: PageScheme | undefined): string | null {
+  return React.useMemo(() => {
+    if (!scheme || !brand || !theme?.ok) return null
+    const other = buildTheme({ ...brand, colors: { ...scheme.colors } })
+    if (!other.ok) throw new Error(`FeatherPage: the scheme's colours do not compile:\n- ${other.problems.join("\n- ")}`)
+    if (isDarkTheme(other.css) === isDarkTheme(theme.css)) throw new Error(`FeatherPage: scheme.colors is a ${isDarkTheme(theme.css) ? "dark" : "light"} set, like the brand's; give the brand's other scheme`)
+    return schemeCss(theme.css, other.css)
+  }, [brand, theme, scheme])
+}
+
+/** The theme in the head: its variables, its other colour scheme, its open-font faces, and the preloads of those
+ * fonts. */
+function ThemeHead({ theme, scheme }: { theme: ReturnType<typeof buildTheme> | null; scheme?: string | null }) {
   if (!theme?.ok) return null
   const faces = fontFaces(theme.fonts)
   return (
     <>
       <style data-feather-theme="">{theme.css}</style>
+      {scheme ? <style data-feather-scheme="">{scheme}</style> : null}
       {faces ? <style data-feather-fonts="">{faces}</style> : null}
       {theme.preload.map((p) => (
         <link key={p.href} rel="preload" href={p.href} as={p.as} type={p.type} crossOrigin={p.crossorigin} />
@@ -115,6 +131,7 @@ function PageFrame({ page, head, children }: { page: PageDocument; head: React.R
   const name = page.nav?.brand ?? page.title
   const bed = srcOf(page.sound?.bed)
   const reveal = page.footer?.variant === "reveal"
+  const toggle = page.scheme ? (page.scheme.toggle ?? (page.nav ? "nav" : "footer")) : null
   return (
     <>
       {head}
@@ -131,14 +148,21 @@ function PageFrame({ page, head, children }: { page: PageDocument; head: React.R
               </a>
             ) : undefined
           }
-          actions={bed ? <SoundToggle src={bed} /> : undefined}
+          actions={
+            bed || toggle === "nav" ? (
+              <>
+                {toggle === "nav" ? <SchemeToggle place="nav" /> : null}
+                {bed ? <SoundToggle src={bed} /> : null}
+              </>
+            ) : undefined
+          }
         />
       ) : null}
       {/* The page's loudness is a ceiling every block and expression component under main reads (data-loudness). */}
       <main data-page="" data-loudness={page.loudness} className={reveal ? "relative z-10 bg-surface-base" : undefined}>
         {page.cursor === "follower" ? <CursorLabels.Provider value>{children}</CursorLabels.Provider> : children}
       </main>
-      {page.footer ? <Footer footer={page.footer} name={name} /> : null}
+      {page.footer ? <Footer footer={page.footer} name={name} {...(toggle === "footer" ? { aside: <SchemeToggle place="footer" /> } : {})} /> : null}
       {/* Last, so it shifts no generated ids of the page above it. */}
       {page.cursor === "follower" ? <Cursor /> : null}
     </>
@@ -154,7 +178,8 @@ export interface PageNotFoundProps {
 export function PageNotFound({ page, tokens }: PageNotFoundProps) {
   const brand = tokens ?? (typeof page.brand === "object" ? (page.brand as unknown as BrandTokens) : undefined)
   const theme = React.useMemo(() => (brand ? buildTheme(brand) : null), [brand])
-  const head = <ThemeHead theme={theme} />
+  const scheme = useSchemeCss(brand, theme, page.scheme)
+  const head = <ThemeHead theme={theme} scheme={scheme} />
   return (
     <PageFrame page={{ ...page, loader: undefined }} head={head}>
       <NotFound notFound={page.notFound ?? {}} />
@@ -202,14 +227,15 @@ export function PreparedPage({ page, intent, tokens, blocks, href }: PreparedPag
   const library = React.useMemo(() => ({ ...defaultBlocks, ...blocks }) as BlockLibrary, [blocks])
   const registry = React.useMemo(() => livingRegistry(library), [library])
   const context = usePageContext(resolved)
+  const brand = tokens ?? (typeof page.brand === "object" ? (page.brand as unknown as BrandTokens) : undefined)
+  const theme = React.useMemo(() => (brand ? buildTheme(brand) : null), [brand])
+  const scheme = useSchemeCss(brand, theme, page.scheme)
   const scenes = pageScenes(resolved)
   const scene = scenes.find((s) => s.intent === intent)
   if (!scene) throw new Error(`PreparedPage: "${intent}" is not a prepared scene of this page`)
-  const brand = tokens ?? (typeof page.brand === "object" ? (page.brand as unknown as BrandTokens) : undefined)
-  const theme = brand ? buildTheme(brand) : null
   return (
     <>
-      <ThemeHead theme={theme} />
+      <ThemeHead theme={theme} scheme={scheme} />
       <main data-page="" data-intent={intent} data-loudness={page.loudness}>
         <PageContext.Provider value={context}>
           <PreparedSceneView scene={scene} speaker={resolved.speaker as Speaker} registry={registry} scenes={scenes} href={href} headingLevel={1} />

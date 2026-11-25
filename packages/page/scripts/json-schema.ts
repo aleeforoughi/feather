@@ -22,6 +22,8 @@ function field(spec: FieldSpec): Json {
       return { $ref: "#/$defs/media" }
     case "texts":
       return { type: "array", items: { type: "string" }, ...(spec.min !== undefined ? { minItems: spec.min } : {}), ...(spec.max !== undefined ? { maxItems: spec.max } : {}) }
+    case "numbers":
+      return { type: "array", items: { type: "number" }, ...(spec.min !== undefined ? { minItems: spec.min } : {}), ...(spec.max !== undefined ? { maxItems: spec.max } : {}) }
     case "vector":
       return { type: "array", minItems: spec.length, maxItems: spec.length, items: { type: "number", ...(spec.min !== undefined ? { minimum: spec.min } : {}), ...(spec.max !== undefined ? { maximum: spec.max } : {}) } }
     case "map":
@@ -41,7 +43,8 @@ function object(fields: Fields, extra: Json = {}, required: string[] = []): Json
 
 /** The JSON Schema of one version: 0 (the sections, scenes and living layer) or 1 (also the page edges). */
 export function pageJsonSchema(version: 0 | 1 = 1): Json {
-  const blocks = Object.entries(BLOCKS).map(([name, { doc }]) => {
+  // A block of feather.page/1 (`since: 1`) is not in /0.
+  const blocks = Object.entries(BLOCKS).filter(([, b]) => version === 1 || b.since !== 1).map(([name, { doc }]) => {
     const range = BLOCK_RANGE[name]
     const knobs = version === 1 ? ` Variants: ${range.variants ? range.variants.join(", ") : "the brand's own (free text)"}${range.variants ? ` (default ${range.variants[0]})` : ""}. Align: ${range.aligns.join(", ")}. Scroll: ${range.scroll.join(", ")}.` : ""
     return {

@@ -395,6 +395,65 @@
         "native",
         "follower"
       ]
+    },
+    "scheme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "toggle": {
+          "enum": [
+            "nav",
+            "footer"
+          ]
+        },
+        "colors": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "background": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "surface": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "primary": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "primaryText": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "accent": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "accentText": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "destructive": {
+              "type": "string",
+              "maxLength": 32
+            }
+          },
+          "required": [
+            "background",
+            "surface",
+            "text",
+            "primary"
+          ]
+        }
+      },
+      "required": [
+        "colors"
+      ]
     }
   },
   "$defs": {
@@ -1106,6 +1165,13 @@
                   "type": "boolean"
                 }
               }
+            },
+            "views": {
+              "enum": [
+                "grid",
+                "list",
+                "index"
+              ]
             }
           },
           "required": [
@@ -2965,6 +3031,1428 @@
           },
           "required": [
             "block"
+          ]
+        },
+        {
+          "description": "Questions with real radio options, one per step, and a result keyed by the answers. With no script, every question shows, and how the result is decided. Variants: steps (default steps). Align: start, center, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "quiz"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "scoring": {
+              "enum": [
+                "tally",
+                "score"
+              ]
+            },
+            "questions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "help": {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "maxLength": 40
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 80
+                        },
+                        "result": {
+                          "type": "string",
+                          "maxLength": 40
+                        },
+                        "score": {
+                          "type": "integer",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label"
+                      ]
+                    },
+                    "minItems": 2,
+                    "maxItems": 6
+                  }
+                },
+                "required": [
+                  "id",
+                  "q",
+                  "options"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 600
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "min": {
+                    "type": "integer",
+                    "minimum": -800,
+                    "maximum": 800
+                  },
+                  "max": {
+                    "type": "integer",
+                    "minimum": -800,
+                    "maximum": 800
+                  },
+                  "match": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 8,
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 40
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "title"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "variant": {
+              "enum": [
+                "steps"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "A booking flow: service, then date and time, then details, then a review before anything is sent. Slots come from the page; it sends to an action URL, a mailto, or hands over to a booking link. Variants: steps (default steps). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "booking"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "services": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "duration": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "price": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 240
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "maxLength": 10
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "slots": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 16
+                  }
+                },
+                "required": [
+                  "date"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 14
+            },
+            "zone": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "ask": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "phone": {
+                  "type": "boolean"
+                },
+                "note": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "action": {
+              "type": "string",
+              "not": {
+                "pattern": "^\\s*(javascript|data|vbscript):"
+              }
+            },
+            "mailto": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "link": {
+              "type": "string",
+              "not": {
+                "pattern": "^\\s*(javascript|data|vbscript):"
+              }
+            },
+            "confirm": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "variant": {
+              "enum": [
+                "steps"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "A pricing calculator: inputs (range, number, radio, toggle) and a price formula in a small safe language (+ - * /, min, max, round). The total and its breakdown are announced as they change; with no script, the starting prices show. Variants: split, stacked (default split). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "calculator"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 32
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "kind": {
+                    "enum": [
+                      "range",
+                      "number",
+                      "radio",
+                      "toggle"
+                    ]
+                  },
+                  "min": {
+                    "type": "number",
+                    "minimum": -1000000000,
+                    "maximum": 1000000000
+                  },
+                  "max": {
+                    "type": "number",
+                    "minimum": -1000000000,
+                    "maximum": 1000000000
+                  },
+                  "step": {
+                    "type": "number",
+                    "minimum": 0.0001,
+                    "maximum": 1000000000
+                  },
+                  "value": {
+                    "type": "number",
+                    "minimum": -1000000000,
+                    "maximum": 1000000000
+                  },
+                  "unit": {
+                    "type": "string",
+                    "maxLength": 16
+                  },
+                  "help": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "label": {
+                          "type": "string",
+                          "maxLength": 60
+                        },
+                        "value": {
+                          "type": "number",
+                          "minimum": -1000000000,
+                          "maximum": 1000000000
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "value"
+                      ]
+                    },
+                    "minItems": 2,
+                    "maxItems": 6
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "kind"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "lines": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 32
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "formula": {
+                    "type": "string",
+                    "maxLength": 400
+                  }
+                },
+                "required": [
+                  "label",
+                  "formula"
+                ]
+              },
+              "maxItems": 6
+            },
+            "formula": {
+              "type": "string",
+              "maxLength": 400
+            },
+            "total": {
+              "type": "string",
+              "maxLength": 60
+            },
+            "prefix": {
+              "type": "string",
+              "maxLength": 4
+            },
+            "suffix": {
+              "type": "string",
+              "maxLength": 24
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "note": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "variant": {
+              "enum": [
+                "split",
+                "stacked"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "block",
+            "title",
+            "formula"
+          ]
+        },
+        {
+          "description": "Data as a bar, line or area chart, drawn in SVG in the theme's inks, with its summary sentence and the data as a table behind a disclosure. The end state draws in on reveal; under reduced motion it is simply there. Variants: bar, line, area (default bar). Align: start, center, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "chart"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "summary": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "series": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  }
+                },
+                "required": [
+                  "label"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 24
+                  },
+                  "values": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 1,
+                    "maxItems": 4
+                  }
+                },
+                "required": [
+                  "label",
+                  "values"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 24
+            },
+            "axis": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "unit": {
+              "type": "string",
+              "maxLength": 12
+            },
+            "prefix": {
+              "type": "string",
+              "maxLength": 4
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "source": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "variant": {
+              "enum": [
+                "bar",
+                "line",
+                "area"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "block",
+            "title",
+            "summary"
+          ]
+        },
+        {
+          "description": "Places to find: always a list of names, addresses and links (directions, the place's own site, a phone number), with an optional still map. No map SDK and no tiles. Variants: list, map (default list). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "places"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "address": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "directions": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "phone": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "hours": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 160
+                  }
+                },
+                "required": [
+                  "name",
+                  "address"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 24
+            },
+            "variant": {
+              "enum": [
+                "list",
+                "map"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "Episodes on native audio with real-button controls (play, ±15 s, speed, a scrub slider), chapters that seek, and a transcript (required) that can follow playback. Never autoplays; with no script, the browser's own controls. Variants: list (default list). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "podcast"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "episodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "audio": {
+                    "$ref": "#/$defs/media"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "maxLength": 12
+                  },
+                  "date": {
+                    "type": "string",
+                    "maxLength": 24
+                  },
+                  "summary": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "chapters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "at": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 86400
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 80
+                        }
+                      },
+                      "required": [
+                        "at",
+                        "title"
+                      ]
+                    },
+                    "maxItems": 24
+                  },
+                  "transcript": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "at": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 86400
+                        },
+                        "by": {
+                          "type": "string",
+                          "maxLength": 60
+                        },
+                        "text": {
+                          "type": "string",
+                          "maxLength": 2000
+                        }
+                      },
+                      "required": [
+                        "text"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 600
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "audio",
+                  "transcript"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 12
+            },
+            "variant": {
+              "enum": [
+                "list"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "block",
+            "title"
           ]
         }
       ]

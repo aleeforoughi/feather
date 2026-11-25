@@ -8,6 +8,7 @@ import { validatePage } from "./core/validate"
 import { FeatherPage } from "./render"
 import { defaultBlocks } from "./blocks/index"
 import { BLOCKS } from "./blocks/fixtures"
+import { BLOCKS as SPEC } from "./core/spec"
 import type { BlockName, PageDocument } from "./core/types"
 
 const themes = path.join(import.meta.dirname, "../../tokens/themes")
@@ -31,7 +32,8 @@ describe("feather.page/0 renders as it did before the knobs", () => {
     await expect(html).toMatchFileSnapshot("__snapshots__/studio-of-one.page-0.html")
   })
 
-  it.each(Object.keys(defaultBlocks) as BlockName[])("the %s block with no knobs, byte for byte", async (kind) => {
+  // Every block that exists in /0 (a feather.page/1 block, `since: 1`, has no /0 rendering to hold).
+  it.each((Object.keys(defaultBlocks) as BlockName[]).filter((k) => SPEC[k].since !== 1))("the %s block with no knobs, byte for byte", async (kind) => {
     const Block = defaultBlocks[kind] as React.ComponentType<{ block: unknown }>
     const html = renderToStaticMarkup(<Block block={BLOCKS[kind]} />)
     await expect(html).toMatchFileSnapshot(`__snapshots__/block-${kind}-0.html`)

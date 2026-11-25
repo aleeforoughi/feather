@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 import type { BlockName } from "../core/types"
 import { defaultBlocks } from "./index"
 import { BLOCKS } from "./fixtures"
+import { BLOCK_NAMES } from "../core/spec"
 
 const NAMES = Object.keys(defaultBlocks) as BlockName[]
 
@@ -14,7 +15,7 @@ function renderBlock(kind: BlockName, extra: { onAsk?: (s: string) => void } = {
 
 describe("default blocks", () => {
   it("has one component for every block kind", () => {
-    expect(NAMES).toHaveLength(13)
+    expect(NAMES).toEqual(BLOCK_NAMES)
   })
 
   it.each(NAMES)("%s renders as a labelled region", (kind) => {

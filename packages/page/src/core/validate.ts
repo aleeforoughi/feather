@@ -2,6 +2,7 @@
 // block table in spec.ts, so a block is described once.
 import { ALIGNS, ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, KINETIC_ENTERS, PAGE_KNOBS, PAGE_SCHEMAS, PINNED_PATTERNS, ROUTE_VARIANTS, SCENE_KINDS, SCENE_PRESETS, SCROLL_PATTERNS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "./spec"
 import type { PageDocument, PageIssue, PageResult } from "./types"
+import { checkFlowBlock, checkScheme, checkViews } from "./validate-flows"
 
 const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v)
 const esc = (k: string | number) => String(k).replace(/~/g, "~0").replace(/\//g, "~1")
@@ -34,6 +35,7 @@ export function validatePage(input: unknown): PageResult {
   for (const [k, { fields }] of Object.entries(EDGES)) if (doc[k] !== undefined) checkFields(`/${k}`, doc[k], fields, {}, add)
   if (doc.transition !== undefined) checkField("/transition", doc.transition, { kind: "enum", values: ROUTE_VARIANTS }, {}, add)
   for (const [k, spec] of Object.entries(PAGE_KNOBS)) if (doc[k] !== undefined) checkField(`/${k}`, doc[k], spec, {}, add)
+  if (doc.schema !== "feather.page/0") checkScheme(doc, add)
   const ctx: BlockContext = { v1: doc.schema !== "feather.page/0", pageLoudness: typeof doc.loudness === "number" ? doc.loudness : undefined }
 
   if (doc.speaker !== undefined) {
@@ -118,6 +120,7 @@ function checkBlock(path: string, b: unknown, library: Record<string, unknown>, 
     else if (ids.has(b.id)) add(`${path}/id`, "duplicate-id", `the id "${b.id}" is used twice`)
     else ids.add(b.id)
   }
+  if (!ctx.v1 && spec.since === 1) return add(`${path}/block`, "needs-schema-1", `${kind} is a block of feather.page/1; set "schema": "feather.page/1"`)
   if (!ctx.v1) {
     // A /1 field on a /0 page: name the schema it needs, as the edges do.
     const v1 = blockFields(kind as string, 1)
@@ -154,6 +157,8 @@ function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx:
   }
   if (kind === "quote" && b.items !== undefined && variant !== "rail") add(`${path}/items`, "contradiction", "more quotes are the rail's; set variant: rail")
   if (isObject(b.scene)) checkScene(`${path}/scene`, kind, variant, b, b.scene, level, add)
+  checkFlowBlock(path, kind, b, add)
+  checkViews(path, b, add)
 
   if (motion) {
     const enter = motion.enter
@@ -259,6 +264,11 @@ function checkField(path: string, v: unknown, spec: FieldSpec, library: Record<s
     }
     case "texts":
       if (!Array.isArray(v) || v.some((x) => typeof x !== "string")) return add(path, "type", "expected a list of text")
+      if (spec.min !== undefined && v.length < spec.min) add(path, "too-few", `at least ${spec.min}`)
+      if (spec.max !== undefined && v.length > spec.max) add(path, "too-many", `at most ${spec.max}`)
+      return
+    case "numbers":
+      if (!Array.isArray(v) || v.some((x) => typeof x !== "number" || !Number.isFinite(x))) return add(path, "type", "expected a list of numbers")
       if (spec.min !== undefined && v.length < spec.min) add(path, "too-few", `at least ${spec.min}`)
       if (spec.max !== undefined && v.length > spec.max) add(path, "too-many", `at most ${spec.max}`)
       return

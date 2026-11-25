@@ -9,3 +9,10 @@ export { Footer, NotFound, type FooterProps, type NotFoundProps } from "./blocks
 export { defaultBlocks, type BlockProps } from "./blocks/index"
 export { mountPage, type MountedPage } from "./mount"
 export { SceneLayer, type SceneLayerProps } from "./blocks/scene"
+// Product flows in a page (wave 5).
+export { QuizBlock, BookingBlock, CalculatorBlock, ChartBlock, PlacesBlock, PodcastBlock } from "./blocks/index"
+export { FLOW_BLOCKS, FLOW_RANGE, FLOW_PAGE_KNOBS, QUIZ_SCORING, CALCULATOR_INPUTS, VIEW_MODES, VIEW_BLOCKS, SCHEME_TOGGLES, SCHEME_COLORS } from "./core/spec"
+export { parseFormula, evaluateFormula, formulaValue, priceOf, formatAmount, quizResult, quizScore, niceScale, FORMULA_FUNCTIONS, type FormulaNode, type ParsedFormula } from "./core/flows"
+export { SchemeToggle, SCHEME_KEY, schemeScript, schemeCss, type SchemeChoice } from "./blocks/scheme"
+export { ViewSwitch, useViewMode, viewKey, VIEW_OPTIONS } from "./blocks/views"
+export type { FlowBlock, PageScheme, ViewMode, ChartVariant, QuizQuestionSpec, QuizOptionSpec, QuizResultSpec, BookingService, BookingDay, CalculatorInputSpec, PlaceItem, PodcastEpisode } from "./core/types"
