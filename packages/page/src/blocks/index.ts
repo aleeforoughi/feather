@@ -1,72 +1,43 @@
 import type * as React from "react"
 import type { BlockName } from "../core/types"
 import type { BlockProps } from "./shared"
-import { CaseBlock } from "./case"
-import { ContactBlock } from "./contact"
-import { FaqBlock } from "./faq"
-import { HeroBlock } from "./hero"
-import { LogosBlock } from "./logos"
-import { NumbersBlock } from "./numbers"
-import { OfferBlock } from "./offer"
-import { ProcessBlock } from "./process"
-import { QuoteBlock } from "./quote"
-import { SignatureBlock } from "./signature"
-import { StatementBlock } from "./statement"
-import { TimelineBlock } from "./timeline"
-import { WorkBlock } from "./work"
-// Wave 5 part A: the page blocks (media and new blocks).
-import { ComparisonBlock } from "./comparison"
-import { FormBlock } from "./form"
-import { GalleryBlock } from "./gallery"
-import { JournalBlock } from "./journal"
-import { ShowreelBlock } from "./showreel"
-import { StoryBlock } from "./story"
-import { TestimonialsBlock } from "./testimonials"
-// Product flows (wave 5 part B): page blocks too.
-import { BookingBlock } from "./booking"
-import { CalculatorBlock } from "./calculator"
-import { ChartBlock } from "./chart"
-import { PlacesBlock } from "./places"
-import { PodcastBlock } from "./podcast"
-import { QuizBlock } from "./quiz"
+import { coreBlocks } from "./core"
+import { mediaBlocks } from "./media-family"
+import { flowBlocks } from "./flow-family"
 
 export type { BlockProps, BlockOf } from "./shared"
 export { mediaProps, mediaSrc, type FrameMedia } from "./media"
-export { HeroBlock, StatementBlock, WorkBlock, CaseBlock, NumbersBlock, TimelineBlock, ProcessBlock, LogosBlock, QuoteBlock, OfferBlock, FaqBlock, ContactBlock, SignatureBlock }
-export { GalleryBlock, ComparisonBlock, StoryBlock, TestimonialsBlock, JournalBlock, FormBlock, ShowreelBlock }
-export { fieldProblem } from "./form"
+export { HeroBlock } from "./hero"
+export { StatementBlock } from "./statement"
+export { WorkBlock } from "./work"
+export { CaseBlock } from "./case"
+export { NumbersBlock } from "./numbers"
+export { TimelineBlock } from "./timeline"
+export { ProcessBlock } from "./process"
+export { LogosBlock } from "./logos"
+export { QuoteBlock } from "./quote"
+export { OfferBlock } from "./offer"
+export { FaqBlock } from "./faq"
+export { ContactBlock } from "./contact"
+export { SignatureBlock } from "./signature"
+// Wave 5 part A: the page blocks (media and new blocks).
+export { GalleryBlock } from "./gallery"
+export { ComparisonBlock } from "./comparison"
+export { StoryBlock } from "./story"
+export { TestimonialsBlock } from "./testimonials"
+export { JournalBlock } from "./journal"
+export { FormBlock, fieldProblem } from "./form"
+export { ShowreelBlock } from "./showreel"
 export { journalDate } from "./journal"
-export { QuizBlock, BookingBlock, CalculatorBlock, ChartBlock, PlacesBlock, PodcastBlock }
+// Product flows (wave 5 part B): page blocks too.
+export { QuizBlock } from "./quiz"
+export { BookingBlock } from "./booking"
+export { CalculatorBlock } from "./calculator"
+export { ChartBlock } from "./chart"
+export { PlacesBlock } from "./places"
+export { PodcastBlock } from "./podcast"
+export { coreBlocks, mediaBlocks, flowBlocks }
 
-/** The default block library: one component per kind of block (the /0 library, then the /1 page blocks). A brand may
- * replace any of them. */
-export const defaultBlocks: { [K in BlockName]: React.ComponentType<BlockProps<K>> } = {
-  hero: HeroBlock,
-  statement: StatementBlock,
-  work: WorkBlock,
-  case: CaseBlock,
-  numbers: NumbersBlock,
-  timeline: TimelineBlock,
-  process: ProcessBlock,
-  logos: LogosBlock,
-  quote: QuoteBlock,
-  offer: OfferBlock,
-  faq: FaqBlock,
-  contact: ContactBlock,
-  signature: SignatureBlock,
-  // Wave 5 part A: the page blocks (feather.page/1 only).
-  gallery: GalleryBlock,
-  comparison: ComparisonBlock,
-  story: StoryBlock,
-  testimonials: TestimonialsBlock,
-  journal: JournalBlock,
-  form: FormBlock,
-  showreel: ShowreelBlock,
-  // Product flows (wave 5 part B): page blocks too.
-  quiz: QuizBlock,
-  booking: BookingBlock,
-  calculator: CalculatorBlock,
-  chart: ChartBlock,
-  places: PlacesBlock,
-  podcast: PodcastBlock,
-}
+/** The default block library: one component per kind of block (the /0 library, then the /1 page blocks: the media
+ * family and the product flows). A brand may replace any of them. */
+export const defaultBlocks: { [K in BlockName]: React.ComponentType<BlockProps<K>> } = { ...coreBlocks, ...mediaBlocks, ...flowBlocks }

@@ -1,5 +1,6 @@
 // The JSON Schema of feather.page/0, built from spec.ts (for editors and other languages). The validator stays the
 // authority: it also checks references, scenes and the honesty floor, which a schema cannot.
+import { PAGE_BLOCK_DOC } from "../src/core/page-docs.ts"
 import { ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, PAGE_BLOCKS, PAGE_KNOBS, ROUTE_VARIANTS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "../src/core/spec.ts"
 
 type Json = Record<string, unknown>
@@ -52,11 +53,11 @@ function object(fields: Fields, extra: Json = {}, required: string[] = []): Json
 
 /** The JSON Schema of one version: 0 (the sections, scenes and living layer) or 1 (also the page edges). */
 export function pageJsonSchema(version: 0 | 1 = 1): Json {
-  const describe = ([name, { doc }]: [string, { doc: string }]) => {
+  const describe = ([name, { doc }]: [string, { doc?: string }]) => {
     const range = BLOCK_RANGE[name]
     const knobs = version === 1 ? ` Variants: ${range.variants ? range.variants.join(", ") : "the brand's own (free text)"}${range.variants ? ` (default ${range.variants[0]})` : ""}. Align: ${range.aligns.join(", ")}. Scroll: ${range.scroll.join(", ")}.` : ""
     return {
-      description: `${doc}${knobs}`,
+      description: `${doc ?? PAGE_BLOCK_DOC[name]}${knobs}`,
       ...object(blockFields(name, version), { block: { const: name }, id: { type: "string", pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }, ["block"]),
     }
   }

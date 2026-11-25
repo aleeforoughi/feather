@@ -23,13 +23,18 @@ export default defineConfig({
       output: {
         // One stable name per release (the zip lists it); the version is in the release, not the file name.
         // The feather-react parts a page loads on demand (the gallery's Lightbox) are one chunk too,
-        // feather-page-parts.js.
+        // feather-page-parts.js, and so is each page-block family: feather-page-media.js and feather-page-flows.js.
         chunkFileNames: (chunk) =>
           chunk.moduleIds.some((id) => /[\\/]feather-scene[\\/]|[\\/]scene[\\/](?:dist|src)[\\/]three[\\/]/.test(id))
             ? "feather-page-three.js"
             : chunk.moduleIds.some((id) => /[\\/]blocks[\\/]react-parts\.(?:js|tsx)$/.test(id))
               ? "feather-page-parts.js"
-              : "feather-page-[name].js",
+              : chunk.moduleIds.some((id) => /[\\/]blocks[\\/]media-family\.(?:js|ts)$/.test(id))
+                ? "feather-page-media.js"
+                : chunk.moduleIds.some((id) => /[\\/]blocks[\\/]flow-family\.(?:js|ts)$/.test(id))
+                  ? "feather-page-flows.js"
+                  : // Anything else the runtime and its chunks share (the bundler's helpers, React's JSX runtime).
+                    "feather-page-shared.js",
       },
     },
   },
