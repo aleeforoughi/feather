@@ -2,7 +2,7 @@
 // Living Page layered on when the document has one. Deterministic: the same page, brand and host give the same DOM.
 import * as React from "react"
 import { buildTheme, type BrandTokens } from "@aleeforoughi/feather-tokens"
-import { Cursor, Loader, OverlayMenu, SoundToggle } from "@aleeforoughi/feather-expression"
+import { Cursor, Loader, LocaleProvider, OverlayMenu, SoundToggle } from "@aleeforoughi/feather-expression"
 import { LivingPage, PreparedSceneView, createRegistry, useLivingAsk, type AskHandler, type Block, type BlockKind, type PreparedScene, type Speaker } from "@aleeforoughi/feather-living"
 import { coreBlocks } from "./blocks/core"
 import type { BlockProps } from "./blocks/shared"
@@ -187,8 +187,9 @@ function PageFrame({ page, head, plan, children }: { page: PageDocument; head: R
   const reveal = page.footer?.variant === "reveal"
   const { SchemeToggle } = React.useContext(PagePartsContext)
   const toggle = page.scheme && SchemeToggle ? (page.scheme.toggle ?? (page.nav ? "nav" : "footer")) : null
+  // Numbers are written in the page's language, so the server and every browser write the same digits.
   return (
-    <>
+    <LocaleProvider locale={page.lang}>
       {head}
       {page.loader ? <Loader variant={page.loader.variant ?? "counter"} label={page.loader.label ?? `Loading ${page.title ?? "the page"}`} sound={page.loader.sound === true && !!bed} /> : null}
       {page.nav ? (
@@ -221,7 +222,7 @@ function PageFrame({ page, head, plan, children }: { page: PageDocument; head: R
       {page.footer ? <Footer footer={page.footer} name={name} {...(toggle === "footer" && SchemeToggle ? { aside: <SchemeToggle place="footer" /> } : {})} /> : null}
       {/* Last, so it shifts no generated ids of the page above it. */}
       {page.cursor === "follower" ? <Cursor /> : null}
-    </>
+    </LocaleProvider>
   )
 }
 

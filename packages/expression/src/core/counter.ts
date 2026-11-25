@@ -42,14 +42,20 @@ export function countTo({ from = 0, to, duration = 900, ease, onUpdate, onDone, 
   return remove
 }
 
+/** The locale numbers are written in when none is given: fixed, so a server render and the browser agree. */
+export const DEFAULT_LOCALE = "en"
+
 // One formatter per locale and decimals: `toLocaleString` with options builds a new Intl.NumberFormat on every call,
 // and a counter formats every frame.
 const formatters = new Map<string, Intl.NumberFormat>()
 
-/** Formats a counter value with the target's decimals, so the width does not jump. */
-export function formatCount(value: number, to: number, locale?: string): string {
+/**
+ * Formats a counter value with the target's decimals, so the width does not jump. The locale defaults to
+ * DEFAULT_LOCALE, never the environment's: the browser's own locale would write other digits than the server did.
+ */
+export function formatCount(value: number, to: number, locale: string = DEFAULT_LOCALE): string {
   const decimals = (String(to).split(".")[1] ?? "").length
-  const key = `${locale ?? ""}|${decimals}`
+  const key = `${locale}|${decimals}`
   let format = formatters.get(key)
   if (!format) {
     format = new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
