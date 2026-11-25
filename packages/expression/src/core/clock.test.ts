@@ -75,7 +75,7 @@ describe("clock", () => {
     const frames = fakeFrames()
     const clock = createClock(frames)
     const deltas: number[] = []
-    const again = (t: number, d: number) => {
+    const again = (_time: number, d: number) => {
       deltas.push(d)
       if (deltas.length < 6) clock.once(again)
     }
