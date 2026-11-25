@@ -3,6 +3,7 @@ import { clock } from "../core/clock"
 import { reveal, revealKeyframes } from "../core/reveal"
 import { prefersReducedMotion, revealDistance, roleMotion, staggerDelays, staggerStep } from "../core/motion"
 import { fontsReady, groupLines, splitChars, splitWords } from "../core/split"
+import { isLongRun } from "../core/fit"
 import {
   BLINK_MS,
   PRESETS,
@@ -25,6 +26,7 @@ import { allows } from "../core/loudness"
 import { useMergedRef, useReducedMotion } from "../hooks"
 import { useDeclaredLoudness } from "./loudness"
 import { cn } from "../cn"
+import { FitText, fitStyle } from "./fit-text"
 
 export type DisplaySize = "xl" | "l" | "m" | "s"
 export type DisplaySplit = "line" | "word" | "char" | "none"
@@ -83,9 +85,13 @@ const MASK_PAD = "py-1 -my-1"
  * (oval within its own 1.8s). A title already in view at mount never starts at opacity 0, so it stays LCP-safe. With
  * no script the server markup is the plain title; under reduced motion it stays plain (a 150ms fade where the theme
  * says so; scramble and swap show their final text at once).
+ *
+ * It fits its box (docs/visual-system.md section 14.1): foundation.css caps the size at what fits the column it sits
+ * in, a run longer than the measure is written as --fit-chars and set as one unbreakable piece (fit-word), and only a
+ * run that cannot fit even at the floor hyphenates. Every piece wraps as a whole word, never inside one.
  */
 export const DisplayTitle = React.forwardRef<HTMLElement, DisplayTitleProps>(function DisplayTitle(
-  { as: Tag = "h2", size = "l", split, effect: effectProp = "rise", words, interval, paused = false, trigger = "enter", className, children: text, ...props },
+  { as: Tag = "h2", size = "l", split, effect: effectProp = "rise", words, interval, paused = false, trigger = "enter", className, style, children: text, ...props },
   forwarded
 ) {
   const root = React.useRef<HTMLElement>(null)
@@ -145,12 +151,15 @@ export const DisplayTitle = React.forwardRef<HTMLElement, DisplayTitleProps>(fun
 
   const className_ = cn(SIZE[size], "text-fg-primary", className)
   const variant = effect === "rise" ? riseSplit : effect
-  const common = { "data-slot": "display-title", "data-variant": variant, "data-split": effect === "rise" ? riseSplit : pieced ? unit : "none", className: className_, ...props }
+  // The longest run the size must fit, the swap's words included (only when one is longer than the measure).
+  const fit = fitStyle(text, ...(swapWords ?? []))
+  const style_ = fit ? { ...fit, ...style } : style
+  const common = { "data-slot": "display-title", "data-variant": variant, "data-split": effect === "rise" ? riseSplit : pieced ? unit : "none", className: className_, ...(style_ ? { style: style_ } : {}), ...props }
   const plain = reduced || (effect === "rise" && riseSplit === "none")
   if (plain) {
     return (
       <Tag ref={ref as React.Ref<never>} {...common}>
-        {name}
+        <FitText>{name}</FitText>
       </Tag>
     )
   }
@@ -172,17 +181,20 @@ export const DisplayTitle = React.forwardRef<HTMLElement, DisplayTitleProps>(fun
 
 type PieceMode = "rise" | "mask" | "skew" | "oval" | "scramble"
 
-/** The split pieces. Words are always inline-block and unbreakable; characters sit inside their word. A mask effect
- * puts the moving part (an `inner`) inside a clipping piece; `data-mask` marks what is released when it finishes. */
+/** The split pieces. Words are always inline-block and unbreakable; characters sit inside their word. A word longer
+ * than the measure is a fit-word: still whole while it fits, it hyphenates only when it cannot fit even at the floor.
+ * A mask effect puts the moving part (an `inner`) inside a clipping piece; `data-mask` marks what is released when it
+ * finishes. */
 function Pieces({ text, unit, mode }: { text: string; unit: EffectUnit | "word" | "char"; mode: PieceMode }) {
   const masked = mode === "mask"
   return (
     <>
       {splitWords(text).map((word, i) => {
         if (/^\s+$/.test(word)) return word
+        const whole = isLongRun(word) ? "fit-word" : "inline-block whitespace-nowrap"
         if (unit === "char") {
           return (
-            <span key={i} data-slot="display-title-piece" data-piece="word" className="inline-block whitespace-nowrap">
+            <span key={i} data-slot="display-title-piece" data-piece="word" className={whole}>
               {splitChars(word).map((ch, j) =>
                 mode === "mask" || mode === "skew" ? (
                   <span key={j} data-slot="display-title-piece" data-piece="char" data-mask={masked ? "" : undefined} className={cn("inline-block align-top", masked && `overflow-hidden ${MASK_PAD}`)}>
@@ -201,15 +213,15 @@ function Pieces({ text, unit, mode }: { text: string; unit: EffectUnit | "word" 
         }
         if (unit === "word" && (mode === "mask" || mode === "skew")) {
           return (
-            <span key={i} data-slot="display-title-piece" data-piece="word" data-mask={masked ? "" : undefined} className={cn("inline-block align-top whitespace-nowrap", masked && `overflow-hidden ${MASK_PAD}`)}>
-              <span data-slot="display-title-piece" data-piece="inner" className="inline-block">
+            <span key={i} data-slot="display-title-piece" data-piece="word" data-mask={masked ? "" : undefined} className={cn(whole, "align-top", masked && `overflow-hidden ${MASK_PAD}`)}>
+              <span data-slot="display-title-piece" data-piece="inner" className={isLongRun(word) ? "fit-word" : "inline-block"}>
                 {word}
               </span>
             </span>
           )
         }
         return (
-          <span key={i} data-slot="display-title-piece" data-piece="word" className="inline-block whitespace-nowrap">
+          <span key={i} data-slot="display-title-piece" data-piece="word" className={whole}>
             {word}
           </span>
         )
@@ -223,15 +235,15 @@ function Pieces({ text, unit, mode }: { text: string; unit: EffectUnit | "word" 
 function Swap({ before, after, words }: { before: string; after: string; words: string[] }) {
   return (
     <>
-      {before}
-      <span data-slot="display-title-swap" className={cn("inline-grid overflow-hidden align-bottom", MASK_PAD)}>
+      <FitText>{before}</FitText>
+      <span data-slot="display-title-swap" className={cn("inline-grid max-w-full overflow-hidden align-bottom", MASK_PAD)}>
         {words.map((w, i) => (
-          <span key={i} data-slot="display-title-piece" data-piece="swap-word" data-state={i === 0 ? "active" : "idle"} style={{ gridArea: "1 / 1", transform: i === 0 ? undefined : "translateY(110%)" }}>
+          <span key={i} data-slot="display-title-piece" data-piece="swap-word" data-state={i === 0 ? "active" : "idle"} className={isLongRun(w) ? "fit-word" : undefined} style={{ gridArea: "1 / 1", transform: i === 0 ? undefined : "translateY(110%)" }}>
             {w}
           </span>
         ))}
       </span>
-      {after}
+      <FitText>{after}</FitText>
     </>
   )
 }

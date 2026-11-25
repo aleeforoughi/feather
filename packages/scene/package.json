@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-scene",
-  "version": "1.22.1",
+  "version": "1.22.2",
   "description": "Feather's 3D and WebGL scenes as World renderers: shader backgrounds and image-to-depth on raw WebGL (no dependency), and on Three.js (an optional peer) the object viewer, the studio stage, particles, camera rails and post. Every scene keeps the World's floors: capped pixels, the quality ladder, the capability gate, a poster, pausing when hidden.",
   "license": "UNLICENSED",
   "type": "module",
