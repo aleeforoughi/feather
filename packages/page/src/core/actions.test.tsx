@@ -64,12 +64,14 @@ describe("one filled action per section", () => {
 })
 
 describe("the default disclosure", () => {
-  const living = { speaker: { kind: "person", name: "Mara Ellis" }, living: { anchor: "reader" } }
+  const living = { schema: "feather.page/1", speaker: { kind: "person", name: "Mara Ellis" }, living: { anchor: "reader" } }
   it("a living page with a speaker and no disclosure says it is an AI agent speaking for the speaker", () => {
     expect(defaultDisclosure("Mara Ellis")).toBe("An AI agent speaking for Mara Ellis")
     expect(pageDisclosure({ ...living } as never)).toBe("An AI agent speaking for Mara Ellis")
     expect(pageDisclosure({ ...living, living: { disclosure: "An AI agent, in Mara's words" } } as never)).toBe("An AI agent, in Mara's words")
     expect(pageDisclosure({ speaker: living.speaker } as never)).toBeUndefined()
+    // A /0 page keeps the Living Page's own default line, byte for byte as before.
+    expect(pageDisclosure({ ...living, schema: "feather.page/0" } as never)).toBeUndefined()
   })
 
   it("holds to the validator's own rule: written out as the page's disclosure, it validates", () => {
