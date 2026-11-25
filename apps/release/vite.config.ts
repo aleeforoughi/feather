@@ -7,7 +7,9 @@ import { defineConfig } from "vite"
 // Three.js never enters the runtime. A page's Three.js scenes (particles, a model, a camera rail) load
 // @aleeforoughi/feather-scene/three with a dynamic import, which becomes one chunk beside the runtime,
 // feather-page-three.js, with three bundled into it. The runtime imports it by a relative URL, so it loads from wherever
-// the runtime was loaded from (`feather-page build --runtime <href>`), and only on a page whose scene runs.
+// the runtime was loaded from (`feather-page build --runtime <href>`), and only on a page whose scene runs. The same
+// holds for feather-page-parts.js: feather-react's Lightbox, Select and RadioGroup, loaded only when a gallery opens an
+// image or a form with a select or a choice hydrates.
 export default defineConfig({
   plugins: [react()],
   define: { "process.env.NODE_ENV": JSON.stringify("production") },
@@ -21,7 +23,14 @@ export default defineConfig({
       preserveEntrySignatures: "allow-extension",
       output: {
         // One stable name per release (the zip lists it); the version is in the release, not the file name.
-        chunkFileNames: (chunk) => (chunk.moduleIds.some((id) => /[\\/]feather-scene[\\/]|[\\/]scene[\\/](?:dist|src)[\\/]three[\\/]/.test(id)) ? "feather-page-three.js" : "feather-page-[name].js"),
+        // The feather-react parts a page loads on demand (the gallery's Lightbox, the form's Select and RadioGroup) are
+        // one chunk too, feather-page-parts.js.
+        chunkFileNames: (chunk) =>
+          chunk.moduleIds.some((id) => /[\\/]feather-scene[\\/]|[\\/]scene[\\/](?:dist|src)[\\/]three[\\/]/.test(id))
+            ? "feather-page-three.js"
+            : chunk.moduleIds.some((id) => /[\\/]blocks[\\/]react-parts\.(?:js|tsx)$/.test(id))
+              ? "feather-page-parts.js"
+              : "feather-page-[name].js",
       },
     },
   },

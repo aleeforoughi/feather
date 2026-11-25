@@ -88,6 +88,12 @@ describe("gallery", () => {
     expect(status.textContent).toContain("2 of 6")
   })
 
+  it("names its rail apart from its section (landmarks are told apart by name)", () => {
+    render(<GalleryBlock block={BLOCKS.gallery} />)
+    const names = screen.getAllByRole("region").map((r) => r.getAttribute("aria-label") ?? document.getElementById(r.getAttribute("aria-labelledby")!)?.textContent)
+    expect(names).toEqual(["From the studio", "From the studio, one image at a time"])
+  })
+
   it("an endless rail adds copies only after mount, hidden and inert", async () => {
     const doc = parse(renderToStaticMarkup(<GalleryBlock block={{ ...BLOCKS.gallery, loop: true }} />))
     expect(doc.querySelectorAll('[data-slot="reel-item"][data-variant="copy"]')).toHaveLength(0)

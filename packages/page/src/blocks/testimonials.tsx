@@ -22,7 +22,7 @@ export function TestimonialsBlock({ block }: BlockProps<"testimonials">) {
       <KnobBody knobs={knobs}>
         {knobs.variant === "rail" ? (
           <div data-slot="testimonials-rail" className="col-span-full">
-            <Reel aria-label={block.title ?? "What people say"} previousLabel="Previous quote" nextLabel="Next quote">
+            <Reel aria-label={`${block.title ?? "What people say"}, one quote at a time`} previousLabel="Previous quote" nextLabel="Next quote">
               {block.items.map((q) => (
                 <QuoteCard key={quoteKey(q)} q={q} className="w-xs sm:w-sm" />
               ))}

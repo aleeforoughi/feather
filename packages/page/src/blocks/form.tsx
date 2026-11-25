@@ -1,10 +1,14 @@
 import * as React from "react"
 import { Section } from "@aleeforoughi/feather-expression"
-import { Field, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, Input, RadioGroup, RadioGroupItem, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@aleeforoughi/feather-react"
+import { Field, FieldDescription, FieldError, FieldLabel, FieldLegend, FieldSet, Input, Textarea } from "@aleeforoughi/feather-react"
 import type { FormField, FormVariant } from "../core/types"
 import { useHydrated } from "./hydration"
 import { KnobBody, KnobTitle, alignClass, useKnobs } from "./knobs"
 import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
+
+// The enhanced select and choice, from the page's lazy chunk of feather-react parts (react-parts.tsx).
+const PartSelect = React.lazy(() => import("./react-parts").then((m) => ({ default: m.PartSelect })))
+const PartChoice = React.lazy(() => import("./react-parts").then((m) => ({ default: m.PartChoice })))
 
 // The minimal underline: the field is its baseline, at the control's height, with the focus ring on the control.
 const UNDERLINE = "rounded-none border-0 border-b bg-transparent px-0 focus-ring"
@@ -70,32 +74,29 @@ function Control({ field, id, error, hydrated }: ControlProps) {
 
   if (type === "choice") {
     const options = field.options ?? []
+    const natives = (
+      <div data-slot="form-choices" className="flex flex-col gap-1">
+        {options.map((o, i) => (
+          <div key={o} data-slot="form-choice" className="flex min-h-12 items-center gap-3">
+            <input type="radio" data-slot="form-radio-native" id={`${id}-${i}`} name={field.name} value={o} required={field.required} className="size-5 accent-primary focus-ring" />
+            <FieldLabel htmlFor={`${id}-${i}`} className="type-body">
+              {o}
+            </FieldLabel>
+          </div>
+        ))}
+      </div>
+    )
     return (
       <FieldSet data-invalid={error ? true : undefined} aria-describedby={describedBy}>
         <FieldLegend variant="label">{label}</FieldLegend>
         {hint}
+        {/* The native radios are what the server writes, and what shows until the enhanced group has loaded. */}
         {hydrated ? (
-          <RadioGroup name={field.name} aria-label={field.label} required={field.required} className="flex flex-col gap-1" {...common}>
-            {options.map((o, i) => (
-              <div key={o} data-slot="form-choice" className="flex min-h-12 items-center gap-3">
-                <RadioGroupItem value={o} id={`${id}-${i}`} />
-                <FieldLabel htmlFor={`${id}-${i}`} className="type-body">
-                  {o}
-                </FieldLabel>
-              </div>
-            ))}
-          </RadioGroup>
+          <React.Suspense fallback={natives}>
+            <PartChoice id={id} name={field.name} label={field.label} required={field.required} options={options} {...common} />
+          </React.Suspense>
         ) : (
-          <div data-slot="form-choices" className="flex flex-col gap-1">
-            {options.map((o, i) => (
-              <div key={o} data-slot="form-choice" className="flex min-h-12 items-center gap-3">
-                <input type="radio" data-slot="form-radio-native" id={`${id}-${i}`} name={field.name} value={o} required={field.required} className="size-5 accent-primary focus-ring" />
-                <FieldLabel htmlFor={`${id}-${i}`} className="type-body">
-                  {o}
-                </FieldLabel>
-              </div>
-            ))}
-          </div>
+          natives
         )}
         {message}
       </FieldSet>
@@ -107,20 +108,7 @@ function Control({ field, id, error, hydrated }: ControlProps) {
     control = <Textarea id={id} name={field.name} required={field.required} maxLength={field.max} placeholder={field.placeholder} autoComplete={field.autocomplete} rows={4} className={join(UNDERLINE, "min-h-24 py-3")} {...common} />
   } else if (type === "select") {
     const options = field.options ?? []
-    control = hydrated ? (
-      <Select name={field.name} required={field.required} items={options.map((o) => ({ value: o, label: o }))}>
-        <SelectTrigger id={id} className={join(UNDERLINE, "w-full")} {...common}>
-          <SelectValue placeholder={field.placeholder ?? "Choose one"} />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((o) => (
-            <SelectItem key={o} value={o}>
-              {o}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    ) : (
+    const native = (
       <select id={id} data-slot="form-select-native" name={field.name} required={field.required} defaultValue="" className={NATIVE_SELECT} {...common}>
         <option value="" disabled={field.required}>
           {field.placeholder ?? "Choose one"}
@@ -131,6 +119,13 @@ function Control({ field, id, error, hydrated }: ControlProps) {
           </option>
         ))}
       </select>
+    )
+    control = hydrated ? (
+      <React.Suspense fallback={native}>
+        <PartSelect id={id} name={field.name} required={field.required} placeholder={field.placeholder ?? "Choose one"} options={options} className={join(UNDERLINE, "w-full")} {...common} />
+      </React.Suspense>
+    ) : (
+      native
     )
   } else {
     const t = type as "text" | "email" | "tel" | "url" | "number"

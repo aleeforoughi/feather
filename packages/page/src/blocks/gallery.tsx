@@ -1,11 +1,16 @@
 import * as React from "react"
 import { MediaFrame, Reel, Section, useReducedMotion, type MediaAspect, type MediaTreatment } from "@aleeforoughi/feather-expression"
-import { Lightbox, type LightboxImage } from "@aleeforoughi/feather-react"
+import type { LightboxImage } from "@aleeforoughi/feather-react"
 import type { GalleryItem, GalleryVariant } from "../core/types"
 import { HoverIndex, HoverThumb } from "./hover-index"
 import { KnobBody, KnobTitle, scrollAllowed, useKnobs } from "./knobs"
 import { mediaProps, mediaSrc } from "./media"
 import { join, useRegion, type BlockProps } from "./shared"
+
+// feather-react's Lightbox comes from the page's lazy chunk of parts (react-parts.tsx), on the first open; a pointer
+// or focus on an image fetches it ahead.
+const parts = () => import("./react-parts")
+const Lightbox = React.lazy(() => parts().then((m) => ({ default: m.Lightbox })))
 
 /** The masonry's rhythm of frames: the column heights fall out of it, and every frame's box is known before it loads. */
 const MASONRY: MediaAspect[] = ["4/5", "1/1", "3/4", "4/3", "4/5", "16/9"]
@@ -30,6 +35,8 @@ function Opener({ item, index, onOpen, className, children, ...rest }: { item: G
       data-slot="gallery-open"
       aria-haspopup="dialog"
       className={join("block focus-ring", className)}
+      onPointerEnter={() => void parts()}
+      onFocus={() => void parts()}
       onClick={(e) => {
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()
@@ -70,7 +77,8 @@ interface VariantProps {
 function Rail({ items, onOpen, treatment, label, loop }: VariantProps & { loop: boolean }) {
   return (
     <div data-slot="gallery-rail" className="col-span-full">
-      <Reel aria-label={label} loop={loop} previousLabel="Previous image" nextLabel="Next image">
+      {/* Named apart from the section around it (landmarks are told apart by their names). */}
+      <Reel aria-label={`${label}, one image at a time`} loop={loop} previousLabel="Previous image" nextLabel="Next image">
         {items.map((item, i) => (
           <figure key={i} data-slot="gallery-item" className="flex w-xs flex-col gap-3 sm:w-sm">
             <Opener item={item} index={i} onOpen={onOpen} className="rounded-card">
@@ -307,12 +315,18 @@ export function GalleryBlock({ block }: BlockProps<"gallery">) {
   const box = React.useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion(box)
   const [open, setOpen] = React.useState<number | null>(null)
+  // The lightbox is on the page from its first open (so it can close with its own exit), never before.
+  const [opened, setOpened] = React.useState(false)
+  const show = (i: number | null) => {
+    if (i !== null) setOpened(true)
+    setOpen(i)
+  }
   // The wheel is decided after mount (the server and the first render draw the rail, its static form).
   const [wheel, setWheel] = React.useState(false)
   React.useEffect(() => setWheel(knobs.variant === "wheel" && !reduced && block.items.length >= WHEEL_MIN && scrollAllowed(box.current)), [knobs.variant, reduced, block.items.length])
   const images: LightboxImage[] = block.items.map((item) => ({ src: mediaSrc(item.media), alt: altOf(item), ...(item.caption || item.title ? { caption: item.caption ?? item.title } : {}) }))
   const label = block.title ?? "Gallery"
-  const props: VariantProps = { items: block.items, onOpen: setOpen, treatment: knobs.treatment, label }
+  const props: VariantProps = { items: block.items, onOpen: show, treatment: knobs.treatment, label }
   const v = knobs.variant === "wheel" && !wheel ? "rail" : knobs.variant
   return (
     <Section id={id} data-block="gallery" {...labelled} {...knobs.section} {...(knobs.variant === "wheel" ? { "data-state": wheel ? "wheel" : "rail" } : {})}>
@@ -331,7 +345,11 @@ export function GalleryBlock({ block }: BlockProps<"gallery">) {
           {v === "masonry" ? <Masonry {...props} /> : v === "grid" ? <GridVariant {...props} /> : v === "hover-list" ? <HoverListVariant {...props} /> : v === "wheel" ? <Wheel {...props} /> : <Rail {...props} loop={block.loop === true} />}
         </div>
       </KnobBody>
-      <Lightbox images={images} index={open} onIndexChange={setOpen} download={false} previousLabel="Previous image" nextLabel="Next image" />
+      {opened ? (
+        <React.Suspense fallback={null}>
+          <Lightbox images={images} index={open} onIndexChange={setOpen} download={false} previousLabel="Previous image" nextLabel="Next image" />
+        </React.Suspense>
+      ) : null}
     </Section>
   )
 }

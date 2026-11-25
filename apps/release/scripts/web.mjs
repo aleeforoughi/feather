@@ -13,8 +13,9 @@ const dist = path.join(import.meta.dirname, "../dist")
 const version = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "../package.json"), "utf8")).version
 
 /** Every file and folder of the web bundle, relative to dist. The Three.js chunk loads only on a page whose 3D scene
- * runs, from beside the runtime. */
-export const WEB_FILES = ["feather-page.css", "feather-page-runtime.js", "feather-page-three.js", "fonts"]
+ * runs, and the parts chunk only where a gallery opens an image or a form enhances its select or choice, each from
+ * beside the runtime; the bundler's own helpers, which the runtime and the parts share, are a file of their own. */
+export const WEB_FILES = ["feather-page.css", "feather-page-runtime.js", "feather-page-three.js", "feather-page-parts.js", "feather-page-rolldown-runtime.js", "fonts"]
 
 const read = (f) => fs.readFileSync(path.join(dist, f), "utf8")
 const kb = (n) => `${(n / 1000).toFixed(1)} kB`
@@ -34,7 +35,7 @@ function check() {
   }
   if (!/import\s*\(\s*["']\.\/feather-page-three\.js["']\s*\)/.test(runtime)) problems.push("feather-page-runtime.js does not load ./feather-page-three.js by a relative dynamic import")
   if (/^\s*import\s[^(]*["']\.\/feather-page-three\.js["']/m.test(runtime)) problems.push("feather-page-runtime.js imports the Three.js chunk statically")
-  for (const f of ["feather-page-runtime.js", "feather-page-three.js"]) {
+  for (const f of ["feather-page-runtime.js", "feather-page-three.js", "feather-page-parts.js"]) {
     const bytes = fs.readFileSync(path.join(dist, f))
     console.log(`${f}: ${kb(bytes.length)}, ${kb(gzipSync(bytes).length)} gzip`)
   }
