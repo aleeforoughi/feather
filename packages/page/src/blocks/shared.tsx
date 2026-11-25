@@ -1,4 +1,5 @@
 import * as React from "react"
+import { FitText, fitStyle } from "@aleeforoughi/feather-expression"
 import type { BlockName, PageBlock } from "../core/types"
 
 /** One block of kind `K`, narrowed out of the document's block union. */
@@ -29,8 +30,8 @@ export function useRegion(block: { id?: string; title?: string }, label: string)
 /** A block's own heading: `h2`, in the heading role. */
 export function BlockTitle({ id, children }: { id: string; children: string }) {
   return (
-    <h2 id={id} data-slot="block-title" className="col-span-full mb-12 type-heading-1 text-fg-primary">
-      {children}
+    <h2 id={id} data-slot="block-title" className="col-span-full mb-12 type-heading-1 text-fg-primary" style={fitStyle(children)}>
+      <FitText>{children}</FitText>
     </h2>
   )
 }

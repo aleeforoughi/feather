@@ -1,4 +1,4 @@
-import { Reel, Section } from "@aleeforoughi/feather-expression"
+import { FitText, Reel, Section, fitStyle } from "@aleeforoughi/feather-expression"
 import type { TimelineVariant } from "../core/types"
 import { KnobBody, KnobTitle, useKnobs } from "./knobs"
 import { BlockTitle, useRegion, type BlockProps } from "./shared"
@@ -16,7 +16,7 @@ export function TimelineBlock({ block }: BlockProps<"timeline">) {
       {block.items.map((item) => (
         <li key={`${item.when}-${item.what}`} data-slot="timeline-item" className="grid grid-cols-1 gap-2 border-t border-line-primary py-6 md:grid-cols-12 md:gap-8">
           <p data-slot="timeline-when" className="type-caps text-fg-secondary md:col-span-3">
-            {item.when}
+            <FitText>{item.when}</FitText>
           </p>
           <p data-slot="timeline-what" className="type-body-lg text-prose text-fg-primary md:col-span-9">
             {item.what}
@@ -46,8 +46,8 @@ export function TimelineBlock({ block }: BlockProps<"timeline">) {
             <Reel aria-label={`${block.title ?? "Timeline"}, moment by moment`}>
               {block.items.map((item, i) => (
                 <div key={`${item.when}-${item.what}`} data-slot="timeline-item" aria-roledescription="moment" aria-label={`${i + 1} of ${block.items.length}`} className="flex w-2xs flex-col gap-4 border-t border-line-primary pt-6 sm:w-xs">
-                  <p data-slot="timeline-when" className="type-display-s numeric text-fg-primary">
-                    {item.when}
+                  <p data-slot="timeline-when" className="type-display-s numeric text-fg-primary" style={fitStyle(item.when)}>
+                    <FitText>{item.when}</FitText>
                   </p>
                   <p data-slot="timeline-what" className="type-body-lg text-prose text-fg-secondary">
                     {item.what}
