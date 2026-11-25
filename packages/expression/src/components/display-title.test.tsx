@@ -300,4 +300,47 @@ describe("DisplayTitle effects", () => {
       unmount()
     }
   })
+
+  describe("fits its box (docs/visual-system.md section 14.1)", () => {
+    const LONG = "Die Donaudampfschifffahrtsgesellschaft is making moments"
+
+    it("writes nothing for a title whose words are all within the measure, so it renders as before", () => {
+      const html = renderToStaticMarkup(<DisplayTitle as="h1">I design interfaces that compose themselves.</DisplayTitle>)
+      expect(html).toBe('<h1 data-slot="display-title" data-variant="word" data-split="word" class="type-display-l text-fg-primary">I design interfaces that compose themselves.</h1>')
+    })
+
+    it("writes the longest run as --fit-chars, and sets a long word as one fit-word in the plain title", () => {
+      const html = renderToStaticMarkup(<DisplayTitle as="h1" style={{ color: "red" }}>{LONG}</DisplayTitle>)
+      expect(html).toContain('style="--fit-chars:34;color:red"')
+      expect(html).toContain('<span data-slot="fit-word" class="fit-word">Donaudampfschifffahrtsgesellschaft</span> is making moments')
+    })
+
+    it("sets a long word's piece as a fit-word in every split, the short ones still unbreakable", async () => {
+      stubMotion(false)
+      for (const effect of ["rise", "mask"] as DisplayEffect[]) {
+        const { container, unmount } = render(<DisplayTitle effect={effect} split="word">{LONG}</DisplayTitle>)
+        await settle()
+        const words = [...container.querySelectorAll<HTMLElement>('[data-piece="word"]')]
+        const long = words.find((w) => w.textContent === "Donaudampfschifffahrtsgesellschaft")!
+        expect(long.className, effect).toContain("fit-word")
+        expect(long.className, effect).not.toContain("whitespace-nowrap")
+        for (const w of words.filter((w) => w !== long)) expect(w.className, effect).toContain("whitespace-nowrap")
+        unmount()
+      }
+    })
+
+    it("counts the swap's words in --fit-chars and lets a long one wrap in its slot", async () => {
+      stubMotion(false)
+      const { container } = render(
+        <DisplayTitle effect="swap" words={["Rechtsschutzversicherungsgesellschaften", "calm"]}>
+          {"Interfaces that feel {word}."}
+        </DisplayTitle>
+      )
+      await settle()
+      const title = container.querySelector<HTMLElement>('[data-slot="display-title"]')!
+      expect(title.style.getPropertyValue("--fit-chars")).toBe("39")
+      expect(container.querySelector('[data-slot="display-title-swap"]')!.className).toContain("max-w-full")
+      expect(container.querySelector('[data-piece="swap-word"][data-state="active"]')!.className).toContain("fit-word")
+    })
+  })
 })

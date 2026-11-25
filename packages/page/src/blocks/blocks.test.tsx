@@ -148,3 +148,30 @@ describe("content blocks", () => {
     expect(container.querySelector('[data-slot="signature"]')?.getAttribute("data-variant")).toBe("ink")
   })
 })
+
+describe("fit (docs/visual-system.md section 14.1)", () => {
+  const Numbers = defaultBlocks.numbers as React.ComponentType<{ block: unknown }>
+  const Timeline = defaultBlocks.timeline as React.ComponentType<{ block: unknown }>
+
+  it("a block title with a run longer than the measure writes it, and sets that run as one fit-word", () => {
+    const { container } = render(<Numbers block={{ block: "numbers", id: "n", title: "Die Rechtsschutzversicherungsgesellschaften", items: [{ value: 3, label: "systems" }] }} />)
+    const title = container.querySelector<HTMLElement>('[data-slot="block-title"]')!
+    expect(title.style.getPropertyValue("--fit-chars")).toBe("39")
+    expect(title.querySelector('[data-slot="fit-word"]')?.textContent).toBe("Rechtsschutzversicherungsgesellschaften")
+  })
+
+  it("a long unit may wrap under its number; a short one stays on its line", () => {
+    const { container } = render(<Numbers block={{ block: "numbers", id: "n", variant: "plain", items: [{ value: 1250, unit: "kilometres", label: "driven" }, { value: 12, unit: "years", label: "designing" }] }} />)
+    const values = [...container.querySelectorAll('[data-slot="number-value"]')].map((v) => v.textContent)
+    expect(values[0]).toMatch(/^1,250 kilometres$/)
+    expect(values[1]).toBe("12\u00a0years")
+  })
+
+  it("a word value in a horizontal timeline is sized to fit its card", () => {
+    const { container } = render(<Timeline block={{ block: "timeline", id: "t", variant: "horizontal", title: "Along the way", items: [{ when: "Scene", what: "One." }, { when: "Donaudampfschifffahrt", what: "Two." }] }} />)
+    const whens = [...container.querySelectorAll<HTMLElement>('[data-slot="timeline-when"]')]
+    expect(whens[0].getAttribute("style")).toBeNull()
+    expect(whens[1].style.getPropertyValue("--fit-chars")).toBe("21")
+    expect(whens[1].querySelector('[data-slot="fit-word"]')).not.toBeNull()
+  })
+})

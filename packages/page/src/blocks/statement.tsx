@@ -2,6 +2,8 @@ import * as React from "react"
 import {
   DisplayTitle,
   Marquee,
+  fitStyle,
+  isLongRun,
   Section,
   scrub,
   splitWords,
@@ -72,12 +74,13 @@ function FillTitle({
       id={id}
       data-slot="statement-fill"
       className={`type-display-${size} text-fg-primary`}
+      style={fitStyle(text)}
     >
       {splitWords(text).map((w, i) =>
         /^\s+$/.test(w) ? (
           w
         ) : (
-          <span key={i} data-slot="statement-word">
+          <span key={i} data-slot="statement-word" className={isLongRun(w) ? "fit-word" : undefined}>
             {w}
           </span>
         )

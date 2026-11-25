@@ -1,5 +1,45 @@
 # Feather — changelog
 
+## 1.22.2 — 2026-11-25
+
+**Type fits its box on every screen.** Qooler's device check found three layout bugs in 1.22 blocks at phone width on composed pages.
+
+### Fixes
+- **Display type fits its box.**
+  - **The bug:** a split hero's title took its size from the viewport, not its half column, and every kinetic piece is an unbreakable inline-block. A long word ran out of the title: 82px on a 390px phone, 440px on desktop. A horizontal timeline's word value ran out of its card by 19px and 323px.
+  - **The cap:** each display step is now capped at what fits the box it sits in. The box is the page's content width times the share the title's column takes, declared from the spans the blocks' columns already carry, never measured.
+  - **What must fit:** 10 characters at 0.62em (`--display-measure`, `--display-advance`), or the text's longest unbreakable run when that is longer. DisplayTitle and the blocks write that run as `--fit-chars`, only when it is longer, so /0 pages render byte for byte as before.
+  - **The floor:** nothing steps under `--display-fit-floor` (1.5rem). A run that cannot fit even there becomes a `fit-word` and hyphenates in the page's `lang`. An ordinary word never breaks.
+  - **Tracking:** a capped title gives its tracking back (`--display-fit-tracking`), never tighter than in proportion to its new size.
+- **An eyebrow never meets the title's glyphs.**
+  - **The cause:** a display line set under 1 hangs its glyphs out of its box by (ascent + descent − leading) / 2. For Studio's 160px title at leading 0.86 that is 34px, against the hero's fixed 24px gap.
+  - **The fix:** where a display title meets other copy, that edge reserves the overhang (`--display-overhang`, 1.3em; the reference faces measure 1.25 to 1.29). A utility margin still wins.
+- **The fit costs no main-thread time.** It uses no size containers and no `:has()`; together those had cost about 55 extra style passes during a loud page's load and failed the mobile TBT budget. Columns declare their share instead, and run lengths are counted without a Unicode property regex.
+- **Numbers keep to their cell.**
+  - A number keeps its unit on its line while the pair fits the measure; a longer unit wraps under it (`unitSpace`).
+  - In the lead variant, the other numbers wrap under their label.
+  - Inside a page block, copy that is not a title breaks a word too long for its line instead of overflowing.
+
+### `@aleeforoughi/feather-expression`
+- New: `FitText` and `fitStyle`.
+- New in `./core`: `FIT_MEASURE`, `fitChars`, `fitParts`, `isLongRun`, `longestRun`, `runLength`, `runs`, `unitSpace` and `joinUnit`.
+- Counter joins a long unit with a plain space.
+
+### Gates
+- **`apps/showcase/e2e/fit.spec.ts`** (in `test:sites`) renders every hero, numbers, statement, case and timeline variant:
+  - at loudness 0 and 3;
+  - in stress copy: German compounds, titles over 60 characters, an `em` in the title, long units, word values;
+  - in three brands, at 390, 820 and 1440px.
+
+  It asserts:
+  - no overflow;
+  - no overlap of the hero's eyebrow, title glyphs, lede and acts;
+  - no break inside a word that would fit;
+  - no title tracked tighter than −0.1em.
+
+  Against 1.22.1 it reports 911 problems; now it reports none.
+- **Visual baselines:** the stories with a display title next to other copy move by the reserved overhang, so their baselines are re-recorded. Only those stories' baselines are replaced; every other story still has to match.
+
 ## 1.22.1 — 2026-11-25
 
 **A page hydrates in every browser locale, and its title shows without frames.** Before this fix, a page built by `feather-page build --runtime` failed to hydrate (React #418) in a browser whose locale writes other digits than the build machine's, such as Persian (`fa-IR`) or Arabic (`ar-EG`). The server wrote the numbers block's counters as `1,280`, and the browser wrote `۱٬۲۸۰`. React then discarded the server markup and rendered the page again on the client. Reported by Qooler, whose loudness-2 and loudness-3 previews threw on the owner's Chrome.

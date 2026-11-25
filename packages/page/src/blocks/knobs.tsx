@@ -3,7 +3,7 @@
 // /0 page renders byte for byte as it did. Every colour stays a token: a tone re-points the semantic roles
 // (--surface-base, --text-primary, …) inside the section, it never writes a colour.
 import * as React from "react"
-import { DisplayTitle, HOUSE, allows, loudnessOf, reveal, type DisplayEffect, type DisplaySize, type MediaTreatment, type SectionSpace, type SectionTone } from "@aleeforoughi/feather-expression"
+import { DisplayTitle, FitText, HOUSE, allows, fitStyle, loudnessOf, reveal, type DisplayEffect, type DisplaySize, type MediaTreatment, type SectionSpace, type SectionTone } from "@aleeforoughi/feather-expression"
 import { BLOCK_RANGE, KINETIC_ENTERS, SECONDARY_INK } from "../core/spec"
 import type { BlockAlign, BlockCrop, BlockMotion, BlockScale, BlockTone, Knobs, PageDefaults, PageLayout } from "../core/types"
 import { BlockTitle, join } from "./shared"
@@ -181,8 +181,8 @@ export function KnobTitle({ id, children, knobs, motion }: { id: string; childre
   if (!knobs.scale && !kinetic && !split) return <BlockTitle id={id}>{children}</BlockTitle>
   if (!knobs.scale && !kinetic) {
     return (
-      <h2 id={id} data-slot="block-title" className="col-span-full mb-12 type-heading-1 text-fg-primary lg:col-span-4 lg:mb-0">
-        {children}
+      <h2 id={id} data-slot="block-title" className="col-span-full mb-12 type-heading-1 text-fg-primary lg:col-span-4 lg:mb-0" style={fitStyle(children)}>
+        <FitText>{children}</FitText>
       </h2>
     )
   }

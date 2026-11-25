@@ -1,7 +1,7 @@
 {
   "name": "@feather-apps/release",
   "private": true,
-  "version": "1.22.1",
+  "version": "1.22.2",
   "type": "module",
   "description": "The release assets callers download from each GitHub release: the feather-page CLI as one file, the page stylesheet with its fonts, and the browser runtime that mounts a page with motion, with its Three.js chunk beside it (loaded only where a 3D scene runs).",
   "scripts": {
