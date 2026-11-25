@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "../cn"
+import { useMuffleWhile } from "./sound-hooks"
 import { roleMotion, staggerDelays, staggerStep } from "../core/motion"
 
 export interface OverlayMenuItem {
@@ -66,6 +67,8 @@ export function OverlayMenu({ items, label = "Site", openLabel = "Menu", closeLa
   const toggle = React.useRef<HTMLButtonElement>(null)
   const panel = React.useRef<HTMLDivElement>(null)
   const [open, setOpen] = React.useState(false)
+  // Sound (when the person has turned it on) muffles while the menu covers the page.
+  useMuffleWhile(open)
   /** The panel stays visible while it closes (the close animation), so this trails `open`. */
   const [shown, setShown] = React.useState(false)
   const token = React.useRef(0)
