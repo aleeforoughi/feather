@@ -1225,7 +1225,9 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   --border-tertiary: var(--text-primary);
   --border: var(--text-primary);
   --input: var(--text-primary);
-  --ring-width: 3px;
+}
+[data-page][data-layout="brutalist"] :focus-visible {
+  outline-width: 3px;
 }
 [data-page][data-layout="brutalist"] [data-living-section] + [data-living-section] > [data-slot="section"] {
   border-block-start: 3px solid var(--text-primary);
