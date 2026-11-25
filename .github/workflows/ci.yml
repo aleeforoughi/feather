@@ -36,6 +36,8 @@ jobs:
       - name: The composer's 5 ms budget, measured alone (the parallel test run shares the CPU)
         run: FEATHER_SPEED=1 pnpm --filter @aleeforoughi/feather-liquid exec vitest run test/invariants.test.ts -t "5 ms budget"
       - run: pnpm hygiene
+      - name: The 2-CPU render gate (feather-page build of one direction, all routes, in 500 ms; range proposal section 6)
+        run: taskset -c 0,1 node scripts/render-gate.mjs
       - name: Release assets (the feather-page CLI as one file, the page CSS and runtime) build and run standalone
         run: |
           pnpm --filter @feather-apps/release build
