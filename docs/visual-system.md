@@ -628,10 +628,13 @@ house defaults below live in foundation.css for it.
   Display leading is a ratio, not a 4px multiple: it is the one type exception, and only for `type-display-*`.
 - **Fit.** Display type never runs past its box, never meets the copy around it and never breaks inside a word that
   would fit (`apps/showcase/e2e/fit.spec.ts` proves it on every hero, numbers, statement, case and timeline variant).
-  - Each display step is capped at what fits the box it sits in: the nearest inline-size container (`100cqi`), or
-    outside one the page's content width. The parent of every display title, block title and display figure is a
-    container, so a split hero's title sizes against its half column and a number against its cell, never the
-    viewport.
+  - Each display step is capped at what fits the box it sits in: the page's content width times the share of it the
+    title's column takes (`--fit-share`), less the gutters it does not span (`--fit-gap`), an equal-columns grid's
+    share (`--fit-cols`) and the column's padding (`--fit-pad`); a fixed card states its width (`--fit-box`).
+    foundation.css declares the shares from the spans the blocks' columns already carry (`lg:col-span-5` is 5 of the
+    grid's columns), so a split hero's title sizes against its half column and a number against its cell, never the
+    viewport. Nothing is measured: a size container would cost a style pass per container on every layout, which a
+    loud page's load cannot afford (the mobile TBT budget). The estimates err small.
   - What must fit is `--display-measure` characters (10) at `--display-advance` em each (0.62), or the text's longest
     unbreakable run when it is longer: `--fit-chars`, which DisplayTitle and the page blocks write only then
     (`fitStyle`, `FitText` in `feather-expression`), so ordinary text renders byte for byte as before. The heading

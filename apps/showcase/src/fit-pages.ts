@@ -51,7 +51,8 @@ function blocks(): Section[] {
     statement("marquee"),
     statement("fill"),
     statement("swap", { title: "Interfaces that feel {word} to the Rechtsschutzversicherungsgesellschaften", words: ["Donaudampfschifffahrtsgesellschaft", "calm", "inevitable"] }),
-    { block: "case", id: "case-editorial", variant: "editorial", title: TITLES[1], body: LEDE, facts: [{ label: "Rolle", value: "Gestaltungsleitung" }, { label: "Ergebnis", value: "Vierzig Prozent weniger Anfragen" }] },
+    { block: "case", id: "case-editorial", variant: "editorial", title: TITLES[1], body: LEDE, media: MEDIA, facts: [{ label: "Rolle", value: "Gestaltungsleitung" }, { label: "Ergebnis", value: "Vierzig Prozent weniger Anfragen" }] },
+    { block: "case", id: "case-solo", variant: "editorial", title: TITLES[0], body: LEDE },
     { block: "case", id: "case-scale", variant: "scale", title: TITLES[0], body: LEDE, media: MEDIA, facts: [{ label: "Rolle", value: "Gestaltungsleitung" }] },
     ...["list", "horizontal"].map((variant) => ({
       block: "timeline",
