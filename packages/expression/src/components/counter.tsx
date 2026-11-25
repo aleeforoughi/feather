@@ -2,8 +2,7 @@ import * as React from "react"
 import { cn } from "../cn"
 import { useReducedMotion } from "../hooks"
 import { countTo, formatCount } from "../core/counter"
-
-const NBSP = " "
+import { unitSpace } from "../core/fit"
 
 export interface CounterProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> {
   /** The final value. */
@@ -11,7 +10,8 @@ export interface CounterProps extends Omit<React.HTMLAttributes<HTMLSpanElement>
   from?: number
   /** ms; kept within 600 to 1200. */
   duration?: number
-  /** A unit after the number, joined with a non-breaking space ("%", "ms", "years"). */
+  /** A unit after the number, joined with a non-breaking space ("%", "ms", "years"); a pair longer than the fit
+   * measure (core/fit unitSpace) is joined with a plain space, so a long unit may wrap under the number. */
   unit?: string
   locale?: string
 }
@@ -25,6 +25,8 @@ export const Counter = React.forwardRef<HTMLSpanElement, CounterProps>(function 
   const root = React.useRef<HTMLSpanElement>(null)
   const reduced = useReducedMotion(root)
   const final = formatCount(value, value, locale)
+  // The space between the number and its unit, decided on the final value so it never changes while counting.
+  const joiner = unit ? unitSpace(final, unit) : ""
   const [text, setText] = React.useState(final)
   const [state, setState] = React.useState<"idle" | "counting" | "done">("done")
 
@@ -67,11 +69,11 @@ export const Counter = React.forwardRef<HTMLSpanElement, CounterProps>(function 
     <span ref={set} data-slot="counter" data-state={state} className={cn("numeric inline-block", className)} style={{ minInlineSize: `${final.length}ch`, ...style }} {...props}>
       <span data-slot="counter-value" aria-hidden="true">
         {text}
-        {unit ? NBSP + unit : null}
+        {unit ? joiner + unit : null}
       </span>
       <span data-slot="counter-final" className="sr-only">
         {final}
-        {unit ? NBSP + unit : null}
+        {unit ? joiner + unit : null}
       </span>
     </span>
   )

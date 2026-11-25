@@ -71,4 +71,13 @@ describe("Counter", () => {
     unmount()
     expect(clock.size).toBe(0)
   })
+
+  it("keeps a short unit on the number's line and lets a long one wrap under it", () => {
+    const short = render(<Counter value={12} unit="years" locale="en-US" />)
+    expect(short.container.querySelector('[data-slot="counter-final"]')!.textContent).toBe(`12${NBSP}years`)
+    short.unmount()
+    const long = render(<Counter value={1250} unit="kilometres" locale="en-US" />)
+    expect(long.container.querySelector('[data-slot="counter-final"]')!.textContent).toBe("1,250 kilometres")
+    expect(long.container.querySelector('[data-slot="counter-value"]')!.textContent).toMatch(/^[\d,]+ kilometres$/)
+  })
 })
