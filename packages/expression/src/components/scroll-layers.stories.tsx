@@ -91,9 +91,9 @@ const ProcessCards = () => (
   <ScrollLayers variant="stack" aria-label="How we work" className="bg-surface-base py-16">
     {PROCESS.map((step) => (
       <article key={step.n} data-slot="story-card" className={`flex min-h-80 flex-col justify-between gap-12 rounded-card border border-line-tertiary p-8 shadow-2 ${step.tone}`}>
-        <p className="type-caps text-fg-tertiary numeric">{step.n}</p>
+        <p className="type-caps text-fg-secondary numeric">{step.n}</p>
         <div data-slot="story-card-text" className="flex flex-col gap-3">
-          <h3 className="type-display-s text-fg-primary">{step.title}</h3>
+          <h2 className="type-display-s text-fg-primary">{step.title}</h2>
           <p className="max-w-prose type-body-lg text-fg-secondary">{step.body}</p>
         </div>
       </article>
@@ -137,13 +137,13 @@ const Work = ({ label = "Selected work" }: { label?: string }) => (
       <article key={w.client} data-slot="story-work" className="flex w-72 flex-col gap-4 sm:w-96">
         <div data-slot="story-work-art" className={`aspect-4/5 w-full rounded-card bg-linear-to-br ${w.art}`} aria-hidden="true" />
         <div data-slot="story-work-text" className="flex flex-col gap-1">
-          <h3 className="type-heading-3 text-fg-primary">
+          <h2 className="type-heading-3 text-fg-primary">
             <a href={`#${w.client.toLowerCase().replace(/\W+/g, "-")}`} className="rounded-control focus-ring">
               {w.client}
             </a>
-          </h3>
+          </h2>
           <p className="type-body text-fg-secondary">{w.what}</p>
-          <p className="type-caption text-fg-tertiary numeric">{w.year}</p>
+          <p className="type-caption text-fg-secondary numeric">{w.year}</p>
         </div>
       </article>
     ))}

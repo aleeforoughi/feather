@@ -60,6 +60,15 @@ for (const brand of BRANDS) {
       const page = await context.newPage()
       await page.goto(url(brand), { waitUntil: "networkidle" })
       await scrollThrough(page)
+      // Reduced motion keeps a 150ms cross-fade for reveals (docs/visual-system.md §14.2): let every finite animation
+      // finish (2s at most), then nothing may still be running. A loop (an infinite animation) never finishes, so it
+      // still fails here.
+      await page.evaluate(() =>
+        Promise.race([
+          Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished.catch(() => undefined))),
+          new Promise((resolve) => setTimeout(resolve, 2000)),
+        ])
+      )
       const moving = await page.evaluate(() =>
         [...document.querySelectorAll("*")].filter((el) => {
           const s = getComputedStyle(el)

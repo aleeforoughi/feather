@@ -172,7 +172,7 @@ export function WorkBlock({ block }: BlockProps<"work">) {
     return (
       <Section id={id} data-block="work" {...labelled} grid={false} {...knobs.section}>
         {title ? <div data-slot="work-head" className="page-grid">{title}</div> : null}
-        <ScrollLayers variant="horizontal" aria-label={block.title ?? "Selected work"} {...(block.scroll?.length ? { length: block.scroll.length } : {})}>
+        <ScrollLayers variant="horizontal" aria-label={`${block.title ?? "Selected work"}, one at a time`} {...(block.scroll?.length ? { length: block.scroll.length } : {})}>
           {items.map((item) => (
             <WorkPanel key={item.id} item={item} wide={false} />
           ))}
@@ -186,7 +186,7 @@ export function WorkBlock({ block }: BlockProps<"work">) {
       <KnobBody knobs={knobs}>
         {stack ? (
           <div data-slot="work-stack" className="col-span-full">
-            <ScrollLayers variant="stack" aria-label={block.title ?? "Selected work"}>
+            <ScrollLayers variant="stack">
               {items.map((item) => (
                 <WorkPanel key={item.id} item={item} wide />
               ))}

@@ -33,6 +33,8 @@ jobs:
       - run: pnpm build
       - run: pnpm typecheck
       - run: pnpm test
+      - name: The composer's 5 ms budget, measured alone (the parallel test run shares the CPU)
+        run: FEATHER_SPEED=1 pnpm --filter @aleeforoughi/feather-liquid exec vitest run test/invariants.test.ts -t "5 ms budget"
       - run: pnpm hygiene
       - name: Release assets (the feather-page CLI as one file, the page CSS and runtime) build and run standalone
         run: |

@@ -43,7 +43,7 @@ export function TimelineBlock({ block }: BlockProps<"timeline">) {
       <KnobBody knobs={knobs}>
         {knobs.variant === "horizontal" ? (
           <div data-slot="timeline" data-variant="horizontal" className="col-span-full">
-            <Reel aria-label={block.title ?? "Timeline"}>
+            <Reel aria-label={`${block.title ?? "Timeline"}, moment by moment`}>
               {block.items.map((item, i) => (
                 <div key={`${item.when}-${item.what}`} data-slot="timeline-item" aria-roledescription="moment" aria-label={`${i + 1} of ${block.items.length}`} className="flex w-2xs flex-col gap-4 border-t border-line-primary pt-6 sm:w-xs">
                   <p data-slot="timeline-when" className="type-display-s numeric text-fg-primary">
