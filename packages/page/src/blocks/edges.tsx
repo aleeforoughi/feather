@@ -60,7 +60,7 @@ export function Footer({ footer, name }: FooterProps) {
           <ul data-slot="page-footer-links" role="list" className="col-span-full flex flex-wrap gap-x-8 gap-y-2">
             {footer.links.map((l) => (
               <li key={l.href} data-slot="page-footer-item">
-                <a href={l.href} data-slot="page-footer-link" className="inline-flex min-h-12 items-center type-label text-fg-primary underline-offset-4 hover:underline focus-ring">
+                <a href={l.href} data-slot="page-footer-link" className="inline-flex min-h-12 min-w-12 items-center type-label text-fg-primary underline-offset-4 hover:underline focus-ring">
                   {l.label}
                 </a>
               </li>

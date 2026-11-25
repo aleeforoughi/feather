@@ -43,6 +43,14 @@ describe("buildTheme", () => {
     if (built.ok) await expect(body(built.css)).toMatchFileSnapshot(`golden/${name}.v1.css`)
   })
 
+  // feather-tokens/3 brands: golden/v3-brands.json holds studio, portrait and seed as they were written in /3, and
+  // golden/<name>.v3.css their theme from the engine before /4 existed. A /3 document stays byte for byte.
+  it.each(["studio", "portrait", "seed"])("writes the /3 %s theme the same way", async (name) => {
+    const built = buildTheme(json("golden/v3-brands.json")[name])
+    expect(built.ok).toBe(true)
+    if (built.ok) await expect(body(built.css)).toMatchFileSnapshot(`golden/${name}.v3.css`)
+  })
+
   it("is deterministic", () => {
     const tokens = json("golden/rich-brand.json")
     expect(buildTheme(tokens)).toEqual(buildTheme(structuredClone(tokens)))
@@ -105,10 +113,27 @@ describe("migrateTokens", () => {
   it("rejects an unknown schema and non-objects", () => {
     expect(migrateTokens({ schema: "feather-tokens/9" })).toEqual({
       ok: false,
-      problems: ['schema "feather-tokens/9" is not one Feather reads (qooe-tokens/1, feather-tokens/2, feather-tokens/3)'],
+      problems: ['schema "feather-tokens/9" is not one Feather reads (qooe-tokens/1, feather-tokens/2, feather-tokens/3, feather-tokens/4)'],
     })
     expect(migrateTokens([])).toMatchObject({ ok: false })
     expect(buildTheme(null)).toMatchObject({ ok: false })
+  })
+
+  it("reads /3 and /4 as they are, and moves up to /4 only on request", () => {
+    const v3 = { ...json("golden/rich-brand.json"), schema: "feather-tokens/3" }
+    expect(migrateTokens(v3)).toEqual({ ok: true, from: "feather-tokens/3", tokens: v3 })
+    const v4 = { ...v3, schema: "feather-tokens/4" }
+    expect(migrateTokens(v4)).toEqual({ ok: true, from: "feather-tokens/4", tokens: v4 })
+    expect(migrateTokens(v3, { to: "feather-tokens/4" })).toEqual({ ok: true, from: "feather-tokens/3", tokens: v4 })
+    expect(migrateTokens(v4, { to: "feather-tokens/4" })).toEqual({ ok: true, from: "feather-tokens/4", tokens: v4 })
+    // An older brand takes the /3 step on the way.
+    const v1 = json("golden/rich-brand.json")
+    expect(migrateTokens(v1, { to: "feather-tokens/4" })).toEqual({ ok: true, from: "qooe-tokens/1", tokens: { ...v1, schema: "feather-tokens/4", pace: v1.motion ?? "calm", focus: "primary" } })
+  })
+
+  it("never migrates down, and names its targets", () => {
+    expect(migrateTokens({ schema: "feather-tokens/4" }, { to: "feather-tokens/3" })).toEqual({ ok: false, problems: ["cannot migrate feather-tokens/4 down to feather-tokens/3: a migration only adds"] })
+    expect(migrateTokens({ schema: "feather-tokens/3" }, { to: "feather-tokens/2" as never })).toEqual({ ok: false, problems: ['cannot migrate to "feather-tokens/2": the targets are feather-tokens/3, feather-tokens/4'] })
   })
 
   it("builds the same theme from either schema", () => {

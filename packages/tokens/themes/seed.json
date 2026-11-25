@@ -2,7 +2,7 @@
   "name": "seed",
   "dark": false,
   "tokens": {
-    "schema": "feather-tokens/3",
+    "schema": "feather-tokens/4",
     "name": "Seed",
     "colors": {
       "background": "#F6F7FB",
@@ -21,9 +21,8 @@
     "shape": "pill",
     "density": "comfortable",
     "elevation": "soft",
-    "pace": "snappy",
-    "signature": "quint-out",
-    "overshoot": true,
+    "loudness": 2,
+    "personality": "playful",
     "spring": { "bounce": 0.2 },
     "contrast": "quiet",
     "surface": "glass",

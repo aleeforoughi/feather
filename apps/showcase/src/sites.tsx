@@ -1,8 +1,10 @@
 // Three reference brands from one page schema: the same feather.page/1 document, rendered in Studio, Portrait and
 // Seed. Only the tokens change. The model is off: the starters play the prepared scenes.
 //   ?brand=studio|portrait|seed   the brand
+//   ?page=loud                    the loud reference page (loudness 3, the expressive variants); default the reference page
 //   ?view=404                     the page's 404 route (PageNotFound)
 //   ?loader=counter|dock          adds the page's loader (wave 1 e2e; the budget pages run without one)
+//   ?sound=1                      adds an ambient bed (the nav's toggle) and the loader's sound choice
 //   ?transition=<variant>         how a brand switch arrives (default the page's own `transition`)
 // Switching brands is an in-page route change through createTransitions().go(), so every route variant can be seen
 // and tested here; a static site built by `feather-page build` uses cross-document View Transitions instead.
@@ -13,14 +15,21 @@ import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 import studio from "@aleeforoughi/feather-tokens/themes/studio.json"
 import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
 import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
-import doc from "../../../packages/page/examples/studio-of-one.page.json"
+import reference from "../../../packages/page/examples/studio-of-one.page.json"
+import loud from "../../../packages/page/examples/studio-of-one-loud.page.json"
 import "./sites.css"
 
 const BRANDS: Record<string, { dark: boolean; tokens: unknown }> = { studio, portrait, seed }
 const params = new URLSearchParams(location.search)
 const loader = params.get("loader")
+const doc = params.get("page") === "loud" ? loud : reference
 
-const result = validatePage(loader === "counter" || loader === "dock" ? { ...doc, loader: { variant: loader, label: "Loading the studio of one" } } : doc)
+const withSound = params.get("sound") === "1"
+const result = validatePage({
+  ...doc,
+  ...(loader === "counter" || loader === "dock" ? { loader: { variant: loader, label: "Loading the studio of one", ...(withSound ? { sound: true } : {}) } } : {}),
+  ...(withSound ? { sound: { bed: "media/bed.mp3" } } : {}),
+})
 if (!result.ok) throw new Error(result.issues.map((i) => `${i.path} ${i.code}`).join("\n"))
 const page: PageDocument = result.page
 const variant = (params.get("transition") ?? page.transition ?? "fade") as RouteVariant
@@ -35,7 +44,7 @@ function view(name: string) {
     <StrictMode>
       <nav aria-label="Brands" data-slot="brand-switch" className="flex justify-center gap-4 bg-surface-base p-2 type-caption text-fg-secondary">
         {Object.keys(BRANDS).map((b) => (
-          <a key={b} href={`?brand=${b}`} aria-current={b === name ? "page" : undefined} className="underline-offset-4 aria-[current=page]:text-fg-primary aria-[current=page]:underline">
+          <a key={b} href={`?${new URLSearchParams({ ...Object.fromEntries(params), brand: b })}`} aria-current={b === name ? "page" : undefined} className="underline-offset-4 aria-[current=page]:text-fg-primary aria-[current=page]:underline">
             {b}
           </a>
         ))}

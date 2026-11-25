@@ -1,151 +1,49 @@
 # Feather
 
-**Feather renders the next necessary human interaction, shaped to this person, on this device, right now, and
-dissolves it when its purpose is done.** Semantics in, the right experience out.
+**Feather is a design system that products install as packages and reshape with one brand file.** It renders the next
+necessary human interaction, shaped to this person, on this device, and the websites around it, from the same tokens:
+change the brand and everything restyles, with accessibility and reduced-motion paths built in.
 
-Feather is becoming the first *liquid* design system: callers describe what must happen (an Experience IR), and
-Feather composes the interface for the person, their abilities and their device at runtime. The plan, its
-principles and its milestones are in [`docs/PLAN.md`](docs/PLAN.md).
+## Three ways in
 
-What is built so far:
-
-- **The static foundation (L0):** themeable React components, a token-driven theme engine, and the gates that keep
-  them clean.
-- **The contract (L1):** the [Experience IR](docs/ir/README.md), with its validator and conformance fixtures.
-- **Decision organisms (L2):** [ten components](docs/organisms.md), each rendering one IR node as a complete,
-  accessible interaction.
-- **The liquid composer (L3):** [`compose(experience, context)`](docs/composer.md) turns an experience and who it is
-  for into a layout plan by named rules, with a trace of every decision. The web manifestation renders that plan,
-  and the playground shows one experience in four contexts.
-- **Visual hygiene (V1):** every value comes from [one finite visual system](docs/visual-system.md) (4px grid, three
-  densities, one control frame, type roles, one emphasis scale, one motion curve), enforced by static hygiene and a
-  rendered audit of every story.
-- **More than one body (L4):** the same experience as [web, switch scanning, voice and plain text](docs/manifestations.md).
-  A conformance suite proves every act reaches the same reply in all four, and that an irreversible act needs a
-  deliberate act in each.
-- **Callers:** any system can [call Feather](docs/callers.md). A Python SDK builds and validates experiences and
-  replies, and a one-import browser bundle renders them in any page.
-
-| Package | What it is |
+| You are building | Start here |
 |---|---|
-| [`@aleeforoughi/feather-tokens`](packages/tokens) | Token schema `feather-tokens/3` (reads /2 and `qooe-tokens/1`), the theme engine and `feather-brand` CLI, the foundation CSS, the reference themes and fonts. |
-| [`@aleeforoughi/feather-intent`](packages/intent) | The Experience IR `feather.ir/0`: TypeScript types, JSON Schema, `validate()`, `validateReply()` and the `feather-ir` CLI. No dependencies. |
-| [`@aleeforoughi/feather-context`](packages/context) | Who an experience is rendered for, and where: persona, capability, device and brand types. Types only. |
-| [`@aleeforoughi/feather-liquid`](packages/liquid) | The composer: `compose(experience, context)` gives a layout plan, by named rules, with a trace. Pure and deterministic. |
-| [`@aleeforoughi/feather-manifest-web`](packages/manifest-web) | The web manifestation: `<FeatherExperience>` and `<PlanView>` render a plan with Feather's components, and turn every act into a validated reply. |
-| [`@aleeforoughi/feather-manifest-switch`](packages/manifest-switch) | Switch access on the web: scanning (one or two switches) and dwell over the web body. Dwell may arm an act; it never commits one. |
-| [`@aleeforoughi/feather-dialog`](packages/dialog) | The turn-based engine text and voice share: what to present, what the person may answer, and the reply it becomes. No I/O. |
-| [`@aleeforoughi/feather-manifest-text`](packages/manifest-text) | Plain text and the terminal, with the `feather-text` CLI (conversation on stderr, replies as JSON lines on stdout). |
-| [`@aleeforoughi/feather-manifest-voice`](packages/manifest-voice) | Prompts, spoken confirmations and readback for any speech engine. |
-| [`feather-sdk`](packages/python) (Python) | For callers: build and validate experiences and replies, and serve the browser bundle. A wheel on every release. No dependencies. |
-| [`@aleeforoughi/feather-embed`](packages/embed) | Feather in any web page with one script import: `mount(element, experience, { onReply })`. Self-contained and style-scoped. |
-| [`@aleeforoughi/feather-react`](packages/react) | 28 atoms, 7 molecules and 10 organisms on Base UI and Tailwind CSS v4, styled only through tokens. |
-| [`@aleeforoughi/feather-documents`](packages/documents) | Token-themed HTML/CSS document templates and the render and verify kit (not published yet). |
-| [`apps/storybook`](apps/storybook) | Every component and story, switchable between the reference themes; home of the a11y and visual suites. |
-| [`apps/showcase`](apps/showcase) | The component sheet, built against the packages exactly as a product would. |
-| [`apps/playground`](apps/playground) | Edit an experience, change the person and the device, and see the plan, the trace and the result in four contexts, each in its own body. |
-| [`conformance`](conformance) | IR fixtures, the cross-body suite (every act, in every body, reaches the same reply), and the Python parity corpus. |
-| [`examples/python-caller`](examples/python-caller) | A complete caller in one file of standard-library Python, run end to end in CI. |
+| **Product UI**: an app, a dashboard, a tool | `@aleeforoughi/feather-react` and `@aleeforoughi/feather-tokens`: 28 atoms, 7 molecules and 10 organisms on Base UI and Tailwind CSS v4, styled only through tokens |
+| **A website**: a studio, a portfolio, a launch | `@aleeforoughi/feather-page`: one `feather.page/1` JSON document and a brand file give a complete, themeable site, with the [Living Page](docs/living.md) layered on |
+| **A caller**: a service that decides what a person must do | The [Experience IR](docs/ir/README.md) and `feather-sdk` for Python, or `@aleeforoughi/feather-embed` for any page: send meaning, get the person's checked reply |
 
-## Ask Feather for an experience
-
-From Python (Godpip), or from a page without React: see [Calling Feather](docs/callers.md).
-
-Callers describe the interaction as meaning, in `feather.ir/0`, and validate it before sending:
-
-```ts
-import { validate, formatIssues } from "@aleeforoughi/feather-intent"
-
-const result = validate({
-  ir: "feather.ir/0",
-  experience: "approve_campaign",
-  nodes: [
-    { type: "Recommendation", id: "rec", intent: "launch the recommended test", summary: "7 days, purchase objective" },
-    { type: "IrreversibleAction", id: "go", intent: "confirm spend", consequence: { spend: { amount: 1050, currency: "AED" } } },
-    { type: "Alternative", id: "less", intent: "spend less" },
-  ],
-})
-if (!result.ok) console.error(formatIssues(result.issues))
+```bash
+npm install @aleeforoughi/feather-react @aleeforoughi/feather-tokens   # after pointing @aleeforoughi at GitHub Packages
+npx feather-brand                                                      # brand/tokens.json -> a theme
 ```
 
-How the IR works, and every rule and error code, is in [`docs/ir/README.md`](docs/ir/README.md); every node
-type is in [`docs/ir/nodes.md`](docs/ir/nodes.md).
+## Read next
 
-Render it for the person in front of you. The host passes the context on every render, and Feather stores none of
-it:
+| | |
+|---|---|
+| [Getting started](docs/getting-started.md) | Install, theme, a first page, a first product screen, a Python caller |
+| [The package map](docs/packages.md) | Every package, its entry points, who depends on whom |
+| [Theming](docs/theming.md) | The brand file from primitives to component tokens, loudness, and what the engine refuses |
+| [Patterns built](docs/patterns.md) | The award patterns Feather has, by release, and what is planned |
+| [The visual system](docs/visual-system.md) | Every value, with its reason, and the gates that enforce it |
+| [Changelog](CHANGELOG.md) | Release by release |
+| Storybook (`pnpm storybook`) | Every component in all seven reference brands, the Foundations pages, and a theme builder |
 
-```tsx
-import { FeatherExperience } from "@aleeforoughi/feather-manifest-web"
+## What it holds
 
-<FeatherExperience
-  experience={experience}
-  context={{ device: { surface: "phone" }, persona: { explanation: "brief" } }}
-  onReply={(reply) => send(reply)} // { experience, node, act, value? }, already checked with validateReply
-/>
-```
+- **Static foundation:** themeable React components, a token-driven theme engine (`feather-tokens/4`), and the gates that
+  keep them clean.
+- **The liquid core:** the [Experience IR](docs/ir/README.md), [ten organisms](docs/organisms.md) that each render one node,
+  and [`compose(experience, context)`](docs/composer.md), which turns an experience and who it is for into a layout plan by
+  named rules with a trace.
+- **More than one body:** the same experience as [web, switch scanning, voice and plain text](docs/manifestations.md); a
+  conformance suite proves every act reaches the same reply in all four.
+- **The website layer:** [primitives for award-grade sites](docs/expression.md) (type, media, scroll, routes, scenes), the
+  [Living Page](docs/living.md), and [pages from a schema](docs/page.md).
+- **Callers:** a Python SDK and a one-import browser bundle ([callers](docs/callers.md)).
 
-To see what Feather decided and why, call `compose(experience, context)` from `@aleeforoughi/feather-liquid`. Each
-value in the plan comes with the rule that chose it and what it overrode. The rules are in
-[`docs/composer.md`](docs/composer.md).
-
-## Use Feather in a product
-
-1. Point the `@aleeforoughi` scope at GitHub Packages (a token with `read:packages` in `NPM_TOKEN`), in `.npmrc`:
-
-   ```ini
-   @aleeforoughi:registry=https://npm.pkg.github.com
-   //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
-   ```
-
-2. Install, with React 19 and Tailwind CSS v4 already in the product:
-
-   ```bash
-   npm install @aleeforoughi/feather-react @aleeforoughi/feather-tokens
-   ```
-
-   With no brand, Feather renders its default theme, **feather**: black and white, with color only where it
-   carries meaning (status, errors). Everything is set in JetBrains Mono, headings and text alike, and `.dark` switches to
-   **feather-dark**. Steps 3 and 4 are for a product that has its own brand.
-
-3. Write the brand into `brand/tokens.json` (`feather-tokens/3`; a `feather-tokens/2` or QOOE `qooe-tokens/1` file works as it is) and
-   generate the theme:
-
-   ```bash
-   npx feather-brand                     # brand/tokens.json → src/styles/brand.css, brand-fonts.css
-   npx feather-brand --migrate           # optional: stamp an older file as feather-tokens/3
-   ```
-
-4. In the product's stylesheet:
-
-   ```css
-   @import "tailwindcss";
-   @import "@aleeforoughi/feather-react/styles.css";
-   @import "./styles/brand-fonts.css";
-   @import "./styles/brand.css";
-   ```
-
-5. Wrap the app once and compose from Feather:
-
-   ```tsx
-   import { Button, Card, CardContent, FeatherProvider } from "@aleeforoughi/feather-react"
-
-   <FeatherProvider>
-     <Card><CardContent><Button>Continue</Button></CardContent></Card>
-   </FeatherProvider>
-   ```
-
-A brand reshapes Feather only through tokens: colors, fonts, the shape, density, elevation and motion axes, and
-component tokens per `data-slot` (`"button"`, `"button.outline"`). Never edit a component; ask for the gap as an
-issue.
-
-### From a QOOE Feather branch
-
-A product that was cut as a copy of Feather (`feather.lock.json`) switches by deleting its copied
-`src/components/ui`, `src/lib/motion.ts` and `scripts/apply-brand.mjs`, installing the packages as above, and
-rewriting `@/components/ui/<name>` imports to `@aleeforoughi/feather-react`. `FoundationProviders` becomes
-`FeatherProvider` plus the product's own `QueryClientProvider`; `isPreview` and `appOrigin`
-(`legacy/branch-tools/foundation/runtime.ts`) move into the product. `brand/tokens.json` needs no change. The
-old tools stay in [`legacy/branch-tools`](legacy/branch-tools) until every branch has moved.
+Feather never calls a model, stores a person, or imports a product. What earns a component its place, and how it is
+versioned, is in [`FEATHER.md`](FEATHER.md).
 
 ## Develop
 

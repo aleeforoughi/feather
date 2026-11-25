@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-expression",
-  "version": "1.19.0",
+  "version": "1.20.0",
   "description": "Feather's website layer: sections, stages, display type, media, marquees, counters, one scroll clock, transitions and a World canvas slot. Brand motion through feather-tokens/3 only.",
   "license": "UNLICENSED",
   "type": "module",

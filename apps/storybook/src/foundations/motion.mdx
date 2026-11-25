@@ -1,0 +1,61 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+import { ExpressionMotion, PaceTable, ProductMotion, SignatureCurves } from "./components/motion"
+
+<Meta title="Foundations/Motion" />
+
+# Motion
+
+Feather has two motion vocabularies, and a brand sets both through tokens.
+
+- **Product roles** are for interface: one curve (`--ease-standard`), six durations, a role per use. A component picks
+  a role, never milliseconds.
+- **Expression roles** are for websites: reveal, media, scene, stagger, hover-out and spring, in the brand's
+  **signature curve** and **pace**.
+
+Everything respects `prefers-reduced-motion` and `data-motion="reduced"`. Interaction never waits for motion, and
+focus and errors never wait at all.
+
+## Product roles
+
+The brand's `motion` axis (`calm` or `snappy`) scales the six durations. Below, each role plays the move it is made
+for.
+
+<Unstyled><ProductMotion /></Unstyled>
+
+## Expression roles
+
+Reveal, media and scene take the current brand's duration and curve, and the stagger between blocks. A `/2` brand has no
+expression block, so these use the house defaults.
+
+<Unstyled><ExpressionMotion /></Unstyled>
+
+### Pace
+
+`calm` and `snappy` also set the product durations. `cinematic` stretches only the expression roles: product UI stays calm.
+Every sequence ends within 1.2 seconds, and a stagger compresses to fit.
+
+<Unstyled><PaceTable /></Unstyled>
+
+## Signature curves
+
+A brand picks one house curve, or a bounded custom `cubicBezier` (x between 0 and 1, y between -0.6 and 1.6; outside
+0 to 1 it overshoots, which needs `"overshoot": true`).
+
+<Unstyled><SignatureCurves /></Unstyled>
+
+## Reduced motion
+
+| Role | Under reduced motion |
+|---|---|
+| reveal, media, scene | a 150ms cross-fade |
+| stagger, hover-out, spring | nothing |
+| product roles | transitions end at once (0.01ms) |
+
+A brand may only make a role quieter (`"reduced": { "reveal": "none" }`), never louder.
+
+## Rules
+
+- Animate only `transform`, `opacity`, `filter` and `clip-path`. Never `transition: all`, never width or height.
+- Never scale from 0. Resting positions are whole pixels.
+- Anything that moves for longer than 5 seconds can be paused.
+- One clock drives every scroll, counter and canvas effect, so nothing runs while the tab is hidden.

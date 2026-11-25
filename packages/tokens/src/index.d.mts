@@ -17,12 +17,22 @@ export interface DisplayStep {
 }
 export type SignatureName = "expo-out" | "quint-out" | "sine-out" | "scout" | "sheet" | "standard"
 export type ExpressionRole = "reveal" | "media" | "scene" | "stagger" | "hoverOut" | "spring"
+/** feather-tokens/4: how loud the brand's website patterns may get (0 quiet, 1 composed, 2 expressive, 3 spectacle). */
+export type Loudness = 0 | 1 | 2 | 3
+/** feather-tokens/4: one word that sets pace and signature together. */
+export type Personality = "calm" | "precise" | "playful" | "cinematic"
+/** feather-tokens/4: a colour-blocked section's surface and the ink that reads on it (4.5:1). Leave `ink` out and the
+ * engine picks one that reads. */
+export interface BlockPair {
+  surface: string
+  ink?: string
+}
 
-/** Brand tokens as Feather reads them: feather-tokens/3 (feather-tokens/2 and qooe-tokens/1 migrate on read). */
+/** Brand tokens as Feather reads them: feather-tokens/4 or /3 (feather-tokens/2 and qooe-tokens/1 migrate on read). */
 export interface BrandTokens {
-  schema?: "feather-tokens/3" | "feather-tokens/2" | "qooe-tokens/1"
+  schema?: "feather-tokens/4" | "feather-tokens/3" | "feather-tokens/2" | "qooe-tokens/1"
   name?: string
-  colors: { primary: string; background: string; surface: string; text: string } & Record<string, string>
+  colors: BrandColors
   typography: {
     fontFamily: { display?: FontSlot; body?: FontSlot; mono?: FontSlot }
     headingWeight?: 400 | 500 | 600 | 700
@@ -38,7 +48,11 @@ export interface BrandTokens {
   shape?: "sharp" | "soft" | "rounded" | "pill"
   density?: "compact" | "comfortable" | "spacious"
   elevation?: "flat" | "soft" | "dramatic"
-  motion?: "calm" | "snappy"
+  /** The product durations axis; in feather-tokens/4 it may instead be `{ personality }`, and product durations then
+   * follow pace (cinematic runs product UI calm). */
+  motion?: "calm" | "snappy" | { personality?: Personality }
+  /** feather-tokens/4: the brand's default loudness (default 1); a block's data-loudness overrides it. */
+  loudness?: Loudness
   /** feather-tokens/3. Cinematic stretches only the expression roles; product UI runs calm. */
   pace?: "calm" | "snappy" | "cinematic"
   signature?: SignatureName | { cubicBezier: [number, number, number, number] }
@@ -57,6 +71,17 @@ export interface BrandTokens {
   components?: Record<string, Record<string, string | number>>
 }
 
+/** A brand's colours: four required roles, the optional named roles (accent, border, destructive, success, warning,
+ * info, their *Text inks, primaryText, mutedForeground), and in feather-tokens/4 the colour blocks and the media scrim. */
+export type BrandColors = { primary: string; background: string; surface: string; text: string } & {
+  /** feather-tokens/4: up to four colour blocks (block-1..block-4); the rest derive from the palette. */
+  blocks?: BlockPair[]
+  /** feather-tokens/4: the media scrim's colour (default the inverse surface); the engine solves its opacity. */
+  mediaScrim?: string
+  /** feather-tokens/4: the ink on the media scrim (4.5:1 over a white and a black frame). */
+  inkOnMedia?: string
+} & Record<string, string | BlockPair[] | undefined>
+
 /** A reference theme file (themes/*.json). */
 export interface ReferenceTheme {
   name: string
@@ -72,7 +97,7 @@ export type ThemeResult =
       derived: DerivedEmphasis
       /** Preload links for display faces marked `preload` (feather-tokens/3). */
       preload: { href: string; as: "font"; type: "font/woff2"; crossorigin: "anonymous" }[]
-      summary: { shape: string; density: string; elevation: string; motion: string; display: string; body: string; pace?: string; signature?: string; contrast?: string; surface?: string; focus?: string }
+      summary: { shape: string; density: string; elevation: string; motion: string; display: string; body: string; pace?: string; signature?: string; contrast?: string; surface?: string; focus?: string; loudness?: Loudness; personality?: Personality }
     }
   | { ok: false; problems: string[] }
 
@@ -84,11 +109,17 @@ export interface DerivedEmphasis {
   borderPrimary: string
 }
 
-export type MigrationResult = { ok: true; tokens: BrandTokens & { schema: "feather-tokens/3" }; from: string } | { ok: false; problems: string[] }
+export type MigrationTarget = "feather-tokens/3" | "feather-tokens/4"
+export type MigrationResult = { ok: true; tokens: BrandTokens & { schema: MigrationTarget }; from: string } | { ok: false; problems: string[] }
 
+/** What an older document migrates to on read, and what `feather-brand --migrate` stamps by default. */
 export const TOKEN_SCHEMA: "feather-tokens/3"
+/** The newest schema; a document moves to it only on request. */
+export const LATEST_SCHEMA: "feather-tokens/4"
 export const KNOWN_SCHEMAS: readonly string[]
-export function migrateTokens(input: unknown): MigrationResult
+export const MIGRATION_TARGETS: readonly MigrationTarget[]
+/** Older documents become /3, a /3 or /4 one stays as it is; `to` moves it up (never down). */
+export function migrateTokens(input: unknown, options?: { to?: MigrationTarget }): MigrationResult
 
 export function buildTheme(tokens: unknown): ThemeResult
 export function contrastRatio(a: unknown, b: unknown): number | null
@@ -149,3 +180,16 @@ export const FOCUS_FLOOR: number
 export const FALLBACK_FACES: readonly string[]
 export function fluidClamp(min: number, max: number, viewport?: [number, number]): string
 export function fluidTracking(size: { min: number; max: number }, tracking: { min: number; max: number }, viewport?: [number, number]): string
+
+// ── feather-tokens/4: the range layer (src/range.mjs) ──
+export const LOUDNESS: readonly Loudness[]
+export const DEFAULT_LOUDNESS: Loudness
+export const BLOCK_COUNT: number
+export const BLOCK_FLOOR: number
+export const MEDIA_FLOOR: number
+/** The media scrim's opacity search: from `start`, by `step`, up to `max`. */
+export const MEDIA_SCRIM: { start: number; step: number; max: number }
+/** House constants in foundation.css (the same in every brand): --layer-* and --opacity-*. */
+export const LAYERS: Record<"base" | "raised" | "sticky" | "overlay" | "modal" | "toast" | "cursor", number>
+export const OPACITY: Record<"dim" | "muted" | "disabled", number>
+export const PERSONALITIES: Record<Personality, { pace: "calm" | "snappy" | "cinematic"; signature: SignatureName; overshoot?: boolean }>

@@ -11,10 +11,13 @@ export const PAGE_SCHEMAS = ["feather.page/0", "feather.page/1"] as const
 /** A field's shape. Kept small on purpose: what a page needs, nothing a renderer would have to guess. */
 export type FieldSpec =
   | { kind: "text"; max?: number }
-  | { kind: "number" }
+  /** A number, optionally bounded (inclusive) and whole. Out of bounds is `out-of-range`. */
+  | { kind: "number"; min?: number; max?: number; integer?: boolean }
   | { kind: "boolean" }
-  /** One of a fixed set of names (a variant). */
-  | { kind: "enum"; values: readonly string[] }
+  /** One of a fixed set of names (a variant). A value outside the set is `type`, or `code` when given. */
+  | { kind: "enum"; values: readonly string[]; code?: "unknown-variant" }
+  /** A small object of its own fields (the knobs' motion and scroll). */
+  | { kind: "object"; of: Record<string, FieldSpec & { required?: boolean }> }
   | { kind: "media" }
   | { kind: "href" }
   | { kind: "texts"; min?: number; max?: number }
@@ -50,7 +53,7 @@ export const BLOCKS: Record<string, { fields: Fields; doc: string }> = {
 export const BLOCK_NAMES = Object.keys(BLOCKS)
 
 /** The ways a route can arrive (createTransitions in @aleeforoughi/feather-expression). */
-export const ROUTE_VARIANTS = ["none", "fade", "view", "push", "columns"] as const
+export const ROUTE_VARIANTS = ["none", "fade", "view", "push", "slide", "sheets", "circle", "columns"] as const
 
 const LINK: Fields = { label: text(40, true), href: { kind: "href", required: true } }
 
@@ -75,6 +78,139 @@ export const EDGES: Record<string, { fields: Fields; doc: string }> = {
     fields: { variant: { kind: "enum", values: ["counter", "dock"] }, label: text(80), sound: { kind: "boolean" } },
   },
   sound: { doc: "One ambient bed, off until the person turns it on; the toggle sits in the nav.", fields: { bed: { kind: "media", required: true } } },
+}
+
+// ---- The knobs (feather.page/1, wave 2; docs/proposals/2026-11-24-range.md sections 3.3, 4 and 5) ---------------
+// Every knob is an enum or a bounded number with one documented meaning. They are additive: a /0 page renders as it
+// did, and a knob on a /0 page is `needs-schema-1`. Knobs compose and never fight: contradictions are errors.
+
+/** Loudness 0 quiet, 1 composed, 2 expressive, 3 spectacle (section 3.3). On the page (its default) and on a block. */
+export const LOUDNESS = [0, 1, 2, 3] as const
+/** The block's ground. inverse flips the semantic inks onto the inverse surface; block-1..4 are the brand's colour
+ * blocks (feather-tokens/4 `--block-N` and `--block-N-ink`; before /4 they fall back to the inverse pair). */
+export const TONES = ["base", "subtle", "raised", "inverse", "block-1", "block-2", "block-3", "block-4"] as const
+/** The section's vertical rhythm (Section space). */
+export const SPACES = ["s", "m", "l", "xl"] as const
+/** The display size step of the block's title. */
+export const SCALES = ["s", "m", "l", "xl"] as const
+/** How media meets the page edge: none (inside the grid, rounded), edge (runs off one side), bleed (edge to edge). */
+export const CROPS = ["none", "edge", "bleed"] as const
+/** How the block's content sits on the grid: start, center, offset (set off-axis, from column 4 of 12), split (the
+ * title beside the content). Each block takes the ones that make sense for it (BLOCK_RANGE). */
+export const ALIGNS = ["start", "center", "offset", "split"] as const
+/** How the block enters. none: it is simply there. fade: the block fades in. rise: the house reveal (the default).
+ * mask, skew, oval, blink, scramble: the title's kinetic effect (DisplayTitle), which needs loudness 2. */
+export const ENTERS = ["none", "fade", "rise", "mask", "skew", "oval", "blink", "scramble"] as const
+export const KINETIC_ENTERS = ["mask", "skew", "oval", "blink", "scramble"] as const
+/** Which way a reveal travels (up, down), or a marquee runs (left, right). */
+export const DIRECTIONS = ["up", "down", "left", "right"] as const
+/** The stagger between pieces, always inside the 1.2s sequence cap. */
+export const STAGGERS = ["none", "tight", "default", "loose"] as const
+/** The block's scroll move. reveal: it rises in (needs loudness 1). parallax, stack, horizontal, scale, pin: scroll
+ * choreography (ScrollLayers and Stage), which needs loudness 2. */
+export const SCROLL_PATTERNS = ["reveal", "parallax", "stack", "horizontal", "scale", "pin"] as const
+/** The patterns that pin the block while it scrubs: they take `length`. Only `pin` takes `snap`. */
+export const PINNED_PATTERNS = ["horizontal", "scale", "pin"] as const
+
+/** The knob fields every block takes in /1. `variant` is set per block from BLOCK_RANGE. */
+export const KNOB_FIELDS: Fields = {
+  loudness: { kind: "number", min: 0, max: 3, integer: true },
+  tone: { kind: "enum", values: TONES },
+  space: { kind: "enum", values: SPACES },
+  align: { kind: "enum", values: ALIGNS },
+  scale: { kind: "enum", values: SCALES },
+  crop: { kind: "enum", values: CROPS },
+  motion: {
+    kind: "object",
+    of: {
+      enter: { kind: "enum", values: ENTERS },
+      intensity: { kind: "number", min: 0, max: 1 },
+      direction: { kind: "enum", values: DIRECTIONS },
+      stagger: { kind: "enum", values: STAGGERS },
+    },
+  },
+  scroll: {
+    kind: "object",
+    of: {
+      pattern: { kind: "enum", values: SCROLL_PATTERNS },
+      length: { kind: "number", min: 1, max: 4 },
+      snap: { kind: "boolean" },
+    },
+  },
+}
+
+export interface BlockRange {
+  /** The block's named variants; the first is today's rendering (the default). null: free text (the brand's own). */
+  variants: readonly string[] | null
+  /** The aligns the block takes (start is always one). */
+  aligns: readonly (typeof ALIGNS)[number][]
+  /** The scroll patterns the block supports (reveal always). */
+  scroll: readonly (typeof SCROLL_PATTERNS)[number][]
+  /** Whether the block has media that `crop` applies to, and a display title that `scale` sizes. */
+  crop: boolean
+  scale: boolean
+  /** The scroll pattern a variant is built on: another non-reveal pattern on it contradicts it. */
+  implies?: Record<string, (typeof SCROLL_PATTERNS)[number]>
+  /** Variants that need media. */
+  needsMedia?: readonly string[]
+  /** Variants that run a marquee: the only ones where motion.direction may be left or right. */
+  sideways?: readonly string[]
+  /** Fields the block gains in /1. */
+  fields?: Fields
+}
+
+const LINKS2: FieldSpec & { required?: boolean } = { kind: "list", of: { label: text(40, true), href: { kind: "href", required: true } }, min: 1, max: 2 }
+const FACTS: FieldSpec & { required?: boolean } = { kind: "list", of: { label: text(40, true), value: text(60, true) }, max: 6 }
+
+/** Every block's variants and the knobs that apply to it. */
+export const BLOCK_RANGE: Record<string, BlockRange> = {
+  hero: {
+    variants: ["stacked", "giant-type", "split", "film", "product", "index", "interactive"],
+    aligns: ["start", "center", "offset"],
+    scroll: ["reveal", "parallax", "scale"],
+    crop: true,
+    scale: true,
+    needsMedia: ["split", "film", "product"],
+    fields: { facts: FACTS, actions: LINKS2 },
+  },
+  statement: {
+    variants: ["plain", "centred", "offset", "marquee", "fill", "swap"],
+    // The variants carry the statement's placement (centred, offset), so it takes no align of its own.
+    aligns: ["start"],
+    scroll: ["reveal"],
+    crop: false,
+    scale: true,
+    sideways: ["marquee"],
+    fields: { words: { kind: "texts", min: 2, max: 6 } },
+  },
+  work: { variants: ["grid", "hover-list", "stack", "rail"], aligns: ["start", "split"], scroll: ["reveal", "stack", "horizontal"], crop: false, scale: true, implies: { stack: "stack", rail: "horizontal" } },
+  case: { variants: ["editorial", "scale"], aligns: ["start", "center"], scroll: ["reveal", "parallax", "scale"], crop: true, scale: true, implies: { scale: "scale" }, needsMedia: ["scale"] },
+  numbers: { variants: ["counter", "plain", "lead"], aligns: ["start", "center", "split"], scroll: ["reveal"], crop: false, scale: true },
+  timeline: { variants: ["list", "horizontal"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
+  process: { variants: ["list", "pinned", "rows"], aligns: ["start", "split"], scroll: ["reveal", "pin"], crop: false, scale: true, implies: { pinned: "pin" } },
+  logos: { variants: ["grid", "marquee"], aligns: ["start", "center"], scroll: ["reveal"], crop: false, scale: true, sideways: ["marquee"] },
+  quote: { variants: ["large", "rail", "pull"], aligns: ["start", "center", "offset"], scroll: ["reveal"], crop: false, scale: true, fields: { items: { kind: "list", of: { text: text(400, true), by: text(80, true), role: text(80) }, min: 1, max: 8 } } },
+  offer: { variants: ["cards", "table"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
+  faq: { variants: ["list"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
+  contact: { variants: ["plain"], aligns: ["start", "center", "offset"], scroll: ["reveal"], crop: false, scale: true },
+  signature: { variants: null, aligns: ["start", "center"], scroll: ["reveal", "parallax"], crop: true, scale: true },
+}
+
+/** Page-level knobs (feather.page/1): the page's loudness, and defaults a block takes when it sets none. A default
+ * align or crop a block does not take is ignored for that block. */
+export const PAGE_KNOBS: Fields = {
+  loudness: { kind: "number", min: 0, max: 3, integer: true },
+  defaults: { kind: "object", of: { space: { kind: "enum", values: SPACES }, align: { kind: "enum", values: ALIGNS }, scale: { kind: "enum", values: SCALES }, crop: { kind: "enum", values: CROPS } } },
+}
+
+/** A block's fields in a schema version: /0 is the table above; /1 adds the knobs and the block's /1 fields. */
+export function blockFields(name: string, version: 0 | 1): Fields {
+  const spec = BLOCKS[name]
+  const base: Fields = { title: { kind: "text", max: 160 }, ...spec.fields }
+  if (version === 0) return base
+  const range = BLOCK_RANGE[name]
+  const variant: Fields = range.variants ? { variant: { kind: "enum", values: range.variants, code: "unknown-variant" } } : {}
+  return { ...base, ...range.fields, ...variant, ...KNOB_FIELDS }
 }
 
 /** Top-level fields. */

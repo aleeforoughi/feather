@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cn } from "../cn"
-import { useReducedMotion } from "../hooks"
+import { useMergedRef, useReducedMotion } from "../hooks"
+import { useLoudnessAllows } from "./loudness"
 import { capabilityGate, retire } from "../core/gate"
 import { createWorld, deviceHints, pickQuality, type Quality, type WorldController, type WorldRenderer } from "../core/world"
 
@@ -27,7 +28,11 @@ export interface WorldProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
  * quality tier and the brand's renderer runs on the one clock. Decorative to assistive technology.
  */
 export const World = React.forwardRef<HTMLDivElement, WorldProps>(function World({ renderer, still, quality, paused = false, gate = "world", onWorld, className, ...props }, ref) {
+  const root = React.useRef<HTMLDivElement>(null)
+  const merged = useMergedRef(ref, root)
   const reduced = useReducedMotion()
+  // A scene needs loudness 3 where one is declared; below that the still stays.
+  const sceneAllowed = useLoudnessAllows(root, "scene")
   const canvas = React.useRef<HTMLCanvasElement>(null)
   const [picked, setPicked] = React.useState<Quality>("static")
   const [ready, setReady] = React.useState(false)
@@ -43,7 +48,7 @@ export const World = React.forwardRef<HTMLDivElement, WorldProps>(function World
   const onWorldRef = React.useRef(onWorld)
   onWorldRef.current = onWorld
 
-  const effective: Quality = reduced ? "static" : picked
+  const effective: Quality = reduced || !sceneAllowed ? "static" : picked
 
   React.useEffect(() => {
     const el = canvas.current
@@ -78,7 +83,7 @@ export const World = React.forwardRef<HTMLDivElement, WorldProps>(function World
 
   const live = effective !== "static"
   return (
-    <div ref={ref} data-slot="world" data-variant={effective} data-state={ready ? "ready" : "still"} aria-hidden="true" className={cn("relative size-full overflow-hidden", className)} {...props}>
+    <div ref={merged} data-slot="world" data-variant={effective} data-state={ready ? "ready" : "still"} aria-hidden="true" className={cn("relative size-full overflow-hidden", className)} {...props}>
       {still === undefined || still === null || still === false ? null : (
         <div data-slot="world-still" className={cn("absolute inset-0", ready && "invisible")}>
           {typeof still === "string" ? <img src={still} alt="" decoding="async" loading="lazy" className="size-full object-cover" data-slot="world-still-image" /> : still}

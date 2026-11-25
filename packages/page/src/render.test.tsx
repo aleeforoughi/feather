@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderToStaticMarkup } from "react-dom/server"
 import { validatePage } from "./core/validate"
-import { FeatherPage, PageNotFound, PreparedPage, pageScenes } from "./render"
+import { FeatherPage, PageNotFound, PreparedPage, fontFaces, pageScenes } from "./render"
 import type { PageDocument } from "./core/types"
 
 const themes = path.join(import.meta.dirname, "../../tokens/themes")
@@ -30,7 +30,8 @@ describe("FeatherPage", () => {
       return /<style data-feather-theme="">([\s\S]*?)<\/style>/.exec(html)?.[1] ?? ""
     })
     expect(new Set(css).size).toBe(3)
-    const bodies = ["studio", "portrait", "seed"].map((b) => renderToStaticMarkup(<FeatherPage page={doc()} tokens={theme(b)} />).replace(/<style[\s\S]*?<\/style>/, ""))
+    // Everything but the brand's head (theme, open-font faces, their preloads) is the same markup.
+    const bodies = ["studio", "portrait", "seed"].map((b) => renderToStaticMarkup(<FeatherPage page={doc()} tokens={theme(b)} />).replace(/<style[\s\S]*?<\/style>/g, "").replace(/<link rel="preload"[^>]*\/>/g, ""))
     expect(new Set(bodies).size).toBe(1)
   })
 
@@ -103,5 +104,30 @@ describe("the page edges (feather.page/1)", () => {
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("This page went somewhere else")
     expect(screen.getByRole("link", { name: "Back to the work" }).getAttribute("href")).toBe("/")
     expect(document.querySelector('[data-slot="loader"]')).toBeNull()
+  })
+})
+
+describe("the brand's open fonts", () => {
+  it("writes every @font-face of an open font, with its metric-matched fallback, and no bundler imports", () => {
+    const tokens = theme("studio")
+    const inter = { family: "Inter", files: [{ src: "/fonts/inter/inter-latin-wght-normal.woff2", weight: [100, 900], style: "normal" }], fallback: { family: "Arial", sizeAdjust: 107.35, ascentOverride: 90.24, descentOverride: 22.47, lineGapOverride: 0 }, generic: "sans-serif" }
+    const brand = { ...tokens, typography: { ...tokens.typography, fontFamily: { ...tokens.typography?.fontFamily, display: inter } } }
+    for (const html of [
+      renderToStaticMarkup(<FeatherPage page={doc()} tokens={brand} />),
+      renderToStaticMarkup(<PageNotFound page={doc()} tokens={brand} />),
+      renderToStaticMarkup(<PreparedPage page={doc()} intent="hire" tokens={brand} />),
+    ]) {
+      const fonts = /<style data-feather-fonts="">([\s\S]*?)<\/style>/.exec(html)?.[1] ?? ""
+      const faces = fonts.match(/@font-face\s*\{[^}]*\}/g) ?? []
+      expect(faces.some((f) => /font-family:\s*"Inter"/.test(f) && f.includes("/fonts/inter/inter-latin-wght-normal.woff2"))).toBe(true)
+      expect(faces.some((f) => /font-family:\s*"Inter Fallback"/.test(f) && f.includes("Arial") && f.includes("107.35%"))).toBe(true)
+      expect(fonts).not.toContain("@import")
+    }
+  })
+
+  it("writes no font style when the theme has no faces, and never the bundler imports", () => {
+    expect(fontFaces(undefined)).toBeNull()
+    expect(fontFaces('@import "@aleeforoughi/feather-tokens/fonts/inter.css";\n')).toBeNull()
+    expect(fontFaces('@import "x.css";\n@font-face {\n  font-family: "A";\n}')).toBe('@font-face {\n  font-family: "A";\n}')
   })
 })

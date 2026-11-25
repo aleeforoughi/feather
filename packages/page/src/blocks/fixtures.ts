@@ -28,3 +28,22 @@ export const BLOCKS: { [K in PageBlock["block"]]: Extract<PageBlock, { block: K 
   contact: { block: "contact", id: "contact", title: "Let’s talk", body: "I read every message myself.", actions: [{ label: "Write to me", href: "mailto:hello@example.com" }, { label: "Book a call", href: "https://cal.example.com/alee" }] },
   signature: { block: "signature", id: "signature", title: "The one thing only this brand does.", body: "Restyled by the brand through its tokens.", variant: "ink" },
 }
+
+/** What a variant needs beyond the block's fixture (feather.page/1): the swap statement's words, the rail's other
+ * quotes, the product hero's facts and act. */
+export const VARIANT_EXTRAS: Record<string, Record<string, Record<string, unknown>>> = {
+  hero: {
+    product: { eyebrow: "Field kit", title: "One notebook for every brief.", lede: "Ruled for type, gridded for layout, bound to lie flat.", facts: [{ label: "Pages", value: "192" }, { label: "Paper", value: "100 gsm" }, { label: "Grid", value: "5 mm" }, { label: "Binding", value: "Lay-flat" }], actions: [{ label: "Order one", href: "/order" }] },
+    film: { actions: [{ label: "See the work", href: "#work" }] },
+    split: { actions: [{ label: "See the work", href: "#work" }] },
+  },
+  statement: { swap: { title: "I design interfaces that feel {word}.", words: ["obvious", "calm", "inevitable"] } },
+  quote: {
+    rail: {
+      items: [
+        { text: "The system did the boring parts so we could do the interesting ones.", by: "Jun Park", role: "Design lead, Freezon" },
+        { text: "Every screen arrived with its empty, loading and error states already designed.", by: "Sam Okafor", role: "CTO, Evercover" },
+      ],
+    },
+  },
+}

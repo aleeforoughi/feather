@@ -200,7 +200,7 @@ describe("type", () => {
     expect(t.fonts).toContain('@import "@aleeforoughi/feather-tokens/fonts/inter.css";')
     expect(t.fonts).toContain('src: url("/fonts/brier-var.woff2") format("woff2");\n  font-weight: 300 800;')
     expect(t.fonts).toContain("font-display: swap;")
-    expect(t.fonts).toContain('font-family: "Brier Fallback";\n  src: local("Arial");\n  size-adjust: 104%;\n  ascent-override: 92%;\n  descent-override: 24%;\n  line-gap-override: 0%;')
+    expect(t.fonts).toContain('font-family: "Brier Fallback";\n  src: local("Arial"), local("Liberation Sans"), local("Arimo");\n  size-adjust: 104%;\n  ascent-override: 92%;\n  descent-override: 24%;\n  line-gap-override: 0%;')
     expect(vars(t.css)["--brand-font-display"]).toBe('"Brier", "Brier Fallback", sans-serif')
     expect(t.preload).toEqual([
       { href: "/fonts/brier-var.woff2", as: "font", type: "font/woff2", crossorigin: "anonymous" },
@@ -285,10 +285,10 @@ describe("schema/feather-tokens-3.json", () => {
   })
 })
 
-describe("the /3 reference themes", () => {
+describe("the expression reference themes (written as feather-tokens/4)", () => {
   it.each(["studio", "portrait", "seed"])("%s compiles and differs from the others in every expression axis it names", (name) => {
     const theme = json(`../themes/${name}.json`)
-    expect(theme.tokens.schema).toBe("feather-tokens/3")
+    expect(theme.tokens.schema).toBe("feather-tokens/4")
     const t = built(theme.tokens)
     expect(t.css).toContain("--ease-signature")
   })

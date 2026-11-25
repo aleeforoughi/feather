@@ -1,0 +1,212 @@
+{
+  "schema": "feather.page/0",
+  "brand": "brand/tokens.json",
+  "title": "Alee — design engineer",
+  "description": "Interfaces that compose themselves from intent, and the websites around them.",
+  "lang": "en",
+  "speaker": {
+    "kind": "person",
+    "name": "Alee",
+    "voice": "voice.md"
+  },
+  "library": {
+    "work": {
+      "acceptto": {
+        "title": "Acceptto",
+        "summary": "Sign-in without passwords, designed so the safe choice is the easy one.",
+        "year": "2025",
+        "role": "Design lead"
+      },
+      "freezon": {
+        "title": "Freezon",
+        "summary": "A cold-chain dashboard that shows the one shipment at risk, not all of them.",
+        "year": "2024",
+        "role": "Product design"
+      },
+      "evercover": {
+        "title": "Evercover",
+        "summary": "Insurance that explains itself in one sentence before it asks for anything.",
+        "year": "2023",
+        "role": "Design and front end"
+      }
+    }
+  },
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "eyebrow": "Design engineer",
+      "title": "I design interfaces that compose themselves.",
+      "lede": "Products that show the next necessary thing, and websites that answer back.",
+      "starters": [
+        "Show me the work",
+        "Can I hire you?",
+        "What are you on now?"
+      ]
+    },
+    {
+      "block": "work",
+      "id": "work",
+      "title": "Selected work",
+      "items": [
+        "acceptto",
+        "freezon",
+        "evercover"
+      ]
+    },
+    {
+      "block": "numbers",
+      "id": "proof",
+      "title": "In numbers",
+      "items": [
+        {
+          "value": 12,
+          "unit": "years",
+          "label": "designing products"
+        },
+        {
+          "value": 40,
+          "unit": "%",
+          "label": "fewer support tickets at Acceptto"
+        },
+        {
+          "value": 3,
+          "label": "design systems shipped"
+        }
+      ]
+    },
+    {
+      "block": "process",
+      "id": "process",
+      "title": "How I work",
+      "steps": [
+        {
+          "title": "Find the sentence",
+          "body": "Every product fits in one sentence. We write it first."
+        },
+        {
+          "title": "Design the floor",
+          "body": "Accessibility, speed and states before effects."
+        },
+        {
+          "title": "Build the ceiling",
+          "body": "Then the motion and the craft people remember."
+        }
+      ]
+    },
+    {
+      "block": "quote",
+      "id": "quote",
+      "text": "Alee made the hard part feel obvious, and then made it beautiful.",
+      "by": "Mara Ellis",
+      "role": "VP Product, Acceptto"
+    },
+    {
+      "block": "contact",
+      "id": "contact",
+      "title": "Let's talk",
+      "body": "I read every message myself.",
+      "actions": [
+        {
+          "label": "Write to me",
+          "href": "mailto:hello@example.com"
+        },
+        {
+          "label": "Book a call",
+          "href": "https://cal.example.com/alee"
+        }
+      ]
+    }
+  ],
+  "scenes": {
+    "work": {
+      "ask": "Show me the work",
+      "line": "Acceptto is the one I'd show you first.",
+      "blocks": [
+        {
+          "block": "case",
+          "title": "Acceptto",
+          "body": "Passwordless sign-in for 2 million people. The safe path became the default path.",
+          "facts": [
+            {
+              "label": "Role",
+              "value": "Design lead"
+            },
+            {
+              "label": "Result",
+              "value": "40% fewer tickets"
+            }
+          ]
+        }
+      ],
+      "asks": [
+        "How did you build it?",
+        "Can I hire you?"
+      ]
+    },
+    "hire": {
+      "ask": "Can I hire you?",
+      "line": "Yes, from January. What are you hiring for?",
+      "blocks": [
+        {
+          "block": "offer",
+          "title": "Ways to work together",
+          "items": [
+            {
+              "name": "A product sprint",
+              "price": "Two weeks",
+              "body": "One problem, designed and prototyped."
+            },
+            {
+              "name": "A design system",
+              "price": "Six weeks",
+              "body": "Tokens, components and the gates that keep them."
+            }
+          ]
+        }
+      ],
+      "asks": [
+        "What does a sprint cost?",
+        "Book a call"
+      ]
+    },
+    "now": {
+      "ask": "What are you on now?",
+      "line": "A design system that composes itself from intent.",
+      "blocks": [
+        {
+          "block": "statement",
+          "title": "Semantics in, the right experience out."
+        }
+      ],
+      "asks": [
+        "Show me the work"
+      ]
+    },
+    "contact": {
+      "ask": "Book a call",
+      "line": "Pick a time that suits you. I'll be there.",
+      "blocks": [
+        {
+          "block": "contact",
+          "actions": [
+            {
+              "label": "Book a call",
+              "href": "https://cal.example.com/alee"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "living": {
+    "anchor": "reader",
+    "fold": true,
+    "prepared": [
+      "work",
+      "hire",
+      "now",
+      "contact"
+    ]
+  }
+}

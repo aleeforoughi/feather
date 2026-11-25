@@ -6,52 +6,16 @@ import "@aleeforoughi/feather-tokens/fonts/inter.css"
 import "@aleeforoughi/feather-tokens/fonts/fraunces.css"
 import "@aleeforoughi/feather-tokens/fonts/dm-sans.css"
 import "@aleeforoughi/feather-tokens/fonts/jetbrains-mono.css"
-import { buildTheme, type BrandTokens } from "@aleeforoughi/feather-tokens"
-import voidPill from "@aleeforoughi/feather-tokens/themes/void-pill.json"
-import paperSharp from "@aleeforoughi/feather-tokens/themes/paper-sharp.json"
-import feather from "@aleeforoughi/feather-tokens/themes/feather.json"
-import featherDark from "@aleeforoughi/feather-tokens/themes/feather-dark.json"
-import studio from "@aleeforoughi/feather-tokens/themes/studio.json"
-import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
-import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
+import { applyTheme, THEME_ITEMS } from "./themes"
 import "@aleeforoughi/feather-tokens/fonts/space-grotesk.css"
 // From source, not the package build: the stories import their components from source, and providers must be
 // the same module instances as the components that read them.
 import { featherTheme } from "./feather-theme"
 import { FeatherProvider } from "../../../packages/react/src/provider"
-
-/** Reference themes (@aleeforoughi/feather-tokens/themes): built by the same engine that writes a product's
- * brand.css, and checked by scripts/feather-hygiene.mjs on every Feather release. */
-const THEMES: Record<string, { dark: boolean; tokens: BrandTokens } | null> = {
-  feather: feather as { dark: boolean; tokens: BrandTokens },
-  "feather-dark": featherDark as { dark: boolean; tokens: BrandTokens },
-  "void-pill": voidPill as { dark: boolean; tokens: BrandTokens },
-  "paper-sharp": paperSharp as { dark: boolean; tokens: BrandTokens },
-  // feather-tokens/3 brands: the website layer's three reference routes.
-  studio: studio as { dark: boolean; tokens: BrandTokens },
-  portrait: portrait as { dark: boolean; tokens: BrandTokens },
-  seed: seed as { dark: boolean; tokens: BrandTokens },
-}
-
-const STYLE_ID = "feather-storybook-theme"
+import { FeatherDocsContainer } from "./docs-container"
 
 function ThemeApplier({ name }: { name: string }) {
-  useLayoutEffect(() => {
-    const theme = THEMES[name] ?? null
-    document.getElementById(STYLE_ID)?.remove()
-    if (theme) {
-      const built = buildTheme(theme.tokens)
-      if (built.ok) {
-        const style = document.createElement("style")
-        style.id = STYLE_ID
-        style.textContent = built.css
-        document.head.appendChild(style)
-      } else {
-        console.error("Theme failed:", built.problems)
-      }
-    }
-    document.documentElement.classList.toggle("dark", theme?.dark ?? false)
-  }, [name])
+  useLayoutEffect(() => applyTheme(name), [name])
   return null
 }
 
@@ -73,15 +37,7 @@ const preview: Preview = {
         title: "Theme",
         icon: "paintbrush",
         dynamicTitle: true,
-        items: [
-          { value: "feather", title: "Feather (default)" },
-          { value: "feather-dark", title: "Feather dark" },
-          { value: "void-pill", title: "Void Pill (dark)" },
-          { value: "paper-sharp", title: "Paper Sharp (light)" },
-          { value: "studio", title: "Studio (/3, dark, cinematic)" },
-          { value: "portrait", title: "Portrait (/3, paper)" },
-          { value: "seed", title: "Seed (/3, glass)" },
-        ],
+        items: THEME_ITEMS,
       },
     },
   },
@@ -89,7 +45,24 @@ const preview: Preview = {
   parameters: {
     layout: "centered",
     // Docs pages in the default theme's font.
-    docs: { theme: featherTheme },
+    docs: { theme: featherTheme, container: FeatherDocsContainer },
+    options: {
+      // Sidebar order. Story titles are unchanged (visual baselines are keyed by story id): only the order moves.
+      storySort: {
+        method: "",
+        order: [
+          "Foundations",
+          ["Introduction", "Tokens", "Motion", "Loudness", "Three tiers", "Accessibility floor", "Theme builder"],
+          "Atoms",
+          "Molecules",
+          "Organisms",
+          "Experiences",
+          "Website",
+          "Living",
+          "Pages",
+        ],
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,

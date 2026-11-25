@@ -1,0 +1,37 @@
+/* Foundations docs pages: plain CSS over Feather's tokens, so every swatch, scale and demo follows the toolbar's brand.
+ * The pages are documentation, never product UI, so the product visual rules do not apply to them. */
+.fd { color: #18181b; }
+/* The docs page itself stays light; only the panels wear the brand. */
+.fd * { box-sizing: border-box; }
+.fd-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); margin: 16px 0 28px; }
+.fd-group { margin: 24px 0 4px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7; }
+.fd-swatch { border: 1px solid rgba(128, 128, 128, 0.35); border-radius: 8px; overflow: hidden; background: var(--card, #fff); color: var(--text-primary, #18181b); font-size: 12px; line-height: 16px; }
+.fd-swatch > div:first-child { height: 56px; border-bottom: 1px solid rgba(128, 128, 128, 0.35); }
+.fd-swatch > div:last-child { padding: 8px 10px; }
+.fd-swatch code, .fd code.fd-name { font-size: 12px; word-break: break-all; }
+.fd-swatch span { display: block; opacity: 0.75; font-variant-numeric: tabular-nums; }
+.fd-panel { font-family: var(--brand-font-body, ui-sans-serif, system-ui, sans-serif); background: var(--background, #fff); color: var(--text-primary, #18181b); border: 1px solid var(--border-secondary, #ddd); border-radius: 8px; padding: 20px; margin: 16px 0 28px; }
+.fd-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.fd-tile { display: grid; place-items: center; min-width: 96px; height: 72px; padding: 8px; background: var(--card, #fff); border: 1px solid var(--border-secondary, #ddd); font-size: 12px; text-align: center; }
+.fd-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0 28px; }
+.fd-table th, .fd-table td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid rgba(128, 128, 128, 0.35); }
+.fd-table th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; font-weight: 600; }
+.fd-btn { appearance: none; min-height: 44px; padding: 0 16px; border-radius: var(--radius-control, 8px); border: 1px solid var(--border-primary, #888); background: var(--card, #fff); color: var(--text-primary, #18181b); font: inherit; font-size: 14px; cursor: pointer; }
+.fd-btn:focus-visible { outline: 2px solid var(--ring, #18181b); outline-offset: 2px; }
+.fd-btn[aria-pressed="true"] { background: var(--primary, #18181b); color: var(--primary-foreground, #fff); }
+.fd-label { display: block; font-size: 12px; font-weight: 600; margin: 0 0 4px; }
+.fd-field { min-height: 44px; width: 100%; padding: 0 10px; border: 1px solid var(--border-primary, #888); border-radius: 6px; background: #fff; color: #18181b; font: inherit; font-size: 14px; }
+.fd-field:focus-visible { outline: 2px solid #18181b; outline-offset: 2px; }
+.fd-form { display: grid; gap: 14px 16px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin: 12px 0 20px; }
+.fd-form fieldset { border: 0; padding: 0; margin: 0; }
+.fd-problems { margin: 8px 0; padding: 10px 14px 10px 28px; border: 1px solid #b42318; border-radius: 6px; color: #7a1a12; background: #fff4f2; font-size: 13px; }
+.fd-ok { margin: 8px 0; padding: 10px 14px; border: 1px solid #2f7a4a; border-radius: 6px; color: #1d4d2f; background: #f0faf3; font-size: 13px; }
+.fd-split { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .fd-split { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); } }
+.fd-pre { max-height: 360px; overflow: auto; margin: 0; padding: 12px; background: #18181b; color: #f4f4f5; border-radius: 6px; font-size: 12px; line-height: 18px; }
+.fd-box { width: 64px; height: 64px; border-radius: var(--radius-card, 8px); background: var(--primary, #18181b); }
+.fd-matrix td, .fd-matrix th { text-align: center; }
+.fd-matrix td:first-child, .fd-matrix th:first-child { text-align: left; }
+.fd-yes { font-weight: 700; }
+.fd-no { opacity: 0.4; }
+.fd-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

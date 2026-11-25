@@ -1,0 +1,54 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Foundations/Introduction" />
+
+# Feather
+
+Feather is a design system that products install as packages and reshape with their brand's tokens, never by editing
+its components. It covers three kinds of work: product UI, award-grade websites, and callers (any system that wants a
+person to decide something) that send meaning and get the right interface back.
+
+This Storybook is the whole system in one place. Every component renders in every reference brand, every story is
+checked for accessibility and for pixel drift, and the pages under **Foundations** explain the values underneath.
+
+## What is where
+
+| Sidebar group | What it holds | Package |
+|---|---|---|
+| **Foundations** | These pages: tokens, motion, loudness, tiers, the accessibility floor, and the theme builder. | `@aleeforoughi/feather-tokens` |
+| **Atoms** | Buttons, fields, dialogs, tables: the product UI parts, styled only through tokens. | `@aleeforoughi/feather-react` |
+| **Molecules** | Compositions any product reuses: lightbox, gallery, activity feed, budget bar, role avatars. | `@aleeforoughi/feather-react` |
+| **Organisms** | One Experience IR node as a whole interaction: approval, recommendation, trade-off. | `@aleeforoughi/feather-react` |
+| **Experiences** | An IR experience composed for a person and a device, in four bodies. | `@aleeforoughi/feather-manifest-web` and `-switch` |
+| **Website** | The primitives an award-grade site is made of: type, media, layout, scroll, routes, the loader, the menu. | `@aleeforoughi/feather-expression` |
+| **Living** | The Living Page: a full site that an agent expands in place. | `@aleeforoughi/feather-living` |
+| **Pages** | `feather.page` blocks, the page edges, and whole pages from one JSON document. | `@aleeforoughi/feather-page` |
+
+## Switch brands
+
+Use the paintbrush **Theme** control in the toolbar. It builds the brand with the production theme engine, so what
+you see here is what a product gets. Every story and every swatch on these pages follows it.
+
+| Brand | Schema | Character |
+|---|---|---|
+| `feather` | `/2` | The default: black and white, JetBrains Mono, color only where it means something. |
+| `feather-dark` | `/2` | The same, dark. |
+| `paper-sharp` | `/2` | Light, sharp corners, flat. |
+| `void-pill` | `/2` | Dark, pill controls, dramatic shadows, snappy. |
+| `studio` | `/4` | Dark and cinematic: film grain, a bold display face, the `scout` curve. |
+| `portrait` | `/4` | Warm paper, a serif display face, quiet. |
+| `seed` | `/4` | Glass overlays, pill shapes, a spring with overshoot. |
+
+The three `/4` brands carry the website layer's expression axes (pace, signature curve, surface, contrast) and the range
+layer (loudness, colour blocks, the media scrim, a motion personality). The `/2` brands get the house defaults, so they
+work with every website component too.
+
+## Where to go next
+
+- **Tokens** shows every role as a live swatch or scale.
+- **Motion** and **Loudness** show how a brand moves, and how much.
+- **Three tiers** and **Accessibility floor** show what every component promises.
+- **Theme builder** writes a brand file and shows it on real components in seconds.
+
+The written guides are in the repository: `docs/getting-started.md`, `docs/theming.md`, `docs/packages.md`,
+`docs/patterns.md` and `docs/visual-system.md`.

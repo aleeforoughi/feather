@@ -75,7 +75,7 @@ test.describe("loaders", () => {
 })
 
 test.describe("route transitions", () => {
-  for (const variant of ["view", "push", "columns", "fade", "none"]) {
+  for (const variant of ["view", "push", "slide", "sheets", "circle", "columns", "fade", "none"]) {
     test(`${variant}: the new route arrives, focus lands on its h1, nothing is left behind`, async ({ page }) => {
       await page.goto(`/sites.html?brand=studio&transition=${variant}`, { waitUntil: "networkidle" })
       await page.locator('[data-slot="brand-switch"] a', { hasText: "seed" }).click()
@@ -117,4 +117,45 @@ test.describe("footer and 404", () => {
       expect(await axe(page)).toEqual([])
     })
   }
+})
+
+test.describe("tap targets at 390px", () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+
+  /** Every visible link and button in `selector` is at least 44 by 44 CSS pixels (WCAG 2.5.8 asks 24; the house asks 44). */
+  async function targets(page: Page, selector: string) {
+    return page.evaluate((sel) => {
+      const small: string[] = []
+      for (const scope of document.querySelectorAll(sel)) {
+        for (const el of scope.querySelectorAll<HTMLElement>("a[href], button")) {
+          const r = el.getBoundingClientRect()
+          const s = getComputedStyle(el)
+          if (r.width === 0 || r.height === 0 || s.visibility === "hidden") continue
+          if (r.width < 44 || r.height < 44) small.push(`${el.getAttribute("data-slot") ?? el.tagName} "${el.textContent?.trim()}" ${Math.round(r.width)}x${Math.round(r.height)}`)
+        }
+      }
+      return small
+    }, selector)
+  }
+
+  test("the nav, its open menu and the footer", async ({ page }) => {
+    await page.goto("/sites.html?brand=studio&sound=1", { waitUntil: "networkidle" })
+    expect(await targets(page, '[data-slot="overlay-menu-bar"]')).toEqual([])
+    expect(await targets(page, '[data-slot="page-footer"]')).toEqual([])
+    await page.locator('[data-slot="overlay-menu-toggle"]').click()
+    await expect(page.getByRole("dialog")).toBeVisible()
+    expect(await targets(page, '[data-slot="overlay-menu"]')).toEqual([])
+  })
+
+  test("the loader's sound choice", async ({ page }) => {
+    await page.goto("/sites.html?brand=seed&loader=dock&sound=1")
+    await expect(page.locator('[data-slot="loader-sound-off"]')).toBeVisible({ timeout: 9000 })
+    expect(await targets(page, '[data-slot="loader-sound"]')).toEqual([])
+  })
+
+  test("the 404", async ({ page }) => {
+    await page.goto("/sites.html?brand=portrait&view=404", { waitUntil: "networkidle" })
+    expect(await targets(page, '[data-block="not-found"]')).toEqual([])
+    expect(await targets(page, '[data-slot="page-footer"]')).toEqual([])
+  })
 })

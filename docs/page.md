@@ -59,6 +59,42 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
     static routes (`view` and `push` styled by foundation.css, off under reduced motion; `columns` needs script, so
     a static site fades);
   - `sound`: `{ bed }`, one looping bed, off until the person turns it on with the toggle in the nav.
+- **Knobs and variants (`feather.page/1`, from 1.20).** A Qooler direction is a choice of blocks, their variants and a
+  few bounded knobs, themed by the brand. Every knob is an enum or a bounded number, checked by `validatePage` with a
+  JSON pointer and a code, and listed in `schema/feather.page-1.json`. A knob on a `/0` page reports `needs-schema-1`.
+  - Page: `loudness` (0–3) and `defaults: { space, align, scale, crop }` (a default a block does not take is ignored
+    for it).
+  - Every block: `variant`; `loudness`; `tone` (base, subtle, raised, inverse, block-1 to block-4, from the brand's
+    `/4` colour blocks); `space` and `scale` (s, m, l, xl); `align` (start, center, offset, split, as each block
+    allows); `crop` (none, edge, bleed: hero, case, signature); `motion: { enter, intensity, direction, stagger }`;
+    `scroll: { pattern, length, snap }`.
+  - Codes: `unknown-variant`, `out-of-range`, `unsupported` (a knob the block does not take), `contradiction` (scroll
+    at loudness 0, a pin below loudness 2, a pattern that fights the variant, `snap` without a pin) and `missing`
+    (a film or split hero without media, a swap without words).
+  - Variants, the first being each block's default (today's rendering):
+
+    | block | variants |
+    |---|---|
+    | hero | stacked, giant-type, split, film, product, index, interactive (renders as giant-type until wave 4) |
+    | statement | plain, centred, offset, marquee, fill, swap |
+    | work | grid, hover-list, stack, rail |
+    | case | editorial, scale |
+    | numbers | counter, plain, lead |
+    | process | list, pinned, rows |
+    | logos | grid, marquee |
+    | quote | large, rail, pull |
+    | offer | cards, table |
+    | timeline | list, horizontal |
+    | faq, contact | one each |
+  - `examples/studio-of-one-loud.page.json` is the reference page at loudness 3, using the expressive variants (the
+    showcase serves it at `sites.html?page=loud`).
+- **Loudness on a page.** `FeatherPage` sets `data-loudness` on `<main>` from `page.loudness`, and each block's section
+  from its own knob; the brand's default is the theme's `--loudness` (`feather-tokens/4`). The expression components
+  ask what the level allows: a reveal needs 1, kinetic type, pins, horizontal tracks and scrubbed sequences need 2,
+  a World scene needs 3; below that each shows its static form. Reduced motion is stronger than any loudness.
+- **Static or hydrated.** `feather-page build` writes static pages that read completely with no script, never with
+  the loader. `--runtime <href>` (the release's `feather-page-runtime.js`) makes each page carry its document and
+  brand and hydrate: the loader, the menu, the motion and the Living Page come alive with no re-render.
 - `scenes` are the prepared answers. With `living.prepared`, each becomes a static, indexable route that works with
   the model off.
 

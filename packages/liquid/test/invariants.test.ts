@@ -111,7 +111,10 @@ describe.each(fixtures)("%s", (_file, ir) => {
 })
 
 describe("speed", () => {
-  it("composes a large experience well inside the 5 ms budget", () => {
+  // A 5ms budget is only measured fairly on an idle machine. In CI the workspace tests run several packages at once,
+  // so this one runs alone in its own step (FEATHER_SPEED=1, .github/workflows/ci.yml) with the same budget;
+  // locally it runs with the rest.
+  it.runIf(!process.env.CI || process.env.FEATHER_SPEED === "1")("composes a large experience well inside the 5 ms budget", () => {
     // 481 nodes: ten times the largest fixture.
     const nodes: unknown[] = [{ type: "Recommendation", id: "rec", intent: "launch", summary: "Launch now", expandable: { why: "It is ready." } }]
     for (let i = 0; i < 160; i++) {

@@ -13,8 +13,10 @@ const fontFiles = join(dirname(createRequire(join(getAbsolutePath("@aleeforoughi
 
 // The stories live next to their components in packages/react, next to the renderers in packages/manifest-web, and
 // next to the website layer in packages/expression, packages/living and packages/page.
+// The Foundations docs pages (MDX, in apps/storybook/src) come first: they are docs, not stories, so the visual and
+// audit suites (which read only type "story" entries from index.json) never see them.
 const config: StorybookConfig = {
-  stories: ["../../../packages/react/src/**/*.mdx", "../../../packages/react/src/**/*.stories.@(js|jsx|mjs|ts|tsx)", "../../../packages/manifest-web/src/**/*.stories.@(ts|tsx)", "../../../packages/manifest-switch/src/**/*.stories.@(ts|tsx)", "../../../packages/expression/src/**/*.stories.@(ts|tsx)", "../../../packages/living/src/**/*.stories.@(ts|tsx)", "../../../packages/page/src/**/*.stories.@(ts|tsx)"],
+  stories: ["../src/**/*.mdx", "../../../packages/react/src/**/*.mdx", "../../../packages/react/src/**/*.stories.@(js|jsx|mjs|ts|tsx)", "../../../packages/manifest-web/src/**/*.stories.@(ts|tsx)", "../../../packages/manifest-switch/src/**/*.stories.@(ts|tsx)", "../../../packages/expression/src/**/*.stories.@(ts|tsx)", "../../../packages/living/src/**/*.stories.@(ts|tsx)", "../../../packages/page/src/**/*.stories.@(ts|tsx)"],
   addons: [
     getAbsolutePath("@chromatic-com/storybook"),
     getAbsolutePath("@storybook/addon-vitest"),

@@ -1,0 +1,55 @@
+name: Pattern request
+description: A page block, variant or knob a caller (Qooler) needs and Feather does not have yet. The only way new blocks enter Feather (FEATHER.md, "How a missing block gets in").
+labels: [pattern-request]
+body:
+  - type: input
+    id: pattern
+    attributes:
+      label: Catalog id
+      description: The pattern's id in Qooler's award catalog (knowledge/research/2026-11-24-pattern-catalog.json), or "new" with a short name.
+      placeholder: hover-list-media-reveal
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What it is, how it is built, its knobs
+      description: The pattern described the catalog's way, in your own words; never pasted code.
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: Draft spec
+      description: The block or variant as feather.page fields, with values and bounds.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: tiers
+    attributes:
+      label: Tiers and access
+      description: Its no-script form, its reduced-motion form, its mobile form (same, simplified or off), its keyboard path and labels.
+    validations:
+      required: true
+  - type: input
+    id: brand
+    attributes:
+      label: The brand that needs it
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: A verified example (award page opened, site's code read) or a measured need. Mark anything unverified.
+    validations:
+      required: true
+  - type: dropdown
+    id: shape
+    attributes:
+      label: Smallest form that would do
+      description: Rule 2 of FEATHER.md, extend before adding.
+      options: [a knob on an existing block, a variant of an existing block, a new block]
+    validations:
+      required: true

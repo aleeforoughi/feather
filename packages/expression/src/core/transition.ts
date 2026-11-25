@@ -5,10 +5,15 @@
 import { prefersReducedMotion } from "./motion"
 
 /** How a route arrives. `view`: the old page recedes while the new one wipes up. `push`: the old page drifts up
- * under a veil while the new one rises. `columns`: four columns cover the page and lift off the new one. `fade`: the
+ * under a veil while the new one rises. `slide`: the old page stays as a dimmed, receding layer while the new one
+ * slides up over it. `sheets`: the new page rises as a sheet tilted -4deg while the old one recedes. `circle`: the new
+ * page opens as a circle from the last click or tap (the centre after a key press). `columns`: four columns cover the page and lift off the new one. `fade`: the
  * browser's own cross-fade. `none`: an instant swap. Every variant is instant under reduced motion, and `view`,
  * `push` and `fade` are instant where View Transitions are not supported; the content always arrives. */
-export type RouteVariant = "none" | "fade" | "view" | "push" | "columns"
+export type RouteVariant = "none" | "fade" | "view" | "push" | "slide" | "sheets" | "circle" | "columns"
+
+/** A pointer press counts as the origin of a route change for this long (ms); after it, the origin is the centre. */
+export const POINTER_WINDOW = 1000
 
 export interface GoOptions {
   variant?: RouteVariant
@@ -84,6 +89,8 @@ export interface Transitions {
   readonly pending: number
 }
 
+const now = () => (typeof performance !== "undefined" ? performance.now() : Date.now())
+
 export function createTransitions(doc: ViewTransitionDocument | undefined = typeof document === "undefined" ? undefined : (document as ViewTransitionDocument)): Transitions {
   const disposers = new Set<() => void>()
   const leave = () => {
@@ -96,6 +103,16 @@ export function createTransitions(doc: ViewTransitionDocument | undefined = type
       }
     }
   }
+  // The last pointer press, for the circle variant. Passive, and never removed: it is one listener per document.
+  let pointer: { x: number; y: number; at: number } | null = null
+  doc?.addEventListener?.(
+    "pointerdown",
+    (e) => {
+      const { clientX, clientY } = e as PointerEvent
+      pointer = { x: clientX, y: clientY, at: now() }
+    },
+    { passive: true, capture: true }
+  )
   return {
     onLeave(dispose) {
       disposers.add(dispose)
@@ -125,10 +142,28 @@ export function createTransitions(doc: ViewTransitionDocument | undefined = type
       }
       const html = doc.documentElement
       if (variant !== "fade") html?.setAttribute("data-route-transition", variant)
+      const origin = variant === "circle" ? (pointer && now() - pointer.at <= POINTER_WINDOW ? pointer : null) : undefined
+      if (origin !== undefined) {
+        html?.style?.setProperty("--route-x", origin ? `${origin.x}px` : "50%")
+        html?.style?.setProperty("--route-y", origin ? `${origin.y}px` : "50%")
+      }
       const transition = doc.startViewTransition(update)
-      await transition.updateCallbackDone
+      const clear = () => {
+        html?.removeAttribute("data-route-transition")
+        if (origin !== undefined) {
+          html?.style?.removeProperty("--route-x")
+          html?.style?.removeProperty("--route-y")
+        }
+      }
+      try {
+        await transition.updateCallbackDone
+      } catch (e) {
+        clear()
+        throw e
+      }
       done()
-      void transition.finished?.finally(() => html?.removeAttribute("data-route-transition"))
+      if (transition.finished) void transition.finished.finally(clear)
+      else clear()
     },
     get pending() {
       return disposers.size

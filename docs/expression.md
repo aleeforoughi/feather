@@ -30,6 +30,17 @@ other packages.
 | `OverlayMenu` | A minimal bar whose Menu opens a full-screen list of large links | Without script a plain list; a modal dialog with focus trapped, Escape, the page `inert`, focus returned; a fade under reduced motion |
 | `SoundToggle` | One ambient bed, off until the person turns it on | `aria-pressed`; remembered; silent while the tab is hidden; static under reduced motion |
 
+## Wave 2: type, scroll and loudness
+
+| Piece | What it does | Floor it keeps |
+|---|---|---|
+| `DisplayTitle` `effect` | `rise` (default), `mask` (lines rise from behind a mask, 0.8s, 0.1 per line, expo-out), `skew` (characters slide and unskew; at 992px and up), `oval` (lines open through a growing ellipse, 1.5s), `blink` (a film-cut flicker), `scramble` (characters settle left to right), `swap` (one word cycles in a `{word}` slot) | One accessible name, the full text; nothing in view starts hidden; plain text under reduced motion; swap pauses on hover, focus, `paused`, off screen and hidden |
+| `Stage` `steps`, `snap` | Pinned storytelling: text steps scroll past a sticky visual; the active step is `data-step` and a render-prop argument | Steps stack in flow with no script or under reduced motion; never longer than 4 viewports |
+| `ScrollLayers` | `parallax` (layers at depth 0.8 to 1.2, at most ±15%), `stack` (sticky cards; the earlier one scales to 0.95 and dims), `horizontal` (a pinned track on fine pointers), `scale` (media grows from an inset to full bleed) | Horizontal is a native snap rail on touch and under reduced motion; never takes over the wheel; the scale caption stays outside the clipped layer |
+| `ImageSequence` | Scroll-scrubbed frames on a canvas: first and last frames load first, then midpoints; the nearest loaded frame draws, eased (lerp 0.08); a lighter set below 768px | The poster with its alt is the no-script, reduced-motion and data-saver form; capped pixel ratio; sleeps off screen and hidden |
+| Route variants `slide`, `sheets`, `circle` | The new page slides over a receding old one (0.75s); arrives as a sheet tilted -4deg (0.8s); or opens as a circle from the last tap (0.9s) | Instant under reduced motion and without View Transitions; focus moves to the new h1 |
+| `loudnessOf`, `allows` | The level at an element: the nearest `data-loudness`, else the brand's `--loudness`, else 1; what it allows: reveal 1, kinetic and scroll 2, scene 3 | Components only gate where a level is declared; reduced motion is stronger |
+
 ## The edge runtime (wave 1)
 
 The runtime under the page edges and every heavy effect, in `core/`. The values are read from the 2026 award

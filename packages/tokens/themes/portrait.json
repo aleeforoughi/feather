@@ -2,7 +2,7 @@
   "name": "portrait",
   "dark": false,
   "tokens": {
-    "schema": "feather-tokens/3",
+    "schema": "feather-tokens/4",
     "name": "Portrait",
     "colors": {
       "background": "#EBE7DF",
@@ -23,8 +23,8 @@
     "shape": "soft",
     "density": "spacious",
     "elevation": "flat",
-    "pace": "calm",
-    "signature": "expo-out",
+    "loudness": 1,
+    "personality": "calm",
     "contrast": "quiet",
     "surface": "paper",
     "focus": "accent"

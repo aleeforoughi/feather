@@ -99,6 +99,22 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* feather-tokens/4 (docs/visual-system.md section 14.5): the colour-blocked sections (bg-block-1, text-block-1-ink…),
+   the media scrim (bg-media-scrim) and the ink that reads on it (text-ink-on-media). A /4 brand's theme writes them,
+   each pair measured at 4.5:1; every other brand gets the house defaults in the base layer below. */
+@theme inline {
+    --color-block-1: var(--block-1);
+    --color-block-1-ink: var(--block-1-ink);
+    --color-block-2: var(--block-2);
+    --color-block-2-ink: var(--block-2-ink);
+    --color-block-3: var(--block-3);
+    --color-block-3-ink: var(--block-3-ink);
+    --color-block-4: var(--block-4);
+    --color-block-4-ink: var(--block-4-ink);
+    --color-media-scrim: var(--media-scrim);
+    --color-ink-on-media: var(--ink-on-media);
+}
+
 /* The primitives a brand's theme overrides (feather-brand writes them at :root:root). Neutral defaults, so Feather
    works without a brand: shape "rounded", elevation "soft". Utilities: rounded-xs|control|card|dialog, shadow-1|2|3,
    ease-standard, and the type scale. */
@@ -401,6 +417,36 @@
     --layout-gutter: 1rem;
     --layout-margin: 1rem;
     --layout-max: 100%;
+    /* feather-tokens/4 (section 14.5). Loudness: the brand's default volume, 0 quiet to 3 spectacle; a /4 theme
+       writes its own, and data-loudness on a block overrides it. */
+    --loudness: 1;
+    /* Layers: one z-index scale for every brand (z-layer-*). Nothing stacks outside it. */
+    --layer-base: 0;
+    --layer-raised: 10;
+    --layer-sticky: 20;
+    --layer-overlay: 40;
+    --layer-modal: 50;
+    --layer-toast: 60;
+    --layer-cursor: 70;
+    /* Opacity roles (opacity-dim, opacity-muted, opacity-disabled): the only opacities a component sets. */
+    --opacity-dim: 0.6;
+    --opacity-muted: 0.72;
+  }
+  /* The colour blocks and the media scrim for a brand that is not /4: pairs of roles the engine already holds to their
+     floors (primary on its foreground, the inverse surface, the accent tint and muted under text-primary). Declared
+     on .dark too, so the aliases resolve inside a dark subtree. A /4 brand's theme writes measured values instead. */
+  :root,
+  .dark {
+    --block-1: var(--primary);
+    --block-1-ink: var(--primary-foreground);
+    --block-2: var(--surface-inverse);
+    --block-2-ink: var(--text-inverse);
+    --block-3: var(--accent);
+    --block-3-ink: var(--accent-foreground);
+    --block-4: var(--muted);
+    --block-4-ink: var(--text-primary);
+    --media-scrim: color-mix(in oklab, var(--surface-inverse) 62%, transparent);
+    --ink-on-media: var(--text-inverse);
   }
   [data-density="tight"] {
     --control-height: 2.25rem;
@@ -599,6 +645,34 @@
 }
 @utility opacity-disabled {
   opacity: var(--opacity-disabled);
+}
+@utility opacity-dim {
+  opacity: var(--opacity-dim);
+}
+@utility opacity-muted {
+  opacity: var(--opacity-muted);
+}
+/* Layers (section 14.5): the z-index scale, the same in every brand. */
+@utility z-layer-base {
+  z-index: var(--layer-base);
+}
+@utility z-layer-raised {
+  z-index: var(--layer-raised);
+}
+@utility z-layer-sticky {
+  z-index: var(--layer-sticky);
+}
+@utility z-layer-overlay {
+  z-index: var(--layer-overlay);
+}
+@utility z-layer-modal {
+  z-index: var(--layer-modal);
+}
+@utility z-layer-toast {
+  z-index: var(--layer-toast);
+}
+@utility z-layer-cursor {
+  z-index: var(--layer-cursor);
 }
 
 /* Press (section 10): scale 0.985 while a control is held. Use `active:press` with a motion role that lists scale. */
@@ -907,6 +981,69 @@ html[data-route-transition="push"]::view-transition-old(root) {
 }
 html[data-route-transition="push"]::view-transition-new(root) {
   animation: feather-route-push-in 1200ms var(--ease-push) both;
+}
+@keyframes feather-route-slide-out {
+  to {
+    transform: scale(0.9);
+    filter: brightness(0.5);
+  }
+}
+@keyframes feather-route-slide-in {
+  from {
+    transform: translateY(110svh);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes feather-route-sheets-out {
+  to {
+    transform: scale(0.95);
+    filter: brightness(0.6);
+  }
+}
+@keyframes feather-route-sheets-in {
+  from {
+    transform: translateY(105lvh) rotate(-4deg);
+  }
+  to {
+    transform: translateY(0) rotate(0);
+  }
+}
+/* The circle origin: createTransitions sets these inline on <html> for one transition (the last pointer press). */
+html {
+  --route-x: 50%;
+  --route-y: 50%;
+}
+@keyframes feather-route-circle {
+  from {
+    clip-path: circle(0 at var(--route-x, 50%) var(--route-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--route-x, 50%) var(--route-y, 50%));
+  }
+}
+html[data-route-transition="slide"]::view-transition-old(root) {
+  transform-origin: 50% 0;
+  animation: feather-route-slide-out 750ms cubic-bezier(0.5, 0, 0, 1) both;
+}
+html[data-route-transition="slide"]::view-transition-new(root) {
+  animation: feather-route-slide-in 750ms cubic-bezier(0.5, 0, 0, 1) both;
+}
+html[data-route-transition="sheets"]::view-transition-old(root) {
+  animation: feather-route-sheets-out 800ms var(--ease-route) both;
+}
+html[data-route-transition="sheets"]::view-transition-new(root) {
+  transform-origin: 50% 100%;
+  animation: feather-route-sheets-in 800ms var(--ease-route) both;
+}
+html[data-route-transition="circle"]::view-transition-old(root) {
+  animation: none;
+  z-index: 0;
+}
+html[data-route-transition="circle"]::view-transition-new(root) {
+  z-index: 1;
+  animation: feather-route-circle 900ms var(--ease-wipe) both;
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-route-transition]::view-transition-group(*),

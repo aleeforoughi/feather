@@ -1,5 +1,102 @@
 # Feather — changelog
 
+## 1.20.0 — 2026-11-25
+
+**Wave 2: type, scroll, variety and a product you can pick up.** Kinetic type, scroll choreography, three more route
+transitions, `feather-tokens/4` with loudness, the page knobs and a variant set for every block, so directions differ
+by more than their brand. The release now ships the page runtime itself, and the docs, Storybook and a theme builder
+make Feather read as one organised product. Values come from the award winners' shipped code (Qooler file 27
+sections 7 and 8); the code is Feather's own. The owner accepted the plan's decisions
+([docs/proposals/2026-11-24-range.md](docs/proposals/2026-11-24-range.md) §10), and FEATHER.md now holds the
+clean-room rule and the pattern-request intake.
+
+### Type and scroll (`@aleeforoughi/feather-expression`)
+- **`DisplayTitle` `effect`:** `rise`, `mask`, `skew`, `oval`, `blink`, `scramble` and `swap` (with `words`,
+  `interval`, `paused`, `trigger`). The text is always one accessible name and complete without script; under
+  reduced motion the title is plain.
+- **`Stage` `steps` and `snap`:** pinned storytelling. The steps stack in flow without script or motion, and a pin is
+  never longer than 4 viewports.
+- **`ScrollLayers`:** `parallax`, `stack`, `horizontal` and `scale`.
+  - The horizontal track is a native snap rail on touch and under reduced motion, and never takes over the wheel.
+  - The scale caption stays outside the clipped layer.
+- **`ImageSequence`:** scroll-scrubbed canvas frames.
+  - Frames load in priority order: first and last, then midpoints.
+  - The poster with its alt is the no-script, reduced-motion and data-saver form.
+  - It uses the capped pixel ratio and sleeps when off screen or hidden.
+- **Route variants:** `slide`, `sheets` and `circle` (from the last tap), with `POINTER_WINDOW`.
+- **Loudness:** `loudnessOf(el)` and `allows(level, what)`. Section reveals, kinetic effects, pins and sequences,
+  and World scenes each ask for their level, and fall back to their static forms below it.
+- Storage is read on first use, never at import, so a server render or a CLI never touches it.
+
+### `feather-tokens/4` (`@aleeforoughi/feather-tokens`)
+- Additive: `/2` and `/3` theme CSS is unchanged byte for byte, which the golden themes prove.
+- **`loudness`** (0–3) becomes `--loudness`.
+- **Colour blocks:** `colors.blocks` (up to 4 surface and ink pairs, each at 4.5:1) give `bg-block-N` and
+  `text-block-N-ink`.
+- **Media text:** `colors.mediaScrim` and `colors.inkOnMedia` give `bg-media-scrim` and `text-ink-on-media` (the
+  scrim rises until the ink holds 4.5:1). `bg-scrim` stays the dialog scrim.
+- **`personality`** (calm, precise, playful, cinematic) sets pace and signature together; anything written
+  explicitly wins.
+- **House layers and opacity:** `z-layer-*`, `opacity-dim` and `opacity-muted`.
+- **Matched fallbacks for foundation families:** each of the 15 gets a metric-matched fallback face, so a `/4` theme
+  swaps fonts without a shift. `src/fallbacks.mjs` is generated from the installed font files.
+- **`LATEST_SCHEMA`:** the reference themes Studio, Portrait and Seed are now `/4`. `feather-brand --migrate --to 4`
+  upgrades a file only if the result builds.
+- **`feather-font add <family>`:** any open font, self-hosted with a fallback matched to it.
+  - It downloads the font once from Fontsource into a cache and prints its licence.
+  - The fallback is matched to the width of English text and to the font's vertical metrics.
+  - It can write the result straight into a brand file.
+
+### Variety (`feather.page/1`, `@aleeforoughi/feather-page`)
+- **Knobs:**
+  - page level: `loudness` and `defaults`;
+  - every block: `variant`, `loudness`, `tone` (including block-1..4), `space`, `scale`, `align`, `crop`, `motion`
+    and `scroll`;
+  - new codes `unknown-variant`, `out-of-range`, `unsupported` and `contradiction`;
+  - `/0` pages render byte for byte as before.
+- **Variants for every block:**
+  - hero: stacked, giant-type, split, film, product, index;
+  - statement: plain, centred, offset, marquee, fill, swap;
+  - work: grid, hover-list, stack, rail;
+  - case: editorial, scale;
+  - numbers: counter, plain, lead;
+  - process: list, pinned, rows;
+  - logos: grid, marquee;
+  - quote: large, rail, pull;
+  - offer: cards, table;
+  - timeline: list, horizontal.
+- **The loud reference page:** `examples/studio-of-one-loud.page.json` is the reference page at loudness 3, served at
+  `sites.html?page=loud`.
+- **Fixes:**
+  - The static build never writes the loader (it hung at 0% with nothing to mount it).
+  - Pages now emit the brand's own `@font-face` rules (open fonts never loaded before).
+  - Footer and nav links are at least 48px wide as well as tall.
+- **`feather-page build --runtime <href>`:** pages hydrate with the release runtime, so the loader, the menu, the
+  motion and the Living Page all run.
+
+### The page runtime as release assets (`apps/release`)
+- `feather-page-<version>.mjs` is the CLI as one self-contained Node file.
+- `feather-page-web-<version>.zip` holds `feather-page.css` (every block and edge, with the foundation fonts as
+  files) and `feather-page-runtime.js` (`hydrate`, `mount`, `validatePage`).
+- CI builds the CLI and runs it standalone.
+
+### A product you can pick up
+- **README:** a front door.
+- **Guides:**
+  - `docs/getting-started.md`: install, theme, first page, first product screen, Python;
+  - `docs/theming.md`: the brand file from primitives to roles to component tokens, the axes, loudness, fonts, what
+    the engine refuses;
+  - `docs/packages.md`: every package, its entry points and the release assets;
+  - `docs/patterns.md`: which catalog patterns are built, and in which release.
+- **Storybook:**
+  - The sidebar runs Foundations, Atoms, Molecules, Organisms, Experiences, Website, Living, Pages.
+  - Foundations pages: Introduction, Tokens (live swatches of the current brand), Motion, Loudness, Three tiers,
+    Accessibility floor.
+  - Theme builder: build a brand live, see every problem the engine reports, preview real components and blocks, and
+    copy or download the JSON.
+  - Block variants appear in real brands with real content.
+- **Issue template:** `.github/ISSUE_TEMPLATE/pattern-request.yml`.
+
 ## 1.19.0 — 2026-11-24
 
 **Wave 1: the page edges, and the runtime under them.** The moves the 2026 award winners name most (Qooler file 27

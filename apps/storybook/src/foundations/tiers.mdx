@@ -1,0 +1,29 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+import { TierViewer } from "./components/tiers"
+
+<Meta title="Foundations/Three tiers" />
+
+# Three tiers
+
+Every enhanced component works in three tiers, and a component without all three does not ship.
+
+| Tier | Who gets it | What they get |
+|---|---|---|
+| **No script** | Crawlers, reader modes, a failed bundle, `feather-page build` output | The complete HTML: every word, link and image in place and readable. |
+| **Reduced motion** | Anyone with `prefers-reduced-motion`, or a plan that sets `data-motion="reduced"` | A 150ms cross-fade or the end state. Feedback stays; spatial motion goes. |
+| **Full** | Everyone else | The brand's signature curve, pace and loudness. |
+
+One component, in all three:
+
+<Unstyled><TierViewer /></Unstyled>
+
+## How each tier is proven
+
+| Tier | The proof |
+|---|---|
+| No script | Render tests write each component with `renderToStaticMarkup` and assert the content is there; the showcase's end-to-end suite loads the built pages with JavaScript off and checks the content, the links and the 404. |
+| Reduced motion | The hygiene gate (`pnpm hygiene`) fails an expression component that animates without a reduced-motion path; unit tests set the preference; the end-to-end suite emulates it on whole pages. |
+| Full | Storybook runs every story with axe; the visual suite records every story in four brands; the website gate measures frame rate and the mobile budgets (LCP, CLS, TBT). |
+
+Heavy effects add a fourth fallback: without WebGL, on data saver, or on a weak device, a scene shows its poster and
+the same DOM text. The capability gate decides once and remembers.

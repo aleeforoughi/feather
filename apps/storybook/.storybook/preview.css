@@ -19,3 +19,6 @@
 @source not "../../../packages/living/src/**/*.test.tsx";
 @source "../../../packages/page/src";
 @source not "../../../packages/page/src/**/*.test.tsx";
+
+/* The Foundations docs pages (apps/storybook/src). */
+@source "../src";
