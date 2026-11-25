@@ -382,7 +382,8 @@
     --display-fit-floor: 1.5rem;
     /* What the tracking gives back as the fit takes size away: 0.1 of each px under the step's size (the tightest
        tracking the bounds allow a brand, in em), so a capped title is never tracked tighter than in proportion to its
-       new size, and never looser than 0 unless its step is. */
+       new size, and never looser than 0 unless its step is. Type set larger than its step (a fitted wordmark) keeps
+       the step's tracking, as before. */
     --display-fit-tracking: 0.1;
     /* A face's ascent and descent, in em: what a display line set under it hangs out of its box. 1.3 holds the
        reference display faces (Space Grotesk 1.29, Sora 1.28, Fraunces 1.25, measured in Chromium). */
@@ -1083,7 +1084,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: min(var(--display-xl-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-xl-leading);
-  letter-spacing: min(var(--display-xl-tracking) + (var(--display-xl-size) - 1em) * var(--display-fit-tracking), max(var(--display-xl-tracking), 0px));
+  letter-spacing: min(var(--display-xl-tracking) + max(0px, var(--display-xl-size) - 1em) * var(--display-fit-tracking), max(var(--display-xl-tracking), 0px));
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
   overflow-wrap: anywhere;
@@ -1092,7 +1093,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: min(var(--display-l-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-l-leading);
-  letter-spacing: min(var(--display-l-tracking) + (var(--display-l-size) - 1em) * var(--display-fit-tracking), max(var(--display-l-tracking), 0px));
+  letter-spacing: min(var(--display-l-tracking) + max(0px, var(--display-l-size) - 1em) * var(--display-fit-tracking), max(var(--display-l-tracking), 0px));
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
   overflow-wrap: anywhere;
@@ -1101,7 +1102,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: min(var(--display-m-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-m-leading);
-  letter-spacing: min(var(--display-m-tracking) + (var(--display-m-size) - 1em) * var(--display-fit-tracking), max(var(--display-m-tracking), 0px));
+  letter-spacing: min(var(--display-m-tracking) + max(0px, var(--display-m-size) - 1em) * var(--display-fit-tracking), max(var(--display-m-tracking), 0px));
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
   overflow-wrap: anywhere;
@@ -1110,7 +1111,7 @@ html[data-route-transition="circle"]::view-transition-new(root) {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
   font-size: min(var(--display-s-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-s-leading);
-  letter-spacing: min(var(--display-s-tracking) + (var(--display-s-size) - 1em) * var(--display-fit-tracking), max(var(--display-s-tracking), 0px));
+  letter-spacing: min(var(--display-s-tracking) + max(0px, var(--display-s-size) - 1em) * var(--display-fit-tracking), max(var(--display-s-tracking), 0px));
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
   overflow-wrap: anywhere;
