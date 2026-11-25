@@ -9,9 +9,18 @@
   "nav": {
     "brand": "Footpath",
     "items": [
-      { "label": "The latest", "href": "#latest" },
-      { "label": "This issue", "href": "#issue" },
-      { "label": "The letter", "href": "#letter" }
+      {
+        "label": "Latest",
+        "href": "#latest"
+      },
+      {
+        "label": "Issue",
+        "href": "#issue"
+      },
+      {
+        "label": "Newsletter",
+        "href": "#letter"
+      }
     ]
   },
   "sections": [
@@ -22,20 +31,53 @@
       "eyebrow": "Issue 14, Winter",
       "title": "The long way round.",
       "lede": "This issue follows six people who chose the slower route to work, and found the city they had been driving past for years.",
-      "media": { "src": "media/editorial-cover.svg", "alt": "A figure walking along a canal towpath at dawn, the city skyline faint behind" }
+      "media": {
+        "src": "media/editorial-cover.svg",
+        "alt": "A figure walking along a canal towpath at dawn, the city skyline faint behind"
+      },
+      "crop": "bleed"
     },
     {
       "block": "journal",
       "id": "latest",
       "variant": "featured",
-      "title": "The latest",
+      "title": "Latest",
       "items": [
-        { "date": "2026-11-20", "title": "Forty minutes on foot, every day, for a year", "excerpt": "A bus driver gave up the bus. What she noticed in the first month, and what she still notices.", "href": "#latest", "media": { "src": "media/editorial-1.svg", "decorative": true } },
-        { "date": "2026-11-06", "title": "The map that drew itself", "excerpt": "How a city's desire lines, the paths worn across its parks, became its new cycle routes.", "href": "#latest" },
-        { "date": "2026-10-23", "title": "In praise of the school run", "excerpt": "Eleven minutes, twice a day: the most important conversation a parent has is on the pavement.", "href": "#latest" },
-        { "date": "2026-10-09", "title": "Coastline, measured by hand", "excerpt": "A retired surveyor walks the shore of his county and finds it is longer every time.", "href": "#latest" }
+        {
+          "date": "2026-11-20",
+          "title": "Forty minutes on foot, every day, for a year",
+          "excerpt": "A bus driver gave up the bus. What she noticed in the first month, and what she still notices.",
+          "href": "#latest",
+          "media": {
+            "src": "media/editorial-1.svg",
+            "decorative": true
+          }
+        },
+        {
+          "date": "2026-11-06",
+          "title": "The map that drew itself",
+          "excerpt": "How a city's desire lines, the paths worn across its parks, became its new cycle routes.",
+          "href": "#latest"
+        },
+        {
+          "date": "2026-10-23",
+          "title": "In praise of the school run",
+          "excerpt": "Eleven minutes, twice a day: the most important conversation a parent has is on the pavement.",
+          "href": "#latest"
+        },
+        {
+          "date": "2026-10-09",
+          "title": "Coastline, measured by hand",
+          "excerpt": "A retired surveyor walks the shore of his county and finds it is longer every time.",
+          "href": "#latest"
+        }
       ],
-      "more": [{ "label": "Every story", "href": "#latest" }]
+      "more": [
+        {
+          "label": "Every story",
+          "href": "#latest"
+        }
+      ]
     },
     {
       "block": "statement",
@@ -48,11 +90,32 @@
       "block": "story",
       "id": "issue",
       "variant": "stacked",
-      "title": "This issue, in one walk",
+      "title": "This issue",
       "steps": [
-        { "title": "Leave early", "body": "The canal at six, before the cyclists, when the herons still own it.", "media": { "src": "media/editorial-2.svg", "alt": "A heron standing on a lock gate in mist" } },
-        { "title": "Take the cut-through", "body": "The alley behind the market that every resident knows and no map shows.", "media": { "src": "media/editorial-3.svg", "alt": "A narrow brick alley with crates stacked at its far end" } },
-        { "title": "Arrive on foot", "body": "Forty minutes later than the car, and somehow less tired.", "media": { "src": "media/editorial-4.svg", "alt": "An office door, a pair of muddy boots beside it" } }
+        {
+          "title": "Leave early",
+          "body": "The canal at six, before the cyclists, when the herons still own it.",
+          "media": {
+            "src": "media/editorial-2.svg",
+            "alt": "A heron standing on a lock gate in mist"
+          }
+        },
+        {
+          "title": "Take the cut-through",
+          "body": "The alley behind the market that every resident knows and no map shows.",
+          "media": {
+            "src": "media/editorial-3.svg",
+            "alt": "A narrow brick alley with crates stacked at its far end"
+          }
+        },
+        {
+          "title": "Arrive on foot",
+          "body": "Forty minutes later than the car, and somehow less tired.",
+          "media": {
+            "src": "media/editorial-4.svg",
+            "alt": "An office door, a pair of muddy boots beside it"
+          }
+        }
       ]
     },
     {
@@ -67,22 +130,42 @@
       "block": "form",
       "id": "letter",
       "variant": "underline",
-      "title": "The letter, between issues",
+      "title": "Newsletter",
       "body": "One email a month: a walk, a map and a story we could not fit in print.",
       "action": "/subscribe",
       "fields": [
-        { "name": "email", "label": "Your email", "type": "email", "required": true, "autocomplete": "email" },
-        { "name": "frequency", "label": "How often", "type": "choice", "options": ["Monthly", "Only with a new issue"] }
+        {
+          "name": "email",
+          "label": "Your email",
+          "type": "email",
+          "required": true,
+          "autocomplete": "email"
+        },
+        {
+          "name": "frequency",
+          "label": "How often",
+          "type": "choice",
+          "options": [
+            "Monthly",
+            "Only with a new issue"
+          ]
+        }
       ],
-      "submit": "Send me the letter",
+      "submit": "Subscribe",
       "note": "No tracking pixels. Leave with one click, from any letter."
     }
   ],
   "footer": {
     "variant": "plain",
     "links": [
-      { "label": "The latest", "href": "#latest" },
-      { "label": "The letter", "href": "#letter" }
+      {
+        "label": "Latest",
+        "href": "#latest"
+      },
+      {
+        "label": "Newsletter",
+        "href": "#letter"
+      }
     ],
     "note": "Footpath is reader-funded and has no advertising."
   },

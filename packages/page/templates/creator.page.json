@@ -9,14 +9,33 @@
   "nav": {
     "brand": "Small Hours",
     "items": [
-      { "label": "Episodes", "href": "#listen" },
-      { "label": "The reel", "href": "#reel" },
-      { "label": "Suggest a guest", "href": "#guest" }
+      {
+        "label": "Episodes",
+        "href": "#listen"
+      },
+      {
+        "label": "Reel",
+        "href": "#reel"
+      },
+      {
+        "label": "Guests",
+        "href": "#guest"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
     ]
   },
   "scheme": {
     "toggle": "nav",
-    "colors": { "background": "#15120f", "surface": "#1f1b17", "text": "#f3ece2", "primary": "#f3ece2", "primaryText": "#15120f" }
+    "colors": {
+      "background": "#15120f",
+      "surface": "#1f1b17",
+      "text": "#f3ece2",
+      "primary": "#f3ece2",
+      "primaryText": "#15120f"
+    }
   },
   "sections": [
     {
@@ -24,11 +43,17 @@
       "id": "top",
       "variant": "giant-type",
       "eyebrow": "A podcast, every other Thursday",
-      "title": "An hour in someone else's workshop.",
+      "title": "Hours in the workshop.",
       "lede": "Potters, luthiers, bookbinders, a woman who repairs church clocks. Recorded where they work, with the tools still running.",
       "actions": [
-        { "label": "Play the latest", "href": "#listen" },
-        { "label": "Suggest a guest", "href": "#guest" }
+        {
+          "label": "Listen now",
+          "href": "#listen"
+        },
+        {
+          "label": "Suggest a guest",
+          "href": "#guest"
+        }
       ]
     },
     {
@@ -45,12 +70,26 @@
           "date": "20 November 2026",
           "summary": "Ruth has kept the same church clock running for twenty-two years. We climb the tower with her on a winding day.",
           "chapters": [
-            { "at": 0, "title": "The climb" },
-            { "at": 3, "title": "Winding by hand" }
+            {
+              "at": 0,
+              "title": "The climb"
+            },
+            {
+              "at": 3,
+              "title": "Winding by hand"
+            }
           ],
           "transcript": [
-            { "at": 0, "by": "Host", "text": "We are about ninety steps up, and Ruth has not stopped talking once." },
-            { "at": 3, "by": "Ruth Okonkwo", "text": "Forty turns for the time, forty for the strike. You count them, or you lose your place." }
+            {
+              "at": 0,
+              "by": "Host",
+              "text": "We are about ninety steps up, and Ruth has not stopped talking once."
+            },
+            {
+              "at": 3,
+              "by": "Ruth Okonkwo",
+              "text": "Forty turns for the time, forty for the strike. You count them, or you lose your place."
+            }
           ]
         },
         {
@@ -61,7 +100,11 @@
           "date": "6 November 2026",
           "summary": "A potter who mixes every glaze from the ash of the wood that fires it.",
           "transcript": [
-            { "at": 0, "by": "Tomas Lind", "text": "Apple wood gives you a green you cannot buy. Oak gives you a brown that looks like weather." }
+            {
+              "at": 0,
+              "by": "Tomas Lind",
+              "text": "Apple wood gives you a green you cannot buy. Oak gives you a brown that looks like weather."
+            }
           ]
         }
       ]
@@ -69,9 +112,13 @@
     {
       "block": "showreel",
       "id": "reel",
-      "title": "The reel",
+      "title": "Reel",
       "body": "Ninety seconds from this season's workshops, with captions.",
-      "media": { "src": "media/small-hours-reel.webm", "alt": "Hands at work: a potter's wheel, a lathe, a clock's escapement, a bookbinder's needle", "poster": "media/small-hours-reel.svg" },
+      "media": {
+        "src": "media/small-hours-reel.webm",
+        "alt": "Hands at work: a potter's wheel, a lathe, a clock's escapement, a bookbinder's needle",
+        "poster": "media/small-hours-reel.svg"
+      },
       "captions": "media/small-hours-reel.vtt",
       "speech": true
     },
@@ -87,14 +134,32 @@
       "block": "form",
       "id": "guest",
       "variant": "conversational",
-      "title": "Suggest a guest",
+      "title": "Guests",
       "body": "Know someone who makes something by hand and has never been asked about it? Four questions.",
       "action": "/guests",
       "fields": [
-        { "name": "maker", "label": "Who should we visit?", "required": true, "hint": "Their name, or what they make." },
-        { "name": "craft", "label": "What do they make?", "required": true },
-        { "name": "where", "label": "Where is their workshop?", "hint": "A town is enough." },
-        { "name": "email", "label": "Your email, so we can thank you", "type": "email", "autocomplete": "email" }
+        {
+          "name": "maker",
+          "label": "Who should we visit?",
+          "required": true,
+          "hint": "Their name, or what they make."
+        },
+        {
+          "name": "craft",
+          "label": "What do they make?",
+          "required": true
+        },
+        {
+          "name": "where",
+          "label": "Where is their workshop?",
+          "hint": "A town is enough."
+        },
+        {
+          "name": "email",
+          "label": "Your email, so we can thank you",
+          "type": "email",
+          "autocomplete": "email"
+        }
       ],
       "submit": "Send the suggestion",
       "note": "We read every one, and we never contact a maker without asking you first."
@@ -102,17 +167,32 @@
     {
       "block": "contact",
       "id": "contact",
-      "title": "Write to the show",
+      "title": "Contact",
       "body": "Corrections, stories, a workshop we should hear. One of us reads everything.",
-      "actions": [{ "label": "Email Small Hours", "href": "mailto:hello@example.com" }]
+      "actions": [
+        {
+          "label": "Email us",
+          "href": "mailto:hello@example.com"
+        }
+      ]
     }
   ],
   "footer": {
     "variant": "wordmark",
     "wordmark": "Small Hours",
     "links": [
-      { "label": "Episodes", "href": "#listen" },
-      { "label": "Suggest a guest", "href": "#guest" }
+      {
+        "label": "Episodes",
+        "href": "#listen"
+      },
+      {
+        "label": "Guests",
+        "href": "#guest"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
     ],
     "note": "Made independently, with no adverts in the episodes."
   },

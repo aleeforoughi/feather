@@ -250,18 +250,29 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
 
   | template | for | layout | what it uses |
   |---|---|---|---|
-  | `launch` | a product launch, loudness 3 | poster | the interactive hero over an aurora shader, kinetic type (mask, fill, swap), the pinned scroll story, numbers, the offer toggle, questions, a 404 |
-  | `studio` | a studio or agency | swiss | the giant-type hero, bento work from the library, a case, a masonry gallery, testimonials on a rail, the process, logos |
-  | `editorial` | a journal or magazine | editorial | a cover, the featured journal, an offset statement, a story in stacked steps, a large quote, a newsletter form |
-  | `service` | a local business | colour-blocking | the split hero, services as offer cards, the booking flow, testimonials, places, questions, contact |
-  | `product` | SaaS pricing | two-colour | the product hero, an area chart, before and after, the calculator, the plans table, questions |
+  | `launch` | a product launch, loudness 3 | poster | the interactive hero over an aurora shader, kinetic type (the mask enter, the fill statement), the pinned scroll story, numbers, the offer toggle, questions, a 404 |
+  | `studio` | a studio or agency | swiss | the giant-type hero, bento work from the library, a case, a masonry gallery, testimonials on a rail, the process |
+  | `editorial` | a journal or magazine | editorial | a full-bleed cover, the featured journal, an offset statement, a story in stacked steps, a large quote, a newsletter form |
+  | `service` | a local business | colour-blocking | the split hero (its picture full bleed), services as offer cards, the booking flow, testimonials, places, questions, contact |
+  | `product` | SaaS pricing | two-colour | the giant-type hero, an area chart, before and after, the calculator, the plans table, questions |
   | `creator` | a podcast or creator | brutalist | the podcast with chapters and transcripts, the showreel with captions, a conversational form, the scheme toggle |
+
+  Each is built to the winners' measured medians (Qooler file 28): about seven sections with plain-noun section titles,
+  about five single-word navigation items, a first screen that is giant type or full-bleed media with a short display
+  title and two short, verb-led actions, and one filled action per section.
 
   `feather-page init <template>` writes one out ([getting-started.md](getting-started.md)); `import { TEMPLATES }
   from "@aleeforoughi/feather-page/templates/index.js"` gives them in code, each with its one-line description. The
   showcase serves each at `sites.html?template=<name>` in the three reference brands (its site e2e: axe, the mobile
   budgets, reduced motion; and for `launch`, no WebGL and no script), and Storybook's "Templates" section, the last, shows
   them as `feather-page init` writes them.
+- **One filled action per section (from 1.23).** On the winners about a quarter of actions are filled, so the one
+  filled action stands out (Qooler file 28 section 3). A section's primary action is filled and the rest are quiet
+  (outlined) or text links: the hero's and contact's first action unless another says `primary: true` (an action
+  field on `/1` pages; `primary: false` on every one fills none), a hero whose starters show (on a Living Page) fills
+  its first starter and no action, a podcast fills the first episode's Play, a quiz's result link leads its Start again, and the flows
+  fill only the step's next act. Two `primary: true` actions in one section are a
+  `contradiction` at `/sections/N/actions` (`/1` only: a `/0` page has no `primary` field).
 - **The render budget (from 1.23).** `feather-page build` of one direction (a page in its brand), every route, in 500 ms
   or less on two CPUs: `scripts/render-gate.mjs` builds every template and reference example in each reference brand,
   in-process, warms once, and fails when the median of five builds (validate, the layout check, render, write) passes

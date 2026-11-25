@@ -157,7 +157,7 @@ test.describe("the exit test: launch at loudness 3", () => {
       await expect(layer).toHaveAttribute("data-state", "poster")
       await expect(layer.locator('[data-slot="scene-poster"]')).toHaveCount(1)
       await expect(page.locator("canvas")).toHaveCount(0)
-      await expect(page.getByRole("heading", { level: 1, name: "Wake up to a sunrise, every morning." })).toBeVisible()
+      await expect(page.getByRole("heading", { level: 1, name: "Wake up to daylight." })).toBeVisible()
       for (const t of titles("launch")) await expect(page.getByRole("heading", { name: t, exact: true }).first(), t).toBeAttached()
       expect(await axe(page)).toEqual([])
       expect(errors).toEqual([])
@@ -179,7 +179,7 @@ test.describe("the exit test: launch at loudness 3", () => {
       await page.goto("https://feather.test/")
       await expect(page.locator("main")).toHaveAttribute("data-layout", "poster")
       await expect(page.locator('[data-slot="loader"]')).toHaveCount(0)
-      await expect(page.getByRole("heading", { level: 1, name: "Wake up to a sunrise, every morning." })).toBeVisible()
+      await expect(page.getByRole("heading", { level: 1, name: "Wake up to daylight." })).toBeVisible()
       for (const t of titles("launch")) await expect(page.getByRole("heading", { name: t, exact: true }).first(), t).toBeVisible()
       // The story's steps are stacked in reading order, each with its picture; the offer's prices are all there.
       for (const step of ["Dawn, at 6:30", "Sunrise, at 6:45", "Daylight, at 7:00"]) await expect(page.getByText(step, { exact: true }).first()).toBeVisible()
