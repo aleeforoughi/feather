@@ -67,9 +67,8 @@ export const AUDIO_FILE = /\.(?:mp3|m4a|aac|ogg|oga|opus|wav|webm)(?:[?#]|$)/i
 
 /** The flow blocks: page blocks (PAGE_BLOCKS, below), so feather.page/1 only (on a /0 page `needs-schema-1`) and never in a
  * prepared scene (an answer is built from the Living Page's library). */
-export const FLOW_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
+export const FLOW_BLOCKS: Record<string, { fields: Fields; doc?: string }> = {
   quiz: {
-    doc: "Questions with real radio options, one per step, and a result keyed by the answers. With no script, every question shows, and how the result is decided.",
     fields: {
       title: text(120, true),
       body: BODY,
@@ -79,7 +78,6 @@ export const FLOW_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
     },
   },
   booking: {
-    doc: "A booking flow: service, then date and time, then details, then a review before anything is sent. Slots come from the page; it sends to an action URL, a mailto, or hands over to a booking link.",
     fields: {
       title: text(120, true),
       body: BODY,
@@ -94,7 +92,6 @@ export const FLOW_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
     },
   },
   calculator: {
-    doc: "A pricing calculator: inputs (range, number, radio, toggle) and a price formula in a small safe language (+ - * /, min, max, round). The total and its breakdown are announced as they change; with no script, the starting prices show.",
     fields: {
       title: text(120, true),
       body: BODY,
@@ -125,7 +122,6 @@ export const FLOW_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
     },
   },
   chart: {
-    doc: "Data as a bar, line or area chart, drawn in SVG in the theme's inks, with its summary sentence and the data as a table behind a disclosure. The end state draws in on reveal; under reduced motion it is simply there.",
     fields: {
       title: text(120, true),
       summary: text(240, true),
@@ -139,7 +135,6 @@ export const FLOW_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
     },
   },
   places: {
-    doc: "Places to find: always a list of names, addresses and links (directions, the place's own site, a phone number), with an optional still map. No map SDK and no tiles.",
     fields: {
       title: text(120, true),
       body: BODY,
@@ -148,7 +143,6 @@ export const FLOW_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
     },
   },
   podcast: {
-    doc: "Episodes on native audio with real-button controls (play, ±15 s, speed, a scrub slider), chapters that seek, and a transcript (required) that can follow playback. Never autoplays; with no script, the browser's own controls.",
     fields: {
       title: text(120, true),
       body: BODY,
@@ -508,28 +502,20 @@ const FORM_FIELD: Fields = {
   autocomplete: text(40),
 }
 
-export const PAGE_BLOCK_DOCS = {
-  gallery: "Images to look through, each opening large in the lightbox. Every image is content: it needs alt text.",
-  comparison: "Before and after, compared with a slider (a native range); side by side without script.",
-  story: "A story told in two to six steps, each with its picture, which stays pinned and changes as the steps pass.",
-  testimonials: "Several people's words, attributed: a grid, or a rail.",
-  journal: "Writing, as an editorial list: date, title, excerpt and the link to read it.",
-  form: "A short form that posts to the page's own endpoint (or opens an email), and works with no script.",
-  showreel: "A film with its controls and captions: play and pause, mute, and a captions track when anyone speaks.",
-} as const
+// The page blocks' documentation is core/page-docs.ts: only the JSON Schema reads it, so the release runtime, which
+// validates pages, does not carry the prose.
 
 /** Blocks only feather.page/1 takes (not the Living Page's): the media and new blocks, then the product flows. */
-export const PAGE_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
-  gallery: { doc: PAGE_BLOCK_DOCS.gallery, fields: { title: TITLE, body: BODY, items: { kind: "list", of: GALLERY_ITEM, min: 2, max: 24 } } },
+export const PAGE_BLOCKS: Record<string, { fields: Fields; doc?: string }> = {
+  gallery: { fields: { title: TITLE, body: BODY, items: { kind: "list", of: GALLERY_ITEM, min: 2, max: 24 } } },
   comparison: {
-    doc: PAGE_BLOCK_DOCS.comparison,
     fields: { title: TITLE, body: BODY, before: { kind: "media", required: true }, after: { kind: "media", required: true }, beforeLabel: text(40), afterLabel: text(40), start: { kind: "number", min: 0, max: 100, integer: true } },
   },
-  story: { doc: PAGE_BLOCK_DOCS.story, fields: { title: TITLE, steps: { kind: "list", of: STORY_STEP, min: 2, max: 6 } } },
-  testimonials: { doc: PAGE_BLOCK_DOCS.testimonials, fields: { title: TITLE, items: { kind: "list", of: TESTIMONIAL, min: 2, max: 12 } } },
-  journal: { doc: PAGE_BLOCK_DOCS.journal, fields: { title: TITLE, items: { kind: "list", of: JOURNAL_ENTRY, min: 1, max: 12 }, more: { kind: "list", of: LINK, max: 1 } } },
-  form: { doc: PAGE_BLOCK_DOCS.form, fields: { title: TITLE, body: BODY, action: { kind: "href", required: true }, fields: { kind: "list", of: FORM_FIELD, min: 1, max: 8 }, submit: text(40), note: text(160) } },
-  showreel: { doc: PAGE_BLOCK_DOCS.showreel, fields: { title: TITLE, body: BODY, media: { kind: "media", required: true }, captions: { kind: "media" }, speech: { kind: "boolean" } } },
+  story: { fields: { title: TITLE, steps: { kind: "list", of: STORY_STEP, min: 2, max: 6 } } },
+  testimonials: { fields: { title: TITLE, items: { kind: "list", of: TESTIMONIAL, min: 2, max: 12 } } },
+  journal: { fields: { title: TITLE, items: { kind: "list", of: JOURNAL_ENTRY, min: 1, max: 12 }, more: { kind: "list", of: LINK, max: 1 } } },
+  form: { fields: { title: TITLE, body: BODY, action: { kind: "href", required: true }, fields: { kind: "list", of: FORM_FIELD, min: 1, max: 8 }, submit: text(40), note: text(160) } },
+  showreel: { fields: { title: TITLE, body: BODY, media: { kind: "media", required: true }, captions: { kind: "media" }, speech: { kind: "boolean" } } },
   // Product flows (wave 5 part B; FLOW_BLOCKS above): quiz, booking, calculator, chart, places, podcast.
   ...FLOW_BLOCKS,
 }
@@ -544,7 +530,7 @@ Object.assign(BLOCK_RANGE, {
   journal: { variants: ["list", "featured"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true, treatment: true },
   form: { variants: ["underline", "conversational"], aligns: ["start", "center", "split"], scroll: ["reveal"], crop: false, scale: true },
   showreel: { variants: ["player"], aligns: ["start", "center"], scroll: ["reveal"], crop: true, scale: true },
-} satisfies Record<keyof typeof PAGE_BLOCK_DOCS, BlockRange>)
+} satisfies Record<"gallery" | "comparison" | "story" | "testimonials" | "journal" | "form" | "showreel", BlockRange>)
 
 // The product flows' ranges (FLOW_RANGE above), beside the page blocks'.
 Object.assign(BLOCK_RANGE, FLOW_RANGE)

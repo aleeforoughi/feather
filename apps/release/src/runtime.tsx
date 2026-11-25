@@ -3,12 +3,22 @@
 // server markup, so the motion, the loader, the menu and the Living Page come alive without a re-render. It also
 // mounts a page document into any element (`mount`), for a host that renders on the client only. Its styles are
 // feather-page.css, released beside it.
-import { StrictMode } from "react"
+//
+// The runtime carries the Living Page's library only. The page blocks come in families of their own, beside it:
+// feather-page-media.js (gallery, comparison, story, testimonials, journal, form, showreel) and feather-page-flows.js
+// (quiz, booking, calculator, chart, places, podcast, and the scheme toggle and the work's view switch), each loaded
+// only for a page whose document uses it. hydrate loads them before it hydrates, so the server's markup is matched by the same components with no flash
+// and no mismatch; mount renders them as lazy components under one Suspense boundary.
+import { lazy, StrictMode, Suspense } from "react"
 import { hydrateRoot } from "react-dom/client"
-import { FeatherPage, mountPage, PageNotFound, PreparedPage, validatePage, type MountedPage, type PageDocument } from "@aleeforoughi/feather-page"
+import { FeatherPageCore as FeatherPage, loadPageBlocks, mountPage, PageNotFoundCore as PageNotFound, PreparedPage, validateLoaded, type MountedPage, type PageDocument, type PageFamilies, type PageResult } from "@aleeforoughi/feather-page/runtime"
 import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 
-export { validatePage }
+/** validatePage with every rule the runtime holds: the core's always, and the product flows' once their family has
+ * loaded (hydrate and mount load it for any page that uses a flow). */
+export function validatePage(doc: unknown): PageResult {
+  return validateLoaded(doc)
+}
 
 export interface RuntimeOptions {
   /** The brand's tokens, when the document's `brand` is a path the browser cannot read. */
@@ -21,30 +31,47 @@ export interface RuntimeOptions {
 }
 
 const checked = (doc: unknown): PageDocument => {
-  const r = validatePage(doc)
+  const r = validateLoaded(doc)
   if (!r.ok) throw new Error(`Not a valid feather.page document:\n${r.issues.map((i) => `- ${i.path || "/"} ${i.code}: ${i.message}`).join("\n")}`)
   return r.page
 }
-const element = (page: PageDocument, { tokens, notFound, intent, base = "/" }: RuntimeOptions) => (
+const element = (page: PageDocument, { tokens, notFound, intent, base = "/" }: RuntimeOptions, { blocks, parts }: PageFamilies) => (
   <StrictMode>
     {notFound ? (
-      <PageNotFound page={page} tokens={tokens} />
+      <PageNotFound page={page} tokens={tokens} parts={parts} />
     ) : intent ? (
       <PreparedPage page={page} intent={intent} tokens={tokens} href={(i) => `${base.endsWith("/") ? base : `${base}/`}${i}`} />
     ) : (
-      <FeatherPage page={page} tokens={tokens} />
+      <FeatherPage page={page} tokens={tokens} blocks={blocks} parts={parts} />
     )}
   </StrictMode>
 )
 
-/** Mounts a page document into a container (client rendering, in a transition: see mountPage). */
+/** Mounts a page document into a container (client rendering, in a transition: see mountPage). An invalid document
+ * throws at once; the page appears whole once the block families it uses have loaded, and is checked again then with
+ * their rules. */
 export function mount(container: Element, doc: unknown, options: RuntimeOptions = {}): MountedPage {
-  return mountPage(container, element(checked(doc), options))
+  checked(doc)
+  const Page = lazy(async () => {
+    const families = await loadPageBlocks(doc)
+    const page = checked(doc)
+    return { default: () => element(page, options, families) }
+  })
+  return mountPage(
+    container,
+    <Suspense fallback={null}>
+      <Page />
+    </Suspense>
+  )
 }
 
-/** Hydrates server markup that `feather-page build --runtime` wrote: the same document, the same brand. */
-export function hydrate(container: Element, doc: unknown, options: RuntimeOptions = {}): void {
-  hydrateRoot(container, element(checked(doc), options))
+/** Hydrates server markup that `feather-page build --runtime` wrote: the same document, the same brand. The block
+ * families the page uses load first (the server's markup stays as it is meanwhile), then the page is checked with every
+ * rule and hydrates. */
+export async function hydrate(container: Element, doc: unknown, options: RuntimeOptions = {}): Promise<void> {
+  // A prepared scene holds only the living library; a 404 needs only the scheme toggle, which comes with the flows.
+  const families = options.intent ? { blocks: {}, parts: {} } : await loadPageBlocks(options.notFound && typeof doc === "object" && doc ? { ...doc, sections: [] } : doc)
+  hydrateRoot(container, element(checked(doc), options, families))
 }
 
 // A built page boots itself: <div data-feather-page-root> with a sibling <script type="application/json" data-feather-page>.
@@ -53,6 +80,6 @@ if (typeof document !== "undefined") {
   const data = document.querySelector('script[type="application/json"][data-feather-page]')
   if (root && data?.textContent) {
     const { page, ...options } = JSON.parse(data.textContent) as { page: unknown } & RuntimeOptions
-    hydrate(root, page, options)
+    void hydrate(root, page, options)
   }
 }

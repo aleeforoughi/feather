@@ -286,6 +286,22 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
 - **Static or hydrated.** `feather-page build` writes static pages that read completely with no script, never with
   the loader. `--runtime <href>` (the release's `feather-page-runtime.js`) makes each page carry its document and
   brand and hydrate: the loader, the menu, the motion and the Living Page come alive with no re-render.
+- **The release runtime and its block families (from 1.23).** `feather-page-runtime.js` carries the Living Page's
+  library only (built from `@aleeforoughi/feather-page/runtime`: `FeatherPageCore`, `loadPageBlocks`,
+  `validateLoaded`). The page blocks ship beside it as families, each loaded only for a page whose document uses one:
+  - `feather-page-media.js`: gallery, comparison, story, testimonials, journal, form, showreel;
+  - `feather-page-flows.js`: quiz, booking, calculator, chart, places, podcast, the scheme toggle and the work's view
+    switch, and the flows' validation rules;
+  - `feather-page-parts.js`: feather-react's Lightbox, on a gallery's first open;
+  - `feather-page-shared.js`: the bundler's helpers, which the runtime and its chunks share (every page loads it).
+
+  `hydrate` reads which families the document uses, loads them, validates the page with every rule then known, and
+  only then hydrates: the server's markup stays as it is meanwhile, with no flash and no mismatch. `mount` renders under
+  one Suspense boundary once the families have loaded. The runtime's `validatePage` checks the flows' own rules once
+  their family has loaded (hydrate and mount load it for any page that uses a flow). A library user's `FeatherPage`
+  imports every block statically and is unchanged. The release check holds that no family's blocks are in what every
+  page downloads, and that what every page downloads (the runtime and the shared helpers) stays within 174 KB gzip:
+  Feather 1.22.0's runtime plus 10%.
 - `scenes` are the prepared answers. With `living.prepared`, each becomes a static, indexable route that works with
   the model off.
 

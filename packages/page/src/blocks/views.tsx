@@ -3,12 +3,14 @@
 // renders its items in the view useViewMode gives it, and places ViewSwitch above them. The view the block names is
 // its static form: without script there is no switch, and that view is the one shown.
 import * as React from "react"
-import { MediaFrame } from "@aleeforoughi/feather-expression"
-import type { ViewMode, WorkItem } from "../core/types"
+import { Grid, MediaFrame, Section } from "@aleeforoughi/feather-expression"
+import type { ViewMode, WorkItem, WorkVariant } from "../core/types"
+import { KnobBody, KnobTitle, useKnobs } from "./knobs"
+import { WorkCard } from "./work"
 import { Segmented, useStored, type SegmentOption } from "./controls"
 import { mediaProps } from "./media"
 import { sizesOf } from "./sizes"
-import { CardBody, useCursorLabel } from "./shared"
+import { CardBody, useCursorLabel, useRegion, type BlockProps } from "./shared"
 
 export const VIEW_OPTIONS: readonly SegmentOption<ViewMode>[] = [
   { value: "grid", label: "Grid" },
@@ -105,5 +107,40 @@ export function WorkIndex({ items }: { items: WorkItem[] }) {
         )
       })}
     </ol>
+  )
+}
+
+/** Work with the view-mode switch (`views`, wave 5): grid, list or index, the person's choice remembered for this page.
+ * The view the block names is the one a page without script shows. */
+export function WorkViews({ block, items }: { block: BlockProps<"work">["block"]; items: WorkItem[] }) {
+  const { id, titleId, labelled } = useRegion(block, "Selected work")
+  const knobs = useKnobs<WorkVariant>("work", block, { space: "l" })
+  const key = id ?? titleId.replace(/-title$/, "")
+  const [mode, setMode] = useViewMode(key, block.views ?? "grid")
+  const columns = knobs.align === "split" ? 2 : items.length === 1 || items.length === 2 || items.length === 4 ? 2 : 3
+  return (
+    <Section id={id} data-block="work" data-view={mode} {...labelled} {...knobs.section}>
+      {block.title ? (
+        <KnobTitle id={titleId} knobs={knobs} motion={block.motion}>
+          {block.title}
+        </KnobTitle>
+      ) : null}
+      <KnobBody knobs={knobs}>
+        <div data-slot="work-views" className="col-span-full flex flex-col gap-8">
+          <ViewSwitch block={key} value={mode} onChange={setMode} />
+          {mode === "list" ? (
+            <WorkList items={items} />
+          ) : mode === "index" ? (
+            <WorkIndex items={items} />
+          ) : (
+            <Grid columns={columns}>
+              {items.map((item) => (
+                <WorkCard key={item.id} item={item} treatment={knobs.treatment} sizes={sizesOf(columns === 2 ? "work.grid.2" : "work.grid.3")} />
+              ))}
+            </Grid>
+          )}
+        </div>
+      </KnobBody>
+    </Section>
   )
 }
