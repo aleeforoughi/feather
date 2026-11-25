@@ -78,15 +78,22 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
     |---|---|
     | hero | stacked, giant-type, split, film, product, index, interactive (with a `scene`: the scene fills the band behind the words; without one it renders as giant-type) |
     | statement | plain, centred, offset, marquee, fill, swap |
-    | work | grid, hover-list, stack, rail |
+    | work | grid, hover-list, stack, rail, fullscreen-cases (each piece a full screen, its picture bleeding under the media scrim, its words on it), bento (a mosaic on Bento, the first piece leading) |
     | case | editorial, scale |
     | numbers | counter, plain, lead |
     | process | list, pinned, rows |
     | logos | grid, marquee |
     | quote | large, rail, pull |
-    | offer | cards, table |
+    | offer | cards, table, toggle (a radio group switches every price between two `periods`, each item giving its two `prices`; CSS only, so it works with no script; the prices are a live region) |
     | timeline | list, horizontal |
     | faq, contact | one each |
+    | gallery | rail, masonry, grid, hover-list, wheel (see the page blocks below) |
+    | comparison | slider |
+    | story | pinned, stacked |
+    | testimonials | grid, rail |
+    | journal | list, featured |
+    | form | underline, conversational |
+    | showreel | player |
   - `examples/studio-of-one-loud.page.json` is the reference page at loudness 3, using the expressive variants (the
     showcase serves it at `sites.html?page=loud`).
 - **Scenes (`scene`, from 1.22).** On `hero` (the `interactive` variant), `case` and `signature`:
@@ -106,6 +113,40 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   - Three.js loads only for a page with a model, particles or rail scene, as its own chunk; a page without one never
     downloads it. A product that bundles `@aleeforoughi/feather-page` itself installs `three` (an optional peer) or
     aliases it to an empty module.
+- **The page blocks (`feather.page/1`, from 1.23).** Blocks only a `/1` page takes, in `PAGE_BLOCKS` in `spec.ts`. They
+  are the page's, not the Living Page's: `BLOCK_NAMES` stays the living library, a prepared scene (an answer) cannot
+  hold one (`unknown-block`), and on a `/0` page one is `needs-schema-1`.
+
+  | block | fields | variants | what holds at every tier |
+  |---|---|---|---|
+  | `gallery` | `title?`, `body?`, `items` (2–24: `{ media, title?, caption? }`), `loop?` | rail (default: a native snap rail, previous and next, keyboard-scrolled; `loop` makes it endless), masonry (columns in a set rhythm of aspects), grid (the caption on the scrim, revealed on hover and focus, always shown on touch), hover-list (an index whose picture follows hover and focus; thumbnails on touch), wheel (a ring turned one step by drag, horizontal scroll or the arrow keys; loudness 2, motion allowed and three images, else the rail) | Every image opens feather-react's `Lightbox` (no download on a site); each is a real link to its file first, so with no script it still opens. A loop's copies are `aria-hidden` and inert, and Tab leaves. Only the wheel's front image is reachable, and which one it is is announced. |
+  | `comparison` | `title?`, `body?`, `before`, `after`, `beforeLabel?`, `afterLabel?` (40), `start?` (0–100) | slider | A native range, named, with the arrow keys, Home and End, its value spoken as both shares (`aria-valuetext`). Both pictures are in the document with their alt text; with no script they stand side by side. `crop` takes the frame off the grid. |
+  | `story` | `title?`, `steps` (2–6: `{ title, body?, media }`) | pinned (default: the picture pinned on Stage, changing to the step crossing the middle; `scroll.snap`), stacked | Below loudness 2, under reduced motion and with no script, Stage stacks the steps in reading order, each with its picture; stacked always does. The frame shows the theme's placeholder until each picture decodes. |
+  | `testimonials` | `title?`, `items` (2–12: `{ text, by, role? }`) | grid, rail | quote's own cards (`QuoteCard`): a figure, a blockquote and the attribution. |
+  | `journal` | `title?`, `items` (1–12: `{ date (YYYY-MM-DD), title, excerpt?, href, media? }`), `more?` (one link) | list, featured (the first entry leads with its picture) | A real `<time datetime>`, the title as the link, the pictures decoration. |
+  | `form` | `title?`, `body?`, `action` (an http(s) URL, a path, or `mailto:`), `fields` (1–8: `{ name (a slug), label, type? (text, email, tel, url, number, textarea, select, choice), required?, hint?, placeholder?, options? (2–8, select and choice), max? (1–4000), autocomplete? }`), `submit?`, `note?` | underline (default: every field a minimal baseline), conversational (one question at a time, its place announced, Back and Next, Enter moves on) | A real `<form method="post">` that works with no script (a `mailto:` action writes the answers as text/plain), the whole form shown. feather-react's Field, Input and Textarea; a select and a choice are native until the script runs, then its Select and RadioGroup, with the same names. With script, messages in words beside each field (announced as they appear), a summary of what needs a look, and focus on the first. |
+  | `showreel` | `title?`, `body?`, `media` (a video, with its `poster`), `captions?` (a `.vtt`), `speech?` | player | Play and pause, sound and captions are real buttons (sound and captions with `aria-pressed`), always visible. It starts muted only with motion allowed, off data saver and at loudness 1; otherwise the poster waits for Play. A film with speech must carry its captions. With no script it is the browser's player, with the same track. |
+
+  Codes: `missing` (a gallery or comparison picture without alt text, a select or choice without options, a showreel
+  without its poster, speech without captions), `contradiction` (a decorative gallery or comparison picture, `loop` on a
+  gallery that is not a rail or a wheel, options or `max` where they do not belong), `bad-href` (a form action that is
+  not http(s), a path or `mailto:`), `bad-media` (a showreel that is not a video, captions that are not WebVTT),
+  `duplicate-id` (a field name used twice), `type` (a journal date not written YYYY-MM-DD, a field name that is not a
+  slug).
+- **Image treatments (`treatment`, from 1.23).** A block knob, on the blocks with images (hero, case, signature, work,
+  gallery, story, journal): `clean` (default), `clip-reveal` (uncovered as it enters), `inner-parallax` (drifts inside
+  its frame), `blur-to-sharp` (soft until it decodes), `duotone` (the brand's primary and surface), `grain` (a still
+  film grain). Each is MediaFrame's, decoration only (the alt text stays the content) and CSS-first: the moving ones
+  run on the browser's scroll timeline where it has one, rest under reduced motion and on the LCP image, and need
+  loudness 1 (clip-reveal, blur-to-sharp) or 2 (inner-parallax): a declared loudness below that is a `contradiction`;
+  on a block without images it is `unsupported`. The film hero keeps its scrim and takes none.
+- **The film hero (from 1.23).** Its poster (or image) is the LCP: an eager, high-priority image the server writes,
+  painted over the media scrim until it decodes, so the copy over it (held at 4.5:1 by the scrim) reads from the first
+  paint. The film arrives after mount, only with motion allowed and off data saver; under reduced motion and on data
+  saver the poster stays alone with a visible Play control (Pause while it plays). With no script it is the poster.
+- **MediaFrame's placeholder (from 1.23).** Every frame is painted from the theme until its media decodes: the subtle
+  surface, or the media scrim for film. It is a CSS background (so it holds with no script, and nothing shifts: the
+  frame's box is its aspect), and the frame drops it once its media is ready.
 - **Loudness on a page.** `FeatherPage` sets `data-loudness` on `<main>` from `page.loudness`, and each block's section
   from its own knob; the brand's default is the theme's `--loudness` (`feather-tokens/4`). The expression components
   ask what the level allows: a reveal needs 1, kinetic type, pins, horizontal tracks and scrubbed sequences need 2,
