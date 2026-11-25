@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-react",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "tokenSchema": "feather-tokens/3",
   "themeAxes": {
     "shape": [

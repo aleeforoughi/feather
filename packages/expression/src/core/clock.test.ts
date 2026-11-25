@@ -70,4 +70,22 @@ describe("clock", () => {
     expect(callbacks.size).toBe(0)
     expect(frames.pending).toBe(1)
   })
+
+  it("keeps exactly one frame pending when a tick schedules the next frame from inside a frame (render on demand)", () => {
+    const frames = fakeFrames()
+    const clock = createClock(frames)
+    const deltas: number[] = []
+    const again = (t: number, d: number) => {
+      deltas.push(d)
+      if (deltas.length < 6) clock.once(again)
+    }
+    clock.once(again)
+    for (let t = 0; t <= 80; t += 16) {
+      expect(frames.pending).toBeLessThanOrEqual(1)
+      frames.flush(t)
+    }
+    expect(deltas).toEqual([0, 16, 16, 16, 16, 16])
+    expect(frames.pending).toBe(0)
+    expect(clock.running).toBe(false)
+  })
 })

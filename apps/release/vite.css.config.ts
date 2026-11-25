@@ -5,6 +5,8 @@ import { defineConfig } from "vite"
 // references, which would put all fifteen font families into the CSS as data URLs. Here each font stays a file and
 // loads only when a brand uses it.
 export default defineConfig({
+  // Every url() relative to the stylesheet (./fonts/…), so a host can serve the bundle under any path.
+  base: "./",
   plugins: [tailwindcss()],
   build: {
     outDir: "dist",

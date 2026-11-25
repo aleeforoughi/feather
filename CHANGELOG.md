@@ -52,6 +52,16 @@ dependency.
   - reduced motion keeps the feedback as colour and an instant press.
 - **New stories:** `States` stories show each moment.
 
+### Fixes
+- **The clock kept doubling its pending frames.** A tick that schedules the next frame from inside a frame, which is
+  how the World renders on demand, requested a frame of its own on top of the loop's. Pending frames doubled every
+  frame and each tick saw a zero delta, which kept render-on-demand scenes from settling and the quality ladder from
+  measuring. There is now exactly one pending frame, and a test holds it (shipped since 1.18).
+
+- **The web bundle works under any path.** `feather-page.css` pointed at its fonts from the site root (`/fonts/…`),
+  so a host serving the bundle under a path lost every face. Its `url()`s are now relative to the stylesheet, and
+  CI fails on any root URL or any font file missing beside it.
+
 ### Pages
 - **`cursor` page knob:** `native` by default, or `follower`, which labels the work links. A page without it renders
   byte for byte as before.

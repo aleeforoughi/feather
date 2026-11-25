@@ -41,6 +41,17 @@ jobs:
           pnpm --filter @feather-apps/release build
           mkdir -p /tmp/feather-page-smoke && cp apps/release/dist/feather-page.mjs /tmp/feather-page-smoke/
           node /tmp/feather-page-smoke/feather-page.mjs validate packages/page/examples/studio-of-one.page.json
+          # The web bundle can be served under any path: every url() in feather-page.css is relative to it and exists.
+          node -e '
+            const fs = require("fs"), path = require("path"), dir = "apps/release/dist"
+            const css = fs.readFileSync(path.join(dir, "feather-page.css"), "utf8")
+            const urls = [...css.matchAll(/url\(([^)]+)\)/g)].map((m) => m[1].replace(/["\x27]/g, ""))
+            const rooted = urls.filter((u) => u.startsWith("/") || /^https?:/.test(u))
+            if (rooted.length) { console.error("root or absolute url() in feather-page.css:", rooted.slice(0, 5)); process.exit(1) }
+            const missing = urls.filter((u) => !u.startsWith("data:") && !fs.existsSync(path.join(dir, u)))
+            if (missing.length) { console.error("url() targets missing beside feather-page.css:", missing.slice(0, 5)); process.exit(1) }
+            console.log(`feather-page.css: ${urls.length} relative url() targets, all present`)
+          '
       - name: Size (liquid + manifest-web under 60 KB gzipped, PLAN.md section 9)
         run: pnpm size
       - name: Build Storybook
