@@ -14,8 +14,8 @@
 //   ?transition=<variant>         how a brand switch arrives (default the page's own `transition`)
 //   ?hero=poster                  the loud page's hero scene at quality poster (the scene e2e, so a software-rendered
 //                                 shader does not run while it inspects the model further down)
-// The page loads as a page built by `feather-page build --runtime` does: its document on its own, then only the block
-// families it uses (media, flows), so the loud page's budgets measure what that page ships.
+// The page loads as a page built by `feather-page build --runtime` does: only the block families its document uses
+// (media, flows) load, so the loud page's budgets measure what that page ships.
 // Switching brands is an in-page route change through createTransitions().go(), so every route variant can be seen
 // and tested here; a static site built by `feather-page build` uses cross-document View Transitions instead.
 import { StrictMode } from "react"
@@ -25,6 +25,18 @@ import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 import studio from "@aleeforoughi/feather-tokens/themes/studio.json"
 import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
 import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
+// The documents come with the page as text (22 KB gzip together), so its first render waits on no request, and only
+// the one this URL asks for is parsed.
+import reference from "../../../packages/page/examples/studio-of-one.page.json?raw"
+import loud from "../../../packages/page/examples/studio-of-one-loud.page.json?raw"
+import media from "../../../packages/page/examples/studio-of-one-media.page.json?raw"
+import flows from "../../../packages/page/examples/studio-of-one-flows.page.json?raw"
+import launch from "../../../packages/page/templates/launch.page.json?raw"
+import studioTemplate from "../../../packages/page/templates/studio.page.json?raw"
+import editorial from "../../../packages/page/templates/editorial.page.json?raw"
+import service from "../../../packages/page/templates/service.page.json?raw"
+import product from "../../../packages/page/templates/product.page.json?raw"
+import creator from "../../../packages/page/templates/creator.page.json?raw"
 import schemes from "./schemes.json"
 import "./sites.css"
 
@@ -32,24 +44,11 @@ const BRANDS: Record<string, { dark: boolean; tokens: unknown }> = { studio, por
 const params = new URLSearchParams(location.search)
 const loader = params.get("loader")
 const pageParam = params.get("page")
-type Doc = { default: unknown }
-const PAGES: Record<string, () => Promise<Doc>> = {
-  reference: () => import("../../../packages/page/examples/studio-of-one.page.json"),
-  loud: () => import("../../../packages/page/examples/studio-of-one-loud.page.json"),
-  media: () => import("../../../packages/page/examples/studio-of-one-media.page.json"),
-  flows: () => import("../../../packages/page/examples/studio-of-one-flows.page.json"),
-}
-const TEMPLATES: Record<string, () => Promise<Doc>> = {
-  launch: () => import("../../../packages/page/templates/launch.page.json"),
-  studio: () => import("../../../packages/page/templates/studio.page.json"),
-  editorial: () => import("../../../packages/page/templates/editorial.page.json"),
-  service: () => import("../../../packages/page/templates/service.page.json"),
-  product: () => import("../../../packages/page/templates/product.page.json"),
-  creator: () => import("../../../packages/page/templates/creator.page.json"),
-}
+const PAGES: Record<string, string> = { reference, loud, media, flows }
+const TEMPLATES: Record<string, string> = { launch, studio: studioTemplate, editorial, service, product, creator }
 const template = params.get("template")
 if (template !== null && !TEMPLATES[template]) throw new Error(`?template=${template}: the templates are ${Object.keys(TEMPLATES).join(", ")}`)
-const doc = (await (template ? TEMPLATES[template] : PAGES[pageParam ?? ""] ?? PAGES.reference)()).default as { sections: { scene?: object }[] } & Record<string, unknown>
+const doc = JSON.parse(template ? TEMPLATES[template] : (PAGES[pageParam ?? ""] ?? reference)) as { sections: { scene?: object }[] } & Record<string, unknown>
 
 const withSound = params.get("sound") === "1"
 const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
