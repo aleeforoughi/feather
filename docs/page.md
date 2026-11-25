@@ -63,9 +63,9 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
 - **Knobs and variants (`feather.page/1`, from 1.20).** A Qooler direction is a choice of blocks, their variants and a
   few bounded knobs, themed by the brand. Every knob is an enum or a bounded number, checked by `validatePage` with a
   JSON pointer and a code, and listed in `schema/feather.page-1.json`. A knob on a `/0` page reports `needs-schema-1`.
-  - Page: `loudness` (0–3), `cursor` (`native` by default, or `follower`: work links then say View) and
+  - Page: `loudness` (0–3), `cursor` (`native` by default, or `follower`: work links then say View),
     `defaults: { space, align, scale, crop }` (a default a block does not take is ignored
-    for it).
+    for it) and `layout` (from 1.23, below).
   - Every block: `variant`; `loudness`; `tone` (base, subtle, raised, inverse, block-1 to block-4, from the brand's
     `/4` colour blocks); `space` and `scale` (s, m, l, xl); `align` (start, center, offset, split, as each block
     allows); `crop` (none, edge, bleed: hero, case, signature); `motion: { enter, intensity, direction, stagger }`;
@@ -220,6 +220,50 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
   remembered choice is on the page before its first paint; with no script the system's preference holds and the toggle
   is not shown. The validator checks the toggle has an edge to sit in (`missing`), the colours are hex (`type`) and
   that text reads at 4.5:1 on its ground (`contradiction`); the renderer refuses a set of the same scheme as the brand.
+- **Layouts (`layout`, from 1.23).** A page-level knob for the page's structure: `editorial`, `swiss`, `brutalist`,
+  `poster`, `colour-blocking` or `two-colour` (`LAYOUTS` in `spec.ts`). A layout is never a colour and never a free
+  value: `FeatherPage` sets `data-layout` on `<main>` (and on each section's wrapper what it decides for that section),
+  and `foundation.css` draws it by re-pointing the theme's own roles (grid placement, rhythm, rules, radius, shadow and
+  the grounds). It works with every block; where a block cannot follow, it keeps its own form.
+
+  | layout | what it does | where a block keeps its own |
+  |---|---|---|
+  | `editorial` | Asymmetric: from 1024px every other section hangs from column 4 of 12 (`data-hang`), so the reading line steps across the page; block titles in the display face at the `s` display size | Sections off the page grid (full-bleed media, a cropped case, the film hero) do not hang |
+  | `swiss` | A strict grid: a hairline in the strong border opens every section on the grid's measure, each block title carries its section's number in tabular figures (decoration, `content: … / ""`, so it is not in the heading's name), square corners, no shadows | Sections off the page grid draw no rule |
+  | `brutalist` | Every border in the ink, a 3px rule in the ink between sections, square corners, no shadows, a 3px focus ring, block titles in the brand's mono face in capitals | The hero's display title keeps the display face |
+  | `poster` | Every section a full screen (`100svh`, so nothing moves with the browser's bars), its content in the middle, block titles at the `m` display size | A section taller than the screen simply runs on |
+  | `colour-blocking` | Every other section (the second, fourth…) on the next of the brand's colour blocks, `block-1` to `block-4` in turn (`data-ground`), every role inside it re-pointed at the pair as a `block-N` tone does | A block with its own `tone`, and the blocks with native controls (`LAYOUT_SKIPS`: form, booking, calculator, quiz, podcast, comparison, showreel), stay on the page ground and pass the turn on |
+  | `two-colour` | The ground and one ink, with the ink's tints, for the whole document (nav and footer too): the accent, the colour blocks, the inverse and the chart series become the ink; images take the `duotone` treatment unless they name another. The ink is the brand's `primary` where it and its secondary tint read at 4.5:1 on the ground both ways (`data-ink="primary"`), else its text colour (`data-ink="text"`) | State colours (an error) keep their own |
+
+  The contrast floor holds on every ground a layout introduces. `layoutPlan(layout, sections, themes)`
+  (`core/layouts.ts`) measures each colour block colour-blocking uses, and the two-colour ink, in the brand's compiled
+  theme and in the scheme's other set: the ink and its secondary tint (80% of it into the ground) at 4.5:1. A brand that
+  cannot meet it is a `contradiction` at `/layout`: `checkLayout(page, tokens)` returns it, `feather-page build`
+  prints it and exits 1 before writing anything, and `FeatherPage` refuses to render the page. A `/0` page with a layout
+  is `needs-schema-1`; an unknown one is `unknown-variant`. Storybook's "Pages/Layouts" shows each layout in the three
+  reference brands.
+- **Templates (from 1.23).** Six whole pages in `packages/page/templates/` (shipped in the package, and in the release
+  CLI), each composed from the library, the page blocks and the knobs with specific, invented copy, and each with its
+  own layout. None names a brand: `brand` is a path to fill in, and the brand is the theme.
+
+  | template | for | layout | what it uses |
+  |---|---|---|---|
+  | `launch` | a product launch, loudness 3 | poster | the interactive hero over an aurora shader, kinetic type (mask, fill, swap), the pinned scroll story, numbers, the offer toggle, questions, a 404 |
+  | `studio` | a studio or agency | swiss | the giant-type hero, bento work from the library, a case, a masonry gallery, testimonials on a rail, the process, logos |
+  | `editorial` | a journal or magazine | editorial | a cover, the featured journal, an offset statement, a story in stacked steps, a large quote, a newsletter form |
+  | `service` | a local business | colour-blocking | the split hero, services as offer cards, the booking flow, testimonials, places, questions, contact |
+  | `product` | SaaS pricing | two-colour | the product hero, an area chart, before and after, the calculator, the plans table, questions |
+  | `creator` | a podcast or creator | brutalist | the podcast with chapters and transcripts, the showreel with captions, a conversational form, the scheme toggle |
+
+  `feather-page init <template>` writes one out ([getting-started.md](getting-started.md)); `import { TEMPLATES }
+  from "@aleeforoughi/feather-page/templates/index.js"` gives them in code, each with its one-line description. The
+  showcase serves each at `sites.html?template=<name>` in the three reference brands (its site e2e: axe, the mobile
+  budgets, reduced motion; and for `launch`, no WebGL and no script), and Storybook's "Templates" section, the last, shows
+  them as `feather-page init` writes them.
+- **The render budget (from 1.23).** `feather-page build` of one direction (a page in its brand), every route, in 500 ms
+  or less on two CPUs: `scripts/render-gate.mjs` builds every template and reference example in each reference brand,
+  in-process, warms once, and fails when the median of five builds (validate, the layout check, render, write) passes
+  the budget. CI runs it under `taskset -c 0,1`. The build itself is `bin/build.mjs`, which the CLI calls.
 - `examples/studio-of-one-flows.page.json` is the reference page for the flows (the showcase serves it at
   `sites.html?page=flows`, with each brand's own other set).
 - **Loudness on a page.** `FeatherPage` sets `data-loudness` on `<main>` from `page.loudness`, and each block's section

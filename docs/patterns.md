@@ -6,7 +6,8 @@ and access). Feather takes the techniques and the measured values, never a site'
 variant or a knob of something that exists whenever it can: the library grows from need, not from the catalog's
 length ([FEATHER.md](../FEATHER.md); the plan is [proposals/2026-11-24-range.md](proposals/2026-11-24-range.md)).
 
-This page lists what is built, through wave 2. How to ask for one that is missing: a `pattern-request` issue.
+This page lists what is built: waves 1, 2 and 5 in full, and waves 3 and 4 by family (their rows are in the CHANGELOG's
+1.21.0 and 1.22.0 entries). How to ask for one that is missing: a `pattern-request` issue.
 
 **Tiers.** Every pattern works in the three tiers of the Foundations "Three tiers" page: **no script** (complete HTML),
 **reduced motion** (a short cross-fade or the end state) and **full**. A row says only where a tier differs. **Loudness**
@@ -100,6 +101,60 @@ number, and the validator rejects contradictions with a code. The page also take
 The authoritative table of variants and what each block accepts is `BLOCK_RANGE` in
 `packages/page/src/core/spec.ts`, and the JSON Schema `feather.page-1.json`.
 
+## Media and page blocks (wave 5, 1.23.0)
+
+Page blocks are `feather.page/1` only (`PAGE_BLOCKS` in `packages/page/src/core/spec.ts`): a `/0` page reports
+`needs-schema-1`, and a prepared scene cannot hold one. Each is in [page.md](page.md) with its fields.
+
+| Catalog id | Feather | Release | Tiers / loudness |
+|---|---|---|---|
+| `gallery-horizontal-rail` | `gallery variant="rail"` (a native snap rail, previous and next; `loop` makes it endless) | 1.23.0 | Every image a real link to its file, opening feather-react's `Lightbox` (lazy) with script; a loop's copies `aria-hidden` and inert |
+| `gallery-masonry` | `gallery variant="masonry"`, and `"grid"` (the caption on the scrim, on hover and focus) | 1.23.0 | As the rail |
+| `work-list-hover-preview` (for pictures) | `gallery variant="hover-list"` | 1.23.0 | Thumbnails on touch |
+| `wheel-gallery`, `gallery-3d-disc` (the DOM tier) | `gallery variant="wheel"`: a ring turned by drag, horizontal scroll or the arrow keys | 1.23.0 | Loudness 2, motion allowed and three images, else the rail; only the front image is reachable, and it is announced |
+| `comparison` | `comparison variant="slider"`: a native range between two pictures | 1.23.0 | Side by side without script; `aria-valuetext` speaks both shares |
+| `scroll-storytelling-pinned`, `step-text-sticky-visual` (with pictures) | `story variant="pinned"` on `Stage`, and `"stacked"` | 1.23.0 | Stacked in reading order below loudness 2, under reduced motion and without script |
+| `testimonials` | `testimonials variant="grid" \| "rail"`, on quote's `QuoteCard` | 1.23.0 | A figure, a blockquote and the attribution in every tier |
+| `journal-newsletter` | `journal variant="list" \| "featured"`; the newsletter is a `form` | 1.23.0 | A real `<time datetime>`, the title as the link |
+| `form-minimal-underline` | `form variant="underline"`: the browser's own controls in the house style | 1.23.0 | A real `<form method="post">` (or `mailto:`) with no script; with script, messages beside each field and a summary |
+| `form-conversational-stepper`, `form-field-feedback` | `form variant="conversational"`: one question at a time, its place announced | 1.23.0 | The whole form at once without script |
+| `showreel-player`, `video-poster-swap`, `autoplay-on-enter-video` | `showreel variant="player"`: real buttons for play, sound and captions; speech needs captions | 1.23.0 | Muted autoplay only with motion allowed, off data saver, at loudness 1; otherwise the poster waits for Play. No script: the browser's player |
+| `hero-fullbleed-video` (the poster) | The film hero's poster is the LCP: eager, high priority, over the media scrim until it decodes | 1.23.0 | The film arrives after mount, only with motion allowed and off data saver |
+| `bento-grid` | `work variant="bento"` | 1.23.0 | A grid in every tier |
+| `case-fullscreen-preview` | `work variant="fullscreen-cases"` | 1.23.0 | Each piece a full screen, its words on the media scrim |
+| `pricing` (a period switch) | `offer variant="toggle"` with `periods` and each item's `prices` | 1.23.0 | CSS only, so it works with no script; the prices are a live region |
+| `clip-path-image-reveal`, `blur-to-sharp`, `image-inner-parallax`, `grain-overlay` (on images) | The `treatment` knob: `clip-reveal`, `blur-to-sharp`, `inner-parallax`, `duotone`, `grain` (MediaFrame) | 1.23.0 | Decoration only; the moving ones rest under reduced motion and on the LCP image; loudness 1 (2 for inner-parallax) |
+| (responsive images) | `srcset` on any media, with the `sizes` Feather derives from where the image sits (`MEDIA_SIZES`) | 1.23.0 | Without a srcset the markup is as before |
+
+## Product flows in a page (wave 5, 1.23.0)
+
+| Catalog id | Feather | Release | With no script |
+|---|---|---|---|
+| `interactive-quiz` | `quiz`: one question per step, `tally` or `score`, a result's `match` first | 1.23.0 | Every question, and how the result is decided |
+| `booking-flow` | `booking`: service, date and time, details, then a review with Change on every choice; sends to an action, a `mailto` or a booking link | 1.23.0 | One form: radios for services and slots |
+| `pricing-calculator` | `calculator variant="split" \| "stacked"`: inputs and a formula in a small safe language; the total is a live region | 1.23.0 | The starting prices |
+| (data in a page) | `chart variant="bar" \| "line" \| "area"`: SVG in the text ink, a distinct mark per series, the data as a table | 1.23.0 | The end state and the table |
+| `map-navigation` (the honest tier) | `places variant="list" \| "map"`: names, addresses and links, with an optional still map; no map SDK | 1.23.0 | The same list and links |
+| `podcast-player`, `audio-led-timeline` (chapters) | `podcast`: native audio, real-button controls, chapters that seek, a transcript that can follow | 1.23.0 | The browser's own controls, the chapters, the transcript |
+| `theme-toggle` | Page `scheme: { toggle, colors }`: light, dark and system, a radio group in the nav or the footer, remembered; `feather-page build` writes the no-flash script | 1.23.0 | The system's preference holds; the toggle is not shown |
+| `view-mode-switch` | `work views="grid" \| "list" \| "index"`: a segmented radio group, remembered per page and block | 1.23.0 | The view it starts in |
+
+## Layouts and templates (wave 5, 1.23.0)
+
+A layout is one page knob, `layout`, drawn by foundation.css from `main[data-layout]` with the theme's own roles
+([page.md](page.md)); a template is a whole page in `packages/page/templates/`, written out by `feather-page init`.
+
+| Catalog id | Feather | Release | Notes |
+|---|---|---|---|
+| `layout-editorial-asymmetric` | `layout: "editorial"`: every other section hangs from column 4 from 1024px; block titles in the display face (and `align: "offset"` per block, 1.20.0) | 1.23.0 | Off-grid sections keep their own |
+| `layout-swiss-grid` | `layout: "swiss"`: a hairline opens every section on the grid's measure, numbered titles (not read), square corners, no shadows | 1.23.0 | |
+| `layout-brutalist` | `layout: "brutalist"`: borders and heavy rules in the ink, mono capitals for block titles, a 3px focus ring | 1.23.0 | |
+| `poster-layout` | `layout: "poster"`: every section a full screen (`100svh`), its content in the middle, titles at display size | 1.23.0 | No layout shift: the small viewport never changes |
+| `colour-blocking` | `layout: "colour-blocking"`: every other section on the next colour block in turn (and `tone: "block-N"` per block, 1.20.0) | 1.23.0 | Each pair measured at 4.5:1 with its secondary tint, or a `contradiction`; blocks with native controls stay on the page ground |
+| `two-colour-ground` | `layout: "two-colour"`: the ground and one ink (the primary where it reads, else the text colour) for the whole document; images duotone | 1.23.0 | Measured like colour-blocking; state colours keep their own |
+| `case-study-template` and the range's templates (§3.2) | Templates `launch`, `studio`, `editorial`, `service`, `product`, `creator`; `feather-page init <template>`, `init --list` | 1.23.0 | Each in the showcase (`?template=`) and Storybook's "Templates", in three brands |
+| (§6, the 2-CPU server) | `scripts/render-gate.mjs`: `feather-page build` of one direction, all routes, ≤ 500 ms on two CPUs (`taskset -c 0,1` in CI) | 1.23.0 | Every template and reference example, in three brands |
+
 ## Foundations the patterns stand on
 
 | Catalog id | Feather | Release |
@@ -110,14 +165,14 @@ The authoritative table of variants and what each block accepts is `BLOCK_RANGE`
 | `magnetic-button`, `custom-cursor-follow` | `Magnetic`, `Cursor` | 1.18.0 |
 | `in-page-ai-assistant` | `@aleeforoughi/feather-living` | 1.18.0 |
 
-## Planned
+## Waves
 
-Not built yet. They come in order, each as a variant or a knob where it can:
-
-| Wave | Families |
-|---|---|
-| 3 | Sound and pointer: cues and the mixer, the cursor and magnetic family, hover media; the micro-motion layer on every interactive atom |
-| 4 | `feather-scene`: shader backgrounds, particles, the object viewer, the 3D stage, depth-image parallax, camera on rails, post and glass |
-| 5 | The rest of the catalog: media and new blocks (gallery, story, comparison, testimonials, journal, form), product flows in a page, layouts and templates; the 2-CPU render gate |
+| Wave | Families | Release |
+|---|---|---|
+| 1 | The edges | 1.19.0 |
+| 2 | Text and scroll, route changes, block variants and knobs | 1.20.0 |
+| 3 | Sound and pointer: cues and the mixer, the cursor and magnetic family, hover media; the micro-motion layer on every interactive atom | 1.21.0 |
+| 4 | `feather-scene`: shader backgrounds, particles, the object viewer, depth images, camera on rails | 1.22.0 |
+| 5 | The rest of the catalog: media and the page blocks, product flows in a page, layouts and templates; the 2-CPU render gate | 1.23.0 |
 
 The exact scope of each wave is in [proposals/2026-11-24-range.md](proposals/2026-11-24-range.md).

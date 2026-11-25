@@ -45,3 +45,20 @@ Fonts: DM Sans, Figtree, Fraunces, Geist, Inter, JetBrains Mono, Manrope, Nunito
 | `step-list` | molecule | StepItem, StepList | 4 | 1 |
 
 Slot names per component are in `packages/react/foundation.json`.
+
+## The website layer in 1.23.0 (wave 5)
+
+The table above is the product UI as of 1.7.0 (`packages/react/foundation.json` is current). Wave 5 added to the
+website layer; [patterns.md](patterns.md) maps each piece to its catalog id, and [page.md](page.md) has the fields.
+
+| Piece | Package | What |
+|---|---|---|
+| Page blocks: media | `feather-page` | `gallery` (rail, masonry, grid, hover-list, wheel), `comparison` (slider), `story` (pinned, stacked), `testimonials` (grid, rail), `journal` (list, featured), `form` (underline, conversational), `showreel` (player) |
+| Page blocks: product flows | `feather-page` | `quiz` (steps), `booking` (steps), `calculator` (split, stacked), `chart` (bar, line, area), `places` (list, map), `podcast` (list) |
+| New variants | `feather-page` | `work`: fullscreen-cases, bento; `offer`: toggle |
+| Knobs | `feather-page` | Block `treatment` (clean, clip-reveal, inner-parallax, blur-to-sharp, duotone, grain), `views` on work; page `scheme` (the colour scheme toggle) and `layout` (editorial, swiss, brutalist, poster, colour-blocking, two-colour); media `srcset` |
+| Templates | `feather-page` | `templates/`: launch, studio, editorial, service, product, creator; `feather-page init` |
+| Build | `feather-page` | `bin/build.mjs` (the build the CLI and the render gate share); `checkLayout`, `layoutPlan` |
+| Image treatments and the placeholder | `feather-expression` | `MediaFrame treatment` and its theme placeholder until the media decodes; `Reel` loops |
+| Lightbox | `feather-react` | `Lightbox` can turn off download and name its steps; arrow keys wherever focus is in it |
+| Gates | repository | `scripts/render-gate.mjs` (the 2-CPU render budget); the showcase's `?page=media`, `?page=flows` and `?template=<name>` site e2e and Lighthouse runs |
