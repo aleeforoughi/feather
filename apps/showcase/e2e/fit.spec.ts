@@ -134,6 +134,11 @@ async function problems(page: Page): Promise<string[]> {
         const titles = section.querySelectorAll<HTMLElement>('h1, h2:not(.sr-only), [data-slot="number-value"], [data-slot="timeline-when"]')
         for (const title of titles) {
           if (exempt(title) || title.closest('[data-slot="marquee"]')) continue
+          // A fitted title keeps its letters apart: its tracking never tighter than the bounds allow a brand (-0.08em,
+          // run 25% tighter by the bold contrast), whatever size the fit gave it.
+          const ts = getComputedStyle(title)
+          const em = parseFloat(ts.letterSpacing) / parseFloat(ts.fontSize)
+          if (em < -0.1) out.push(`${tag}: ${name(title)} is tracked at ${em.toFixed(3)}em at ${Math.round(parseFloat(ts.fontSize))}px`)
           const chars: { node: Text; i: number }[] = []
           const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT)
           for (let n = walker.nextNode() as Text | null; n; n = walker.nextNode() as Text | null) {
@@ -193,6 +198,7 @@ for (const brand of BRANDS) {
     page.on("pageerror", (e) => errors.push(e.message))
     await page.setViewportSize({ width: WIDTHS[0], height: 900 })
     await page.goto(`/fit.html?brand=${brand}`, { waitUntil: "networkidle" })
+    await page.locator("[data-fit-doc]").last().waitFor()
     expect(errors).toEqual([])
     expect(await page.locator("[data-fit-doc]").count()).toBeGreaterThan(20)
     const found: string[] = []
