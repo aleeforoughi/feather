@@ -14,7 +14,7 @@ function html(file: string, dir = examples) {
   const r = validatePage(JSON.parse(fs.readFileSync(path.join(dir, file), "utf8")))
   if (!r.ok) throw new Error(r.issues.map((i) => `${i.path} ${i.code}`).join("\n"))
   const doc = document.createElement("div")
-  doc.innerHTML = renderToStaticMarkup(<FeatherPage page={{ ...r.page, brand: "" }} tokens={tokens} onAsk={() => {}} />)
+  doc.innerHTML = renderToStaticMarkup(<FeatherPage page={{ ...r.page, brand: "" }} tokens={tokens} onAsk={async function* () {}} />)
   return doc
 }
 

@@ -1,5 +1,90 @@
 # Feather — changelog
 
+## 1.23.0 — 2026-11-25
+
+**Whole websites from one document.** `feather.page/1` gains the blocks, flows, layouts and templates a complete site needs. Every page still renders on the server and works with no script, and a `/0` page renders byte for byte as before.
+
+### Page blocks (`feather.page/1` only)
+- **Media:**
+  - **gallery:** rail (looping), masonry, grid, hover-list or wheel. Every image is a link to its file and opens the Lightbox. The wheel falls back to the rail below loudness 2 and under reduced motion.
+  - **comparison:** a named native range moves the divider and speaks both shares. With no script, the two sides sit side by side.
+  - **story:** pinned steps, one picture at a time, stacked in reading order where they cannot pin.
+  - **testimonials:** cards as a grid or a rail.
+  - **journal:** dated entries in a real `time` element, as a list or featured.
+  - **form:** a real POST, or mailto as text/plain, with no script. The fields are the browser's own controls in the house style. Messages are in words and announced, with a summary, and focus goes to the first problem. Conversational steps ask one question at a time.
+  - **showreel:** play, pause, sound and captions are real buttons. With no script, it is the browser's player with its captions track.
+- **Flows:** six blocks on native controls, each an honest static form with no script:
+  - **quiz:** results by tally, score or match.
+  - **booking:** a review step that sends to an action, a mailto or a booking link.
+  - **calculator:** a pricing calculator over a small, safe formula language (no `eval`), with its total in a live region.
+  - **chart:** a bar, line or area chart in the text ink, with its data as a table.
+  - **places:** a list with directions links.
+  - **podcast:** real buttons, seeking chapters and a transcript that can follow playback. It never autoplays.
+- **Work and offer:**
+  - work gains `fullscreen-cases` and `bento`, and a `views` switch (grid, list or index, remembered per page);
+  - offer gains a price `toggle`: a radio group with both prices in the document, CSS only.
+- **Images:**
+  - **`treatment`** is a block knob: clean, clip-reveal, inner-parallax, blur-to-sharp, duotone or grain. The moving treatments run on the browser's scroll timeline, rest under reduced motion and never apply to the LCP image.
+  - **`srcset`** is accepted on every media object and source. Feather derives `sizes` from where the image sits (`MEDIA_SIZES`, per block, variant and crop), so a caller never writes it. A 390px phone at 2x fetches only the 800w file.
+- **The film hero:**
+  - writes its poster as the LCP over the scrim placeholder;
+  - brings the film only after mount, only with motion allowed and data saver off.
+- **Scheme:** a `scheme` knob gives light, dark and system, with the brand's other colour set compiled beside it. `feather-page build` writes the no-flash script into the head.
+
+### Layouts and templates
+- **The `layout` page knob:** editorial, swiss, brutalist, poster, colour-blocking or two-colour, drawn by foundation.css from the theme's own roles.
+  - Every ground a layout introduces is measured at 4.5:1 with its secondary tint, in the brand and in the scheme's other set.
+  - A brand that cannot carry the layout is a contradiction at `/layout` (`checkLayout`). `FeatherPage` and `build` refuse it.
+- **Six templates** in `packages/page/templates`: launch, studio, editorial, service, product and creator. Each is a whole page in its own layout, with invented copy and no brand. They follow the winners' measured medians: about seven sections with plain-noun titles, about five single-word nav items, and a first screen of giant type or full-bleed media with two short, verb-led actions.
+- **`feather-page init <template> [--out] [--theme] [--force]`** writes a template out and never overwrites a file without `--force`. `init --list` lists the templates.
+- **One filled action per section.**
+  - A section's primary action is filled and the rest are quiet. Hero and contact fill their first action unless one says `primary: true`; `primary: false` on every action fills none.
+  - Two primaries in one section are a contradiction at `/sections/N/actions`.
+  - On a `/1` page, the hero's starters are quiet chips after its one filled action.
+- **Measured defaults for brands that set nothing** (`feather-tokens/4`). What a brand sets, it keeps; `/2` and `/3` brands render as before.
+  - Heading and display weight follow the display face's class: serif and mono 400, grotesk 500, rounded 600.
+  - The display scale's leading and tracking also follow the class.
+  - Each step on a phone is 0.45 to 0.6 of its desktop size.
+  - Capitals get `--caps-tracking`, and the page's rows get a hairline `--rule`.
+  - Section rhythm on a phone is about 0.7 of desktop.
+  - Headings are balanced, body text is pretty, and figures are tabular.
+
+### Runtime
+- **Split per family.** `feather-page-runtime.js` carries the Living Page's library only. The page blocks ship beside it, and a page loads only the families it uses:
+  - `feather-page-media.js`;
+  - `feather-page-flows.js`;
+  - `feather-page-parts.js`, the Lightbox, loaded on a gallery's first open;
+  - `feather-page-shared.js`.
+
+  `hydrate` loads the families first, so the server's markup stays as it is, with no flash and no mismatch. The runtime no longer carries feather-react.
+- **`mount` and `hydrate`** take the host's `onAsk` and the brand's own `blocks`.
+- **Default disclosure.** A `/1` living page with a speaker and no `living.disclosure` shows "An AI agent speaking for {name}". A `/0` page keeps its own line.
+
+### Also
+- **Lightbox:**
+  - `download={false}` turns off downloading;
+  - `previousLabel` and `nextLabel` name the steps;
+  - the arrow keys work wherever focus is inside it.
+- **MediaFrame:**
+  - paints a theme placeholder until its media decodes, a CSS background that holds with no script, so nothing shifts;
+  - `Reel` takes `loop`.
+- **A gallery or testimonials rail** is named apart from its section, so landmarks stay distinct.
+
+### Gates
+- **Runtime size:** what every page downloads (the runtime plus the shared chunk) is held to 174 KB gzip, Feather 1.22.0's runtime plus 10%. It is 167.9 KB. The release check refuses any family block in that download.
+- **Render gate:** `scripts/render-gate.mjs` builds every template and reference example in each reference brand. It fails when the median of five builds passes 500 ms on 2 CPUs (`taskset -c 0,1` in CI).
+- **Site e2e and Lighthouse:**
+  - the flows and media reference pages and the six templates, each in three brands;
+  - checks: one h1, no console errors, axe at the top, after scrolling and with the lightbox open, reduced motion, the mobile budgets;
+  - each block's keyboard path;
+  - launch at loudness 3 also without WebGL and with no script.
+- **The split runtime:** an e2e checks that a plain page requests no family chunk, and that each family page hydrates cleanly with its interactions working.
+- **Visual baselines:** the stories the measured defaults and the hero chips change are re-recorded. Every other story still has to match.
+
+### Notes
+- With the runtime, `validatePage` checks the flows' rules only once the flows chunk has loaded. The library's `validatePage` always checks them.
+- The default disclosure applies to `/1` pages only.
+
 ## 1.22.2 — 2026-11-25
 
 **Type fits its box on every screen.** Qooler's device check found three layout bugs in 1.22 blocks at phone width on composed pages.
