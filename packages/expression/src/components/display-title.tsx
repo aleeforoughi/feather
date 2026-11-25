@@ -21,7 +21,7 @@ import {
   type DisplayEffect,
   type EffectUnit,
 } from "../core/text"
-import { isHidden } from "../core/visibility"
+import { guardEntrance, isHidden } from "../core/visibility"
 import { allows } from "../core/loudness"
 import { useMergedRef, useReducedMotion } from "../hooks"
 import { useDeclaredLoudness } from "./loudness"
@@ -265,12 +265,19 @@ function armEntry(el: HTMLElement, visual: HTMLElement, trigger: "enter" | "load
     (entries) => {
       if (!entries.some((e) => e.isIntersecting)) return
       observer.disconnect()
+      unguard()
       go(visible)
     },
     { threshold: 0.15 }
   )
   observer.observe(el)
+  // With no frames the observer never reports: the title shows as it stands (its end state), never held hidden.
+  const unguard = guardEntrance(() => {
+    observer.disconnect()
+    visual.style.opacity = ""
+  })
   return () => {
+    unguard()
     observer.disconnect()
     visual.style.opacity = ""
   }
@@ -323,6 +330,7 @@ function playPieces(el: HTMLElement, visual: HTMLElement, effect: "mask" | "skew
   let wrapped = false
   let running = false
   let disposed = false
+  let unguard = () => {}
 
   const release = () => {
     running = false
@@ -353,6 +361,10 @@ function playPieces(el: HTMLElement, visual: HTMLElement, effect: "mask" | "skew
     const frames = effectFrames(effect, visible)
     const delays = effectDelays(effect, unit, nodes.length)
     nodes.forEach((n, i) => animations.push(n.animate(frames, { duration: preset.duration, delay: delays[i] ?? 0, easing, fill: "backwards" })))
+    // The pieces start inside their masks: with no frames to carry them out, they finish where they end.
+    unguard = guardEntrance(() => {
+      for (const a of animations) a.finish?.()
+    })
     running = true
     window.addEventListener("resize", onResize)
     void settled(animations).then(() => {
@@ -364,6 +376,7 @@ function playPieces(el: HTMLElement, visual: HTMLElement, effect: "mask" | "skew
   const dispose = armEntry(el, visual, trigger, start)
   return () => {
     disposed = true
+    unguard()
     dispose()
     clearTimeout(timer)
     window.removeEventListener("resize", onResize)
@@ -377,11 +390,14 @@ function playPieces(el: HTMLElement, visual: HTMLElement, effect: "mask" | "skew
 function playBlink(el: HTMLElement, visual: HTMLElement, trigger: "enter" | "load"): () => void {
   if (roleMotion("reveal", el).mode === "none" || typeof visual.animate !== "function") return () => {}
   let animation: Animation | null = null
+  let unguard = () => {}
   const dispose = armEntry(el, visual, trigger, () => {
     visual.style.opacity = ""
     animation = visual.animate(blinkFrames(), { duration: BLINK_MS, fill: "backwards" })
+    unguard = guardEntrance(() => animation?.finish())
   })
   return () => {
+    unguard()
     dispose()
     animation?.cancel()
     visual.style.opacity = ""
@@ -523,17 +539,28 @@ function play(el: HTMLElement, split: Exclude<DisplaySplit, "none">): () => void
     })
   }
   hide()
+  // No frames: the words stand where they end (shown, any animation finished), never held hidden.
+  const stalled = () => {
+    observer.disconnect()
+    if (animations.length) for (const a of animations) a.finish()
+    else for (const n of nodes) n.style.opacity = ""
+  }
+  let unguard = () => {}
   const observer = new IntersectionObserver(
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) {
         show()
         observer.disconnect()
+        unguard()
+        unguard = guardEntrance(stalled)
       }
     },
     { threshold: 0.15 }
   )
   observer.observe(el)
+  unguard = guardEntrance(stalled)
   return () => {
+    unguard()
     observer.disconnect()
     for (const a of animations) a.cancel()
     for (const n of nodes) n.style.opacity = ""

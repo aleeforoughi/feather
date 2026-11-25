@@ -3,6 +3,7 @@ import { cn } from "../cn"
 import { useReducedMotion } from "../hooks"
 import { countTo, formatCount } from "../core/counter"
 import { unitSpace } from "../core/fit"
+import { useLocale } from "./locale"
 
 export interface CounterProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> {
   /** The final value. */
@@ -13,6 +14,7 @@ export interface CounterProps extends Omit<React.HTMLAttributes<HTMLSpanElement>
   /** A unit after the number, joined with a non-breaking space ("%", "ms", "years"); a pair longer than the fit
    * measure (core/fit unitSpace) is joined with a plain space, so a long unit may wrap under the number. */
   unit?: string
+  /** The locale the number is written in; by default the nearest LocaleProvider's (a page's `lang`), else "en". */
   locale?: string
 }
 
@@ -21,7 +23,9 @@ export interface CounterProps extends Omit<React.HTMLAttributes<HTMLSpanElement>
  * still. Assistive technology reads the final value; the tween is hidden from it. Under reduced motion, and with no
  * IntersectionObserver, the final value is simply there.
  */
-export const Counter = React.forwardRef<HTMLSpanElement, CounterProps>(function Counter({ value, from = 0, duration = 900, unit, locale, className, style, ...props }, forwarded) {
+export const Counter = React.forwardRef<HTMLSpanElement, CounterProps>(function Counter({ value, from = 0, duration = 900, unit, locale: own, className, style, ...props }, forwarded) {
+  const inherited = useLocale()
+  const locale = own ?? inherited
   const root = React.useRef<HTMLSpanElement>(null)
   const reduced = useReducedMotion(root)
   const final = formatCount(value, value, locale)

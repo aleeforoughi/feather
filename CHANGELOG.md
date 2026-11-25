@@ -1,5 +1,28 @@
 # Feather — changelog
 
+## 1.22.1 — 2026-11-25
+
+**A page hydrates in every browser locale, and its title shows without frames.** Before this fix, a page built by `feather-page build --runtime` failed to hydrate (React #418) in a browser whose locale writes other digits than the build machine's, such as Persian (`fa-IR`) or Arabic (`ar-EG`). The server wrote the numbers block's counters as `1,280`, and the browser wrote `۱٬۲۸۰`. React then discarded the server markup and rendered the page again on the client. Reported by Qooler, whose loudness-2 and loudness-3 previews threw on the owner's Chrome.
+
+### Fixes
+- **Numbers are written in the page's language.** `FeatherPage` and `PageNotFound` provide the page's `lang` (default `en`), and `Counter` and the plain numbers read it. The server and every browser now write the same digits, and a `"lang": "fa"` page writes Persian digits on both sides.
+- **Expression:**
+  - New `LocaleProvider` and `useLocale` set the locale numbers are written in.
+  - `formatCount` now defaults to `DEFAULT_LOCALE` (`en`) rather than the environment's locale, which differs between a server and a browser.
+  - `Counter` takes the nearest provider's locale, and its own `locale` prop still wins.
+
+- **A title never depends on a frame running.** Previously the hero's masked line rise held its words below their masks, and a reveal held content at opacity 0, until Web Animations or an IntersectionObserver ran. A view that draws no frames (a background pane, a throttled capture, an embedded preview) could therefore leave a loud hero with no visible title, as Qooler's previews in the desktop app's browser pane showed.
+  - The new `guardEntrance` (expression core) shows the end state at once when the document is hidden, or after `ENTRANCE_STALL_MS` (1 s) when no frame has been drawn.
+  - DisplayTitle's mask, skew, oval, blink and rise entrances use it, and so does `reveal`.
+
+### Gates
+- **A new e2e (`apps/showcase/e2e/hydrate.spec.ts`)** builds the loud example with the CLI, `--css` and `--runtime`, and serves it under a subpath with the release files in a folder of their own, as a caller does. It hydrates the page in en-US, fa-IR, ar-EG and de-DE browsers and asserts:
+  - no console errors;
+  - the page's digits;
+  - the hero's title is visible, with the topmost element at its centre belonging to the title.
+- **A view that draws no frames** (requestAnimationFrame never calls back) shows every piece of the title at rest within a second, and nothing stands over it.
+- **Unit tests for `guardEntrance`:** a hidden document, a page that draws no frames, and a page that does.
+
 ## 1.22.0 — 2026-11-25
 
 **Wave 4: 3D and WebGL.** A new package, `@aleeforoughi/feather-scene`: shader backgrounds and image-to-depth on raw
