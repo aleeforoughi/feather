@@ -1,10 +1,15 @@
 import { act, render, screen } from "@testing-library/react"
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { clock } from "../core/clock"
 import { Cursor, Magnetic } from "./magnetic"
 import { mockMedia, REDUCED } from "../test/helpers"
 
-afterEach(() => mockMedia([]))
+beforeEach(() => document.documentElement.style.setProperty("--loudness", "2"))
+afterEach(() => {
+  mockMedia([])
+  document.documentElement.style.removeProperty("--loudness")
+  document.body.innerHTML = ""
+})
 
 describe("Magnetic", () => {
   it("wraps one child with a data-slot and pulls it for a fine pointer", () => {
@@ -60,5 +65,45 @@ describe("Cursor", () => {
     expect(render(<Cursor />).container.querySelector('[data-slot="cursor"]')).toBeNull()
     mockMedia(["pointer: fine", REDUCED])
     expect(render(<Cursor />).container.querySelector('[data-slot="cursor"]')).toBeNull()
+  })
+
+  it("renders nothing below loudness 2", () => {
+    mockMedia(["pointer: fine"])
+    document.documentElement.style.setProperty("--loudness", "1")
+    expect(render(<Cursor />).container.querySelector('[data-slot="cursor"]')).toBeNull()
+  })
+
+  it("grows and labels itself over data-cursor elements, ignores fields, and the element keeps its own name", () => {
+    mockMedia(["pointer: fine"])
+    const { container } = render(
+      <div>
+        <Cursor />
+        <a href="/work" data-cursor="view" aria-label="Open the Aria case study">
+          <span data-testid="inner">Aria</span>
+        </a>
+        <a href="/reel" data-cursor="play" data-cursor-label="Watch reel">
+          Reel
+        </a>
+        <input data-cursor="view" aria-label="Email" />
+        <div data-testid="plain" />
+      </div>,
+    )
+    const el = container.querySelector<HTMLElement>('[data-slot="cursor"]')!
+    const label = container.querySelector<HTMLElement>('[data-slot="cursor-label"]')!
+    const over = (node: Element) => act(() => void node.dispatchEvent(new MouseEvent("pointerover", { bubbles: true })))
+    over(screen.getByTestId("inner"))
+    expect(el.dataset.cursor).toBe("view")
+    expect(label.textContent).toBe("View")
+    expect(el.getAttribute("aria-hidden")).toBe("true")
+    expect(screen.getByRole("link", { name: "Open the Aria case study" })).toBeTruthy()
+    over(screen.getByText("Reel"))
+    expect(el.dataset.cursor).toBe("play")
+    expect(label.textContent).toBe("Watch reel")
+    over(screen.getByRole("textbox", { name: "Email" }))
+    expect(el.dataset.cursor).toBeUndefined()
+    expect(label.textContent).toBe("")
+    over(screen.getByTestId("inner"))
+    over(screen.getByTestId("plain"))
+    expect(el.dataset.cursor).toBeUndefined()
   })
 })

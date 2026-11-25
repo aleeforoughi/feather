@@ -41,8 +41,18 @@ export const BUTTON_PRIMARY =
 export const BUTTON_QUIET =
   "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line-primary bg-surface-base px-6 type-label text-fg-primary focus-ring not-disabled:hover:bg-surface-hover motion-hover-out"
 
+/** Whether the page runs the pointer follower (`cursor: "follower"`): blocks then label their links for it
+ * (`data-cursor="view"`). Off by default, so a page without it renders exactly as before. */
+export const CursorLabels = React.createContext(false)
+
+/** The `data-cursor` attribute a link takes when the follower runs. */
+export function useCursorLabel(kind: "view" | "drag" | "play" | "link" = "view"): { "data-cursor"?: string } {
+  return React.useContext(CursorLabels) ? { "data-cursor": kind } : {}
+}
+
 /** A link or a plain wrapper around a card: the whole card is the link when it has an `href`. */
 export function CardBody({ href, children }: { href?: string; children: React.ReactNode }) {
+  const cursor = useCursorLabel("view")
   if (!href) {
     return (
       <div data-slot="card-body" className="flex h-full flex-col">
@@ -51,7 +61,7 @@ export function CardBody({ href, children }: { href?: string; children: React.Re
     )
   }
   return (
-    <a href={href} data-slot="card-link" className="group flex h-full flex-col rounded-card focus-ring">
+    <a href={href} data-slot="card-link" {...cursor} className="group flex h-full flex-col rounded-card focus-ring">
       {children}
     </a>
   )

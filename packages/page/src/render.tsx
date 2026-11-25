@@ -2,10 +2,11 @@
 // Living Page layered on when the document has one. Deterministic: the same page, brand and host give the same DOM.
 import * as React from "react"
 import { buildTheme, type BrandTokens } from "@aleeforoughi/feather-tokens"
-import { Loader, OverlayMenu, SoundToggle } from "@aleeforoughi/feather-expression"
+import { Cursor, Loader, OverlayMenu, SoundToggle } from "@aleeforoughi/feather-expression"
 import { LivingPage, PreparedSceneView, createRegistry, useLivingAsk, type AskHandler, type Block, type BlockKind, type PreparedScene, type Speaker } from "@aleeforoughi/feather-living"
 import { defaultBlocks, type BlockProps } from "./blocks/index"
 import { Footer, NotFound } from "./blocks/edges"
+import { CursorLabels } from "./blocks/shared"
 import { PageContext, type PageContextValue } from "./blocks/knobs"
 import { resolveRefs } from "./core/validate"
 import type { BlockName, PageBlock, PageDocument } from "./core/types"
@@ -135,9 +136,11 @@ function PageFrame({ page, head, children }: { page: PageDocument; head: React.R
       ) : null}
       {/* The page's loudness is a ceiling every block and expression component under main reads (data-loudness). */}
       <main data-page="" data-loudness={page.loudness} className={reveal ? "relative z-10 bg-surface-base" : undefined}>
-        {children}
+        {page.cursor === "follower" ? <CursorLabels.Provider value>{children}</CursorLabels.Provider> : children}
       </main>
       {page.footer ? <Footer footer={page.footer} name={name} /> : null}
+      {/* Last, so it shifts no generated ids of the page above it. */}
+      {page.cursor === "follower" ? <Cursor /> : null}
     </>
   )
 }

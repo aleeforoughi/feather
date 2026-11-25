@@ -143,6 +143,8 @@ export interface PageDocument {
   loader?: LoaderEdge
   /** How a route arrives (default "fade"). */
   transition?: RouteVariant
+  /** The pointer follower (wave 3): off ("native") by default. */
+  cursor?: "native" | "follower"
   sound?: { bed: Media }
   /** The page's loudness (feather.page/1): a ceiling every block inherits unless it sets its own. */
   loudness?: Loudness

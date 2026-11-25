@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-react",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "tokenSchema": "feather-tokens/3",
   "themeAxes": {
     "shape": [
@@ -348,7 +348,8 @@
         "buttonVariants"
       ],
       "slots": [
-        "button"
+        "button",
+        "button-spinner"
       ],
       "stories": [
         "Default",
@@ -361,6 +362,7 @@
         "Outline",
         "Secondary",
         "Small",
+        "States",
         "With Icon"
       ]
     },
@@ -408,6 +410,7 @@
         "Default",
         "Disabled",
         "Invalid",
+        "States",
         "With Label"
       ]
     },
@@ -518,6 +521,7 @@
         "dropdown-menu",
         "dropdown-menu-checkbox-item",
         "dropdown-menu-checkbox-item-indicator",
+        "dropdown-menu-checkbox-item-mark",
         "dropdown-menu-content",
         "dropdown-menu-group",
         "dropdown-menu-item",
@@ -527,6 +531,7 @@
         "dropdown-menu-radio-group",
         "dropdown-menu-radio-item",
         "dropdown-menu-radio-item-indicator",
+        "dropdown-menu-radio-item-mark",
         "dropdown-menu-separator",
         "dropdown-menu-shortcut",
         "dropdown-menu-sub",
@@ -580,6 +585,7 @@
         "FieldLegend",
         "FieldSeparator",
         "FieldSet",
+        "FieldSuccess",
         "FieldTitle"
       ],
       "slots": [
@@ -593,13 +599,18 @@
         "field-legend",
         "field-separator",
         "field-separator-content",
-        "field-set"
+        "field-set",
+        "field-success",
+        "field-success-mark",
+        "field-success-text"
       ],
       "stories": [
         "Default",
         "Field Set Group",
         "Horizontal",
-        "With Error"
+        "States",
+        "With Error",
+        "With Success"
       ]
     },
     {
@@ -1191,6 +1202,7 @@
         "Default",
         "Disabled",
         "Small",
+        "States",
         "With Label"
       ]
     },

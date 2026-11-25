@@ -1,6 +1,6 @@
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion"
 import { cn } from "../../lib/cn"
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { ChevronDownIcon } from "lucide-react"
 import { Icon } from "./icon"
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
@@ -39,8 +39,7 @@ function AccordionTrigger({
         {...props}
       >
         {children}
-        <Icon icon={ChevronDownIcon} data-slot="accordion-trigger-icon" className="pointer-events-none group-aria-expanded/accordion-trigger:hidden" />
-        <Icon icon={ChevronUpIcon} data-slot="accordion-trigger-icon" className="pointer-events-none hidden group-aria-expanded/accordion-trigger:inline" />
+        <Icon icon={ChevronDownIcon} data-slot="accordion-trigger-icon" className="pointer-events-none motion-state group-aria-expanded/accordion-trigger:rotate-180" />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )
@@ -63,7 +62,7 @@ function AccordionContent({
         <div
           data-slot="accordion-content-body"
           className={cn(
-            "pt-0 pb-3 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-fg-primary [&_p:not(:last-child)]:mb-4",
+            "pt-0 pb-3 [&_a]:underline [&_a]:underline-offset-3 [&_a]:motion-hover [&_a]:hover:text-fg-primary [&_p:not(:last-child)]:mb-4",
             className
           )}
         >

@@ -13,3 +13,52 @@
 @source "./src";
 @source not "./src/**/*.stories.tsx";
 @source not "./src/**/*.test.ts";
+
+/* Micro-motion (docs/visual-system.md section 10, "Micro-motion"): what every interactive atom does when it is pressed,
+   toggled, drawn or refused. Each is built on the six durations and the one curve, and the reduced motion rules in
+   foundation.css end every one of them at once. */
+
+/* The `state` role's properties plus scale, so a toggle that is pressed releases smoothly (checkbox, radio, tab). */
+@utility motion-toggle {
+  transition-property: color, background-color, border-color, outline-color, box-shadow, opacity, transform, rotate, scale;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-standard);
+}
+/* The switch role's colours only: the thumb, whose travel is a spring driven by useThemeMotion. */
+@utility motion-switch-tone {
+  transition-property: background-color, border-color;
+  transition-duration: var(--duration-medium);
+  transition-timing-function: var(--ease-standard);
+}
+/* A mark that draws on (a check): it wipes in from the inline start. Rests unclipped; `draw-start` is where it begins. */
+@utility motion-draw {
+  clip-path: inset(0);
+  transition-property: clip-path, opacity;
+  transition-duration: var(--duration-medium);
+  transition-timing-function: var(--ease-standard);
+}
+@utility draw-start {
+  clip-path: inset(0 100% 0 0);
+}
+/* An error: one 3px shake on transform (never a box), as aria-invalid arrives. */
+@keyframes feather-shake {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-3px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+@utility motion-shake {
+  animation: feather-shake var(--duration-slow) var(--ease-standard) 1;
+}

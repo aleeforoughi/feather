@@ -47,22 +47,33 @@ export function createClock(frames: Frames | null = browserFrames()): Clock {
   let frameId: number | null = null
   let last: number | null = null
   let external: Ticker | null = null
+  // True while the ticks of one frame run. A tick that schedules the next frame from inside this one (the World's
+  // once() per frame) must not request a frame of its own: the frame loop requests exactly one next frame after the
+  // ticks, so there is never more than one pending (before, each such tick doubled the pending frames).
+  let running = false
 
   const run = (time: number) => {
     // Clamped to 1/20s: a frame after a stall or a hidden tab never teleports what moves.
     const delta = last === null ? 0 : Math.min(MAX_DELTA, Math.max(0, time - last))
     last = time
-    for (const tick of [...ticks]) tick(time, delta)
+    running = true
+    try {
+      for (const tick of [...ticks]) tick(time, delta)
+    } finally {
+      running = false
+    }
   }
   const ownFrame = (time: number) => {
     frameId = null
     run(time)
-    if (ticks.size > 0 && !external) frameId = frames?.request(ownFrame) ?? null
+    if (ticks.size > 0) {
+      if (!external) frameId = frames?.request(ownFrame) ?? null
+    } else last = null
   }
   const externalFrame = (time: number) => run(time * 1000)
 
   const start = () => {
-    if (external) return
+    if (external || running) return
     if (frameId === null && frames) frameId = frames.request(ownFrame)
   }
   const stop = () => {
@@ -77,7 +88,8 @@ export function createClock(frames: Frames | null = browserFrames()): Clock {
       start()
       return () => {
         ticks.delete(tick)
-        if (ticks.size === 0) stop()
+        // Inside a frame the loop itself decides (it requests no next frame when nothing is left).
+        if (ticks.size === 0 && !running) stop()
       }
     },
     once(tick) {

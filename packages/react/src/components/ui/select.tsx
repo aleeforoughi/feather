@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from "../../lib/cn"
+import { errorMotion } from "../../lib/micro"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 import { popoverMotion } from "../../lib/popup"
 import { Icon } from "./icon"
@@ -43,6 +44,7 @@ function SelectTrigger({
       data-density={size === "sm" ? "tight" : undefined}
       className={cn(
         "hit-area flex h-control w-fit items-center justify-between gap-2 rounded-control border border-line-primary bg-transparent px-control type-body text-fg-primary whitespace-nowrap motion-state select-none disabled:cursor-not-allowed disabled:opacity-disabled aria-invalid:border-destructive data-placeholder:text-fg-tertiary *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        errorMotion,
         className
       )}
       {...props}
@@ -121,7 +123,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-control min-h-control py-2 pr-8 pl-3 type-body text-fg-primary select-none motion-state focus:bg-surface-hover not-data-[variant=destructive]:focus:**:text-fg-primary data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "relative flex w-full cursor-default items-center gap-2 rounded-control min-h-control py-2 pr-8 pl-3 type-body text-fg-primary select-none motion-state focus:bg-surface-hover active:bg-surface-pressed not-data-[variant=destructive]:focus:**:text-fg-primary data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       {...props}
@@ -131,7 +133,7 @@ function SelectItem({
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
         render={
-          <span data-slot="select-item-indicator" className="pointer-events-none absolute right-3 flex size-4 items-center justify-center" />
+          <span data-slot="select-item-indicator" className="pointer-events-none absolute right-3 flex size-4 items-center justify-center motion-draw data-starting-style:draw-start data-ending-style:opacity-0" />
         }
       >
         <Icon icon={CheckIcon} size={16} className="pointer-events-none" />

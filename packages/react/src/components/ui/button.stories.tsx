@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { useState } from "react"
 import { ArrowRight, Mail } from "lucide-react"
 import { Button } from "./button"
+import { FieldSuccess } from "./field"
 
 const meta = {
   title: "Atoms/Button",
@@ -47,3 +49,50 @@ export const WithIcon: Story = {
 }
 export const IconOnly: Story = { args: { size: "icon", "aria-label": "Send email", children: <Mail /> } }
 export const Disabled: Story = { args: { disabled: true } }
+
+/** Save runs the whole micro-motion: press, a spinner in a box that keeps its size, then a check that draws, announced. */
+function SaveFlow() {
+  const [state, setState] = useState<"idle" | "loading" | "saved">("idle")
+  const save = () => {
+    setState("loading")
+    window.setTimeout(() => setState("saved"), 1200)
+  }
+  return (
+    <div className="flex items-center gap-4">
+      <Button loading={state === "loading"} onClick={save}>
+        Save changes
+      </Button>
+      <FieldSuccess>{state === "saved" ? "Saved" : null}</FieldSuccess>
+    </div>
+  )
+}
+
+/**
+ * Every micro-motion a button has. Press any button (it scales 0.985 in 100ms and springs back), hover it (its surface
+ * eases), Tab to it (the ring appears without moving anything), and press Save to watch loading turn into success.
+ */
+export const States: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button>Default</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="destructive">Delete</Button>
+        <Button size="icon" variant="outline" aria-label="Send email">
+          <Mail />
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button loading>Default</Button>
+        <Button loading variant="outline">
+          <Mail /> Outline
+        </Button>
+        <Button loading variant="ghost">Ghost</Button>
+      </div>
+      <SaveFlow />
+    </div>
+  ),
+}

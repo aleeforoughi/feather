@@ -389,6 +389,12 @@
           ]
         }
       }
+    },
+    "cursor": {
+      "enum": [
+        "native",
+        "follower"
+      ]
     }
   },
   "$defs": {

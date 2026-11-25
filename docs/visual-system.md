@@ -449,8 +449,9 @@ Rules for motion:
     control);
   - disabled: no hover or press motion;
   - loading: geometry preserved.
-- No bounce, overshoot or elastic motion. Drag tracks the pointer directly. Only pickup, drop and settle are
-  eased.
+- No bounce, overshoot or elastic motion, with one exception: a switch thumb springs with a slight overshoot
+  when the brand turns `overshoot` on (micro-motion, below). Drag tracks the pointer directly. Only pickup, drop
+  and settle are eased.
 - **Reduced motion** is in foundation.css: under `prefers-reduced-motion: reduce`, and wherever
   `data-motion="reduced"` is set (`plan.motion`):
   - every transition and animation goes to 0.01ms and one iteration;
@@ -459,6 +460,39 @@ Rules for motion:
   `html { scroll-behavior: smooth }` applies only outside that. `useThemeMotion` reads the same tokens.
 - Interaction never waits for motion, and focus and errors never wait at all.
 - Resting positions are whole pixels.
+
+### Micro-motion: every interactive atom, by default
+
+Every interactive atom answers the person within one frame and never moves another box (proposal 2026-11-24
+§5 A). It is built from the roles above, so a brand's `motion` axis reaches every atom; product UI never reads
+the expression roles, except for the switch's overshoot below. The resting appearance is the same as without it.
+
+| moment | what moves | how |
+|---|---|---|
+| press | controls (button, icon button, linked badge, checkbox, radio, switch, tab) scale 0.985 | `active:press` with `active:motion-press`: in over `micro`, released over the control's own role, so it reverses from where it is. Never on disabled, busy or popup triggers |
+| press, rows | menu and select items, navigation triggers and links take the pressed surface | `active:bg-surface-pressed`; a full-width row never scales |
+| hover | surface, border, text and icon colour | the control's role (`motion-hover`, `motion-state` or `motion-toggle`); links inside prose too |
+| focus | the 2px ring, offset 2px | an outline, so it never changes the box; it appears at once |
+| toggle | checkbox and radio fill; the check draws on; the radio dot grows from half size; the switch thumb travels | `motion-toggle`, `motion-draw` with `data-starting-style:draw-start`; the thumb on `switch` (a spring with the brand's `--spring-bounce` when `--ease-overshoot` overshoots, else the one curve) |
+| open, close | the accordion chevron turns 180° | `motion-state` |
+| loading | a button keeps its size, its label fades out and a spinner fades in; `aria-busy`, still focusable, presses ignored | `Button loading`; the spinner is Tailwind's `animate-spin` (1s linear, loading only, like the 1600ms breath) |
+| success | a check draws on beside the message, announced (`role="status"`) | `FieldSuccess`; the success toast's icon draws the same way |
+| error | a 3px horizontal shake, once, as `aria-invalid` arrives; the message fades in and is announced (`role="alert"`) | `aria-invalid:motion-shake` on fields, selects and choice controls; `FieldError` |
+| enter, leave | menus, selects, popovers, tooltips, dialogs, sheets, toasts, accordion panels | their roles above; a tooltip leaves over `fast` |
+
+The micro-motion utilities ship in `@aleeforoughi/feather-react/styles.css`:
+
+| utility | what it sets |
+|---|---|
+| `motion-toggle` | the `state` role's properties plus `scale`, over `base`, so a pressed toggle releases smoothly |
+| `motion-switch-tone` | the switch role's colours only, over `medium`: the thumb, whose travel is a spring |
+| `motion-draw` | `clip-path` and `opacity` over `medium`, resting at `clip-path: inset(0)` |
+| `draw-start` | `clip-path: inset(0 100% 0 0)`: the mark before it draws (with `data-starting-style:` or `starting:`) |
+| `motion-shake` | one 3px shake (0, −3, 3, −2, 2, 0px, on `transform`) over `slow` |
+
+Reduced motion keeps the feedback and drops the movement: transitions end at once (above), so a press still
+shows its scale, a toggle its colour, an error its colour and message, and the switch thumb moves without
+travel. The shake and the draw do not play.
 
 ## 11. Layout grid
 
