@@ -33,7 +33,7 @@ const STYLES_CSS = `${REACT}/styles.css`
 /** Packages released together, at one version. */
 const RELEASED = [TOKENS, REACT, "packages/intent", "packages/context", "packages/liquid", "packages/manifest-web", "packages/manifest-switch", "packages/manifest-voice", "packages/embed", "packages/documents", "packages/expression", "packages/living", "packages/page"]
 /** The website layer (docs/visual-system.md section 14): its source gets the expression rules on top of Gate 1. */
-const WEBSITE = ["packages/expression", "packages/living", "packages/page"]
+const WEBSITE = ["packages/expression", "packages/living", "packages/page", "packages/scene"]
 /** The one file allowed to call requestAnimationFrame: the clock. */
 const CLOCK = "packages/expression/src/core/clock.ts"
 /** The one file allowed to read devicePixelRatio, and only through Math.min (the cap). */

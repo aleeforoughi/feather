@@ -4,9 +4,9 @@ import path from "node:path"
 import { expect, test, type Page } from "@playwright/test"
 
 // The loud reference page (packages/page/examples/studio-of-one-loud.page.json): loudness 3, every expressive variant
-// (film hero, marquee, stack, fill, pinned process, scale case, rail, swap, horizontal timeline, colour blocks). In
-// every brand it passes axe, stops moving under reduced motion and logs no errors. Its mobile budgets are measured
-// and reported in the test's annotations, and they must still pass.
+// (an interactive hero over a shader, marquee, stack, fill, pinned process, scale case, a product to turn, rail, swap,
+// horizontal timeline, colour blocks). In every brand it passes axe, stops moving under reduced motion and logs no
+// errors. Its mobile budgets are measured and reported in the test's annotations, and they must still pass.
 const budgets = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "budgets.json"), "utf8"))
 const axeSource = fs.readFileSync(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8")
 const BRANDS = ["studio", "portrait", "seed"]
@@ -38,7 +38,7 @@ for (const brand of BRANDS) {
       page.on("console", (m) => m.type() === "error" && errors.push(m.text()))
       await page.goto(url(brand), { waitUntil: "networkidle" })
       expect(await page.locator("main").getAttribute("data-loudness")).toBe("3")
-      for (const v of ["film", "marquee", "stack", "fill", "pinned", "scale", "rail", "swap", "horizontal", "lead", "table"]) {
+      for (const v of ["interactive", "marquee", "stack", "fill", "pinned", "scale", "rail", "swap", "horizontal", "lead", "table"]) {
         await expect(page.locator(`[data-block-variant="${v}"]`).first(), v).toBeAttached()
       }
       await expect(page.locator("h1")).toHaveCount(1)

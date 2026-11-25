@@ -1,22 +1,26 @@
 import { DisplayTitle, MediaFrame, ScrollLayers, Section } from "@aleeforoughi/feather-expression"
 import { EDGE_START, alignClass, sizeOf, useKnobs } from "./knobs"
 import { mediaProps } from "./media"
+import { SceneLayer } from "./scene"
 import { join, useRegion, type BlockProps } from "./shared"
 
 /**
  * The one block only this brand has. Without a brand renderer it reads as a statement; `data-variant` carries
  * `block.variant` so the brand restyles it through tokens and CSS, not through this file. The knobs apply as
- * everywhere: align, scale, crop (edge or bleed takes the media off the grid) and scroll.pattern parallax.
+ * everywhere: align, scale, crop (edge or bleed takes the media off the grid) and scroll.pattern parallax. A `scene`
+ * (loudness 3) takes the media's place, the media becoming its poster.
  */
 export function SignatureBlock({ block }: BlockProps<"signature">) {
   const { id, titleId, labelled } = useRegion(block, "Signature")
   const knobs = useKnobs<string>("signature", block, { space: "l" })
   const centre = knobs.align === "center"
   const cropped = knobs.crop !== "none"
-  const frame = block.media ? <MediaFrame aspect="16/9" {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.media, block.title)} /> : null
+  const frame = block.scene ? (
+    <SceneLayer scene={block.scene} media={block.media} label={block.title ?? "Signature"} aspect="16/9" />
+  ) : block.media ? <MediaFrame aspect="16/9" {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(block.media, block.title)} /> : null
   const media = frame ? (
     <div data-slot="signature-media" {...(knobs.any ? { "data-crop": knobs.crop } : {})} style={knobs.crop === "edge" ? EDGE_START : undefined}>
-      {block.scroll?.pattern === "parallax" ? (
+      {block.scroll?.pattern === "parallax" && !block.scene ? (
         <ScrollLayers variant="parallax">
           <ScrollLayers.Layer depth={0.9}>{frame}</ScrollLayers.Layer>
         </ScrollLayers>

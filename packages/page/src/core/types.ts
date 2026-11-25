@@ -46,6 +46,37 @@ export interface Knobs {
   scroll?: BlockScroll
 }
 
+/** A 3D or WebGL scene (feather.page/1, wave 4) on a hero (interactive), case or signature. spec.ts says what each
+ * kind and preset is. The scene is decoration over the block's poster; the meaning stays in the DOM. */
+export type SceneKind = "shader" | "particles" | "depth" | "model" | "rail"
+export type ShaderScenePreset = "gradient-noise" | "aurora" | "grain-field" | "flow"
+export type ParticleScenePreset = "dust" | "field" | "morph"
+export type SceneQuality = "auto" | "high" | "medium" | "low" | "poster"
+export interface SceneHotspot {
+  id: string
+  /** In the model's own coordinates. */
+  position: [number, number, number]
+  /** The button's name and text. */
+  label: string
+}
+export interface SceneVariant {
+  id: string
+  label: string
+  /** Material name in the GLB → a colour: a theme variable (`--accent`) or a CSS colour. */
+  colors: Record<string, string>
+}
+export interface BlockScene {
+  kind: SceneKind
+  preset?: ShaderScenePreset | ParticleScenePreset
+  quality?: SceneQuality
+  /** The GLB (model). */
+  model?: Media
+  /** The depth map of the block's media (depth): white near. */
+  depth?: Media
+  hotspots?: SceneHotspot[]
+  variants?: SceneVariant[]
+}
+
 interface Base extends Knobs {
   id?: string
   title?: string
@@ -66,10 +97,10 @@ export interface QuoteItem {
   role?: string
 }
 export type PageBlock =
-  | (Base & { block: "hero"; variant?: HeroVariant; title: string; eyebrow?: string; lede?: string; media?: Media; starters?: string[]; facts?: { label: string; value: string }[]; actions?: PageLink[] })
+  | (Base & { block: "hero"; variant?: HeroVariant; title: string; eyebrow?: string; lede?: string; media?: Media; starters?: string[]; facts?: { label: string; value: string }[]; actions?: PageLink[]; scene?: BlockScene })
   | (Base & { block: "statement"; variant?: StatementVariant; title: string; body?: string; words?: string[] })
   | (Base & { block: "work"; variant?: WorkVariant; items: Array<string | WorkItem> })
-  | (Base & { block: "case"; variant?: CaseVariant; title: string; body?: string; media?: Media; facts?: { label: string; value: string }[] })
+  | (Base & { block: "case"; variant?: CaseVariant; title: string; body?: string; media?: Media; facts?: { label: string; value: string }[]; scene?: BlockScene })
   | (Base & { block: "numbers"; variant?: NumbersVariant; items: { value: number; unit?: string; label: string }[] })
   | (Base & { block: "timeline"; variant?: TimelineVariant; items: { when: string; what: string }[] })
   | (Base & { block: "process"; variant?: ProcessVariant; steps: { title: string; body?: string }[] })
@@ -78,7 +109,7 @@ export type PageBlock =
   | (Base & { block: "offer"; variant?: OfferVariant; items: { name: string; price?: string; body?: string; href?: string }[] })
   | (Base & { block: "faq"; variant?: "list"; items: { q: string; a: string }[] })
   | (Base & { block: "contact"; variant?: "plain"; body?: string; actions?: { label: string; href: string }[] })
-  | (Base & { block: "signature"; body?: string; media?: Media; variant?: string })
+  | (Base & { block: "signature"; body?: string; media?: Media; variant?: string; scene?: BlockScene })
 
 export type BlockName = PageBlock["block"]
 

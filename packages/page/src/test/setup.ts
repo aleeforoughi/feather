@@ -16,3 +16,5 @@ if (!("ResizeObserver" in window)) {
 if (!("getAnimations" in Element.prototype)) {
   Object.defineProperty(Element.prototype, "getAnimations", { writable: true, value: () => [] })
 }
+// jsdom has no canvas: say so quietly (null, as a browser without WebGL does), so the World keeps its still.
+Object.defineProperty(HTMLCanvasElement.prototype, "getContext", { writable: true, value: () => null })

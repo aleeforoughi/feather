@@ -1,5 +1,69 @@
 # Feather — changelog
 
+## 1.22.0 — 2026-11-25
+
+**Wave 4: 3D and WebGL.** A new package, `@aleeforoughi/feather-scene`: shader backgrounds and image-to-depth on raw
+WebGL with no dependency, and on Three.js the object viewer, particles, camera rails and post. Every scene is a
+renderer for the expression layer's `World`, so the World's floor holds everywhere: capped pixels, the quality
+ladder, the capability gate, render on demand, pausing when hidden, and a real poster before the first frame and
+wherever a scene does not run. Pages ask for scenes with the `scene` knob. Three.js loads only for a page that needs
+it. Three.js is MIT-licensed (checked 2026-11-25), an optional peer, and pinned at 0.187.0 in the workspace. Values
+come from the award winners' code and the R3F, drei and postprocessing documentation (Qooler file 27 sections 4, 7
+and 8); the code is Feather's own.
+
+### `@aleeforoughi/feather-scene` (new; [docs/scene.md](docs/scene.md))
+- **Raw WebGL (`.`):**
+  - `shaderBackground`: presets gradient-noise, aurora, grain-field and flow. Palette from the theme, mixed in OKLab;
+    `mediump` on a seamless 72-second loop; a resolution share; three levels.
+  - `depthImage`: a photo and its depth map, moved by the pointer, by device tilt after the person enables it, or by a
+    slow drift. Cover-fit with no edge ever showing.
+  - `useScene` connects a scene to its World and brings the still back when the scene stops: no WebGL, a shader error,
+    a lost context, or an asset that will not load.
+- **Three.js (`./three`):**
+  - `objectViewer`: a studio stage (room environment, theme-tinted key and rim lights, contact shadow, fog), a fitted
+    model, turntable, orbit with limits, preset angles, hotspots for real buttons, and finish variants without
+    reloading. `attachKeys` adds arrow keys and preset keys on a focusable wrapper.
+  - `particleField`: dust, a field that yields to the pointer, or a morph between sampled shapes; 60k, 20k or 6k
+    points by tier.
+  - `cameraRail`: a camera along a Catmull-Rom curve, driven by scroll.
+  - `studioPost`: bloom, tone mapping, grain and vignette in one pass.
+- **Every scene:**
+  - never reads `devicePixelRatio`, and has three ladder levels;
+  - runs `prewarm` tasks behind the loader and draws only while something moves;
+  - frees everything on dispose and handles a lost or restored context;
+  - reports `drawn`, so the World keeps its poster until the first real frame.
+
+### Pages (`feather.page/1`)
+- **The `scene` knob** on hero (the `interactive` variant now renders its scene), case and signature: `kind` (shader,
+  particles, depth, model, rail), `preset`, `quality` (a ceiling), and for models `hotspots` and `variants`, with
+  contradiction, missing and unsupported codes.
+- **`SceneLayer`:**
+  - The poster is the block's image.
+  - The scene starts after mount, near the view, at loudness 3, without reduced motion and only where the gate
+    passes. The WebGL probe runs last, because it costs main-thread time on phones.
+  - Hotspots are named buttons over the canvas, mirrored in a list the server writes. Finishes are a radio group, and
+    there are pause and stop-turning controls.
+- **The loud reference page** has an interactive shader hero and a model case. The model is a GLB generated for the
+  showcase (`apps/showcase/scripts/make-model.mjs`; no third-party model).
+- **e2e:**
+  - the poster comes first and the canvas only once drawn;
+  - without WebGL the page is complete, with no errors;
+  - under reduced motion only posters show;
+  - a page without a 3D scene never requests the Three.js chunk;
+  - hotspots are named and keyboard-reachable;
+  - the mobile budgets hold on the loud page with its scenes.
+
+### Release assets
+- **`feather-page-web-<v>.zip`** now carries `feather-page-three.js`, which the runtime loads from beside itself for a
+  page with a model, particles or rail scene. It is about 177 KB gzip, above the plan's 160 KB starting value; a split
+  per scene kind is the next step if it matters in measurement.
+- **The runtime** grew by about 15 KB gzip (the World, the raw scenes and the layer) and carries no Three.js; a check
+  after every build enforces it.
+
+### The World
+- **`WorldRenderer.drawn`:** the World keeps its still up until a renderer says it has drawn, so a loading photo or
+  model never shows an empty canvas.
+
 ## 1.21.0 — 2026-11-25
 
 **Wave 3: sound, the pointer, and micro-motion on every atom.** Sound that is off until the person turns it on,

@@ -1,12 +1,13 @@
 {
   "name": "@feather-apps/release",
   "private": true,
-  "version": "1.21.0",
+  "version": "1.22.0",
   "type": "module",
-  "description": "The release assets callers download from each GitHub release: the feather-page CLI as one file, the page stylesheet with its fonts, and the browser runtime that mounts a page with motion.",
+  "description": "The release assets callers download from each GitHub release: the feather-page CLI as one file, the page stylesheet with its fonts, and the browser runtime that mounts a page with motion, with its Three.js chunk beside it (loaded only where a 3D scene runs).",
   "scripts": {
-    "build": "vite build && vite build -c vite.css.config.ts && vite build -c vite.cli.config.ts",
-    "typecheck": "tsc -p tsconfig.json"
+    "build": "vite build && vite build -c vite.css.config.ts && vite build -c vite.cli.config.ts && node scripts/web.mjs check",
+    "typecheck": "tsc -p tsconfig.json",
+    "zip": "node scripts/web.mjs zip"
   },
   "dependencies": {
     "@aleeforoughi/feather-expression": "workspace:*",
@@ -15,7 +16,9 @@
     "@aleeforoughi/feather-react": "workspace:*",
     "@aleeforoughi/feather-tokens": "workspace:*",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "@aleeforoughi/feather-scene": "workspace:*",
+    "three": "0.187.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",

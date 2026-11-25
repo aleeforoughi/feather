@@ -76,7 +76,7 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
 
     | block | variants |
     |---|---|
-    | hero | stacked, giant-type, split, film, product, index, interactive (renders as giant-type until wave 4) |
+    | hero | stacked, giant-type, split, film, product, index, interactive (with a `scene`: the scene fills the band behind the words; without one it renders as giant-type) |
     | statement | plain, centred, offset, marquee, fill, swap |
     | work | grid, hover-list, stack, rail |
     | case | editorial, scale |
@@ -89,6 +89,23 @@ The reference document is `packages/page/examples/studio-of-one.page.json`.
     | faq, contact | one each |
   - `examples/studio-of-one-loud.page.json` is the reference page at loudness 3, using the expressive variants (the
     showcase serves it at `sites.html?page=loud`).
+- **Scenes (`scene`, from 1.22).** On `hero` (the `interactive` variant), `case` and `signature`:
+  `scene: { kind, preset?, quality?, model?, depth?, hotspots?, variants? }`.
+  - `kind`: `shader` (presets gradient-noise, aurora, grain-field, flow), `particles` (dust, field, morph), `depth` (the
+    block's image and its `depth` map), `model` (a `.glb` or `.gltf`, with up to 8 `hotspots` `{ id, position, label }`
+    and 2–6 finish `variants` `{ id, label, colors }`), or `rail` (a camera flight through the block's scroll).
+  - `quality` (`auto`, `high`, `medium`, `low`, `poster`) is a ceiling: the capability gate always runs, and `poster`
+    means the poster everywhere.
+  - Codes: `contradiction` (a declared loudness below 3, a scene on a hero that is not `interactive`, a scene in a
+    `scale` case), `missing` (a model without its GLB, a depth scene without both images), `unsupported` (a preset or
+    field of another kind), `bad-media` (a model that is not GLB or glTF).
+  - The block's image is the poster (eager on the hero, where it is the LCP); the scene starts after mount, near the
+    view, at loudness 3, without reduced motion and only on a device the gate passes. Hotspots are real buttons over
+    the canvas, mirrored in a list the server writes; finishes are a radio group; anything that moves on its own has a
+    pause control.
+  - Three.js loads only for a page with a model, particles or rail scene, as its own chunk; a page without one never
+    downloads it. A product that bundles `@aleeforoughi/feather-page` itself installs `three` (an optional peer) or
+    aliases it to an empty module.
 - **Loudness on a page.** `FeatherPage` sets `data-loudness` on `<main>` from `page.loudness`, and each block's section
   from its own knob; the brand's default is the theme's `--loudness` (`feather-tokens/4`). The expression components
   ask what the level allows: a reveal needs 1, kinetic type, pins, horizontal tracks and scrubbed sequences need 2,

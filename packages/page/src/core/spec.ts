@@ -24,6 +24,10 @@ export type FieldSpec =
   | { kind: "list"; of: Record<string, FieldSpec & { required?: boolean }>; min?: number; max?: number; ids?: boolean }
   /** A list of library ids (strings) or inline items of the given shape. */
   | { kind: "refs"; library: string; of: Record<string, FieldSpec & { required?: boolean }>; min?: number; max?: number }
+  /** A fixed-length list of numbers (a point in a model's space). */
+  | { kind: "vector"; length: number; min?: number; max?: number }
+  /** An object of free keys (slugs or names) to text: a variant's material colours. */
+  | { kind: "map"; key?: string; max?: number; value?: number }
 
 export type Fields = Record<string, FieldSpec & { required?: boolean }>
 
@@ -111,6 +115,42 @@ export const STAGGERS = ["none", "tight", "default", "loose"] as const
 export const SCROLL_PATTERNS = ["reveal", "parallax", "stack", "horizontal", "scale", "pin"] as const
 /** The patterns that pin the block while it scrubs: they take `length`. Only `pin` takes `snap`. */
 export const PINNED_PATTERNS = ["horizontal", "scale", "pin"] as const
+
+/** What a 3D or WebGL scene is (feather-scene, wave 4). shader: a full-screen field (raw WebGL). particles: points that
+ * drift, yield to the pointer or morph (Three.js). depth: the block's photo given depth by its depth map (raw WebGL).
+ * model: a GLB product to turn and inspect, with hotspots and variants (Three.js). rail: a camera flight that scroll
+ * drives (Three.js). A scene is decoration over the block's poster: it needs loudness 3, and the poster (the block's
+ * media, or a field in the theme's colours) is what every device the scene does not run on keeps. */
+export const SCENE_KINDS = ["shader", "particles", "depth", "model", "rail"] as const
+/** The presets each kind takes (the first is its default); depth, model and rail have none. */
+export const SCENE_PRESETS: Record<(typeof SCENE_KINDS)[number], readonly string[]> = {
+  shader: ["gradient-noise", "aurora", "grain-field", "flow"],
+  particles: ["dust", "field", "morph"],
+  depth: [],
+  model: [],
+  rail: [],
+}
+/** The kinds that load Three.js (a separate chunk, fetched only where the scene runs); shader and depth are raw WebGL. */
+export const THREE_SCENES = ["particles", "model", "rail"] as const
+/** The quality a scene may reach. auto: the capability gate and the device decide. high, medium, low: a ceiling under
+ * what the device allows (the gate still runs). poster: the poster alone, everywhere. */
+export const SCENE_QUALITIES = ["auto", "high", "medium", "low", "poster"] as const
+/** The blocks that take a scene: the hero (its interactive variant), the case and the signature. */
+export const SCENE_BLOCKS = ["hero", "case", "signature"] as const
+
+const SLUG = text(40, true)
+export const SCENE_FIELD: FieldSpec = {
+  kind: "object",
+  of: {
+    kind: { kind: "enum", values: SCENE_KINDS, required: true },
+    preset: { kind: "enum", values: [...new Set(Object.values(SCENE_PRESETS).flat())], code: "unknown-variant" },
+    quality: { kind: "enum", values: SCENE_QUALITIES },
+    model: { kind: "media" },
+    depth: { kind: "media" },
+    hotspots: { kind: "list", of: { id: SLUG, position: { kind: "vector", length: 3, min: -100, max: 100, required: true }, label: text(60, true) }, min: 1, max: 8 },
+    variants: { kind: "list", of: { id: SLUG, label: text(40, true), colors: { kind: "map", key: "a material name", max: 12, value: 60, required: true } }, min: 2, max: 6 },
+  },
+}
 
 /** The knob fields every block takes in /1. `variant` is set per block from BLOCK_RANGE. */
 export const KNOB_FIELDS: Fields = {
@@ -213,7 +253,8 @@ export function blockFields(name: string, version: 0 | 1): Fields {
   if (version === 0) return base
   const range = BLOCK_RANGE[name]
   const variant: Fields = range.variants ? { variant: { kind: "enum", values: range.variants, code: "unknown-variant" } } : {}
-  return { ...base, ...range.fields, ...variant, ...KNOB_FIELDS }
+  const scene: Fields = (SCENE_BLOCKS as readonly string[]).includes(name) ? { scene: SCENE_FIELD } : {}
+  return { ...base, ...range.fields, ...variant, ...KNOB_FIELDS, ...scene }
 }
 
 /** Top-level fields. */

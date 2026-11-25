@@ -1,6 +1,6 @@
 // validatePage: a feather.page/0 or /1 document in, the page or every issue out. Deterministic, no dependencies. Reads the
 // block table in spec.ts, so a block is described once.
-import { ALIGNS, ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, KINETIC_ENTERS, PAGE_KNOBS, PAGE_SCHEMAS, PINNED_PATTERNS, ROUTE_VARIANTS, SCROLL_PATTERNS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "./spec"
+import { ALIGNS, ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, KINETIC_ENTERS, PAGE_KNOBS, PAGE_SCHEMAS, PINNED_PATTERNS, ROUTE_VARIANTS, SCENE_KINDS, SCENE_PRESETS, SCROLL_PATTERNS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "./spec"
 import type { PageDocument, PageIssue, PageResult } from "./types"
 
 const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v)
@@ -153,6 +153,7 @@ function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx:
     if (variant !== "swap" && b.words !== undefined) add(`${path}/words`, "contradiction", "words are the swap statement's; set variant: swap")
   }
   if (kind === "quote" && b.items !== undefined && variant !== "rail") add(`${path}/items`, "contradiction", "more quotes are the rail's; set variant: rail")
+  if (isObject(b.scene)) checkScene(`${path}/scene`, kind, variant, b, b.scene, level, add)
 
   if (motion) {
     const enter = motion.enter
@@ -176,6 +177,41 @@ function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx:
     const effective = typeof pattern === "string" ? pattern : implied
     if (scroll.length !== undefined && !has(PINNED_PATTERNS, effective)) add(`${path}/scroll/length`, "contradiction", `length is for a pinned pattern (${PINNED_PATTERNS.join(", ")}); this block ${effective ? `is a ${effective}` : "does not pin"}`)
     if (scroll.snap !== undefined && effective !== "pin") add(`${path}/scroll/snap`, "contradiction", "snap settles on a pin's steps; this block does not pin")
+  }
+}
+
+/** A scene's knobs against its kind, its block and the loudness: what the field table cannot say. */
+function checkScene(path: string, block: string, variant: string | undefined, b: Record<string, unknown>, scene: Record<string, unknown>, level: number | undefined, add: Add) {
+  const kind = has(SCENE_KINDS, scene.kind) ? scene.kind : undefined
+  // A World scene needs loudness 3 wherever one is declared (the brand's own default decides where none is).
+  if (level !== undefined && level < 3) add(path, "contradiction", `a scene is spectacle, which needs loudness 3 (the block is at ${level})`)
+  if (block === "hero" && variant !== "interactive") add(path, "contradiction", `the scene is the interactive hero's; set variant: interactive${variant ? ` (this hero is ${variant})` : ""}`)
+  if (block === "case" && variant === "scale") add(path, "contradiction", "the scale case grows its media as it pins; a scene cannot sit inside it")
+  if (!kind) return
+  const presets = SCENE_PRESETS[kind]
+  if (typeof scene.preset === "string" && !presets.includes(scene.preset) && Object.values(SCENE_PRESETS).flat().includes(scene.preset)) {
+    add(`${path}/preset`, "unsupported", presets.length ? `a ${kind} scene takes the presets ${presets.join(", ")}` : `a ${kind} scene has no presets`)
+  }
+  for (const k of ["model", "hotspots", "variants"]) if (scene[k] !== undefined && kind !== "model") add(`${path}/${k}`, "unsupported", `${k} is the model scene's (this scene is ${kind})`)
+  if (scene.depth !== undefined && kind !== "depth") add(`${path}/depth`, "unsupported", `depth is the depth scene's (this scene is ${kind})`)
+  if (kind === "model" && scene.model === undefined) add(`${path}/model`, "missing", "a model scene needs its model (a GLB)")
+  const model = typeof scene.model === "string" ? scene.model : isObject(scene.model) && typeof scene.model.src === "string" ? scene.model.src : undefined
+  if (kind === "model" && model !== undefined && !/\.(?:glb|gltf)(?:[?#]|$)/i.test(model)) add(`${path}/model`, "bad-media", "a model is a GLB (or glTF) file")
+  if (kind === "depth") {
+    if (b.media === undefined) add(`${path.slice(0, -"/scene".length)}/media`, "missing", "a depth scene gives the block's photo depth: it needs the photo (media)")
+    if (scene.depth === undefined) add(`${path}/depth`, "missing", "a depth scene needs the photo's depth map (depth)")
+  }
+  for (const k of ["hotspots", "variants"] as const) {
+    const list = scene[k]
+    if (!Array.isArray(list)) continue
+    const seen = new Set<string>()
+    list.forEach((item, i) => {
+      const id = isObject(item) ? item.id : undefined
+      if (typeof id !== "string") return
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) add(`${path}/${k}/${i}/id`, "type", `a ${k === "hotspots" ? "hotspot" : "variant"} id is a slug`)
+      else if (seen.has(id)) add(`${path}/${k}/${i}/id`, "duplicate-id", `the id "${id}" is used twice`)
+      seen.add(id)
+    })
   }
 }
 
@@ -226,6 +262,21 @@ function checkField(path: string, v: unknown, spec: FieldSpec, library: Record<s
       if (spec.min !== undefined && v.length < spec.min) add(path, "too-few", `at least ${spec.min}`)
       if (spec.max !== undefined && v.length > spec.max) add(path, "too-many", `at most ${spec.max}`)
       return
+    case "vector":
+      if (!Array.isArray(v) || v.length !== spec.length || v.some((x) => typeof x !== "number" || !Number.isFinite(x))) return add(path, "type", `expected ${spec.length} numbers`)
+      if (v.some((x) => (spec.min !== undefined && x < spec.min) || (spec.max !== undefined && x > spec.max))) add(path, "out-of-range", `each number from ${spec.min} to ${spec.max}`)
+      return
+    case "map": {
+      if (!isObject(v)) return add(path, "type", `expected an object of ${spec.key ?? "names"} to text`)
+      const entries = Object.entries(v)
+      if (entries.length === 0) add(path, "too-few", "at least 1")
+      if (spec.max !== undefined && entries.length > spec.max) add(path, "too-many", `at most ${spec.max}`)
+      for (const [k, x] of entries) {
+        if (typeof x !== "string") add(`${path}/${esc(k)}`, "type", "expected text")
+        else if (spec.value && [...x].length > spec.value) add(`${path}/${esc(k)}`, "too-long", `at most ${spec.value} characters`)
+      }
+      return
+    }
     case "list":
     case "refs": {
       if (!Array.isArray(v)) return add(path, "type", "expected a list")
