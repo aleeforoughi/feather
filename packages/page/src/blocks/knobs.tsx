@@ -11,6 +11,8 @@ import { BlockTitle, join } from "./shared"
 /** What a block may know about the page around it: the page's defaults, and the index of its sections (the index
  * hero lists them). FeatherPage provides it; a block rendered alone sees none. */
 export interface PageContextValue {
+  /** A feather.page/1 document (a /0 page renders as it always has). */
+  one?: boolean
   defaults?: PageDefaults
   /** The page's layout: a two-colour page gives its images the duotone treatment unless they name another. */
   layout?: PageLayout

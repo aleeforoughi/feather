@@ -5,22 +5,25 @@ import { EDGE_START, PageContext, alignClass, sizeOf, useKnobs, type ResolvedKno
 import { ON_MEDIA, mediaProps, srcsetOf } from "./media"
 import { sizesOf } from "./sizes"
 import { SceneLayer } from "./scene"
-import { BUTTON_PRIMARY, BUTTON_QUIET, filledAction, join, useRegion, type BlockProps } from "./shared"
+import { BUTTON_PRIMARY, BUTTON_QUIET, CHIP, filledAction, join, useRegion, type BlockProps } from "./shared"
 
-/** The starters (when the model is on) as buttons, the first leaning toward the pointer. */
-function Starters({ starters, onAsk, className }: { starters: string[]; onAsk?: (s: string) => void; className: string }) {
+/** The starters (when the model is on). On a /0 page they are buttons, the first filled and leaning toward the
+ * pointer. On a /1 page they are chips, the composer's suggestions: one quiet row, so the section keeps one filled
+ * action (its own link, or none). */
+function Starters({ starters, onAsk, chips, className }: { starters: string[]; onAsk?: (s: string) => void; chips: boolean; className: string }) {
   if (starters.length === 0) return null
   return (
     <ul data-slot="hero-starters" role="list" className={className}>
       {starters.map((starter, i) => {
+        const lead = i === 0 && !chips
         const button = (
-          <button type="button" data-slot="hero-starter" data-variant={i === 0 ? "primary" : "quiet"} className={i === 0 ? BUTTON_PRIMARY : BUTTON_QUIET} onClick={() => onAsk?.(starter)}>
+          <button type="button" data-slot="hero-starter" data-variant={chips ? "chip" : lead ? "primary" : "quiet"} className={chips ? CHIP : lead ? BUTTON_PRIMARY : BUTTON_QUIET} onClick={() => onAsk?.(starter)}>
             {starter}
           </button>
         )
         return (
           <li key={starter} data-slot="hero-starter-item">
-            {i === 0 ? <Magnetic>{button}</Magnetic> : button}
+            {i === 0 && !chips ? <Magnetic>{button}</Magnetic> : button}
           </li>
         )
       })}
@@ -247,12 +250,16 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
       {block.title}
     </DisplayTitle>
   )
+  // A /1 page: the starters are chips, a secondary row after the links, and the links keep their one filled action.
+  const chips = page.one === true
+  const lead = chips || starters.length === 0
   // The starters and the links as one row of acts.
   const acts = (className: string) =>
     starters.length > 0 || block.actions?.length ? (
       <div data-slot="hero-acts-row" className={className}>
-        <Starters starters={starters} onAsk={onAsk} className="flex flex-wrap gap-3" />
-        <Actions actions={block.actions} lead={starters.length === 0} className="flex flex-wrap gap-3" />
+        {chips ? <Actions actions={block.actions} lead={lead} className="flex flex-wrap gap-3" /> : null}
+        <Starters starters={starters} onAsk={onAsk} chips={chips} className="flex flex-wrap gap-3" />
+        {chips ? null : <Actions actions={block.actions} lead={lead} className="flex flex-wrap gap-3" />}
       </div>
     ) : null
 
@@ -267,8 +274,17 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
     )
     const rest = (
       <>
-        <Starters starters={starters} onAsk={onAsk} className={join("col-span-full mt-12 flex flex-wrap gap-3", centre && "justify-center")} />
-        <Actions actions={block.actions} lead={starters.length === 0} className={join("col-span-full flex flex-wrap gap-3", starters.length === 0 ? "mt-12" : "mt-3", centre && "justify-center")} />
+        {chips ? (
+          <>
+            <Actions actions={block.actions} lead={lead} className={join("col-span-full mt-12 flex flex-wrap gap-3", centre && "justify-center")} />
+            <Starters starters={starters} onAsk={onAsk} chips className={join("col-span-full flex flex-wrap gap-2", block.actions?.length ? "mt-4" : "mt-12", centre && "justify-center")} />
+          </>
+        ) : (
+          <>
+            <Starters starters={starters} onAsk={onAsk} chips={false} className={join("col-span-full mt-12 flex flex-wrap gap-3", centre && "justify-center")} />
+            <Actions actions={block.actions} lead={lead} className={join("col-span-full flex flex-wrap gap-3", starters.length === 0 ? "mt-12" : "mt-3", centre && "justify-center")} />
+          </>
+        )}
         {facts.length > 0 ? <Facts facts={facts} className="col-span-full mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4" /> : null}
       </>
     )

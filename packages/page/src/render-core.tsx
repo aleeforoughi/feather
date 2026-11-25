@@ -168,6 +168,7 @@ function ThemeHead({ theme, scheme }: { theme: ReturnType<typeof buildTheme> | n
 function usePageContext(page: PageDocument): PageContextValue {
   return React.useMemo(
     () => ({
+      ...(page.schema === "feather.page/1" ? { one: true } : {}),
       ...(page.defaults ? { defaults: page.defaults } : {}),
       ...(page.layout ? { layout: page.layout } : {}),
       index: page.sections.filter((b): b is typeof b & { id: string; title: string } => typeof b.id === "string" && typeof b.title === "string").map((b) => ({ id: b.id, title: b.title })),

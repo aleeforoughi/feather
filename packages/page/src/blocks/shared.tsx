@@ -38,6 +38,10 @@ export function BlockTitle({ id, children }: { id: string; children: string }) {
 /** Controls are 48px tall (44px hit area at least). The first act of a block is primary; the rest are quiet. */
 export const BUTTON_PRIMARY =
   "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control bg-primary px-6 type-label text-primary-foreground focus-ring"
+/** A starter as a chip (feather.page/1): the living composer's own suggestion style, a secondary row that never
+ * competes with the section's one filled action; at least 48px tall, whatever the density. */
+export const CHIP =
+  "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line-secondary bg-surface-base px-4 type-label text-fg-primary focus-ring not-disabled:hover:bg-surface-hover motion-hover-out"
 export const BUTTON_QUIET =
   "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line-primary bg-surface-base px-6 type-label text-fg-primary focus-ring not-disabled:hover:bg-surface-hover motion-hover-out"
 
