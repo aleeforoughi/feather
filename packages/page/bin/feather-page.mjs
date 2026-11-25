@@ -62,6 +62,9 @@ if (command === "validate") {
   const crossDocument = transition !== undefined && transition !== "none"
   const routeAttr = transition === "view" || transition === "push" ? ` data-route-transition="${transition}"` : ""
   const vt = crossDocument ? `<style>@media (prefers-reduced-motion: no-preference){@view-transition{navigation:auto}}</style>\n` : ""
+  // The colour scheme toggle (scheme): a remembered light or dark choice goes on <html> before the first paint, so the
+  // page never flashes the other scheme. Without script the system's preference holds (the theme's media query).
+  const scheme = page.scheme ? `<script>${lib.schemeScript()}</script>\n` : ""
   // With a runtime, the markup is rendered for hydration and wrapped with the data the runtime boots from. JSON in a
   // script is escaped so no "</script>" or "<!--" inside the document can end it.
   const json = (v) => JSON.stringify(v).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029")
@@ -70,7 +73,7 @@ if (command === "validate") {
       ? `<div data-feather-page-root>${renderToString(element)}</div>\n<script type="application/json" data-feather-page>${json({ ...data, tokens })}</script>\n<script type="module" src="${esc(runtime)}"></script>`
       : renderToStaticMarkup(element)
   const html = (title, body) =>
-    `<!doctype html>\n<html lang="${esc(page.lang ?? "en")}"${routeAttr}>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(title)}</title>\n${page.description ? `<meta name="description" content="${esc(page.description)}">\n<meta property="og:title" content="${esc(title)}">\n<meta property="og:description" content="${esc(page.description)}">\n` : ""}${css ? `<link rel="stylesheet" href="${esc(css)}">\n` : ""}${vt}</head>\n<body>\n${body}\n</body>\n</html>\n`
+    `<!doctype html>\n<html lang="${esc(page.lang ?? "en")}"${routeAttr}>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n${scheme}<title>${esc(title)}</title>\n${page.description ? `<meta name="description" content="${esc(page.description)}">\n<meta property="og:title" content="${esc(title)}">\n<meta property="og:description" content="${esc(page.description)}">\n` : ""}${css ? `<link rel="stylesheet" href="${esc(css)}">\n` : ""}${vt}</head>\n<body>\n${body}\n</body>\n</html>\n`
   const href = (intent) => `${root}${intent}`
   fs.mkdirSync(out, { recursive: true })
   // A static build has no runtime to mount the loader (it would hold at 0%), so the static pages never carry it. With

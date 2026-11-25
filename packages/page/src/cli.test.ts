@@ -55,4 +55,15 @@ describe("feather-page build", () => {
     expect(byFile["404.html"]).toContain('"notFound":true')
     expect(byFile[path.join("work", "index.html")]).toContain('"intent":"work"')
   })
+
+  it("with a scheme, sets a remembered choice in the head before anything paints, and writes both sets", () => {
+    const scheme = { colors: { background: "#F6F1EA", surface: "#FFFFFF", text: "#1C130C", primary: "#1C130C", primaryText: "#FFFFFF" } }
+    for (const p of build({ scheme })) {
+      const head = p.html.slice(0, p.html.indexOf("</head>"))
+      expect(head, p.file).toMatch(/<script>try\{var s=localStorage\.getItem\("feather-scheme"\)/)
+      expect(head.indexOf("<script>"), p.file).toBeLessThan(head.indexOf("<title>"))
+      expect(p.html, p.file).toContain('<style data-feather-scheme="">')
+    }
+    for (const p of build({})) expect(p.html, p.file).not.toContain("feather-scheme")
+  })
 })
