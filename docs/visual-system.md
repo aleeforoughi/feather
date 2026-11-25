@@ -626,6 +626,24 @@ house defaults below live in foundation.css for it.
   | s | 1.5 → 3 | −0.01 → −0.025 | 1.05 |
 
   Display leading is a ratio, not a 4px multiple: it is the one type exception, and only for `type-display-*`.
+- **Fit.** Display type never runs past its box, never meets the copy around it and never breaks inside a word that
+  would fit (`apps/showcase/e2e/fit.spec.ts` proves it on every hero, numbers, statement, case and timeline variant).
+  - Each display step is capped at what fits the box it sits in: the nearest inline-size container (`100cqi`), or
+    outside one the page's content width. The parent of every display title, block title and display figure is a
+    container, so a split hero's title sizes against its half column and a number against its cell, never the
+    viewport.
+  - What must fit is `--display-measure` characters (10) at `--display-advance` em each (0.62), or the text's longest
+    unbreakable run when it is longer: `--fit-chars`, which DisplayTitle and the page blocks write only then
+    (`fitStyle`, `FitText` in `feather-expression`), so ordinary text renders byte for byte as before. The heading
+    roles take the cap only where a text writes `--fit-chars`.
+  - Nothing steps under `--display-fit-floor` (1.5rem). A run that cannot fit even there is a `fit-word`: it
+    hyphenates (`hyphens: auto`, in the page's `lang`) and, as a last resort, breaks anywhere. An ordinary word is
+    one unbreakable piece and moves to the next line whole.
+  - A number keeps its unit on its line (a no-break space) while the pair fits the measure; a longer pair joins with
+    a plain space, so the unit wraps under the number (`unitSpace`).
+  - A display line set under 1 hangs its glyphs out of its box by `(--display-overhang em − 1lh) / 2` at each edge
+    (1.3: the reference faces measure 1.25 to 1.29). Where a title meets other copy, that edge reserves it, so an
+    eyebrow above or a lede below keeps its gap from the glyphs, not only from the box.
 - **Features**, all on by default: `tabularNums` (`numeric`), `balanceTitles` (`--title-wrap`) and `prettyBody`
   (`text-prose`).
 - **`voiceFace`**: the speaker's face in a Living Page (`font-voice`), so you can see who is speaking.

@@ -375,6 +375,14 @@
     --display-s-size: clamp(1.5rem, 1rem + 2.2222vw, 3rem);
     --display-s-tracking: clamp(-0.075rem, 0.005rem - 0.0889vw, -0.015rem);
     --display-s-leading: 1.05;
+    /* Fit (section 14.1): a display line always holds --display-measure characters at --display-advance em each, and
+       no display or heading text steps under --display-fit-floor to fit. */
+    --display-measure: 10;
+    --display-advance: 0.62;
+    --display-fit-floor: 1.5rem;
+    /* A face's ascent and descent, in em: what a display line set under it hangs out of its box. 1.3 holds the
+       reference display faces (Space Grotesk 1.29, Sora 1.28, Fraunces 1.25, measured in Chromium). */
+    --display-overhang: 1.3;
     --title-wrap: balance;
     --body-wrap: pretty;
     --numeric-figures: tabular-nums;
@@ -790,14 +798,14 @@
 }
 @utility type-heading-1 {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: 2.5rem;
+  font-size: min(2.5rem, max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), 0.01) * var(--display-advance))));
   line-height: 3rem;
   font-weight: var(--heading-weight, 700);
   letter-spacing: -0.02em;
 }
 @utility type-heading-2 {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: 2rem;
+  font-size: min(2rem, max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), 0.01) * var(--display-advance))));
   line-height: 2.5rem;
   font-weight: var(--heading-weight, 600);
   letter-spacing: -0.015em;
@@ -1069,35 +1077,80 @@ html[data-route-transition="circle"]::view-transition-new(root) {
 }
 @utility type-display-xl {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: var(--display-xl-size);
+  font-size: min(var(--display-xl-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-xl-leading);
   letter-spacing: var(--display-xl-tracking);
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
+  overflow-wrap: anywhere;
 }
 @utility type-display-l {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: var(--display-l-size);
+  font-size: min(var(--display-l-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-l-leading);
   letter-spacing: var(--display-l-tracking);
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
+  overflow-wrap: anywhere;
 }
 @utility type-display-m {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: var(--display-m-size);
+  font-size: min(var(--display-m-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-m-leading);
   letter-spacing: var(--display-m-tracking);
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
+  overflow-wrap: anywhere;
 }
 @utility type-display-s {
   font-family: var(--brand-font-display, var(--brand-font-body, "JetBrains Mono Variable", monospace));
-  font-size: var(--display-s-size);
+  font-size: min(var(--display-s-size), max(var(--display-fit-floor), min(100cqi, 100vw - 2 * var(--layout-margin)) / (max(var(--fit-chars, 0), var(--display-measure)) * var(--display-advance))));
   line-height: var(--display-s-leading);
   letter-spacing: var(--display-s-tracking);
   font-weight: var(--display-weight);
   text-wrap: var(--title-wrap);
+  overflow-wrap: anywhere;
+}
+/* Fit (section 14.1): display type never runs past its box. Each display step is capped at what fits the box it sits
+   in: the nearest inline-size container (100cqi; the parent of every display title, block title and display figure is
+   one, below), or outside one the page's content width. What must fit is --display-measure characters, or the text's
+   longest unbreakable run when it is longer (--fit-chars: DisplayTitle and the page blocks write it, see
+   feather-expression's core/fit), at --display-advance em each. The heading roles take the cap only where a text
+   writes --fit-chars. Nothing steps under --display-fit-floor: a run that cannot fit even there is a fit-word, which
+   hyphenates (hyphens: auto, in the page's lang) and, as a last resort, breaks anywhere rather than run past its box.
+   An ordinary word never breaks: it is one fit-word or inline piece, and overflow-wrap: anywhere only applies to a
+   run alone on its line that does not fit. */
+@property --fit-chars {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+:where(:has(> :is([data-slot="display-title"], [data-slot="block-title"], [data-slot="statement-fill"], [data-slot="number-value"], [data-slot="timeline-when"]))) {
+  container-type: inline-size;
+}
+/* A display line set under 1 hangs its glyphs out of its box by (--display-overhang em - 1lh) / 2 at the top and at the
+   bottom (34px at 160px and leading 0.86). Where a title meets other copy (an eyebrow above, a lede below), that edge
+   reserves it, so the gap is kept from the glyphs and not only from the box. A utility margin still wins. */
+@layer components {
+  :where(* + :is([data-slot="display-title"], [data-slot="statement-fill"])) {
+    margin-block-start: max(0px, (var(--display-overhang) * 1em - 1lh) / 2);
+  }
+  :where(:is([data-slot="display-title"], [data-slot="statement-fill"]):has(+ *)) {
+    margin-block-end: max(0px, (var(--display-overhang) * 1em - 1lh) / 2);
+  }
+}
+/* Inside a page block no word runs past its box: copy that is not a title (a label, a fact, a cell) breaks a word too
+   long for its line rather than overflow. Titles fit first (above) and break only at the floor. */
+:where([data-block]) {
+  overflow-wrap: anywhere;
+}
+@utility fit-word {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: anywhere;
 }
 /* Website layout (section 14.5): the page grid as a utility, section rhythm (group gaps of 48 to 160px, fluid),
    concentric radii, and the surface axis made visible. */
