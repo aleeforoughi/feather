@@ -14,25 +14,17 @@
 //   ?transition=<variant>         how a brand switch arrives (default the page's own `transition`)
 //   ?hero=poster                  the loud page's hero scene at quality poster (the scene e2e, so a software-rendered
 //                                 shader does not run while it inspects the model further down)
+// The page loads as a page built by `feather-page build --runtime` does: its document on its own, then only the block
+// families it uses (media, flows), so the loud page's budgets measure what that page ships.
 // Switching brands is an in-page route change through createTransitions().go(), so every route variant can be seen
 // and tested here; a static site built by `feather-page build` uses cross-document View Transitions instead.
 import { StrictMode } from "react"
 import { createTransitions, type RouteVariant } from "@aleeforoughi/feather-expression"
-import { FeatherPage, mountPage, PageNotFound, validatePage, type PageDocument } from "@aleeforoughi/feather-page"
+import { FeatherPageCore as FeatherPage, loadPageBlocks, mountPage, PageNotFoundCore as PageNotFound, validateLoaded, type PageDocument } from "@aleeforoughi/feather-page/runtime"
 import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 import studio from "@aleeforoughi/feather-tokens/themes/studio.json"
 import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
 import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
-import reference from "../../../packages/page/examples/studio-of-one.page.json"
-import loud from "../../../packages/page/examples/studio-of-one-loud.page.json"
-import media from "../../../packages/page/examples/studio-of-one-media.page.json"
-import flows from "../../../packages/page/examples/studio-of-one-flows.page.json"
-import launch from "../../../packages/page/templates/launch.page.json"
-import studioTemplate from "../../../packages/page/templates/studio.page.json"
-import editorial from "../../../packages/page/templates/editorial.page.json"
-import service from "../../../packages/page/templates/service.page.json"
-import product from "../../../packages/page/templates/product.page.json"
-import creator from "../../../packages/page/templates/creator.page.json"
 import schemes from "./schemes.json"
 import "./sites.css"
 
@@ -40,19 +32,35 @@ const BRANDS: Record<string, { dark: boolean; tokens: unknown }> = { studio, por
 const params = new URLSearchParams(location.search)
 const loader = params.get("loader")
 const pageParam = params.get("page")
-const TEMPLATES: Record<string, unknown> = { launch, studio: studioTemplate, editorial, service, product, creator }
+type Doc = { default: unknown }
+const PAGES: Record<string, () => Promise<Doc>> = {
+  reference: () => import("../../../packages/page/examples/studio-of-one.page.json"),
+  loud: () => import("../../../packages/page/examples/studio-of-one-loud.page.json"),
+  media: () => import("../../../packages/page/examples/studio-of-one-media.page.json"),
+  flows: () => import("../../../packages/page/examples/studio-of-one-flows.page.json"),
+}
+const TEMPLATES: Record<string, () => Promise<Doc>> = {
+  launch: () => import("../../../packages/page/templates/launch.page.json"),
+  studio: () => import("../../../packages/page/templates/studio.page.json"),
+  editorial: () => import("../../../packages/page/templates/editorial.page.json"),
+  service: () => import("../../../packages/page/templates/service.page.json"),
+  product: () => import("../../../packages/page/templates/product.page.json"),
+  creator: () => import("../../../packages/page/templates/creator.page.json"),
+}
 const template = params.get("template")
 if (template !== null && !TEMPLATES[template]) throw new Error(`?template=${template}: the templates are ${Object.keys(TEMPLATES).join(", ")}`)
-const doc = (template ? TEMPLATES[template] : pageParam === "loud" ? loud : pageParam === "flows" ? flows : pageParam === "media" ? media : reference) as typeof reference
+const doc = (await (template ? TEMPLATES[template] : PAGES[pageParam ?? ""] ?? PAGES.reference)()).default as { sections: { scene?: object }[] } & Record<string, unknown>
 
 const withSound = params.get("sound") === "1"
-const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && "scene" in b && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
-const result = validatePage({
+const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
+const input = {
   ...doc,
   ...(params.get("hero") === "poster" ? { sections: heroPoster(doc.sections) } : {}),
   ...(loader === "counter" || loader === "dock" ? { loader: { variant: loader, label: "Loading the studio of one", ...(withSound ? { sound: true } : {}) } } : {}),
   ...(withSound ? { sound: { bed: "media/bed.mp3" } } : {}),
-})
+}
+const { blocks, parts } = await loadPageBlocks(input)
+const result = validateLoaded(input)
 if (!result.ok) throw new Error(result.issues.map((i) => `${i.path} ${i.code}`).join("\n"))
 const page: PageDocument = result.page
 const variant = (params.get("transition") ?? page.transition ?? "fade") as RouteVariant
@@ -77,7 +85,7 @@ function view(name: string) {
           </a>
         ))}
       </nav>
-      {params.get("view") === "404" ? <PageNotFound page={branded} tokens={tokens} /> : <FeatherPage page={branded} tokens={tokens} />}
+      {params.get("view") === "404" ? <PageNotFound page={branded} tokens={tokens} parts={parts} /> : <FeatherPage page={branded} tokens={tokens} blocks={blocks} parts={parts} />}
     </StrictMode>
   )
 }

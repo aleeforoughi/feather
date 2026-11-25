@@ -11,10 +11,10 @@ const dir = path.resolve(HERE, "..", process.env.STORYBOOK_DIR ?? "storybook-sta
 const index = JSON.parse(fs.readFileSync(path.join(dir, "index.json"), "utf8")) as { entries: Record<string, { id: string; type: string }> }
 const stories = Object.values(index.entries)
   .filter((e) => e.type === "story")
-  // Gate 2 is product UI's law (section 12). The website layer (Website/*, Living/*, Pages/*) follows section 14 instead:
+  // Gate 2 is product UI's law (section 12). The website layer (Website/*, Living/*, Pages/*, and Templates/*, whole pages made of Pages blocks) follows section 14 instead:
   // fluid display sizes and ratio leading are its point. Its motion, focus and reduced-motion rules are checked by
   // the expression gate (scripts/feather-hygiene.mjs, "expression") and its own tests.
-  .filter((e) => !/^(website|living|pages)-/.test(e.id))
+  .filter((e) => !/^(website|living|pages|templates)-/.test(e.id))
   .map((e) => e.id)
   .sort()
 const only = process.env.AUDIT_STORY ? new RegExp(process.env.AUDIT_STORY) : null
