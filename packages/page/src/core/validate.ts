@@ -1,6 +1,6 @@
 // validatePage: a feather.page/0 or /1 document in, the page or every issue out. Deterministic, no dependencies. Reads the
 // block table in spec.ts, so a block is described once.
-import { ALIGNS, ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, KINETIC_ENTERS, PAGE_KNOBS, PAGE_SCHEMAS, PINNED_PATTERNS, ROUTE_VARIANTS, SCENE_KINDS, SCENE_PRESETS, SCROLL_PATTERNS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "./spec"
+import { ALIGNS, ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, KINETIC_ENTERS, MOVING_TREATMENTS, OPTION_FIELDS, PAGE_BLOCKS, PAGE_KNOBS, PAGE_SCHEMAS, PINNED_PATTERNS, ROUTE_VARIANTS, SCENE_KINDS, SCENE_PRESETS, SCROLL_PATTERNS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "./spec"
 import type { PageDocument, PageIssue, PageResult } from "./types"
 
 const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v)
@@ -52,11 +52,11 @@ export function validatePage(input: unknown): PageResult {
   for (const [id, item] of Object.entries(work)) checkFields(`/library/work/${esc(id)}`, item, withoutId(BLOCKS.work.fields.items), library, add)
 
   const ids = new Set<string>()
-  const checkBlocks = (path: string, blocks: unknown, min: number, max: number) => {
+  const checkBlocks = (path: string, blocks: unknown, min: number, max: number, scene = false) => {
     if (!Array.isArray(blocks)) return add(path, "missing", `${path.split("/").pop()} is a list of blocks`)
     if (blocks.length < min) add(path, "too-few", `at least ${min} block${min === 1 ? "" : "s"}`)
     if (blocks.length > max) add(path, "too-many", `at most ${max} blocks`)
-    blocks.forEach((b, i) => checkBlock(`${path}/${i}`, b, library, ids, add, ctx))
+    blocks.forEach((b, i) => checkBlock(`${path}/${i}`, b, library, ids, add, { ...ctx, scene }))
   }
   checkBlocks("/sections", doc.sections, 1, 40)
 
@@ -70,7 +70,7 @@ export function validatePage(input: unknown): PageResult {
       continue
     }
     for (const k of ["ask", "line"]) if (typeof scene[k] !== "string" || !(scene[k] as string).trim()) add(`${at}/${k}`, "missing", `a scene needs its ${k}`)
-    checkBlocks(`${at}/blocks`, scene.blocks, 1, 3)
+    checkBlocks(`${at}/blocks`, scene.blocks, 1, 3, true)
     if (scene.asks !== undefined) checkField(`${at}/asks`, scene.asks, { kind: "texts", max: 3 }, library, add)
   }
 
@@ -106,13 +106,18 @@ interface BlockContext {
   v1: boolean
   /** The page's own loudness, when it sets one. */
   pageLoudness?: number
+  /** The block is in a prepared scene (an answer): only the Living Page's library may be. */
+  scene?: boolean
 }
 
 function checkBlock(path: string, b: unknown, library: Record<string, unknown>, ids: Set<string>, add: Add, ctx: BlockContext) {
   if (!isObject(b)) return add(path, "type", "a block is an object with a `block` kind")
   const kind = b.block
-  const spec = typeof kind === "string" ? BLOCKS[kind] : undefined
-  if (!spec) return add(`${path}/block`, "unknown-block", `"${String(kind)}" is not a block of the library (${Object.keys(BLOCKS).join(", ")})`)
+  const pageOnly = typeof kind === "string" && kind in PAGE_BLOCKS
+  if (pageOnly && ctx.scene) return add(`${path}/block`, "unknown-block", `"${kind}" is a page block; an answer is built from the Living Page's library (${Object.keys(BLOCKS).join(", ")})`)
+  if (pageOnly && !ctx.v1) return add(`${path}/block`, "needs-schema-1", `${kind} is a block of feather.page/1; set "schema": "feather.page/1"`)
+  const spec = typeof kind === "string" ? (BLOCKS[kind] ?? (pageOnly ? PAGE_BLOCKS[kind] : undefined)) : undefined
+  if (!spec) return add(`${path}/block`, "unknown-block", `"${String(kind)}" is not a block of the library (${[...Object.keys(BLOCKS), ...Object.keys(PAGE_BLOCKS)].join(", ")})`)
   if (b.id !== undefined) {
     if (typeof b.id !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(b.id)) add(`${path}/id`, "type", "a block id is a slug (it is its anchor)")
     else if (ids.has(b.id)) add(`${path}/id`, "duplicate-id", `the id "${b.id}" is used twice`)
@@ -154,6 +159,8 @@ function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx:
   }
   if (kind === "quote" && b.items !== undefined && variant !== "rail") add(`${path}/items`, "contradiction", "more quotes are the rail's; set variant: rail")
   if (isObject(b.scene)) checkScene(`${path}/scene`, kind, variant, b, b.scene, level, add)
+  checkTreatment(path, kind, b.treatment, level, add)
+  checkPageBlock(path, kind, variant, b, add)
 
   if (motion) {
     const enter = motion.enter
@@ -177,6 +184,75 @@ function checkKnobs(path: string, kind: string, b: Record<string, unknown>, ctx:
     const effective = typeof pattern === "string" ? pattern : implied
     if (scroll.length !== undefined && !has(PINNED_PATTERNS, effective)) add(`${path}/scroll/length`, "contradiction", `length is for a pinned pattern (${PINNED_PATTERNS.join(", ")}); this block ${effective ? `is a ${effective}` : "does not pin"}`)
     if (scroll.snap !== undefined && effective !== "pin") add(`${path}/scroll/snap`, "contradiction", "snap settles on a pin's steps; this block does not pin")
+  }
+}
+
+/** treatment: only where the block has images, and a moving one only at a loudness that lets it move. */
+function checkTreatment(path: string, kind: string, treatment: unknown, level: number | undefined, add: Add) {
+  if (treatment === undefined) return
+  if (!BLOCK_RANGE[kind].treatment) return add(`${path}/treatment`, "unsupported", `${kind} has no images to treat`)
+  const needs = typeof treatment === "string" ? MOVING_TREATMENTS[treatment] : undefined
+  if (needs !== undefined && level !== undefined && level < needs) add(`${path}/treatment`, "contradiction", `${treatment} moves, which needs loudness ${needs} (the block is at ${level})`)
+}
+
+const VIDEO = /\.(?:mp4|webm|mov|m4v)(?:[?#]|$)/i
+const mediaSrcOf = (m: unknown): string | undefined => (typeof m === "string" ? m : isObject(m) && typeof m.src === "string" ? m.src : undefined)
+const isVideo = (m: unknown) => (isObject(m) && Array.isArray(m.sources) && m.sources.some((x) => isObject(x) && typeof x.type === "string" && x.type.startsWith("video/"))) || VIDEO.test(mediaSrcOf(m) ?? "")
+/** An image that is content: written with its alt text (a bare path, or decorative, has none). */
+const contentImage = (path: string, m: unknown, what: string, add: Add) => {
+  if (m === undefined || mediaSrcOf(m) === undefined) return
+  if (typeof m === "string") add(path, "missing", `${what} is content: write it as { src, alt }`)
+  else if (isObject(m) && m.decorative === true) add(`${path}/decorative`, "contradiction", `${what} is content, never decorative: give it alt text`)
+}
+const ISO_DATE = /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+/** The rules of the page blocks (and the new variants of the living ones) that the field table cannot say. */
+function checkPageBlock(path: string, kind: string, variant: string | undefined, b: Record<string, unknown>, add: Add) {
+  const list = (k: string) => (Array.isArray(b[k]) ? (b[k] as unknown[]) : [])
+  if (kind === "gallery") {
+    if (b.loop !== undefined && variant !== undefined && variant !== "rail" && variant !== "wheel") add(`${path}/loop`, "contradiction", `loop is the rail's and the wheel's (this gallery is ${variant})`)
+    list("items").forEach((item, i) => isObject(item) && contentImage(`${path}/items/${i}/media`, item.media, "a gallery image", add))
+  }
+  if (kind === "comparison") for (const k of ["before", "after"]) contentImage(`${path}/${k}`, b[k], `the ${k} image`, add)
+  if (kind === "journal") list("items").forEach((item, i) => isObject(item) && typeof item.date === "string" && !ISO_DATE.test(item.date) && add(`${path}/items/${i}/date`, "type", "a date is written YYYY-MM-DD"))
+  if (kind === "showreel") {
+    const m = b.media
+    if (mediaSrcOf(m) !== undefined && !isVideo(m)) add(`${path}/media`, "bad-media", "a showreel is a video (mp4, webm, mov, or video sources)")
+    else if (mediaSrcOf(m) !== undefined && !(isObject(m) && typeof m.poster === "string")) add(`${path}/media/poster`, "missing", "a showreel needs its poster: the still before it plays, under reduced motion and on data saver")
+    const captions = mediaSrcOf(b.captions)
+    if (b.speech === true && b.captions === undefined) add(`${path}/captions`, "missing", "a film with speech needs its captions (a WebVTT file)")
+    if (captions !== undefined && !/\.vtt(?:[?#]|$)/i.test(captions)) add(`${path}/captions`, "bad-media", "captions are a WebVTT file (.vtt)")
+  }
+  if (kind === "form") {
+    if (typeof b.action === "string" && !/^(https?:\/\/|mailto:|\/(?!\/)|\.{1,2}\/|[A-Za-z0-9_-])/.test(b.action.trim())) add(`${path}/action`, "bad-href", "a form posts to an http(s) URL or a path, or opens a mailto: address")
+    else if (typeof b.action === "string" && /^(tel:|#)/.test(b.action.trim())) add(`${path}/action`, "bad-href", "a form posts to an http(s) URL or a path, or opens a mailto: address")
+    const seen = new Set<string>()
+    list("fields").forEach((f, i) => {
+      if (!isObject(f)) return
+      const at = `${path}/fields/${i}`
+      if (typeof f.name === "string") {
+        if (!SLUG_RE.test(f.name)) add(`${at}/name`, "type", "a field name is a slug (it is what the form sends)")
+        else if (seen.has(f.name)) add(`${at}/name`, "duplicate-id", `the field name "${f.name}" is used twice`)
+        seen.add(f.name)
+      }
+      const type = typeof f.type === "string" ? f.type : "text"
+      const options = has(OPTION_FIELDS, type)
+      if (options && f.options === undefined) add(`${at}/options`, "missing", `a ${type} needs its options`)
+      if (!options && f.options !== undefined) add(`${at}/options`, "contradiction", "options are a select's or a choice's")
+      if (options && f.max !== undefined) add(`${at}/max`, "contradiction", `a ${type} has no length`)
+      if (type === "choice" && f.placeholder !== undefined) add(`${at}/placeholder`, "contradiction", "a choice has no placeholder")
+    })
+  }
+  if (kind === "offer") {
+    const items = list("items")
+    if (variant === "toggle") {
+      if (b.periods === undefined) add(`${path}/periods`, "missing", "the toggle offer switches between two periods (or plans): name them")
+      items.forEach((item, i) => isObject(item) && item.prices === undefined && add(`${path}/items/${i}/prices`, "missing", "in a toggle offer every item has a price for each period"))
+    } else {
+      if (b.periods !== undefined) add(`${path}/periods`, "contradiction", "periods are the toggle offer's; set variant: toggle")
+      items.forEach((item, i) => isObject(item) && item.prices !== undefined && add(`${path}/items/${i}/prices`, "contradiction", "prices are the toggle offer's; set variant: toggle"))
+    }
   }
 }
 

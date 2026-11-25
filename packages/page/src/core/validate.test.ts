@@ -3,7 +3,7 @@ import path from "node:path"
 import { describe, expect, it } from "vitest"
 import { pageJsonSchema } from "../../scripts/json-schema.ts"
 import { BLOCK_KINDS } from "../../../living/src/core/blocks"
-import { BLOCK_NAMES } from "./spec"
+import { BLOCK_NAMES, PAGE_BLOCK_NAMES } from "./spec"
 import { resolveRefs, validatePage } from "./validate"
 
 // The reference page, loosely typed so a test can break it on purpose.
@@ -107,6 +107,6 @@ describe("schema/feather.page-0.json and feather.page-1.json", () => {
   })
   it("offers one schema per block", () => {
     const blocks = (pageJsonSchema().$defs as { block: { oneOf: { properties: { block: { const: string } } }[] } }).block.oneOf
-    expect(blocks.map((b) => b.properties.block.const)).toEqual(BLOCK_NAMES)
+    expect(blocks.map((b) => b.properties.block.const)).toEqual([...BLOCK_NAMES, ...PAGE_BLOCK_NAMES])
   })
 })

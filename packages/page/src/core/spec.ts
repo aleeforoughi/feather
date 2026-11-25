@@ -152,6 +152,14 @@ export const SCENE_FIELD: FieldSpec = {
   },
 }
 
+/** An image treatment on every image of a block (MediaFrame's MediaTreatment, wave 5): decoration, never content.
+ * clean: none (the default). clip-reveal: uncovered as it enters, and blur-to-sharp: soft until decoded (both need
+ * loudness 1). inner-parallax: the image drifts inside its frame (loudness 2). duotone: the brand's primary and
+ * surface. grain: a still film grain. The moving ones rest under reduced motion and on the LCP image. */
+export const TREATMENTS = ["clean", "clip-reveal", "inner-parallax", "blur-to-sharp", "duotone", "grain"] as const
+/** The treatments that move, and the loudness each needs. */
+export const MOVING_TREATMENTS: Record<string, 1 | 2> = { "clip-reveal": 1, "blur-to-sharp": 1, "inner-parallax": 2 }
+
 /** The knob fields every block takes in /1. `variant` is set per block from BLOCK_RANGE. */
 export const KNOB_FIELDS: Fields = {
   loudness: { kind: "number", min: 0, max: 3, integer: true },
@@ -177,6 +185,7 @@ export const KNOB_FIELDS: Fields = {
       snap: { kind: "boolean" },
     },
   },
+  treatment: { kind: "enum", values: TREATMENTS },
 }
 
 export interface BlockRange {
@@ -197,6 +206,8 @@ export interface BlockRange {
   sideways?: readonly string[]
   /** Fields the block gains in /1. */
   fields?: Fields
+  /** Whether the block has images that `treatment` applies to. */
+  treatment?: boolean
 }
 
 const LINKS2: FieldSpec & { required?: boolean } = { kind: "list", of: { label: text(40, true), href: { kind: "href", required: true } }, min: 1, max: 2 }
@@ -212,6 +223,7 @@ export const BLOCK_RANGE: Record<string, BlockRange> = {
     scale: true,
     needsMedia: ["split", "film", "product"],
     fields: { facts: FACTS, actions: LINKS2 },
+    treatment: true,
   },
   statement: {
     variants: ["plain", "centred", "offset", "marquee", "fill", "swap"],
@@ -223,17 +235,25 @@ export const BLOCK_RANGE: Record<string, BlockRange> = {
     sideways: ["marquee"],
     fields: { words: { kind: "texts", min: 2, max: 6 } },
   },
-  work: { variants: ["grid", "hover-list", "stack", "rail"], aligns: ["start", "split"], scroll: ["reveal", "stack", "horizontal"], crop: false, scale: true, implies: { stack: "stack", rail: "horizontal" } },
-  case: { variants: ["editorial", "scale"], aligns: ["start", "center"], scroll: ["reveal", "parallax", "scale"], crop: true, scale: true, implies: { scale: "scale" }, needsMedia: ["scale"] },
+  work: { variants: ["grid", "hover-list", "stack", "rail", "fullscreen-cases", "bento"], aligns: ["start", "split"], scroll: ["reveal", "stack", "horizontal"], crop: false, scale: true, implies: { stack: "stack", rail: "horizontal" }, treatment: true },
+  case: { variants: ["editorial", "scale"], aligns: ["start", "center"], scroll: ["reveal", "parallax", "scale"], crop: true, scale: true, implies: { scale: "scale" }, needsMedia: ["scale"], treatment: true },
   numbers: { variants: ["counter", "plain", "lead"], aligns: ["start", "center", "split"], scroll: ["reveal"], crop: false, scale: true },
   timeline: { variants: ["list", "horizontal"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
   process: { variants: ["list", "pinned", "rows"], aligns: ["start", "split"], scroll: ["reveal", "pin"], crop: false, scale: true, implies: { pinned: "pin" } },
   logos: { variants: ["grid", "marquee"], aligns: ["start", "center"], scroll: ["reveal"], crop: false, scale: true, sideways: ["marquee"] },
   quote: { variants: ["large", "rail", "pull"], aligns: ["start", "center", "offset"], scroll: ["reveal"], crop: false, scale: true, fields: { items: { kind: "list", of: { text: text(400, true), by: text(80, true), role: text(80) }, min: 1, max: 8 } } },
-  offer: { variants: ["cards", "table"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
+  offer: {
+    variants: ["cards", "table", "toggle"],
+    aligns: ["start", "split"],
+    scroll: ["reveal"],
+    crop: false,
+    scale: true,
+    // toggle: the two periods (or two plans) a radio group switches between, and each item's price in both.
+    fields: { periods: { kind: "texts", min: 2, max: 2 }, items: { kind: "list", of: { name: text(60, true), price: text(40), prices: { kind: "texts", min: 2, max: 2 }, body: text(240), href: { kind: "href" } }, min: 1, max: 4 } },
+  },
   faq: { variants: ["list"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
   contact: { variants: ["plain"], aligns: ["start", "center", "offset"], scroll: ["reveal"], crop: false, scale: true },
-  signature: { variants: null, aligns: ["start", "center"], scroll: ["reveal", "parallax"], crop: true, scale: true },
+  signature: { variants: null, aligns: ["start", "center"], scroll: ["reveal", "parallax"], crop: true, scale: true, treatment: true },
 }
 
 /** Page-level knobs (feather.page/1): the page's loudness, and defaults a block takes when it sets none. A default
@@ -248,7 +268,7 @@ export const PAGE_KNOBS: Fields = {
 
 /** A block's fields in a schema version: /0 is the table above; /1 adds the knobs and the block's /1 fields. */
 export function blockFields(name: string, version: 0 | 1): Fields {
-  const spec = BLOCKS[name]
+  const spec = BLOCKS[name] ?? PAGE_BLOCKS[name]
   const base: Fields = { title: { kind: "text", max: 160 }, ...spec.fields }
   if (version === 0) return base
   const range = BLOCK_RANGE[name]
@@ -260,3 +280,67 @@ export function blockFields(name: string, version: 0 | 1): Fields {
 /** Top-level fields. */
 export const SPEAKER_KINDS = ["person", "company", "product"] as const
 export const ANCHORS = ["reader", "end"] as const
+
+// ---- Media and new page blocks (feather.page/1, wave 5 part A; docs/proposals/2026-11-24-range.md section 5 E and G)
+// Blocks only a /1 page takes. They are the page's, not the Living Page's: an answer is still built from BLOCKS (the
+// living library), so a scene cannot hold one, and BLOCK_NAMES stays equal to feather-living's BLOCK_KINDS.
+
+const GALLERY_ITEM: Fields = { media: { kind: "media", required: true }, title: text(80), caption: text(160) }
+const STORY_STEP: Fields = { title: text(60, true), body: text(240), media: { kind: "media", required: true } }
+const TESTIMONIAL: Fields = { text: text(400, true), by: text(80, true), role: text(80) }
+const JOURNAL_ENTRY: Fields = { date: text(10, true), title: text(120, true), excerpt: text(280), href: { kind: "href", required: true }, media: { kind: "media" } }
+
+/** The kinds of a form field: the input types a page may ask for (each a native control), a multi-line text, a
+ * select and a choice (a radio group). */
+export const FORM_FIELD_TYPES = ["text", "email", "tel", "url", "number", "textarea", "select", "choice"] as const
+/** The form field types that take `options`. */
+export const OPTION_FIELDS = ["select", "choice"] as const
+const FORM_FIELD: Fields = {
+  name: text(40, true),
+  label: text(80, true),
+  type: { kind: "enum", values: FORM_FIELD_TYPES },
+  required: { kind: "boolean" },
+  hint: text(160),
+  placeholder: text(80),
+  options: { kind: "texts", min: 2, max: 8 },
+  /** The longest answer, in characters (text kinds), or the largest number (number). */
+  max: { kind: "number", min: 1, max: 4000, integer: true },
+  /** The browser's autofill hint (name, email, organization, tel…). */
+  autocomplete: text(40),
+}
+
+export const PAGE_BLOCK_DOCS = {
+  gallery: "Images to look through, each opening large in the lightbox. Every image is content: it needs alt text.",
+  comparison: "Before and after, compared with a slider (a native range); side by side without script.",
+  story: "A story told in two to six steps, each with its picture, which stays pinned and changes as the steps pass.",
+  testimonials: "Several people's words, attributed: a grid, or a rail.",
+  journal: "Writing, as an editorial list: date, title, excerpt and the link to read it.",
+  form: "A short form that posts to the page's own endpoint (or opens an email), and works with no script.",
+  showreel: "A film with its controls and captions: play and pause, mute, and a captions track when anyone speaks.",
+} as const
+
+/** Blocks only feather.page/1 takes (not the Living Page's). */
+export const PAGE_BLOCKS: Record<string, { fields: Fields; doc: string }> = {
+  gallery: { doc: PAGE_BLOCK_DOCS.gallery, fields: { title: TITLE, body: BODY, items: { kind: "list", of: GALLERY_ITEM, min: 2, max: 24 } } },
+  comparison: {
+    doc: PAGE_BLOCK_DOCS.comparison,
+    fields: { title: TITLE, body: BODY, before: { kind: "media", required: true }, after: { kind: "media", required: true }, beforeLabel: text(40), afterLabel: text(40), start: { kind: "number", min: 0, max: 100, integer: true } },
+  },
+  story: { doc: PAGE_BLOCK_DOCS.story, fields: { title: TITLE, steps: { kind: "list", of: STORY_STEP, min: 2, max: 6 } } },
+  testimonials: { doc: PAGE_BLOCK_DOCS.testimonials, fields: { title: TITLE, items: { kind: "list", of: TESTIMONIAL, min: 2, max: 12 } } },
+  journal: { doc: PAGE_BLOCK_DOCS.journal, fields: { title: TITLE, items: { kind: "list", of: JOURNAL_ENTRY, min: 1, max: 12 }, more: { kind: "list", of: LINK, max: 1 } } },
+  form: { doc: PAGE_BLOCK_DOCS.form, fields: { title: TITLE, body: BODY, action: { kind: "href", required: true }, fields: { kind: "list", of: FORM_FIELD, min: 1, max: 8 }, submit: text(40), note: text(160) } },
+  showreel: { doc: PAGE_BLOCK_DOCS.showreel, fields: { title: TITLE, body: BODY, media: { kind: "media", required: true }, captions: { kind: "media" }, speech: { kind: "boolean" } } },
+}
+export const PAGE_BLOCK_NAMES = Object.keys(PAGE_BLOCKS)
+
+Object.assign(BLOCK_RANGE, {
+  // The wheel needs loudness 2 and three images; below either it is the rail. Every variant opens the lightbox.
+  gallery: { variants: ["rail", "masonry", "grid", "hover-list", "wheel"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true, treatment: true, fields: { loop: { kind: "boolean" } } },
+  comparison: { variants: ["slider"], aligns: ["start", "center"], scroll: ["reveal"], crop: true, scale: true },
+  story: { variants: ["pinned", "stacked"], aligns: ["start"], scroll: ["reveal", "pin"], crop: false, scale: true, implies: { pinned: "pin" }, treatment: true },
+  testimonials: { variants: ["grid", "rail"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true },
+  journal: { variants: ["list", "featured"], aligns: ["start", "split"], scroll: ["reveal"], crop: false, scale: true, treatment: true },
+  form: { variants: ["underline", "conversational"], aligns: ["start", "center", "split"], scroll: ["reveal"], crop: false, scale: true },
+  showreel: { variants: ["player"], aligns: ["start", "center"], scroll: ["reveal"], crop: true, scale: true },
+} satisfies Record<keyof typeof PAGE_BLOCK_DOCS, BlockRange>)

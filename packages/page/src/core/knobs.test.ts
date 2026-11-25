@@ -1,7 +1,7 @@
 // The knobs of feather.page/1 (wave 2): every one validates, every bad value is refused with its JSON pointer and a
 // code, a knob on a /0 page names the schema it needs, and knobs that fight are contradictions.
 import { describe, expect, it } from "vitest"
-import { BLOCK_RANGE, BLOCKS, ENTERS, SCROLL_PATTERNS, TONES } from "./spec"
+import { BLOCK_RANGE, BLOCKS, ENTERS, PAGE_BLOCKS, SCROLL_PATTERNS, TONES } from "./spec"
 import { validatePage } from "./validate"
 import { pageJsonSchema } from "../../scripts/json-schema"
 
@@ -17,7 +17,14 @@ describe("the knobs validate", () => {
   it("every block takes every one of its variants", () => {
     for (const [kind, range] of Object.entries(BLOCK_RANGE)) {
       for (const variant of range.variants ?? []) {
-        const extra = kind === "statement" && variant === "swap" ? { words: ["a", "b"] } : kind === "quote" && variant === "rail" ? { items: [{ text: "More", by: "Someone" }] } : {}
+        const extra =
+          kind === "statement" && variant === "swap"
+            ? { words: ["a", "b"] }
+            : kind === "quote" && variant === "rail"
+              ? { items: [{ text: "More", by: "Someone" }] }
+              : kind === "offer" && variant === "toggle"
+                ? { periods: ["Monthly", "Yearly"], items: [{ name: "A", prices: ["1", "10"] }] }
+                : {}
         const media = ["split", "film", "product", "scale"].includes(variant) ? { media: "a.jpg" } : {}
         const base = { block: kind, ...minimal(kind), ...media, ...extra, variant }
         ok(page(kind === "hero" ? [base] : [hero, base]))
@@ -140,7 +147,7 @@ describe("feather.page/0 stays as it was", () => {
     const one = pageJsonSchema(1) as { properties: Record<string, unknown>; $defs: { block: { oneOf: { properties: Record<string, { enum?: string[] }> }[] } } }
     expect(one.properties.loudness).toEqual({ type: "integer", minimum: 0, maximum: 3 })
     const work = one.$defs.block.oneOf.find((b) => (b.properties.block as unknown as { const: string }).const === "work")!
-    expect(work.properties.variant.enum).toEqual(["grid", "hover-list", "stack", "rail"])
+    expect(work.properties.variant.enum).toEqual(["grid", "hover-list", "stack", "rail", "fullscreen-cases", "bento"])
     expect((work.properties.scroll as unknown as { properties: { pattern: { enum: string[] } } }).properties.pattern.enum).toEqual([...SCROLL_PATTERNS])
   })
 })
@@ -160,7 +167,14 @@ function minimal(kind: string): Record<string, unknown> {
     faq: { items: [{ q: "Q", a: "A" }] },
     contact: {},
     signature: {},
+    gallery: { items: [{ media: { src: "a.jpg", alt: "A" } }, { media: { src: "b.jpg", alt: "B" } }] },
+    comparison: { before: { src: "a.jpg", alt: "A" }, after: { src: "b.jpg", alt: "B" } },
+    story: { steps: [{ title: "A", media: "a.jpg" }, { title: "B", media: "b.jpg" }] },
+    testimonials: { items: [{ text: "A", by: "B" }, { text: "C", by: "D" }] },
+    journal: { items: [{ date: "2026-01-02", title: "A", href: "/a" }] },
+    form: { action: "/contact", fields: [{ name: "name", label: "Name" }] },
+    showreel: { media: { src: "reel.mp4", alt: "Reel", poster: "reel.jpg" } },
   }
-  expect(Object.keys(req).sort()).toEqual(Object.keys(BLOCKS).sort())
+  expect(Object.keys(req).sort()).toEqual([...Object.keys(BLOCKS), ...Object.keys(PAGE_BLOCKS)].sort())
   return req[kind]
 }

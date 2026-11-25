@@ -35,7 +35,10 @@ export interface BlockScroll {
   /** Settle on a pin's steps. */
   snap?: boolean
 }
+/** An image treatment (wave 5): spec.ts TREATMENTS says what each is. */
+export type MediaTreatmentKnob = "clean" | "clip-reveal" | "inner-parallax" | "blur-to-sharp" | "duotone" | "grain"
 export interface Knobs {
+  treatment?: MediaTreatmentKnob
   loudness?: Loudness
   tone?: BlockTone
   space?: BlockSpace
@@ -83,14 +86,14 @@ interface Base extends Knobs {
 }
 export type HeroVariant = "stacked" | "giant-type" | "split" | "film" | "product" | "index" | "interactive"
 export type StatementVariant = "plain" | "centred" | "offset" | "marquee" | "fill" | "swap"
-export type WorkVariant = "grid" | "hover-list" | "stack" | "rail"
+export type WorkVariant = "grid" | "hover-list" | "stack" | "rail" | "fullscreen-cases" | "bento"
 export type CaseVariant = "editorial" | "scale"
 export type NumbersVariant = "counter" | "plain" | "lead"
 export type TimelineVariant = "list" | "horizontal"
 export type ProcessVariant = "list" | "pinned" | "rows"
 export type LogosVariant = "grid" | "marquee"
 export type QuoteVariant = "large" | "rail" | "pull"
-export type OfferVariant = "cards" | "table"
+export type OfferVariant = "cards" | "table" | "toggle"
 export interface QuoteItem {
   text: string
   by: string
@@ -106,12 +109,61 @@ export type PageBlock =
   | (Base & { block: "process"; variant?: ProcessVariant; steps: { title: string; body?: string }[] })
   | (Base & { block: "logos"; variant?: LogosVariant; items: { name: string; src?: Media }[] })
   | (Base & { block: "quote"; variant?: QuoteVariant; text: string; by: string; role?: string; items?: QuoteItem[] })
-  | (Base & { block: "offer"; variant?: OfferVariant; items: { name: string; price?: string; body?: string; href?: string }[] })
+  | (Base & { block: "offer"; variant?: OfferVariant; periods?: [string, string]; items: { name: string; price?: string; prices?: [string, string]; body?: string; href?: string }[] })
   | (Base & { block: "faq"; variant?: "list"; items: { q: string; a: string }[] })
   | (Base & { block: "contact"; variant?: "plain"; body?: string; actions?: { label: string; href: string }[] })
   | (Base & { block: "signature"; body?: string; media?: Media; variant?: string; scene?: BlockScene })
+  | PageOnlyBlock
 
 export type BlockName = PageBlock["block"]
+
+// ---- Media and new page blocks (feather.page/1, wave 5 part A): spec.ts PAGE_BLOCKS ----
+export type GalleryVariant = "rail" | "masonry" | "grid" | "hover-list" | "wheel"
+export interface GalleryItem {
+  media: Media
+  title?: string
+  caption?: string
+}
+export type StoryVariant = "pinned" | "stacked"
+export interface StoryStep {
+  title: string
+  body?: string
+  media: Media
+}
+export type TestimonialsVariant = "grid" | "rail"
+export type JournalVariant = "list" | "featured"
+export interface JournalEntry {
+  /** YYYY-MM-DD. */
+  date: string
+  title: string
+  excerpt?: string
+  href: string
+  media?: Media
+}
+export type FormVariant = "underline" | "conversational"
+export type FormFieldType = "text" | "email" | "tel" | "url" | "number" | "textarea" | "select" | "choice"
+export interface FormField {
+  /** What the form sends it as (a slug). */
+  name: string
+  label: string
+  type?: FormFieldType
+  required?: boolean
+  hint?: string
+  placeholder?: string
+  /** A select's or a choice's options. */
+  options?: string[]
+  /** The longest answer in characters, or the largest number. */
+  max?: number
+  autocomplete?: string
+}
+export type PageOnlyBlock =
+  | (Base & { block: "gallery"; variant?: GalleryVariant; body?: string; items: GalleryItem[]; loop?: boolean })
+  | (Base & { block: "comparison"; variant?: "slider"; body?: string; before: Media; after: Media; beforeLabel?: string; afterLabel?: string; start?: number })
+  | (Base & { block: "story"; variant?: StoryVariant; steps: StoryStep[] })
+  | (Base & { block: "testimonials"; variant?: TestimonialsVariant; items: QuoteItem[] })
+  | (Base & { block: "journal"; variant?: JournalVariant; items: JournalEntry[]; more?: PageLink[] })
+  | (Base & { block: "form"; variant?: FormVariant; body?: string; action: string; fields: FormField[]; submit?: string; note?: string })
+  | (Base & { block: "showreel"; variant?: "player"; body?: string; media: Media; captions?: Media; speech?: boolean })
 
 export interface Scene {
   /** The starter label, in the visitor's words. */
