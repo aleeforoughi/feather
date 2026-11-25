@@ -56,6 +56,7 @@ callers       feather-intent, feather-context           (no Feather dependencies
 | Package | What it is for | Entry points |
 |---|---|---|
 | `@aleeforoughi/feather-expression` | The primitives an award-grade website is made of: sections, the stage, display type and kinetic effects, media, marquee, scroll layers and image sequences, route transitions, the loader, the overlay menu, the World slot. | `.` (React components and everything in core), `./core` (framework-free: the clock, the scroll engine, the quality ladder, the capability gate, route transitions, loudness) |
+| `@aleeforoughi/feather-scene` | 3D and WebGL scenes as World renderers ([scene.md](scene.md)): shader backgrounds and image-to-depth on raw WebGL, and on Three.js (an optional peer) the object viewer, particles, camera rails and post. | `.` (`shaderBackground`, `depthImage`, `useScene`), `./three` (`objectViewer`, `attachKeys`, `particleField`, `cameraRail`, `studioPost`) |
 | `@aleeforoughi/feather-living` | The Living Page: one scrolling site that an agent expands in place with designed blocks, then folds back. Feather never calls a model; the host streams events. | `.` |
 | `@aleeforoughi/feather-page` | A website from one JSON document, `feather.page/1`: the block library, the page edges (nav, footer, loader, 404, sound), the knobs, the validator, the static builder. | `.` (`FeatherPage`, `mountPage`, `validatePage`, `PageNotFound`), `./schema/*` (`feather.page-0.json`, `feather.page-1.json`), CLI `feather-page` (`validate`, `routes`, `build`) |
 
