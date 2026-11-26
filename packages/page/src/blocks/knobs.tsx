@@ -3,15 +3,19 @@
 // /0 page renders byte for byte as it did. Every colour stays a token: a tone re-points the semantic roles
 // (--surface-base, --text-primary, …) inside the section, it never writes a colour.
 import * as React from "react"
-import { DisplayTitle, FitText, HOUSE, allows, fitStyle, loudnessOf, reveal, type DisplayEffect, type DisplaySize, type SectionSpace, type SectionTone } from "@aleeforoughi/feather-expression"
-import { BLOCK_RANGE, KINETIC_ENTERS } from "../core/spec"
-import type { BlockAlign, BlockCrop, BlockMotion, BlockScale, BlockTone, Knobs, PageDefaults } from "../core/types"
+import { DisplayTitle, FitText, HOUSE, allows, fitStyle, loudnessOf, reveal, type DisplayEffect, type DisplaySize, type MediaTreatment, type SectionSpace, type SectionTone } from "@aleeforoughi/feather-expression"
+import { BLOCK_RANGE, KINETIC_ENTERS, SECONDARY_INK } from "../core/spec"
+import type { BlockAlign, BlockCrop, BlockMotion, BlockScale, BlockTone, Knobs, PageDefaults, PageLayout } from "../core/types"
 import { BlockTitle, join } from "./shared"
 
 /** What a block may know about the page around it: the page's defaults, and the index of its sections (the index
  * hero lists them). FeatherPage provides it; a block rendered alone sees none. */
 export interface PageContextValue {
+  /** A feather.page/1 document (a /0 page renders as it always has). */
+  one?: boolean
   defaults?: PageDefaults
+  /** The page's layout: a two-colour page gives its images the duotone treatment unless they name another. */
+  layout?: PageLayout
   index?: { id: string; title: string }[]
 }
 export const PageContext = React.createContext<PageContextValue>({})
@@ -27,7 +31,7 @@ function scope(ground: string, ink: string): Vars {
     "--surface-raised": `color-mix(in oklab, ${ink} 10%, ${ground})`,
     "--surface-hover": `color-mix(in oklab, ${ink} 14%, ${ground})`,
     "--text-primary": ink,
-    "--text-secondary": `color-mix(in oklab, ${ink} 80%, ${ground})`,
+    "--text-secondary": `color-mix(in oklab, ${ink} ${SECONDARY_INK}%, ${ground})`,
     "--border-primary": `color-mix(in oklab, ${ink} 28%, ${ground})`,
     "--primary": ink,
     "--primary-foreground": ground,
@@ -92,13 +96,15 @@ export interface ResolvedKnobs<V extends string> {
     "data-surface"?: string
     ref?: React.Ref<HTMLElement>
   }
+  /** The image treatment every MediaFrame of the block takes (clean when none is set). */
+  treatment: MediaTreatment
   /** Props for the block's DisplayTitle: its effect and, for none or fade, a still title. */
   title: { effect: DisplayEffect; "data-loudness"?: string }
   /** True when the block sets any knob at all (a /1 block). */
   any: boolean
 }
 
-const KNOB_KEYS = ["variant", "loudness", "tone", "space", "align", "scale", "crop", "motion", "scroll"] as const
+const KNOB_KEYS = ["variant", "loudness", "tone", "space", "align", "scale", "crop", "motion", "scroll", "treatment"] as const
 
 /** Reads a block's knobs, with the page's defaults under them. `fallback` is the block's /0 space and tone. */
 export function useKnobs<V extends string>(kind: string, block: Knobs & { variant?: string }, fallback: { space: SectionSpace; tone?: SectionTone }): ResolvedKnobs<V> {
@@ -145,6 +151,7 @@ export function useKnobs<V extends string>(kind: string, block: Knobs & { varian
     scale,
     crop,
     section,
+    treatment: range.treatment ? (block.treatment ?? (page.layout === "two-colour" ? "duotone" : "clean")) : "clean",
     title: { effect: titleEffect(block.motion), ...(stillTitle(block.motion) ? { "data-loudness": "0" } : {}) },
     any,
   }

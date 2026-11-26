@@ -24,7 +24,7 @@ export { reveal, revealKeyframes, type RevealFrom, type RevealOptions } from "./
 export { splitWords, splitChars, groupLines, fontsReady, type SplitBy } from "./split"
 export { FIT_MEASURE, fitChars, fitParts, isLongRun, joinUnit, longestRun, runLength, runs, unitSpace } from "./fit"
 export { LENIS_OPTIONS, connectScroll, scrollProgress, scrub, supportsScrollTimeline, type GsapLike, type LenisLike, type ScrollConnection, type ScrollEngine } from "./scroll"
-export { DPR_CAP, LADDER_RATIO, MIN_PIXEL_RATIO, PIXEL_BUDGET, cappedPixelRatio, createWorld, deviceHints, pickQuality, type DeviceHints, type Quality, type WorldController, type WorldFrame, type WorldOptions, type WorldRenderer } from "./world"
+export { DPR_CAP, LADDER_RATIO, MIN_PIXEL_RATIO, PIXEL_BUDGET, cappedPixelRatio, createWorld, deviceHints, prefersSaveData, pickQuality, type DeviceHints, type Quality, type WorldController, type WorldFrame, type WorldOptions, type WorldRenderer } from "./world"
 export { CURTAIN, PERSISTENT_SLOT, POINTER_WINDOW, arrive, createTransitions, type GoOptions, type RouteVariant, type Transitions } from "./transition"
 export { COUNTER_MS, DEFAULT_LOCALE, countTo, formatCount, type CountOptions } from "./counter"
 export { MAGNETIC_STRENGTH, follow, magnetic, pointerEffectsAllowed } from "./pointer"

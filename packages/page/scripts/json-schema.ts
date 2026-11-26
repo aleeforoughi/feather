@@ -1,8 +1,18 @@
 // The JSON Schema of feather.page/0, built from spec.ts (for editors and other languages). The validator stays the
 // authority: it also checks references, scenes and the honesty floor, which a schema cannot.
-import { ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, PAGE_KNOBS, ROUTE_VARIANTS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "../src/core/spec.ts"
+import { PAGE_BLOCK_DOC } from "../src/core/page-docs.ts"
+import { ANCHORS, BLOCK_RANGE, BLOCKS, EDGES, PAGE_BLOCKS, PAGE_KNOBS, ROUTE_VARIANTS, SPEAKER_KINDS, blockFields, type FieldSpec, type Fields } from "../src/core/spec.ts"
 
 type Json = Record<string, unknown>
+
+/** An image's widths (/1): 1 to 8 { src, w }, or a srcset string of w descriptors. Feather writes the sizes. */
+const SRCSET: Json = {
+  description: "The image's widths: a list of { src, w } (w in px), or a srcset string of w descriptors (\"a-800.jpg 800w, a-1600.jpg 1600w\"). Feather derives the sizes from where the image sits.",
+  anyOf: [
+    { type: "string", pattern: "^\\s*\\S+\\s+[1-9][0-9]*w\\s*(,\\s*\\S+\\s+[1-9][0-9]*w\\s*){0,7}$" },
+    { type: "array", minItems: 1, maxItems: 8, items: { type: "object", additionalProperties: false, required: ["src", "w"], properties: { src: { type: "string" }, w: { type: "integer", minimum: 1, maximum: 10000 } } } },
+  ],
+}
 
 function field(spec: FieldSpec): Json {
   switch (spec.kind) {
@@ -22,6 +32,8 @@ function field(spec: FieldSpec): Json {
       return { $ref: "#/$defs/media" }
     case "texts":
       return { type: "array", items: { type: "string" }, ...(spec.min !== undefined ? { minItems: spec.min } : {}), ...(spec.max !== undefined ? { maxItems: spec.max } : {}) }
+    case "numbers":
+      return { type: "array", items: { type: "number" }, ...(spec.min !== undefined ? { minItems: spec.min } : {}), ...(spec.max !== undefined ? { maxItems: spec.max } : {}) }
     case "vector":
       return { type: "array", minItems: spec.length, maxItems: spec.length, items: { type: "number", ...(spec.min !== undefined ? { minimum: spec.min } : {}), ...(spec.max !== undefined ? { maximum: spec.max } : {}) } }
     case "map":
@@ -41,14 +53,17 @@ function object(fields: Fields, extra: Json = {}, required: string[] = []): Json
 
 /** The JSON Schema of one version: 0 (the sections, scenes and living layer) or 1 (also the page edges). */
 export function pageJsonSchema(version: 0 | 1 = 1): Json {
-  const blocks = Object.entries(BLOCKS).map(([name, { doc }]) => {
+  const describe = ([name, { doc }]: [string, { doc?: string }]) => {
     const range = BLOCK_RANGE[name]
     const knobs = version === 1 ? ` Variants: ${range.variants ? range.variants.join(", ") : "the brand's own (free text)"}${range.variants ? ` (default ${range.variants[0]})` : ""}. Align: ${range.aligns.join(", ")}. Scroll: ${range.scroll.join(", ")}.` : ""
     return {
-      description: `${doc}${knobs}`,
+      description: `${doc ?? PAGE_BLOCK_DOC[name]}${knobs}`,
       ...object(blockFields(name, version), { block: { const: name }, id: { type: "string", pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }, ["block"]),
     }
-  })
+  }
+  const blocks = Object.entries(BLOCKS).map(describe)
+  // The page blocks are /1's, and only for sections: a prepared scene (an answer) is built from the living library.
+  const pageBlocks = version === 1 ? Object.entries(PAGE_BLOCKS).map(describe) : []
   return {
     $schema: "https://json-schema.org/draft/2020-12/schema",
     $id: `https://github.com/aleeforoughi/feather/schema/feather.page-${version}.json`,
@@ -69,7 +84,7 @@ export function pageJsonSchema(version: 0 | 1 = 1): Json {
       scenes: {
         type: "object",
         propertyNames: { pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-        additionalProperties: { type: "object", additionalProperties: false, required: ["ask", "line", "blocks"], properties: { ask: { type: "string" }, line: { type: "string" }, blocks: { type: "array", minItems: 1, maxItems: 3, items: { $ref: "#/$defs/block" } }, asks: { type: "array", maxItems: 3, items: { type: "string" } } } },
+        additionalProperties: { type: "object", additionalProperties: false, required: ["ask", "line", "blocks"], properties: { ask: { type: "string" }, line: { type: "string" }, blocks: { type: "array", minItems: 1, maxItems: 3, items: { $ref: version === 1 ? "#/$defs/answer" : "#/$defs/block" } }, asks: { type: "array", maxItems: 3, items: { type: "string" } } } },
       },
       living: { type: "object", additionalProperties: false, properties: { anchor: { enum: [...ANCHORS] }, fold: { type: "boolean" }, prepared: { type: "array", items: { type: "string" } }, disclosure: { type: "string" } } },
       ...(version === 1
@@ -84,10 +99,23 @@ export function pageJsonSchema(version: 0 | 1 = 1): Json {
       media: {
         anyOf: [
           { type: "string" },
-          { type: "object", required: ["src"], additionalProperties: false, properties: { src: { type: "string" }, alt: { type: "string" }, poster: { type: "string" }, decorative: { type: "boolean" }, sources: { type: "array", items: { type: "object", required: ["src", "type"], properties: { src: { type: "string" }, type: { type: "string" } } } } } },
+          {
+            type: "object",
+            required: ["src"],
+            additionalProperties: false,
+            properties: {
+              src: { type: "string" },
+              alt: { type: "string" },
+              poster: { type: "string" },
+              decorative: { type: "boolean" },
+              sources: { type: "array", items: { type: "object", required: ["src", "type"], properties: { src: { type: "string" }, type: { type: "string" }, ...(version === 1 ? { srcset: SRCSET } : {}) } } },
+              ...(version === 1 ? { srcset: SRCSET } : {}),
+            },
+          },
         ],
       },
-      block: { oneOf: blocks },
+      block: { oneOf: [...blocks, ...pageBlocks] },
+      ...(version === 1 ? { answer: { oneOf: blocks } } : {}),
     },
   }
 }

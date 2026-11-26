@@ -11,7 +11,8 @@ const external = [...Object.keys(pkg.dependencies), ...Object.keys(pkg.peerDepen
 export default defineConfig({
   plugins: [react()],
   build: {
-    lib: { entry: resolve(import.meta.dirname, "src/index.ts"), formats: ["es"] },
+    // index: the library. runtime: what the release's browser runtime is built from (FeatherPageCore and the families).
+    lib: { entry: { index: resolve(import.meta.dirname, "src/index.ts"), runtime: resolve(import.meta.dirname, "src/runtime.ts") }, formats: ["es"] },
     sourcemap: true,
     emptyOutDir: false,
     rolldownOptions: {

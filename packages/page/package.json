@@ -1,6 +1,6 @@
 {
   "name": "@aleeforoughi/feather-page",
-  "version": "1.22.2",
+  "version": "1.23.0",
   "description": "feather.page/0: websites from a schema. The validator, the JSON Schema, the default block library built on feather-expression, the renderer (with the Living Page), and the feather-page CLI.",
   "license": "UNLICENSED",
   "type": "module",
@@ -14,7 +14,12 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "default": "./dist/runtime.js"
+    },
     "./schema/*": "./schema/*",
+    "./templates/*": "./templates/*",
     "./package.json": "./package.json"
   },
   "files": [
@@ -22,6 +27,7 @@
     "src",
     "schema",
     "bin",
+    "templates",
     "!src/**/*.stories.tsx",
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
@@ -40,6 +46,7 @@
   "dependencies": {
     "@aleeforoughi/feather-expression": "workspace:^",
     "@aleeforoughi/feather-living": "workspace:^",
+    "@aleeforoughi/feather-react": "workspace:^",
     "@aleeforoughi/feather-scene": "workspace:^",
     "@aleeforoughi/feather-tokens": "workspace:^"
   },

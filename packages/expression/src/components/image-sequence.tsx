@@ -4,7 +4,7 @@ import { clock } from "../core/clock"
 import { scrollProgress } from "../core/scroll"
 import { fitRect, loadSequence, nearestLoaded, stepToward, type SequenceLoad } from "../core/sequence"
 import { onVisibilityChange } from "../core/visibility"
-import { cappedPixelRatio } from "../core/world"
+import { cappedPixelRatio, prefersSaveData as saveData } from "../core/world"
 import { useMergedRef, useReducedMotion } from "../hooks"
 import { useLoudnessAllows } from "./loudness"
 
@@ -26,7 +26,6 @@ export interface ImageSequenceProps extends Omit<React.HTMLAttributes<HTMLElemen
   fit?: "cover" | "contain"
 }
 
-const saveData = () => (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true
 const matches = (query: string) => typeof window.matchMedia === "function" && window.matchMedia(query).matches
 
 /**

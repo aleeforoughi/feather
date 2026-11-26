@@ -1,0 +1,486 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand/tokens.json",
+  "title": "Alee — working together",
+  "description": "Find out which way of working fits, see what it costs, book a call, and hear the studio.",
+  "lang": "en",
+  "library": {
+    "work": {
+      "acceptto": {
+        "title": "Acceptto",
+        "summary": "Sign-in without passwords, designed so the safe choice is the easy one.",
+        "year": "2025",
+        "role": "Design lead"
+      },
+      "freezon": {
+        "title": "Freezon",
+        "summary": "A cold-chain dashboard that shows the one shipment at risk, not all of them.",
+        "year": "2024",
+        "role": "Product design"
+      },
+      "evercover": {
+        "title": "Evercover",
+        "summary": "Insurance that explains itself in one sentence before it asks for anything.",
+        "year": "2023",
+        "role": "Design and front end"
+      }
+    }
+  },
+  "nav": {
+    "brand": "Alee",
+    "items": [
+      {
+        "label": "Work",
+        "href": "#work"
+      },
+      {
+        "label": "Fit",
+        "href": "#fit"
+      },
+      {
+        "label": "Cost",
+        "href": "#cost"
+      },
+      {
+        "label": "Book",
+        "href": "#book"
+      },
+      {
+        "label": "Listen",
+        "href": "#listen"
+      }
+    ]
+  },
+  "scheme": {
+    "toggle": "nav",
+    "colors": {
+      "background": "#FBF5EE",
+      "surface": "#FFFFFF",
+      "text": "#1C130C",
+      "primary": "#A8410C",
+      "primaryText": "#FFFFFF",
+      "accent": "#A8410C",
+      "accentText": "#FFFFFF"
+    }
+  },
+  "footer": {
+    "variant": "plain",
+    "links": [
+      {
+        "label": "Work",
+        "href": "#work"
+      },
+      {
+        "label": "Book",
+        "href": "#book"
+      }
+    ],
+    "note": "Built from one feather.page document."
+  },
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "variant": "stacked",
+      "eyebrow": "Working together",
+      "title": "Find the way of working that fits, then book it.",
+      "lede": "A short quiz, an honest price, a time that suits you. Everything here works without a sign-up."
+    },
+    {
+      "block": "work",
+      "id": "work",
+      "title": "Selected work",
+      "views": "grid",
+      "items": [
+        "acceptto",
+        "freezon",
+        "evercover"
+      ]
+    },
+    {
+      "block": "quiz",
+      "id": "fit",
+      "title": "Which way of working fits you?",
+      "body": "Three questions, about a minute. Nothing is sent anywhere.",
+      "questions": [
+        {
+          "id": "stage",
+          "q": "Where is the product now?",
+          "options": [
+            {
+              "id": "idea",
+              "label": "An idea and a sentence",
+              "result": "sprint"
+            },
+            {
+              "id": "live",
+              "label": "Live, with people using it",
+              "result": "system"
+            },
+            {
+              "id": "growing",
+              "label": "Growing faster than the team",
+              "result": "embed"
+            }
+          ]
+        },
+        {
+          "id": "team",
+          "q": "Who would I work with?",
+          "options": [
+            {
+              "id": "founder",
+              "label": "A founder, mostly",
+              "result": "sprint"
+            },
+            {
+              "id": "designers",
+              "label": "A few designers and engineers",
+              "result": "system"
+            },
+            {
+              "id": "org",
+              "label": "Several teams",
+              "result": "embed"
+            }
+          ]
+        },
+        {
+          "id": "time",
+          "q": "How soon do you need something real?",
+          "help": "Real means something people can use, not a deck.",
+          "options": [
+            {
+              "id": "weeks",
+              "label": "In two weeks",
+              "result": "sprint"
+            },
+            {
+              "id": "quarter",
+              "label": "This quarter",
+              "result": "system"
+            },
+            {
+              "id": "ongoing",
+              "label": "It never stops",
+              "result": "embed"
+            }
+          ]
+        }
+      ],
+      "results": [
+        {
+          "id": "sprint",
+          "title": "A product sprint",
+          "body": "Two weeks, one problem, a prototype people can use at the end.",
+          "href": "#cost",
+          "label": "See what it costs"
+        },
+        {
+          "id": "system",
+          "title": "A design system",
+          "body": "Six weeks to tokens, components and the gates that keep them honest.",
+          "href": "#cost",
+          "label": "See what it costs"
+        },
+        {
+          "id": "embed",
+          "title": "Join the team",
+          "body": "A few days a week, inside the team, for as long as it helps.",
+          "href": "#book",
+          "label": "Book a first call"
+        }
+      ]
+    },
+    {
+      "block": "calculator",
+      "id": "cost",
+      "title": "What a site costs",
+      "body": "Move the pieces; the total follows. It is an estimate, not a quote.",
+      "inputs": [
+        {
+          "id": "pages",
+          "label": "Pages",
+          "kind": "range",
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "value": 5,
+          "unit": "pages"
+        },
+        {
+          "id": "system",
+          "label": "Design system",
+          "kind": "radio",
+          "options": [
+            {
+              "label": "Use the brand's own",
+              "value": 0
+            },
+            {
+              "label": "Make a new one",
+              "value": 2400
+            }
+          ]
+        },
+        {
+          "id": "copy",
+          "label": "Copywriting",
+          "kind": "toggle",
+          "help": "I write every page with you."
+        }
+      ],
+      "lines": [
+        {
+          "id": "design",
+          "label": "Design",
+          "formula": "pages * 400 + system"
+        },
+        {
+          "id": "build",
+          "label": "Build",
+          "formula": "pages * 250"
+        },
+        {
+          "id": "words",
+          "label": "Words",
+          "formula": "copy * pages * 120"
+        }
+      ],
+      "formula": "round(design + build + words)",
+      "prefix": "£",
+      "note": "In pounds, before VAT. A real quote follows a first call."
+    },
+    {
+      "block": "chart",
+      "id": "proof",
+      "title": "Fewer tickets, month by month",
+      "summary": "Support tickets at Acceptto fell from 1,240 in January to 610 in June: about half.",
+      "series": [
+        {
+          "label": "Tickets"
+        }
+      ],
+      "rows": [
+        {
+          "label": "Jan",
+          "values": [
+            1240
+          ]
+        },
+        {
+          "label": "Feb",
+          "values": [
+            1110
+          ]
+        },
+        {
+          "label": "Mar",
+          "values": [
+            930
+          ]
+        },
+        {
+          "label": "Apr",
+          "values": [
+            820
+          ]
+        },
+        {
+          "label": "May",
+          "values": [
+            700
+          ]
+        },
+        {
+          "label": "Jun",
+          "values": [
+            610
+          ]
+        }
+      ],
+      "axis": "Month",
+      "source": "Acceptto's help desk, 2025."
+    },
+    {
+      "block": "chart",
+      "id": "answers",
+      "variant": "line",
+      "title": "Tickets and answers",
+      "summary": "As tickets fell by half, answers people found in the help pages more than doubled.",
+      "series": [
+        {
+          "label": "Tickets"
+        },
+        {
+          "label": "Self-served"
+        }
+      ],
+      "rows": [
+        {
+          "label": "Jan",
+          "values": [
+            1240,
+            380
+          ]
+        },
+        {
+          "label": "Feb",
+          "values": [
+            1110,
+            460
+          ]
+        },
+        {
+          "label": "Mar",
+          "values": [
+            930,
+            590
+          ]
+        },
+        {
+          "label": "Apr",
+          "values": [
+            820,
+            700
+          ]
+        },
+        {
+          "label": "May",
+          "values": [
+            700,
+            810
+          ]
+        },
+        {
+          "label": "Jun",
+          "values": [
+            610,
+            880
+          ]
+        }
+      ],
+      "axis": "Month"
+    },
+    {
+      "block": "booking",
+      "id": "book",
+      "title": "Book a first call",
+      "body": "Thirty minutes to see whether I can help. Pick a time that suits you.",
+      "services": [
+        {
+          "id": "intro",
+          "name": "First call",
+          "duration": "30 minutes",
+          "price": "Free",
+          "body": "What you are making, and what is in the way."
+        },
+        {
+          "id": "review",
+          "name": "Design review",
+          "duration": "60 minutes",
+          "price": "£240",
+          "body": "A focused review of one flow, with the fixes written down."
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-12-01",
+          "slots": [
+            "09:30",
+            "11:00",
+            "15:00"
+          ]
+        },
+        {
+          "date": "2026-12-02",
+          "slots": [
+            "10:00",
+            "14:30"
+          ]
+        },
+        {
+          "date": "2026-12-04",
+          "slots": [
+            "09:00",
+            "12:00",
+            "16:30"
+          ]
+        }
+      ],
+      "zone": "Times are in London time (GMT).",
+      "ask": {
+        "phone": true,
+        "note": true
+      },
+      "mailto": "hello@example.com"
+    },
+    {
+      "block": "podcast",
+      "id": "listen",
+      "title": "Notes from the studio",
+      "episodes": [
+        {
+          "id": "room",
+          "title": "The sound of a quiet room",
+          "audio": "media/room.wav",
+          "duration": "0:04",
+          "date": "November 2026",
+          "summary": "A short recording of the studio, and why a calm room makes calmer interfaces.",
+          "chapters": [
+            {
+              "at": 0,
+              "title": "The room"
+            },
+            {
+              "at": 2,
+              "title": "What it taught me"
+            }
+          ],
+          "transcript": [
+            {
+              "at": 0,
+              "by": "Alee",
+              "text": "This is the studio on a Tuesday morning."
+            },
+            {
+              "at": 2,
+              "by": "Alee",
+              "text": "Nothing in it asks for attention, and that is the point."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "block": "places",
+      "id": "find",
+      "title": "Where to find me",
+      "items": [
+        {
+          "name": "The studio",
+          "address": "12 Example Yard\nLondon E2 8AA",
+          "hours": "Tuesday to Thursday, 10:00 to 18:00"
+        },
+        {
+          "name": "The workshop",
+          "address": "4 Sample Street\nMargate CT9 1AA",
+          "hours": "By appointment",
+          "phone": "+44 20 7946 0000"
+        }
+      ]
+    },
+    {
+      "block": "contact",
+      "id": "contact",
+      "title": "Let’s talk",
+      "body": "I read every message myself.",
+      "actions": [
+        {
+          "label": "Write to me",
+          "href": "mailto:hello@example.com"
+        }
+      ]
+    }
+  ]
+}

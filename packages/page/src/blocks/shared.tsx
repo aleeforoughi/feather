@@ -39,8 +39,21 @@ export function BlockTitle({ id, children }: { id: string; children: string }) {
 /** Controls are 48px tall (44px hit area at least). The first act of a block is primary; the rest are quiet. */
 export const BUTTON_PRIMARY =
   "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control bg-primary px-6 type-label text-primary-foreground focus-ring"
+/** A starter as a chip (feather.page/1): the living composer's own suggestion style, a secondary row that never
+ * competes with the section's one filled action; at least 48px tall, whatever the density. */
+export const CHIP =
+  "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line-secondary bg-surface-base px-4 type-label text-fg-primary focus-ring not-disabled:hover:bg-surface-hover motion-hover-out"
 export const BUTTON_QUIET =
   "inline-flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line-primary bg-surface-base px-6 type-label text-fg-primary focus-ring not-disabled:hover:bg-surface-hover motion-hover-out"
+
+/** Which of a section's actions is its one filled action: the one marked `primary: true`; else the first, unless any
+ * says `primary: false` of itself and none is marked (then none). -1 when the section leads with something else. */
+export function filledAction(actions: readonly { primary?: boolean }[], lead = true): number {
+  if (!lead) return -1
+  const marked = actions.findIndex((a) => a.primary === true)
+  if (marked !== -1) return marked
+  return actions.some((a) => a.primary !== undefined) ? -1 : 0
+}
 
 /** Whether the page runs the pointer follower (`cursor: "follower"`): blocks then label their links for it
  * (`data-cursor="view"`). Off by default, so a page without it renders exactly as before. */

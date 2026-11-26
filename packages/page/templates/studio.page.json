@@ -1,0 +1,289 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand.json",
+  "title": "Hollis & Vane — a design studio for public services",
+  "description": "An eight-person studio that designs the services people have to use: council tax, school places, hospital letters. Brand, product and the systems behind them.",
+  "lang": "en",
+  "loudness": 2,
+  "layout": "swiss",
+  "library": {
+    "work": {
+      "parking": {
+        "title": "Resident parking",
+        "summary": "A permit in four minutes instead of four weeks, for a city of 300,000.",
+        "year": "2026",
+        "role": "Service design and build",
+        "href": "#case",
+        "media": {
+          "src": "media/studio-work-1.svg",
+          "alt": "The permit flow on a phone: one question per screen"
+        }
+      },
+      "admissions": {
+        "title": "School admissions",
+        "summary": "One form for every school in the county, with the deadline on every page.",
+        "year": "2025",
+        "role": "Product design",
+        "href": "#work",
+        "media": {
+          "src": "media/studio-work-2.svg",
+          "alt": "A ranked list of six schools, the first one highlighted"
+        }
+      },
+      "letters": {
+        "title": "Outpatient letters",
+        "summary": "Hospital letters rewritten so the time, the place and what to bring come first.",
+        "year": "2025",
+        "role": "Content and typography",
+        "href": "#work",
+        "media": {
+          "src": "media/studio-work-3.svg",
+          "alt": "A hospital letter with the appointment set large at the top"
+        }
+      },
+      "bins": {
+        "title": "Bin day",
+        "summary": "One text the night before, for 140,000 homes: which bin, and only when it changes.",
+        "year": "2024",
+        "role": "Service design",
+        "href": "#work",
+        "media": {
+          "src": "media/studio-work-5.svg",
+          "alt": "A phone showing one message: blue bin tomorrow"
+        }
+      },
+      "wayfinding": {
+        "title": "Library wayfinding",
+        "summary": "Signs, a type family and an app for eleven branch libraries.",
+        "year": "2024",
+        "role": "Identity and wayfinding",
+        "href": "#work",
+        "media": {
+          "src": "media/studio-work-4.svg",
+          "alt": "A tall library sign with floor numbers in a bold sans"
+        }
+      }
+    }
+  },
+  "nav": {
+    "brand": "Hollis & Vane",
+    "items": [
+      {
+        "label": "Work",
+        "href": "#work"
+      },
+      {
+        "label": "Case",
+        "href": "#case"
+      },
+      {
+        "label": "Studio",
+        "href": "#studio"
+      },
+      {
+        "label": "Process",
+        "href": "#process"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "variant": "giant-type",
+      "eyebrow": "Design studio, Leeds",
+      "title": "Forms nobody dreads.",
+      "lede": "Council tax, school places, hospital letters: the services people have no choice but to use, made clear enough to use once and forget.",
+      "actions": [
+        {
+          "label": "See work",
+          "href": "#work"
+        },
+        {
+          "label": "Start a project",
+          "href": "#contact"
+        }
+      ]
+    },
+    {
+      "block": "work",
+      "id": "work",
+      "variant": "bento",
+      "title": "Selected work",
+      "items": [
+        "parking",
+        "admissions",
+        "letters",
+        "wayfinding",
+        "bins"
+      ]
+    },
+    {
+      "block": "case",
+      "id": "case",
+      "title": "Resident parking, in four minutes",
+      "body": "The old permit took a printed form, two proofs of address and a four-week wait. We rebuilt it around the one thing the council already knew: where you live. Most residents now finish before the kettle boils.",
+      "media": {
+        "src": "media/studio-case.svg",
+        "alt": "The parking permit confirmation screen beside the old paper form"
+      },
+      "facts": [
+        {
+          "label": "Time to a permit",
+          "value": "4 minutes, from 4 weeks"
+        },
+        {
+          "label": "Calls to the council",
+          "value": "62% fewer"
+        },
+        {
+          "label": "Our part",
+          "value": "Research, design and build"
+        }
+      ]
+    },
+    {
+      "block": "gallery",
+      "id": "studio",
+      "variant": "masonry",
+      "title": "Studio",
+      "body": "Most of the work happens on paper, on the wall, and in the rooms where the service is used.",
+      "items": [
+        {
+          "media": {
+            "src": "media/gallery-1.svg",
+            "alt": "Paper prototypes of a form, laid out across a table"
+          },
+          "title": "Paper first",
+          "caption": "Admissions, 2025"
+        },
+        {
+          "media": {
+            "src": "media/gallery-2.svg",
+            "alt": "A wall of printed screens with handwritten notes"
+          },
+          "title": "The wall",
+          "caption": "Parking, 2026"
+        },
+        {
+          "media": {
+            "src": "media/gallery-3.svg",
+            "alt": "A library sign prototype propped against a shelf"
+          },
+          "title": "Full size",
+          "caption": "Wayfinding, 2024"
+        },
+        {
+          "media": {
+            "src": "media/gallery-4.svg",
+            "alt": "Type specimens pinned in a grid"
+          },
+          "title": "Specimens",
+          "caption": "Studio, 2025"
+        },
+        {
+          "media": {
+            "src": "media/gallery-5.svg",
+            "alt": "A research session in a council reception, seen from behind"
+          },
+          "title": "On site",
+          "caption": "Parking, 2026"
+        },
+        {
+          "media": {
+            "src": "media/gallery-6.svg",
+            "alt": "A notebook open on a grid page of letter layouts"
+          },
+          "title": "Letters",
+          "caption": "Outpatients, 2025"
+        }
+      ]
+    },
+    {
+      "block": "testimonials",
+      "id": "voices",
+      "variant": "rail",
+      "title": "Testimonials",
+      "items": [
+        {
+          "text": "They spent the first week in our reception, not in a workshop. That week is why the service works.",
+          "by": "Priya Natarajan",
+          "role": "Head of digital, a city council"
+        },
+        {
+          "text": "The letters used to generate calls. Now they answer the questions before anyone has to ask.",
+          "by": "Dr Tom Whitlow",
+          "role": "Outpatients lead, a teaching hospital"
+        },
+        {
+          "text": "Our staff stopped printing the guidance, because the screens finally said what the guidance said.",
+          "by": "Helen Achebe",
+          "role": "Admissions manager, a county council"
+        }
+      ]
+    },
+    {
+      "block": "process",
+      "id": "process",
+      "variant": "rows",
+      "title": "Process",
+      "steps": [
+        {
+          "title": "Sit where it is used",
+          "body": "A week in the reception, the call centre or the waiting room, before anything is drawn."
+        },
+        {
+          "title": "Write it plainly",
+          "body": "The words first: what the service asks, in the order people can answer it."
+        },
+        {
+          "title": "Make it real",
+          "body": "A working version in the first month, tested with the people who will use it."
+        },
+        {
+          "title": "Hand it over whole",
+          "body": "Code, a design system and the team trained to keep it, so nobody depends on us."
+        }
+      ]
+    },
+    {
+      "block": "contact",
+      "id": "contact",
+      "title": "Contact",
+      "body": "Tell us what it is and who has to use it. We reply within two working days, with a first idea.",
+      "actions": [
+        {
+          "label": "Email us",
+          "href": "mailto:studio@example.com"
+        },
+        {
+          "label": "Book a call",
+          "href": "https://cal.example.com/studio"
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "variant": "plain",
+    "links": [
+      {
+        "label": "Work",
+        "href": "#work"
+      },
+      {
+        "label": "Process",
+        "href": "#process"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ],
+    "note": "An eight-person studio in Leeds. We work in the open: our design system and research methods are public."
+  },
+  "transition": "view"
+}

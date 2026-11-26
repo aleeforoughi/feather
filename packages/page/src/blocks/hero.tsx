@@ -1,25 +1,29 @@
 import * as React from "react"
-import { DisplayTitle, MediaFrame, Magnetic, ScrollLayers, Section, useReducedMotion } from "@aleeforoughi/feather-expression"
-import type { HeroVariant, Media, PageLink } from "../core/types"
+import { DisplayTitle, MediaFrame, Magnetic, ScrollLayers, Section, prefersSaveData, useReducedMotion } from "@aleeforoughi/feather-expression"
+import type { ActionLink, HeroVariant, Media } from "../core/types"
 import { EDGE_START, PageContext, alignClass, sizeOf, useKnobs, type ResolvedKnobs } from "./knobs"
-import { mediaProps } from "./media"
+import { ON_MEDIA, mediaProps, srcsetOf } from "./media"
+import { sizesOf } from "./sizes"
 import { SceneLayer } from "./scene"
-import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
+import { BUTTON_PRIMARY, BUTTON_QUIET, CHIP, filledAction, join, useRegion, type BlockProps } from "./shared"
 
-/** The starters (when the model is on) as buttons, the first leaning toward the pointer. */
-function Starters({ starters, onAsk, className }: { starters: string[]; onAsk?: (s: string) => void; className: string }) {
+/** The starters (when the model is on). On a /0 page they are buttons, the first filled and leaning toward the
+ * pointer. On a /1 page they are chips, the composer's suggestions: one quiet row, so the section keeps one filled
+ * action (its own link, or none). */
+function Starters({ starters, onAsk, chips, className }: { starters: string[]; onAsk?: (s: string) => void; chips: boolean; className: string }) {
   if (starters.length === 0) return null
   return (
     <ul data-slot="hero-starters" role="list" className={className}>
       {starters.map((starter, i) => {
+        const lead = i === 0 && !chips
         const button = (
-          <button type="button" data-slot="hero-starter" data-variant={i === 0 ? "primary" : "quiet"} className={i === 0 ? BUTTON_PRIMARY : BUTTON_QUIET} onClick={() => onAsk?.(starter)}>
+          <button type="button" data-slot="hero-starter" data-variant={chips ? "chip" : lead ? "primary" : "quiet"} className={chips ? CHIP : lead ? BUTTON_PRIMARY : BUTTON_QUIET} onClick={() => onAsk?.(starter)}>
             {starter}
           </button>
         )
         return (
           <li key={starter} data-slot="hero-starter-item">
-            {i === 0 ? <Magnetic>{button}</Magnetic> : button}
+            {i === 0 && !chips ? <Magnetic>{button}</Magnetic> : button}
           </li>
         )
       })}
@@ -27,15 +31,16 @@ function Starters({ starters, onAsk, className }: { starters: string[]; onAsk?: 
   )
 }
 
-/** The hero's real links (feather.page/1): the next act that works with the model off. The first is primary when no
- * starter leads. */
-function Actions({ actions, lead, className }: { actions?: PageLink[]; lead: boolean; className: string }) {
+/** The hero's real links (feather.page/1): the next act that works with the model off. One is filled (filledAction:
+ * the first, or the one marked primary) when no starter leads; the rest are quiet. */
+function Actions({ actions, lead, className }: { actions?: ActionLink[]; lead: boolean; className: string }) {
   if (!actions?.length) return null
+  const filled = filledAction(actions, lead)
   return (
     <ul data-slot="hero-actions" role="list" className={className}>
       {actions.map((a, i) => (
         <li key={a.href} data-slot="hero-action-item">
-          <a href={a.href} data-slot="hero-action" data-variant={lead && i === 0 ? "primary" : "quiet"} className={lead && i === 0 ? BUTTON_PRIMARY : BUTTON_QUIET}>
+          <a href={a.href} data-slot="hero-action" data-variant={i === filled ? "primary" : "quiet"} className={i === filled ? BUTTON_PRIMARY : BUTTON_QUIET}>
             {a.label}
           </a>
         </li>
@@ -82,7 +87,8 @@ function Lede({ text, className = "max-w-prose" }: { text?: string; className?: 
  * section pins. Both rest still under reduced motion and below loudness 2. */
 function FlowMedia({ media, alt, priority, knobs, pattern, className }: { media: Media; alt: string; priority: boolean; knobs: ResolvedKnobs<HeroVariant>; pattern?: string; className: string }) {
   const cropped = knobs.crop !== "none"
-  const frame = <MediaFrame aspect="21/9" priority={priority} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(media, alt)} />
+  const sizes = sizesOf(knobs.variant === "stacked" ? "hero.stacked" : "hero.giant-type", cropped)
+  const frame = <MediaFrame aspect="21/9" priority={priority} {...(cropped ? { radius: "none" as const } : {})} {...mediaProps(media, alt, sizes)} treatment={knobs.treatment} />
   const moved =
     pattern === "parallax" ? (
       <ScrollLayers variant="parallax">
@@ -90,7 +96,7 @@ function FlowMedia({ media, alt, priority, knobs, pattern, className }: { media:
       </ScrollLayers>
     ) : pattern === "scale" ? (
       <ScrollLayers variant="scale" length={2}>
-        <MediaFrame aspect="16/9" radius="none" priority={priority} {...mediaProps(media, alt)} />
+        <MediaFrame aspect="16/9" radius="none" priority={priority} {...mediaProps(media, alt, sizesOf("hero.stacked", true))} treatment={knobs.treatment} />
       </ScrollLayers>
     ) : (
       frame
@@ -124,40 +130,74 @@ function Index({ entries }: { entries: { id: string; title: string }[] }) {
   )
 }
 
-/** The film hero's media: full bleed under a scrim, with a pause control above the scrim. Under reduced motion a video
- * does not autoplay (its poster shows, and the control plays it). The image or poster is the LCP. */
+const noSubscription = () => () => {}
+
+/**
+ * The film hero's media: full bleed under a scrim, with a pause control above the scrim. The poster (or the image) is
+ * the LCP: an eager, high-priority image the server writes, painted over the media scrim until it decodes, so the copy
+ * reads from the first frame. The film itself arrives only after mount, where motion is allowed and the visitor has
+ * not asked to save data: under reduced motion and on data saver the poster stays alone, with a Play control for
+ * whoever wants the film anyway. With no script it is the poster, and the control is not shown.
+ */
 function Film({ media, alt, priority }: { media: Media; alt: string; priority: boolean }) {
   const p = mediaProps(media, alt)
   const box = React.useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion(box)
-  const [playing, setPlaying] = React.useState(false)
   const player = React.useRef<HTMLVideoElement>(null)
+  const reduced = useReducedMotion(box)
+  // Data saver is read after hydration (the server and the hydrating render assume it, as they assume reduced motion).
+  const saving = React.useSyncExternalStore(noSubscription, prefersSaveData, () => true)
+  const [choice, setChoice] = React.useState<"play" | "pause" | null>(null)
+  const [playing, setPlaying] = React.useState(false)
+  const [ready, setReady] = React.useState(false)
+  const poster = p.video?.poster
+  const auto = !!p.video && !reduced && !saving
+  // The film comes when motion allows it or the visitor asks for it, and a pause keeps it; without a poster it is the
+  // only picture, so it is always there.
+  const film = !!p.video && (!poster || auto || choice !== null)
   React.useEffect(() => {
     const v = player.current
     if (!v) return
-    if (!reduced) void v.play?.()?.catch?.(() => {})
+    if (choice === "play" || (choice === null && auto)) void v.play?.()?.catch?.(() => {})
     else v.pause?.()
-  }, [reduced])
+  }, [choice, auto, film])
   const toggle = () => {
-    const v = player.current
-    if (!v) return
-    if (v.paused ?? !playing) void v.play?.()?.catch?.(() => {})
-    else v.pause?.()
+    if (playing) {
+      setChoice("pause")
+      player.current?.pause?.()
+    } else {
+      setChoice("play")
+      void player.current?.play?.()?.catch?.(() => {})
+    }
   }
+  const still = p.video ? poster : p.src
   return (
-    <div ref={box} data-slot="hero-film" className="absolute inset-0">
-      {p.video ? (
+    <div ref={box} data-slot="hero-film" data-state={ready ? "ready" : undefined} className="absolute inset-0 media-placeholder-scrim">
+      {still ? (
+        <img
+          data-slot="hero-film-poster"
+          className="block size-full object-cover"
+          src={still}
+          {...(typeof media === "object" && media.srcset ? { srcSet: srcsetOf(media.srcset), sizes: sizesOf("hero.film") } : {})}
+          alt={p.decorative ? "" : (p.alt ?? "")}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          onLoad={() => setReady(true)}
+          {...(priority ? { fetchPriority: "high" as const } : {})}
+        />
+      ) : null}
+      {film && p.video ? (
         <video
           ref={player}
           data-slot="hero-film-media"
-          className="block size-full object-cover"
-          poster={p.video.poster}
+          className="absolute inset-0 block size-full object-cover"
+          poster={poster}
           muted
           loop
           playsInline
-          preload={priority ? "auto" : "metadata"}
-          aria-label={p.decorative ? undefined : p.alt}
-          aria-hidden={p.decorative ? true : undefined}
+          preload={saving || reduced ? "none" : priority ? "auto" : "metadata"}
+          // The poster image carries the alt text; the film over it is the same picture, moving.
+          aria-hidden={still ? true : p.decorative ? true : undefined}
+          aria-label={still || p.decorative ? undefined : p.alt}
           src={p.sources?.length ? undefined : p.src}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
@@ -166,13 +206,11 @@ function Film({ media, alt, priority }: { media: Media; alt: string; priority: b
             <source key={s.src + s.type} data-slot="hero-film-source" src={s.src} type={s.type} />
           ))}
         </video>
-      ) : (
-        <img data-slot="hero-film-media" className="block size-full object-cover" src={p.src} alt={p.decorative ? "" : (p.alt ?? "")} loading={priority ? "eager" : "lazy"} decoding="async" {...(priority ? { fetchPriority: "high" as const } : {})} />
-      )}
+      ) : null}
       {/* The media scrim (feather-tokens/4) holds text-ink-on-media at 4.5:1 over any frame. */}
       <div data-slot="hero-film-scrim" aria-hidden="true" className="absolute inset-0 bg-media-scrim" />
       {p.video ? (
-        <div data-slot="hero-film-control" className="absolute bottom-6 right-6 z-layer-raised">
+        <div data-slot="hero-film-control" className="absolute bottom-6 right-6 z-layer-raised noscript:hidden">
           <button type="button" data-slot="hero-film-toggle" data-variant={playing ? "pause" : "play"} onClick={toggle} className={BUTTON_QUIET}>
             {playing ? "Pause film" : "Play film"}
           </button>
@@ -182,20 +220,6 @@ function Film({ media, alt, priority }: { media: Media; alt: string; priority: b
   )
 }
 
-/** The ink that reads on the media scrim, as the text roles of the copy over it (text-fg-primary and -secondary inside
- * read as text-ink-on-media). */
-const ON_MEDIA = {
-  "--text-primary": "var(--ink-on-media)",
-  "--text-secondary": "var(--ink-on-media)",
-  "--ring": "var(--ink-on-media)",
-  // The primary act is filled with the ink (its label in the inverse surface, the colour opposite the page's ground);
-  // a quiet act sits on the scrim itself, ruled in the ink.
-  "--primary": "var(--ink-on-media)",
-  "--primary-foreground": "var(--surface-inverse)",
-  "--surface-base": "var(--media-scrim)",
-  "--surface-hover": "color-mix(in oklab, var(--ink-on-media) 12%, var(--media-scrim))",
-  "--border-primary": "var(--ink-on-media)",
-} as React.CSSProperties
 
 /**
  * The first view: the page's only h1, one focal point, and the starters when the model is on. Variants (feather.page/1):
@@ -226,12 +250,16 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
       {block.title}
     </DisplayTitle>
   )
+  // A /1 page: the starters are chips, a secondary row after the links, and the links keep their one filled action.
+  const chips = page.one === true
+  const lead = chips || starters.length === 0
   // The starters and the links as one row of acts.
   const acts = (className: string) =>
     starters.length > 0 || block.actions?.length ? (
       <div data-slot="hero-acts-row" className={className}>
-        <Starters starters={starters} onAsk={onAsk} className="flex flex-wrap gap-3" />
-        <Actions actions={block.actions} lead={starters.length === 0} className="flex flex-wrap gap-3" />
+        {chips ? <Actions actions={block.actions} lead={lead} className="flex flex-wrap gap-3" /> : null}
+        <Starters starters={starters} onAsk={onAsk} chips={chips} className="flex flex-wrap gap-3" />
+        {chips ? null : <Actions actions={block.actions} lead={lead} className="flex flex-wrap gap-3" />}
       </div>
     ) : null
 
@@ -246,8 +274,17 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
     )
     const rest = (
       <>
-        <Starters starters={starters} onAsk={onAsk} className={join("col-span-full mt-12 flex flex-wrap gap-3", centre && "justify-center")} />
-        <Actions actions={block.actions} lead={starters.length === 0} className={join("col-span-full flex flex-wrap gap-3", starters.length === 0 ? "mt-12" : "mt-3", centre && "justify-center")} />
+        {chips ? (
+          <>
+            <Actions actions={block.actions} lead={lead} className={join("col-span-full mt-12 flex flex-wrap gap-3", centre && "justify-center")} />
+            <Starters starters={starters} onAsk={onAsk} chips className={join("col-span-full flex flex-wrap gap-2", block.actions?.length ? "mt-4" : "mt-12", centre && "justify-center")} />
+          </>
+        ) : (
+          <>
+            <Starters starters={starters} onAsk={onAsk} chips={false} className={join("col-span-full mt-12 flex flex-wrap gap-3", centre && "justify-center")} />
+            <Actions actions={block.actions} lead={lead} className={join("col-span-full flex flex-wrap gap-3", starters.length === 0 ? "mt-12" : "mt-3", centre && "justify-center")} />
+          </>
+        )}
         {facts.length > 0 ? <Facts facts={facts} className="col-span-full mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4" /> : null}
       </>
     )
@@ -289,7 +326,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
               {copy}
             </div>
             <div data-slot="hero-media" data-crop={knobs.crop}>
-              <MediaFrame aspect="4/5" radius="none" priority={priority} {...mediaProps(block.media, block.title)} />
+              <MediaFrame aspect="4/5" radius="none" priority={priority} {...mediaProps(block.media, block.title, sizesOf("hero.split", true))} treatment={knobs.treatment} />
             </div>
           </div>
         </Section>
@@ -302,7 +339,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
             {copy}
           </div>
           <div data-slot="hero-media" className="lg:col-span-6">
-            <MediaFrame aspect="4/5" priority={priority} {...mediaProps(block.media, block.title)} />
+            <MediaFrame aspect="4/5" priority={priority} {...mediaProps(block.media, block.title, sizesOf("hero.split"))} treatment={knobs.treatment} />
           </div>
         </div>
       </Section>
@@ -348,7 +385,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
         <div data-slot="hero-product" className="col-span-full mt-12 grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
           <Facts facts={facts.slice(0, half)} className="order-2 flex flex-col gap-6 lg:order-1 lg:col-span-3" />
           <div data-slot="hero-media" className="order-1 mx-auto w-full max-w-xl lg:order-2 lg:col-span-6">
-            <MediaFrame aspect="1/1" priority={priority} {...mediaProps(block.media, block.title)} />
+            <MediaFrame aspect="1/1" priority={priority} {...mediaProps(block.media, block.title, sizesOf("hero.product"))} treatment={knobs.treatment} />
           </div>
           <Facts facts={facts.slice(half)} className="order-3 flex flex-col gap-6 lg:col-span-3 lg:text-end" />
         </div>
@@ -380,7 +417,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
     // and the title keeps its own entrance.
     return (
       <Section id={id} data-block="hero" aria-labelledby={titleId} {...knobs.section} {...(model ? {} : { reveal: false, className: "isolate overflow-hidden" })}>
-        {model ? null : <SceneLayer scene={block.scene} media={block.media} label={block.title} placement="behind" priority={priority} />}
+        {model ? null : <SceneLayer scene={block.scene} media={block.media} label={block.title} placement="behind" priority={priority} sizes={sizesOf("hero.interactive")} />}
         <div data-slot="hero-copy" className="col-span-full flex flex-col gap-8">
           <Eyebrow text={block.eyebrow} />
           {title("xl", "text-balance", block.motion?.enter ? knobs.title.effect : "mask")}
@@ -391,7 +428,7 @@ export function HeroBlock({ block, priority = true, onAsk }: BlockProps<"hero">)
             {acts("flex flex-wrap gap-3 lg:justify-end")}
           </div>
         </div>
-        {model ? <SceneLayer scene={block.scene} media={block.media} label={block.title} aspect="16/9" priority={priority} className="col-span-full mt-16" /> : null}
+        {model ? <SceneLayer scene={block.scene} media={block.media} label={block.title} aspect="16/9" priority={priority} sizes={sizesOf("hero.giant-type")} className="col-span-full mt-16" /> : null}
       </Section>
     )
   }

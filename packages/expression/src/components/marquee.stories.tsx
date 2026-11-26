@@ -57,3 +57,16 @@ export const ReelReducedMotion: StoryObj<typeof Reel> = {
     </div>
   ),
 }
+
+/** An endless reel: a copy of the items on each side (hidden and inert), so the snap never runs out; Tab still leaves. */
+export const ReelLoop: StoryObj<typeof Reel> = {
+  render: () => (
+    <Reel aria-label="Words, endlessly" loop>
+      {words.map((w) => (
+        <div key={w} className="flex h-32 w-64 items-center justify-center rounded-card border border-line-primary bg-surface-raised type-heading-2 text-fg-primary">
+          {w}
+        </div>
+      ))}
+    </Reel>
+  ),
+}

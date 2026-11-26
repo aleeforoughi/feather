@@ -14,17 +14,27 @@ export type LightboxImage = { src: string; alt: string; caption?: string; downlo
  */
 const checker = "bg-checker"
 
-/** One image of a set, large, with previous / next (buttons and arrow keys) and download. */
+/**
+ * One image of a set, large, with previous / next (buttons and arrow keys) and download. Closing gives focus back to
+ * what opened it. A website's gallery turns the download off (`download={false}`) and names the steps in its own words.
+ */
 function Lightbox({
   images,
   index,
   onIndexChange,
+  download = true,
+  previousLabel = "Previous",
+  nextLabel = "Next",
   className,
 }: {
   images: LightboxImage[]
   /** The open image, or null when closed. */
   index: number | null
   onIndexChange: (index: number | null) => void
+  /** Offers the open image as a download (default true). */
+  download?: boolean
+  previousLabel?: string
+  nextLabel?: string
   className?: string
 }) {
   const image = index !== null ? images[index] : undefined
@@ -41,8 +51,10 @@ function Lightbox({
       if (e.key === "ArrowRight") step(1)
       if (e.key === "ArrowLeft") step(-1)
     }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
+    // In the capture phase: the dialog's own controls may keep arrow keys from bubbling, and the lightbox's steps must
+    // work wherever focus is inside it.
+    window.addEventListener("keydown", onKey, true)
+    return () => window.removeEventListener("keydown", onKey, true)
   }, [index, many, step])
   return (
     <Dialog open={image !== undefined} onOpenChange={(open) => !open && onIndexChange(null)}>
@@ -64,13 +76,13 @@ function Lightbox({
         <div data-slot="lightbox-nav" data-region="utility" className="flex items-center justify-between gap-action inset-utility">
           <div data-slot="lightbox-steps" className="flex gap-action">
             <Button variant="outline" disabled={!many} onClick={() => step(-1)}>
-              <Icon icon={ChevronLeftIcon} /> Previous
+              <Icon icon={ChevronLeftIcon} /> {previousLabel}
             </Button>
             <Button variant="outline" disabled={!many} onClick={() => step(1)}>
-              Next <Icon icon={ChevronRightIcon} />
+              {nextLabel} <Icon icon={ChevronRightIcon} />
             </Button>
           </div>
-          {image && (
+          {image && download && (
             <Button variant="outline" nativeButton={false} render={<a href={image.src} download={image.downloadName ?? ""} />}>
               <Icon icon={DownloadIcon} /> Download
             </Button>

@@ -178,6 +178,15 @@ export const FILM_GRAIN: { min: number; max: number; default: number }
 export const FOCUS: readonly ["accent", "primary"]
 export const FOCUS_FLOOR: number
 export const FALLBACK_FACES: readonly string[]
+/** feather-tokens/4: the display face's class, which sets the measured display and heading defaults. */
+export type FaceClass = "grotesk" | "serif" | "mono" | "rounded"
+export const FACE_CLASSES: readonly FaceClass[]
+export const FOUNDATION_FACE_CLASSES: Record<string, FaceClass>
+/** The heading and display weight a /4 brand that sets neither headingWeight nor contrast gets, by face class. */
+export const FACE_WEIGHTS: Record<FaceClass, 400 | 500 | 600>
+export function faceClass(value: FontSlot | undefined): FaceClass
+/** The measured display scale for a face class (feather-tokens/4 defaults; measured, Qooler file 28). */
+export function measuredDisplay(cls: FaceClass): Record<"xl" | "l" | "m" | "s", { size: { min: number; max: number }; tracking: { min: number; max: number }; leading: number }>
 export function fluidClamp(min: number, max: number, viewport?: [number, number]): string
 export function fluidTracking(size: { min: number; max: number }, tracking: { min: number; max: number }, viewport?: [number, number]): string
 

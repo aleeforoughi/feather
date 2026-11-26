@@ -190,6 +190,30 @@ with Tailwind v4 and pass its URL with `--css`. It must carry Feather's classes,
 (Adjust the `@source` paths to where the CSS file sits.) Run the Tailwind v4 CLI or its Vite plugin over it to produce
 `app.css`.
 
+### Start from a template
+
+Six whole pages ship with the package, each with its own layout: `launch` (a product launch at loudness 3),
+`studio` (an agency portfolio), `editorial` (a journal), `service` (a local business with booking), `product` (SaaS
+pricing) and `creator` (a podcast). Write one out and build it:
+
+```bash
+npx feather-page init --list
+# the six templates, a line each
+
+npx feather-page init launch --theme brand/tokens.json
+# wrote launch.page.json: the launch template (layout poster, loudness 3)
+
+npx feather-page build launch.page.json --out dist --css /app.css
+```
+
+`init <template>` writes `<template>.page.json` (or `--out file`). It never writes over a file unless you pass
+`--force`, and an unknown name exits 1 with the list. `--theme` points `brand` at your theme file (a feather-tokens file
+or a reference theme), relative to the page, and gives a template with the colour scheme toggle a starting other set
+from the theme's own colours (its ground and ink swapped; tune it after). Without `--theme`, `brand` is `brand.json`
+beside the page. The copy is specific so the page reads as a real one from the start; replace it, and the `media/`
+paths, with your own. If the brand's colours cannot carry the layout (a colour block below 4.5:1), `build` says so as
+a `contradiction` at `/layout` and writes nothing: change the layout, or the brand's `colors.blocks`.
+
 ### The same page in React
 
 ```tsx

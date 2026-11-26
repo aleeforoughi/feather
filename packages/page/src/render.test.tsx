@@ -21,7 +21,7 @@ describe("FeatherPage", () => {
     render(<FeatherPage page={doc()} tokens={theme("portrait")} />)
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
     expect(screen.getByRole("heading", { name: "Selected work" })).toBeTruthy()
-    expect(screen.getByText(/An AI agent answering in Alee/)).toBeTruthy()
+    expect(screen.getByText(/An AI agent speaking for Alee/)).toBeTruthy()
   })
 
   it("restyles entirely from the brand: the same page, three themes", () => {

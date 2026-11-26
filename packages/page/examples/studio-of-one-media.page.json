@@ -1,0 +1,378 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand/tokens.json",
+  "title": "Alee — the studio, in pictures",
+  "description": "The studio of one, told in media: a hero picture in three widths, a gallery, a before and after, a story in steps, the archive on a wheel, writing, a price that switches, and a form that works with no script.",
+  "lang": "en",
+  "loudness": 2,
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "variant": "split",
+      "eyebrow": "Design engineer",
+      "title": "The work, in pictures.",
+      "lede": "Products, sites and the system behind them, as they were made.",
+      "actions": [
+        {
+          "label": "Start a project",
+          "href": "#enquiry"
+        }
+      ],
+      "media": {
+        "src": "media/hero-1600.svg",
+        "alt": "The studio's desk, with the work laid out in pictures",
+        "srcset": [
+          {
+            "src": "media/hero-800.svg",
+            "w": 800
+          },
+          {
+            "src": "media/hero-1600.svg",
+            "w": 1600
+          },
+          {
+            "src": "media/hero-2400.svg",
+            "w": 2400
+          }
+        ]
+      }
+    },
+    {
+      "block": "gallery",
+      "id": "studio",
+      "variant": "rail",
+      "title": "From the studio",
+      "items": [
+        {
+          "media": {
+            "src": "media/gallery-1.svg",
+            "alt": "The Acceptto sign-in on a phone, resting on linen"
+          },
+          "title": "Acceptto",
+          "caption": "Sign-in, 2025"
+        },
+        {
+          "media": {
+            "src": "media/gallery-2.svg",
+            "alt": "A Freezon shipment card with its one warning"
+          },
+          "title": "Freezon",
+          "caption": "Cold chain, 2024"
+        },
+        {
+          "media": {
+            "src": "media/gallery-3.svg",
+            "alt": "The Evercover quote, one sentence long"
+          },
+          "title": "Evercover",
+          "caption": "Insurance, 2023"
+        },
+        {
+          "media": {
+            "src": "media/gallery-4.svg",
+            "alt": "Type specimens pinned to the studio wall"
+          },
+          "title": "Specimens",
+          "caption": "Studio, 2025"
+        },
+        {
+          "media": {
+            "src": "media/gallery-5.svg",
+            "alt": "A design system's tokens printed as a poster"
+          },
+          "title": "Tokens",
+          "caption": "Feather, 2026"
+        },
+        {
+          "media": {
+            "src": "media/gallery-6.svg",
+            "alt": "The notebook, open on its grid page"
+          },
+          "title": "Field kit",
+          "caption": "Print, 2026"
+        }
+      ],
+      "loop": true
+    },
+    {
+      "block": "comparison",
+      "id": "compare",
+      "title": "Before and after",
+      "body": "The Acceptto sign-in, before the redesign and after it. Drag the divider, or use the arrow keys.",
+      "before": {
+        "src": "media/before.svg",
+        "alt": "The old sign-in: four fields and a password rule"
+      },
+      "after": {
+        "src": "media/after.svg",
+        "alt": "The new sign-in: one field and a passkey"
+      },
+      "beforeLabel": "Before",
+      "afterLabel": "After"
+    },
+    {
+      "block": "story",
+      "id": "story",
+      "variant": "pinned",
+      "title": "How a sentence becomes a product",
+      "steps": [
+        {
+          "title": "Write the sentence",
+          "body": "Every product fits in one sentence. We write it before anything is drawn.",
+          "media": {
+            "src": "media/story-1.svg",
+            "alt": "A single sentence written on a card"
+          }
+        },
+        {
+          "title": "Design the floor",
+          "body": "Accessibility, speed and every state, before a single effect.",
+          "media": {
+            "src": "media/story-2.svg",
+            "alt": "Wireframes of the empty, loading and error states"
+          }
+        },
+        {
+          "title": "Build the ceiling",
+          "body": "Then the motion and the craft people remember.",
+          "media": {
+            "src": "media/story-3.svg",
+            "alt": "The finished screen, in the brand's colours"
+          }
+        }
+      ],
+      "scroll": {
+        "snap": true
+      }
+    },
+    {
+      "block": "testimonials",
+      "id": "voices",
+      "variant": "grid",
+      "title": "What people say",
+      "items": [
+        {
+          "text": "Alee made the hard part feel obvious, and then made it beautiful.",
+          "by": "Mara Ellis",
+          "role": "VP Product, Acceptto"
+        },
+        {
+          "text": "The system did the boring parts so we could do the interesting ones.",
+          "by": "Jun Park",
+          "role": "Design lead, Freezon"
+        },
+        {
+          "text": "Every screen arrived with its empty, loading and error states already designed.",
+          "by": "Sam Okafor",
+          "role": "CTO, Evercover"
+        }
+      ],
+      "tone": "subtle"
+    },
+    {
+      "block": "gallery",
+      "id": "archive",
+      "variant": "wheel",
+      "title": "The archive",
+      "items": [
+        {
+          "media": {
+            "src": "media/gallery-1.svg",
+            "alt": "The Acceptto sign-in on a phone, resting on linen"
+          },
+          "title": "Acceptto",
+          "caption": "Sign-in, 2025"
+        },
+        {
+          "media": {
+            "src": "media/gallery-2.svg",
+            "alt": "A Freezon shipment card with its one warning"
+          },
+          "title": "Freezon",
+          "caption": "Cold chain, 2024"
+        },
+        {
+          "media": {
+            "src": "media/gallery-3.svg",
+            "alt": "The Evercover quote, one sentence long"
+          },
+          "title": "Evercover",
+          "caption": "Insurance, 2023"
+        },
+        {
+          "media": {
+            "src": "media/gallery-4.svg",
+            "alt": "Type specimens pinned to the studio wall"
+          },
+          "title": "Specimens",
+          "caption": "Studio, 2025"
+        },
+        {
+          "media": {
+            "src": "media/gallery-5.svg",
+            "alt": "A design system's tokens printed as a poster"
+          },
+          "title": "Tokens",
+          "caption": "Feather, 2026"
+        },
+        {
+          "media": {
+            "src": "media/gallery-6.svg",
+            "alt": "The notebook, open on its grid page"
+          },
+          "title": "Field kit",
+          "caption": "Print, 2026"
+        }
+      ]
+    },
+    {
+      "block": "journal",
+      "id": "journal",
+      "variant": "featured",
+      "title": "Writing",
+      "items": [
+        {
+          "date": "2026-11-12",
+          "title": "The interface that is not there",
+          "excerpt": "Why the best screen is often the one that never had to appear.",
+          "href": "#journal",
+          "media": {
+            "src": "media/gallery-4.svg",
+            "decorative": true
+          }
+        },
+        {
+          "date": "2026-09-30",
+          "title": "States first",
+          "excerpt": "Empty, loading and error, designed before the happy path.",
+          "href": "#journal"
+        },
+        {
+          "date": "2026-06-04",
+          "title": "One sentence",
+          "excerpt": "Every product fits in one. Here is how we find it.",
+          "href": "#journal"
+        }
+      ]
+    },
+    {
+      "block": "offer",
+      "id": "hire",
+      "variant": "toggle",
+      "title": "Ways to work together",
+      "periods": [
+        "Monthly",
+        "Yearly"
+      ],
+      "items": [
+        {
+          "name": "Studio",
+          "prices": [
+            "€900 a month",
+            "€9,000 a year"
+          ],
+          "body": "A day a week, for the long run.",
+          "href": "https://cal.example.com/alee"
+        },
+        {
+          "name": "Sprint",
+          "prices": [
+            "€4,000 a month",
+            "€40,000 a year"
+          ],
+          "body": "Two weeks a month, one problem at a time."
+        }
+      ]
+    },
+    {
+      "block": "form",
+      "id": "enquiry",
+      "variant": "underline",
+      "title": "Start a project",
+      "body": "Four questions. I answer every message myself, within two days.",
+      "action": "/contact",
+      "fields": [
+        {
+          "name": "name",
+          "label": "Your name",
+          "required": true,
+          "autocomplete": "name"
+        },
+        {
+          "name": "email",
+          "label": "Email",
+          "type": "email",
+          "required": true,
+          "autocomplete": "email"
+        },
+        {
+          "name": "budget",
+          "label": "Budget",
+          "type": "select",
+          "options": [
+            "Under €10k",
+            "€10k to €30k",
+            "Over €30k"
+          ],
+          "required": true
+        },
+        {
+          "name": "start",
+          "label": "When would you like to start?",
+          "type": "choice",
+          "options": [
+            "This month",
+            "Next quarter",
+            "Just exploring"
+          ]
+        },
+        {
+          "name": "message",
+          "label": "What are you making?",
+          "type": "textarea",
+          "required": true,
+          "max": 2000,
+          "hint": "A sentence or two is enough."
+        }
+      ],
+      "note": "Your answers go only to me, and are deleted when we finish."
+    }
+  ],
+  "nav": {
+    "brand": "Alee",
+    "items": [
+      {
+        "label": "Studio",
+        "href": "#studio"
+      },
+      {
+        "label": "Before and after",
+        "href": "#compare"
+      },
+      {
+        "label": "Writing",
+        "href": "#journal"
+      },
+      {
+        "label": "Start a project",
+        "href": "#enquiry"
+      }
+    ]
+  },
+  "footer": {
+    "variant": "plain",
+    "links": [
+      {
+        "label": "Studio",
+        "href": "#studio"
+      },
+      {
+        "label": "Start a project",
+        "href": "#enquiry"
+      }
+    ],
+    "note": "Built from one feather.page document."
+  },
+  "transition": "fade"
+}

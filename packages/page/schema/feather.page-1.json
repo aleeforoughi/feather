@@ -131,7 +131,7 @@
             "minItems": 1,
             "maxItems": 3,
             "items": {
-              "$ref": "#/$defs/block"
+              "$ref": "#/$defs/answer"
             }
           },
           "asks": {
@@ -395,6 +395,75 @@
         "native",
         "follower"
       ]
+    },
+    "scheme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "toggle": {
+          "enum": [
+            "nav",
+            "footer"
+          ]
+        },
+        "colors": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "background": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "surface": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "primary": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "primaryText": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "accent": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "accentText": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "destructive": {
+              "type": "string",
+              "maxLength": 32
+            }
+          },
+          "required": [
+            "background",
+            "surface",
+            "text",
+            "primary"
+          ]
+        }
+      },
+      "required": [
+        "colors"
+      ]
+    },
+    "layout": {
+      "enum": [
+        "editorial",
+        "swiss",
+        "brutalist",
+        "poster",
+        "colour-blocking",
+        "two-colour"
+      ]
     }
   },
   "$defs": {
@@ -436,9 +505,73 @@
                   },
                   "type": {
                     "type": "string"
+                  },
+                  "srcset": {
+                    "description": "The image's widths: a list of { src, w } (w in px), or a srcset string of w descriptors (\"a-800.jpg 800w, a-1600.jpg 1600w\"). Feather derives the sizes from where the image sits.",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^\\s*\\S+\\s+[1-9][0-9]*w\\s*(,\\s*\\S+\\s+[1-9][0-9]*w\\s*){0,7}$"
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 8,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "src",
+                            "w"
+                          ],
+                          "properties": {
+                            "src": {
+                              "type": "string"
+                            },
+                            "w": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 10000
+                            }
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
+            },
+            "srcset": {
+              "description": "The image's widths: a list of { src, w } (w in px), or a srcset string of w descriptors (\"a-800.jpg 800w, a-1600.jpg 1600w\"). Feather derives the sizes from where the image sits.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\s*\\S+\\s+[1-9][0-9]*w\\s*(,\\s*\\S+\\s+[1-9][0-9]*w\\s*){0,7}$"
+                },
+                {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "src",
+                      "w"
+                    ],
+                    "properties": {
+                      "src": {
+                        "type": "string"
+                      },
+                      "w": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000
+                      }
+                    }
+                  }
+                }
+              ]
             }
           }
         }
@@ -517,6 +650,9 @@
                     "not": {
                       "pattern": "^\\s*(javascript|data|vbscript):"
                     }
+                  },
+                  "primary": {
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -648,6 +784,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             },
             "scene": {
               "type": "object",
@@ -914,6 +1060,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -922,7 +1078,7 @@
           ]
         },
         {
-          "description": "Selected work, from the library or inline. Variants: grid, hover-list, stack, rail (default grid). Align: start, split. Scroll: reveal, stack, horizontal.",
+          "description": "Selected work, from the library or inline. Variants: grid, hover-list, stack, rail, fullscreen-cases, bento (default grid). Align: start, split. Scroll: reveal, stack, horizontal.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -993,7 +1149,9 @@
                 "grid",
                 "hover-list",
                 "stack",
-                "rail"
+                "rail",
+                "fullscreen-cases",
+                "bento"
               ]
             },
             "loudness": {
@@ -1106,6 +1264,23 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            },
+            "views": {
+              "enum": [
+                "grid",
+                "list",
+                "index"
+              ]
             }
           },
           "required": [
@@ -1273,6 +1448,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             },
             "scene": {
               "type": "object",
@@ -1550,6 +1735,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -1711,6 +1906,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -1872,6 +2077,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -2031,6 +2246,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -2209,6 +2434,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -2218,7 +2453,7 @@
           ]
         },
         {
-          "description": "What can be bought or booked, and for how much. Variants: cards, table (default cards). Align: start, split. Scroll: reveal.",
+          "description": "What can be bought or booked, and for how much. Variants: cards, table, toggle (default cards). Align: start, split. Scroll: reveal.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -2247,6 +2482,14 @@
                     "type": "string",
                     "maxLength": 40
                   },
+                  "prices": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
                   "body": {
                     "type": "string",
                     "maxLength": 240
@@ -2265,10 +2508,19 @@
               "minItems": 1,
               "maxItems": 4
             },
+            "periods": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
             "variant": {
               "enum": [
                 "cards",
-                "table"
+                "table",
+                "toggle"
               ]
             },
             "loudness": {
@@ -2381,6 +2633,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -2541,6 +2803,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -2582,6 +2854,9 @@
                     "not": {
                       "pattern": "^\\s*(javascript|data|vbscript):"
                     }
+                  },
+                  "primary": {
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -2707,6 +2982,16 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             }
           },
           "required": [
@@ -2850,6 +3135,5489 @@
                   "type": "boolean"
                 }
               }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            },
+            "scene": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "shader",
+                    "particles",
+                    "depth",
+                    "model",
+                    "rail"
+                  ]
+                },
+                "preset": {
+                  "enum": [
+                    "gradient-noise",
+                    "aurora",
+                    "grain-field",
+                    "flow",
+                    "dust",
+                    "field",
+                    "morph"
+                  ]
+                },
+                "quality": {
+                  "enum": [
+                    "auto",
+                    "high",
+                    "medium",
+                    "low",
+                    "poster"
+                  ]
+                },
+                "model": {
+                  "$ref": "#/$defs/media"
+                },
+                "depth": {
+                  "$ref": "#/$defs/media"
+                },
+                "hotspots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "position": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 60
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "position",
+                      "label"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "colors": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 12,
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 60
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "colors"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 6
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Images to look through, each opening large in the lightbox. Every image is content: it needs alt text. Variants: rail, masonry, grid, hover-list, wheel (default rail). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "gallery"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "media": {
+                    "$ref": "#/$defs/media"
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "caption": {
+                    "type": "string",
+                    "maxLength": 160
+                  }
+                },
+                "required": [
+                  "media"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 24
+            },
+            "loop": {
+              "type": "boolean"
+            },
+            "variant": {
+              "enum": [
+                "rail",
+                "masonry",
+                "grid",
+                "hover-list",
+                "wheel"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Before and after, compared with a slider (a native range); side by side without script. Variants: slider (default slider). Align: start, center. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "comparison"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "before": {
+              "$ref": "#/$defs/media"
+            },
+            "after": {
+              "$ref": "#/$defs/media"
+            },
+            "beforeLabel": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "afterLabel": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "variant": {
+              "enum": [
+                "slider"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "before",
+            "after"
+          ]
+        },
+        {
+          "description": "A story told in two to six steps, each with its picture, which stays pinned and changes as the steps pass. Variants: pinned, stacked (default pinned). Align: start. Scroll: reveal, pin.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "story"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  "media": {
+                    "$ref": "#/$defs/media"
+                  }
+                },
+                "required": [
+                  "title",
+                  "media"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 6
+            },
+            "variant": {
+              "enum": [
+                "pinned",
+                "stacked"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Several people's words, attributed: a grid, or a rail. Variants: grid, rail (default grid). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "testimonials"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "by": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "role": {
+                    "type": "string",
+                    "maxLength": 80
+                  }
+                },
+                "required": [
+                  "text",
+                  "by"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 12
+            },
+            "variant": {
+              "enum": [
+                "grid",
+                "rail"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Writing, as an editorial list: date, title, excerpt and the link to read it. Variants: list, featured (default list). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "journal"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "maxLength": 10
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "excerpt": {
+                    "type": "string",
+                    "maxLength": 280
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "media": {
+                    "$ref": "#/$defs/media"
+                  }
+                },
+                "required": [
+                  "date",
+                  "title",
+                  "href"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 12
+            },
+            "more": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  }
+                },
+                "required": [
+                  "label",
+                  "href"
+                ]
+              },
+              "maxItems": 1
+            },
+            "variant": {
+              "enum": [
+                "list",
+                "featured"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "A short form that posts to the page's own endpoint (or opens an email), and works with no script. Variants: underline, conversational (default underline). Align: start, center, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "form"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "action": {
+              "type": "string",
+              "not": {
+                "pattern": "^\\s*(javascript|data|vbscript):"
+              }
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "type": {
+                    "enum": [
+                      "text",
+                      "email",
+                      "tel",
+                      "url",
+                      "number",
+                      "textarea",
+                      "select",
+                      "choice"
+                    ]
+                  },
+                  "required": {
+                    "type": "boolean"
+                  },
+                  "hint": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "placeholder": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2,
+                    "maxItems": 8
+                  },
+                  "max": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 4000
+                  },
+                  "autocomplete": {
+                    "type": "string",
+                    "maxLength": 40
+                  }
+                },
+                "required": [
+                  "name",
+                  "label"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "submit": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "note": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "variant": {
+              "enum": [
+                "underline",
+                "conversational"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "action"
+          ]
+        },
+        {
+          "description": "A film with its controls and captions: play and pause, mute, and a captions track when anyone speaks. Variants: player (default player). Align: start, center. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "showreel"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "captions": {
+              "$ref": "#/$defs/media"
+            },
+            "speech": {
+              "type": "boolean"
+            },
+            "variant": {
+              "enum": [
+                "player"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "media"
+          ]
+        },
+        {
+          "description": "Questions with real radio options, one per step, and a result keyed by the answers. With no script, every question shows, and how the result is decided. Variants: steps (default steps). Align: start, center, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "quiz"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "scoring": {
+              "enum": [
+                "tally",
+                "score"
+              ]
+            },
+            "questions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "q": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "help": {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "maxLength": 40
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 80
+                        },
+                        "result": {
+                          "type": "string",
+                          "maxLength": 40
+                        },
+                        "score": {
+                          "type": "integer",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label"
+                      ]
+                    },
+                    "minItems": 2,
+                    "maxItems": 6
+                  }
+                },
+                "required": [
+                  "id",
+                  "q",
+                  "options"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 600
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "min": {
+                    "type": "integer",
+                    "minimum": -800,
+                    "maximum": 800
+                  },
+                  "max": {
+                    "type": "integer",
+                    "minimum": -800,
+                    "maximum": 800
+                  },
+                  "match": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 8,
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 40
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "title"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "variant": {
+              "enum": [
+                "steps"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "A booking flow: service, then date and time, then details, then a review before anything is sent. Slots come from the page; it sends to an action URL, a mailto, or hands over to a booking link. Variants: steps (default steps). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "booking"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "services": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "duration": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "price": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 240
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "maxLength": 10
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "slots": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "maxItems": 16
+                  }
+                },
+                "required": [
+                  "date"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 14
+            },
+            "zone": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "ask": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "phone": {
+                  "type": "boolean"
+                },
+                "note": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "action": {
+              "type": "string",
+              "not": {
+                "pattern": "^\\s*(javascript|data|vbscript):"
+              }
+            },
+            "mailto": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "link": {
+              "type": "string",
+              "not": {
+                "pattern": "^\\s*(javascript|data|vbscript):"
+              }
+            },
+            "confirm": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "variant": {
+              "enum": [
+                "steps"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "A pricing calculator: inputs (range, number, radio, toggle) and a price formula in a small safe language (+ - * /, min, max, round). The total and its breakdown are announced as they change; with no script, the starting prices show. Variants: split, stacked (default split). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "calculator"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 32
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "kind": {
+                    "enum": [
+                      "range",
+                      "number",
+                      "radio",
+                      "toggle"
+                    ]
+                  },
+                  "min": {
+                    "type": "number",
+                    "minimum": -1000000000,
+                    "maximum": 1000000000
+                  },
+                  "max": {
+                    "type": "number",
+                    "minimum": -1000000000,
+                    "maximum": 1000000000
+                  },
+                  "step": {
+                    "type": "number",
+                    "minimum": 0.0001,
+                    "maximum": 1000000000
+                  },
+                  "value": {
+                    "type": "number",
+                    "minimum": -1000000000,
+                    "maximum": 1000000000
+                  },
+                  "unit": {
+                    "type": "string",
+                    "maxLength": 16
+                  },
+                  "help": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "label": {
+                          "type": "string",
+                          "maxLength": 60
+                        },
+                        "value": {
+                          "type": "number",
+                          "minimum": -1000000000,
+                          "maximum": 1000000000
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "value"
+                      ]
+                    },
+                    "minItems": 2,
+                    "maxItems": 6
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "kind"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "lines": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 32
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "formula": {
+                    "type": "string",
+                    "maxLength": 400
+                  }
+                },
+                "required": [
+                  "label",
+                  "formula"
+                ]
+              },
+              "maxItems": 6
+            },
+            "formula": {
+              "type": "string",
+              "maxLength": 400
+            },
+            "total": {
+              "type": "string",
+              "maxLength": 60
+            },
+            "prefix": {
+              "type": "string",
+              "maxLength": 4
+            },
+            "suffix": {
+              "type": "string",
+              "maxLength": 24
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "note": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "variant": {
+              "enum": [
+                "split",
+                "stacked"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title",
+            "formula"
+          ]
+        },
+        {
+          "description": "Data as a bar, line or area chart, drawn in SVG in the theme's inks, with its summary sentence and the data as a table behind a disclosure. The end state draws in on reveal; under reduced motion it is simply there. Variants: bar, line, area (default bar). Align: start, center, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "chart"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "summary": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "series": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  }
+                },
+                "required": [
+                  "label"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 24
+                  },
+                  "values": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 1,
+                    "maxItems": 4
+                  }
+                },
+                "required": [
+                  "label",
+                  "values"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 24
+            },
+            "axis": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "unit": {
+              "type": "string",
+              "maxLength": 12
+            },
+            "prefix": {
+              "type": "string",
+              "maxLength": 4
+            },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "source": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "variant": {
+              "enum": [
+                "bar",
+                "line",
+                "area"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title",
+            "summary"
+          ]
+        },
+        {
+          "description": "Places to find: always a list of names, addresses and links (directions, the place's own site, a phone number), with an optional still map. No map SDK and no tiles. Variants: list, map (default list). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "places"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "address": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "directions": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "phone": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "hours": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 160
+                  }
+                },
+                "required": [
+                  "name",
+                  "address"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 24
+            },
+            "variant": {
+              "enum": [
+                "list",
+                "map"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "Episodes on native audio with real-button controls (play, ±15 s, speed, a scrub slider), chapters that seek, and a transcript (required) that can follow playback. Never autoplays; with no script, the browser's own controls. Variants: list (default list). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "podcast"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "episodes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "audio": {
+                    "$ref": "#/$defs/media"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "maxLength": 12
+                  },
+                  "date": {
+                    "type": "string",
+                    "maxLength": 24
+                  },
+                  "summary": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "chapters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "at": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 86400
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 80
+                        }
+                      },
+                      "required": [
+                        "at",
+                        "title"
+                      ]
+                    },
+                    "maxItems": 24
+                  },
+                  "transcript": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "at": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 86400
+                        },
+                        "by": {
+                          "type": "string",
+                          "maxLength": 60
+                        },
+                        "text": {
+                          "type": "string",
+                          "maxLength": 2000
+                        }
+                      },
+                      "required": [
+                        "text"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 600
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "audio",
+                  "transcript"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 12
+            },
+            "variant": {
+              "enum": [
+                "list"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        }
+      ]
+    },
+    "answer": {
+      "oneOf": [
+        {
+          "description": "The first view: the display title, a short lede, the brand's medium and the starters. Variants: stacked, giant-type, split, film, product, index, interactive (default stacked). Align: start, center, offset. Scroll: reveal, parallax, scale.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "hero"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "eyebrow": {
+              "type": "string",
+              "maxLength": 60
+            },
+            "lede": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "starters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 5
+            },
+            "facts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "value": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "required": [
+                  "label",
+                  "value"
+                ]
+              },
+              "maxItems": 6
+            },
+            "actions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "primary": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "label",
+                  "href"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 2
+            },
+            "variant": {
+              "enum": [
+                "stacked",
+                "giant-type",
+                "split",
+                "film",
+                "product",
+                "index",
+                "interactive"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            },
+            "scene": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "shader",
+                    "particles",
+                    "depth",
+                    "model",
+                    "rail"
+                  ]
+                },
+                "preset": {
+                  "enum": [
+                    "gradient-noise",
+                    "aurora",
+                    "grain-field",
+                    "flow",
+                    "dust",
+                    "field",
+                    "morph"
+                  ]
+                },
+                "quality": {
+                  "enum": [
+                    "auto",
+                    "high",
+                    "medium",
+                    "low",
+                    "poster"
+                  ]
+                },
+                "model": {
+                  "$ref": "#/$defs/media"
+                },
+                "depth": {
+                  "$ref": "#/$defs/media"
+                },
+                "hotspots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "position": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 60
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "position",
+                      "label"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "colors": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 12,
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 60
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "colors"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 6
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "One idea in display type, with an optional line of body. Variants: plain, centred, offset, marquee, fill, swap (default plain). Align: start. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "statement"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "words": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 6
+            },
+            "variant": {
+              "enum": [
+                "plain",
+                "centred",
+                "offset",
+                "marquee",
+                "fill",
+                "swap"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "Selected work, from the library or inline. Variants: grid, hover-list, stack, rail, fullscreen-cases, bento (default grid). Align: start, split. Scroll: reveal, stack, horizontal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "work"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 60
+                      },
+                      "title": {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "summary": {
+                        "type": "string",
+                        "maxLength": 600
+                      },
+                      "media": {
+                        "$ref": "#/$defs/media"
+                      },
+                      "href": {
+                        "type": "string",
+                        "not": {
+                          "pattern": "^\\s*(javascript|data|vbscript):"
+                        }
+                      },
+                      "year": {
+                        "type": "string",
+                        "maxLength": 12
+                      },
+                      "role": {
+                        "type": "string",
+                        "maxLength": 80
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title"
+                    ]
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 12
+            },
+            "variant": {
+              "enum": [
+                "grid",
+                "hover-list",
+                "stack",
+                "rail",
+                "fullscreen-cases",
+                "bento"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            },
+            "views": {
+              "enum": [
+                "grid",
+                "list",
+                "index"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "One piece of work told: a title, the medium, the facts. Variants: editorial, scale (default editorial). Align: start, center. Scroll: reveal, parallax, scale.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "case"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "facts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "value": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "required": [
+                  "label",
+                  "value"
+                ]
+              },
+              "maxItems": 6
+            },
+            "variant": {
+              "enum": [
+                "editorial",
+                "scale"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            },
+            "scene": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "shader",
+                    "particles",
+                    "depth",
+                    "model",
+                    "rail"
+                  ]
+                },
+                "preset": {
+                  "enum": [
+                    "gradient-noise",
+                    "aurora",
+                    "grain-field",
+                    "flow",
+                    "dust",
+                    "field",
+                    "morph"
+                  ]
+                },
+                "quality": {
+                  "enum": [
+                    "auto",
+                    "high",
+                    "medium",
+                    "low",
+                    "poster"
+                  ]
+                },
+                "model": {
+                  "$ref": "#/$defs/media"
+                },
+                "depth": {
+                  "$ref": "#/$defs/media"
+                },
+                "hotspots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "position": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": -100,
+                          "maximum": 100
+                        }
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 60
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "position",
+                      "label"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "colors": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 12,
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 60
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "colors"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 6
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "title"
+          ]
+        },
+        {
+          "description": "Up to four numbers that prove something, counted in. Variants: counter, plain, lead (default counter). Align: start, center, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "numbers"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "value": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "maxLength": 12
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "required": [
+                  "value",
+                  "label"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            },
+            "variant": {
+              "enum": [
+                "counter",
+                "plain",
+                "lead"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Moments in order. Variants: list, horizontal (default list). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "timeline"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "maxLength": 24
+                  },
+                  "what": {
+                    "type": "string",
+                    "maxLength": 160
+                  }
+                },
+                "required": [
+                  "when",
+                  "what"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 12
+            },
+            "variant": {
+              "enum": [
+                "list",
+                "horizontal"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "How the work is done, in two to six steps. Variants: list, pinned, rows (default list). Align: start, split. Scroll: reveal, pin.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "process"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 240
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 6
+            },
+            "variant": {
+              "enum": [
+                "list",
+                "pinned",
+                "rows"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Who it was for. Names are always text; a mark is optional. Variants: grid, marquee (default grid). Align: start, center. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "logos"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "src": {
+                    "$ref": "#/$defs/media"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 24
+            },
+            "variant": {
+              "enum": [
+                "grid",
+                "marquee"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Someone else's words, attributed. Variants: large, rail, pull (default large). Align: start, center, offset. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "quote"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 400
+            },
+            "by": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "role": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "by": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "role": {
+                    "type": "string",
+                    "maxLength": 80
+                  }
+                },
+                "required": [
+                  "text",
+                  "by"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "variant": {
+              "enum": [
+                "large",
+                "rail",
+                "pull"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block",
+            "text",
+            "by"
+          ]
+        },
+        {
+          "description": "What can be bought or booked, and for how much. Variants: cards, table, toggle (default cards). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "offer"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "price": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "prices": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            },
+            "periods": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "variant": {
+              "enum": [
+                "cards",
+                "table",
+                "toggle"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "Questions people actually ask. Variants: list (default list). Align: start, split. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "faq"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "q": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "a": {
+                    "type": "string",
+                    "maxLength": 600
+                  }
+                },
+                "required": [
+                  "q",
+                  "a"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 12
+            },
+            "variant": {
+              "enum": [
+                "list"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "The one next act: how to reach the real person. Variants: plain (default plain). Align: start, center, offset. Scroll: reveal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "contact"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "actions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "href": {
+                    "type": "string",
+                    "not": {
+                      "pattern": "^\\s*(javascript|data|vbscript):"
+                    }
+                  },
+                  "primary": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "label",
+                  "href"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 3
+            },
+            "variant": {
+              "enum": [
+                "plain"
+              ]
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
+            }
+          },
+          "required": [
+            "block"
+          ]
+        },
+        {
+          "description": "The one block only this brand has. Its renderer is the brand's; without one it shows as a statement. Variants: the brand's own (free text). Align: start, center. Scroll: reveal, parallax.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "block": {
+              "const": "signature"
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "body": {
+              "type": "string",
+              "maxLength": 600
+            },
+            "media": {
+              "$ref": "#/$defs/media"
+            },
+            "variant": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "loudness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "tone": {
+              "enum": [
+                "base",
+                "subtle",
+                "raised",
+                "inverse",
+                "block-1",
+                "block-2",
+                "block-3",
+                "block-4"
+              ]
+            },
+            "space": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "align": {
+              "enum": [
+                "start",
+                "center",
+                "offset",
+                "split"
+              ]
+            },
+            "scale": {
+              "enum": [
+                "s",
+                "m",
+                "l",
+                "xl"
+              ]
+            },
+            "crop": {
+              "enum": [
+                "none",
+                "edge",
+                "bleed"
+              ]
+            },
+            "motion": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enter": {
+                  "enum": [
+                    "none",
+                    "fade",
+                    "rise",
+                    "mask",
+                    "skew",
+                    "oval",
+                    "blink",
+                    "scramble"
+                  ]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                },
+                "stagger": {
+                  "enum": [
+                    "none",
+                    "tight",
+                    "default",
+                    "loose"
+                  ]
+                }
+              }
+            },
+            "scroll": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "enum": [
+                    "reveal",
+                    "parallax",
+                    "stack",
+                    "horizontal",
+                    "scale",
+                    "pin"
+                  ]
+                },
+                "length": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 4
+                },
+                "snap": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "treatment": {
+              "enum": [
+                "clean",
+                "clip-reveal",
+                "inner-parallax",
+                "blur-to-sharp",
+                "duotone",
+                "grain"
+              ]
             },
             "scene": {
               "type": "object",

@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "staticDistDir": "./dist",
-      "url": ["http://localhost/sites.html?brand=studio", "http://localhost/sites.html?brand=portrait", "http://localhost/sites.html?brand=seed"],
+      "url": ["http://localhost/sites.html?brand=studio", "http://localhost/sites.html?brand=portrait", "http://localhost/sites.html?brand=seed", "http://localhost/sites.html?page=media&brand=studio", "http://localhost/sites.html?page=media&brand=portrait", "http://localhost/sites.html?page=media&brand=seed", "http://localhost/sites.html?page=flows&brand=studio", "http://localhost/sites.html?page=flows&brand=portrait", "http://localhost/sites.html?page=flows&brand=seed", "http://localhost/sites.html?template=launch&brand=studio", "http://localhost/sites.html?template=studio&brand=studio", "http://localhost/sites.html?template=editorial&brand=studio", "http://localhost/sites.html?template=service&brand=studio", "http://localhost/sites.html?template=product&brand=studio", "http://localhost/sites.html?template=creator&brand=studio", "http://localhost/sites.html?template=launch&brand=portrait", "http://localhost/sites.html?template=launch&brand=seed"],
       "settings": { "preset": "perf", "formFactor": "mobile", "throttlingMethod": "simulate" }
     },
     "assert": {

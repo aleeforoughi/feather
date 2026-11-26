@@ -1,0 +1,241 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand.json",
+  "title": "Aubade One — the lamp that wakes you with daylight",
+  "description": "A bedside lamp that brings the sunrise into the room thirty minutes before your alarm, so you wake the way the morning intended. Shipping in March.",
+  "lang": "en",
+  "loudness": 3,
+  "layout": "poster",
+  "nav": {
+    "brand": "Aubade",
+    "items": [
+      {
+        "label": "Story",
+        "href": "#story"
+      },
+      {
+        "label": "Numbers",
+        "href": "#numbers"
+      },
+      {
+        "label": "Pricing",
+        "href": "#order"
+      },
+      {
+        "label": "Questions",
+        "href": "#faq"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "variant": "interactive",
+      "eyebrow": "Shipping in March",
+      "title": "Wake up to daylight.",
+      "lede": "Aubade One fills the room with daylight for thirty minutes before your alarm, so the morning arrives before the noise does.",
+      "actions": [
+        {
+          "label": "Order now",
+          "href": "#order"
+        },
+        {
+          "label": "See how",
+          "href": "#story"
+        }
+      ],
+      "facts": [
+        {
+          "label": "Light",
+          "value": "2,700 to 6,500 K"
+        },
+        {
+          "label": "Battery",
+          "value": "Ten nights"
+        }
+      ],
+      "media": {
+        "src": "media/launch-lamp.svg",
+        "alt": "Aubade One on a bedside table, glowing a low amber in a dark room"
+      },
+      "motion": {
+        "enter": "mask"
+      },
+      "scene": {
+        "kind": "shader",
+        "preset": "aurora"
+      }
+    },
+    {
+      "block": "statement",
+      "id": "belief",
+      "variant": "fill",
+      "title": "An alarm tells you it is morning. Light lets your body find out for itself.",
+      "scale": "m"
+    },
+    {
+      "block": "story",
+      "id": "story",
+      "variant": "pinned",
+      "title": "The sunrise",
+      "steps": [
+        {
+          "title": "Dawn, at 6:30",
+          "body": "A deep red glow, too faint to read by, starts thirty minutes before your alarm.",
+          "media": {
+            "src": "media/launch-dawn-1.svg",
+            "alt": "The lamp's first glow, a dim red arc on the wall"
+          }
+        },
+        {
+          "title": "Sunrise, at 6:45",
+          "body": "The light warms through amber to gold as the room brightens around you.",
+          "media": {
+            "src": "media/launch-dawn-2.svg",
+            "alt": "The room half lit in warm gold light"
+          }
+        },
+        {
+          "title": "Daylight, at 7:00",
+          "body": "Full, cool daylight. If you are still asleep, a soft chime of birdsong joins it.",
+          "media": {
+            "src": "media/launch-dawn-3.svg",
+            "alt": "The room in full daylight, the lamp a bright white disc"
+          }
+        }
+      ],
+      "scroll": {
+        "snap": true
+      }
+    },
+    {
+      "block": "numbers",
+      "id": "numbers",
+      "variant": "lead",
+      "title": "Results",
+      "items": [
+        {
+          "value": 84,
+          "unit": "%",
+          "label": "of testers woke before their alarm by the second week"
+        },
+        {
+          "value": 30,
+          "unit": "min",
+          "label": "of sunrise before the alarm, or as little as ten"
+        },
+        {
+          "value": 10,
+          "unit": "nights",
+          "label": "on one charge, unplugged"
+        }
+      ]
+    },
+    {
+      "block": "offer",
+      "id": "order",
+      "variant": "toggle",
+      "title": "Pricing",
+      "periods": [
+        "Buy outright",
+        "Pay monthly"
+      ],
+      "items": [
+        {
+          "name": "Aubade One",
+          "prices": [
+            "£149",
+            "£13 a month for 12 months"
+          ],
+          "body": "The lamp, its linen shade and a braided charging cable. Free returns for 100 nights.",
+          "href": "#order"
+        },
+        {
+          "name": "Aubade One, pair",
+          "prices": [
+            "£269",
+            "£23 a month for 12 months"
+          ],
+          "body": "Two lamps that rise together, for both sides of the bed.",
+          "href": "#order"
+        }
+      ]
+    },
+    {
+      "block": "faq",
+      "id": "faq",
+      "title": "Questions",
+      "items": [
+        {
+          "q": "When will my lamp arrive?",
+          "a": "The first lamps ship in March. Order now and yours is in the first batch; we write the week before it leaves."
+        },
+        {
+          "q": "Does it need an app?",
+          "a": "No. Set the alarm on the lamp's dial. The app is there if you want sunsets, naps or a different sunrise on weekends."
+        },
+        {
+          "q": "What if I share the bed with a late sleeper?",
+          "a": "The pair rises on your side first. The light is aimed at the wall, not across the bed."
+        },
+        {
+          "q": "Can I send it back?",
+          "a": "Yes, within 100 nights, for a full refund. We collect it from your door."
+        }
+      ]
+    },
+    {
+      "block": "contact",
+      "id": "contact",
+      "title": "Contact",
+      "body": "Write to the people who made it. We answer within a working day.",
+      "align": "center",
+      "actions": [
+        {
+          "label": "Email us",
+          "href": "mailto:hello@example.com"
+        },
+        {
+          "label": "Order now",
+          "href": "#order"
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "variant": "wordmark",
+    "wordmark": "Aubade",
+    "links": [
+      {
+        "label": "Pricing",
+        "href": "#order"
+      },
+      {
+        "label": "Questions",
+        "href": "#faq"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ],
+    "note": "Prices include VAT and delivery in the UK."
+  },
+  "notFound": {
+    "variant": "type",
+    "title": "This page is still asleep",
+    "body": "The link may be old, or the page has moved. The lamp is still here.",
+    "home": [
+      {
+        "label": "Back to Aubade One",
+        "href": "/"
+      }
+    ]
+  },
+  "transition": "fade"
+}

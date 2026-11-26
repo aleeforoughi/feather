@@ -1,0 +1,200 @@
+{
+  "schema": "feather.page/1",
+  "brand": "brand.json",
+  "title": "Small Hours — conversations with people who make things by hand",
+  "description": "A fortnightly podcast recorded in workshops, kitchens and sheds: an hour with someone who makes things by hand, and how they learned to.",
+  "lang": "en",
+  "loudness": 2,
+  "layout": "brutalist",
+  "nav": {
+    "brand": "Small Hours",
+    "items": [
+      {
+        "label": "Episodes",
+        "href": "#listen"
+      },
+      {
+        "label": "Reel",
+        "href": "#reel"
+      },
+      {
+        "label": "Guests",
+        "href": "#guest"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ]
+  },
+  "scheme": {
+    "toggle": "nav",
+    "colors": {
+      "background": "#15120f",
+      "surface": "#1f1b17",
+      "text": "#f3ece2",
+      "primary": "#f3ece2",
+      "primaryText": "#15120f"
+    }
+  },
+  "sections": [
+    {
+      "block": "hero",
+      "id": "top",
+      "variant": "giant-type",
+      "eyebrow": "A podcast, every other Thursday",
+      "title": "Hours in the workshop.",
+      "lede": "Potters, luthiers, bookbinders, a woman who repairs church clocks. Recorded where they work, with the tools still running.",
+      "actions": [
+        {
+          "label": "Listen now",
+          "href": "#listen"
+        },
+        {
+          "label": "Suggest a guest",
+          "href": "#guest"
+        }
+      ]
+    },
+    {
+      "block": "podcast",
+      "id": "listen",
+      "title": "Episodes",
+      "body": "Every episode has its full transcript, and chapters you can jump between.",
+      "episodes": [
+        {
+          "id": "clocks",
+          "title": "14. The clock in the tower, with Ruth Okonkwo",
+          "audio": "media/small-hours-14.m4a",
+          "duration": "0:06",
+          "date": "20 November 2026",
+          "summary": "Ruth has kept the same church clock running for twenty-two years. We climb the tower with her on a winding day.",
+          "chapters": [
+            {
+              "at": 0,
+              "title": "The climb"
+            },
+            {
+              "at": 3,
+              "title": "Winding by hand"
+            }
+          ],
+          "transcript": [
+            {
+              "at": 0,
+              "by": "Host",
+              "text": "We are about ninety steps up, and Ruth has not stopped talking once."
+            },
+            {
+              "at": 3,
+              "by": "Ruth Okonkwo",
+              "text": "Forty turns for the time, forty for the strike. You count them, or you lose your place."
+            }
+          ]
+        },
+        {
+          "id": "glaze",
+          "title": "13. Glaze that remembers the kiln, with Tomas Lind",
+          "audio": "media/small-hours-13.m4a",
+          "duration": "0:06",
+          "date": "6 November 2026",
+          "summary": "A potter who mixes every glaze from the ash of the wood that fires it.",
+          "transcript": [
+            {
+              "at": 0,
+              "by": "Tomas Lind",
+              "text": "Apple wood gives you a green you cannot buy. Oak gives you a brown that looks like weather."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "block": "showreel",
+      "id": "reel",
+      "title": "Reel",
+      "body": "Ninety seconds from this season's workshops, with captions.",
+      "media": {
+        "src": "media/small-hours-reel.webm",
+        "alt": "Hands at work: a potter's wheel, a lathe, a clock's escapement, a bookbinder's needle",
+        "poster": "media/small-hours-reel.svg"
+      },
+      "captions": "media/small-hours-reel.vtt",
+      "speech": true
+    },
+    {
+      "block": "quote",
+      "id": "quote",
+      "variant": "pull",
+      "text": "I listen while I work. It is the only podcast that sounds like my own workshop.",
+      "by": "A listener",
+      "role": "Furniture maker, by email"
+    },
+    {
+      "block": "form",
+      "id": "guest",
+      "variant": "conversational",
+      "title": "Guests",
+      "body": "Know someone who makes something by hand and has never been asked about it? Four questions.",
+      "action": "/guests",
+      "fields": [
+        {
+          "name": "maker",
+          "label": "Who should we visit?",
+          "required": true,
+          "hint": "Their name, or what they make."
+        },
+        {
+          "name": "craft",
+          "label": "What do they make?",
+          "required": true
+        },
+        {
+          "name": "where",
+          "label": "Where is their workshop?",
+          "hint": "A town is enough."
+        },
+        {
+          "name": "email",
+          "label": "Your email, so we can thank you",
+          "type": "email",
+          "autocomplete": "email"
+        }
+      ],
+      "submit": "Send the suggestion",
+      "note": "We read every one, and we never contact a maker without asking you first."
+    },
+    {
+      "block": "contact",
+      "id": "contact",
+      "title": "Contact",
+      "body": "Corrections, stories, a workshop we should hear. One of us reads everything.",
+      "actions": [
+        {
+          "label": "Email us",
+          "href": "mailto:hello@example.com"
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "variant": "wordmark",
+    "wordmark": "Small Hours",
+    "links": [
+      {
+        "label": "Episodes",
+        "href": "#listen"
+      },
+      {
+        "label": "Guests",
+        "href": "#guest"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
+    ],
+    "note": "Made independently, with no adverts in the episodes."
+  },
+  "transition": "fade"
+}

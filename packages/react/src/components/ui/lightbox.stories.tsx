@@ -28,3 +28,19 @@ function Controlled({ images, start }: { images: LightboxImage[]; start: number 
 export const Default: Story = { render: (args) => <Controlled images={args.images} start={0} /> }
 
 export const SingleImage: Story = { render: () => <Controlled images={SAMPLE_IMAGES.slice(0, 1)} start={0} /> }
+
+/** On a website (feather-page's gallery): no download, and the steps named for what they step through. */
+export const Website: Story = {
+  render: () => {
+    function Gallery() {
+      const [index, setIndex] = React.useState<number | null>(0)
+      return (
+        <>
+          <Button onClick={() => setIndex(0)}>Open the gallery</Button>
+          <Lightbox images={SAMPLE_IMAGES} index={index} onIndexChange={setIndex} download={false} previousLabel="Previous image" nextLabel="Next image" />
+        </>
+      )
+    }
+    return <Gallery />
+  },
+}

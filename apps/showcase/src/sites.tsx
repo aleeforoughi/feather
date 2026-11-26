@@ -2,48 +2,64 @@
 // Seed. Only the tokens change. The model is off: the starters play the prepared scenes.
 //   ?brand=studio|portrait|seed   the brand
 //   ?page=loud                    the loud reference page (loudness 3, the expressive variants); default the reference page
+//   ?page=media                   the media reference page (loudness 2: gallery, comparison, story, testimonials, the
+//                                 wheel, journal, the toggle offer and the form)
+//   ?page=flows                   the product-flows page (wave 5): quiz, calculator, charts, booking, podcast, places, the
+//                                 work's view switch and the colour scheme toggle (each brand with its other colour set)
+//   ?template=<name>              one of the six page templates (wave 5: launch, studio, editorial, service, product,
+//                                 creator), each with its own layout; overrides ?page
 //   ?view=404                     the page's 404 route (PageNotFound)
 //   ?loader=counter|dock          adds the page's loader (wave 1 e2e; the budget pages run without one)
 //   ?sound=1                      adds an ambient bed (the nav's toggle) and the loader's sound choice
 //   ?transition=<variant>         how a brand switch arrives (default the page's own `transition`)
 //   ?hero=poster                  the loud page's hero scene at quality poster (the scene e2e, so a software-rendered
 //                                 shader does not run while it inspects the model further down)
+// The page loads as a page built by `feather-page build --runtime` does: only the block families its document uses
+// (media, flows) load, so the loud page's budgets measure what that page ships.
 // Switching brands is an in-page route change through createTransitions().go(), so every route variant can be seen
 // and tested here; a static site built by `feather-page build` uses cross-document View Transitions instead.
 import { StrictMode } from "react"
 import { createTransitions, type RouteVariant } from "@aleeforoughi/feather-expression"
-import { FeatherPage, mountPage, PageNotFound, validatePage, type PageDocument } from "@aleeforoughi/feather-page"
+import { FeatherPageCore as FeatherPage, loadPageBlocks, mountPage, PageNotFoundCore as PageNotFound, validateLoaded, type PageDocument } from "@aleeforoughi/feather-page/runtime"
 import type { BrandTokens } from "@aleeforoughi/feather-tokens"
 import studio from "@aleeforoughi/feather-tokens/themes/studio.json"
 import portrait from "@aleeforoughi/feather-tokens/themes/portrait.json"
 import seed from "@aleeforoughi/feather-tokens/themes/seed.json"
-import reference from "../../../packages/page/examples/studio-of-one.page.json"
-import loud from "../../../packages/page/examples/studio-of-one-loud.page.json"
+import schemes from "./schemes.json"
 import "./sites.css"
 
 const BRANDS: Record<string, { dark: boolean; tokens: unknown }> = { studio, portrait, seed }
 const params = new URLSearchParams(location.search)
 const loader = params.get("loader")
-const doc = params.get("page") === "loud" ? loud : reference
+// The document this URL asks for: sites.html's head started fetching it beside the page's code (vite.config.ts writes
+// that script and serves each document as pages/<name>.json), so the first render waits on no extra request.
+const doc = (await (window as unknown as { __featherPage: Promise<unknown> }).__featherPage) as { sections: { scene?: object }[] } & Record<string, unknown>
 
 const withSound = params.get("sound") === "1"
-const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && "scene" in b && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
-const result = validatePage({
+const heroPoster = (sections: typeof doc.sections) => sections.map((b, i) => (i === 0 && b.scene ? { ...b, scene: { ...b.scene, quality: "poster" } } : b))
+const input = {
   ...doc,
   ...(params.get("hero") === "poster" ? { sections: heroPoster(doc.sections) } : {}),
   ...(loader === "counter" || loader === "dock" ? { loader: { variant: loader, label: "Loading the studio of one", ...(withSound ? { sound: true } : {}) } } : {}),
   ...(withSound ? { sound: { bed: "media/bed.mp3" } } : {}),
-})
+}
+const { blocks, parts } = await loadPageBlocks(input)
+const result = validateLoaded(input)
 if (!result.ok) throw new Error(result.issues.map((i) => `${i.path} ${i.code}`).join("\n"))
 const page: PageDocument = result.page
 const variant = (params.get("transition") ?? page.transition ?? "fade") as RouteVariant
 const transitions = createTransitions()
+
+/** A page with a colour scheme toggle takes the brand's own other set (each reference brand has one scheme). */
+const SCHEMES = schemes as Record<string, NonNullable<PageDocument["scheme"]>["colors"]>
+const forBrand = (name: string): PageDocument => (page.scheme ? { ...page, scheme: { ...page.scheme, colors: SCHEMES[name] ?? page.scheme.colors } } : page)
 
 function view(name: string) {
   const brand = BRANDS[name] ?? studio
   document.documentElement.classList.toggle("dark", brand.dark)
   document.documentElement.dataset.brand = name
   const tokens = brand.tokens as BrandTokens
+  const branded = forBrand(name)
   return (
     <StrictMode>
       <nav aria-label="Brands" data-slot="brand-switch" className="flex justify-center gap-4 bg-surface-base p-2 type-caption text-fg-secondary">
@@ -53,7 +69,7 @@ function view(name: string) {
           </a>
         ))}
       </nav>
-      {params.get("view") === "404" ? <PageNotFound page={page} tokens={tokens} /> : <FeatherPage page={page} tokens={tokens} />}
+      {params.get("view") === "404" ? <PageNotFound page={branded} tokens={tokens} parts={parts} /> : <FeatherPage page={branded} tokens={tokens} blocks={blocks} parts={parts} />}
     </StrictMode>
   )
 }

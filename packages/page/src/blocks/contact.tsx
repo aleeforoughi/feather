@@ -1,11 +1,12 @@
 import { DisplayTitle, Magnetic, Section } from "@aleeforoughi/feather-expression"
 import { alignClass, sizeOf, useKnobs } from "./knobs"
-import { BUTTON_PRIMARY, BUTTON_QUIET, join, useRegion, type BlockProps } from "./shared"
+import { BUTTON_PRIMARY, BUTTON_QUIET, filledAction, join, useRegion, type BlockProps } from "./shared"
 
-/** The one next act. Actions are real links styled as buttons; the first leans toward the pointer (the page's one other Magnetic control). */
+/** The one next act. Actions are real links styled as buttons: one filled (the first, or the one marked primary), and it leans toward the pointer (the page's one other Magnetic control); the rest are quiet. */
 export function ContactBlock({ block }: BlockProps<"contact">) {
   const { id, titleId, labelled } = useRegion(block, "Contact")
   const actions = block.actions ?? []
+  const filled = filledAction(actions)
   const knobs = useKnobs<"plain">("contact", block, { space: "xl", tone: "subtle" })
   const centre = knobs.align === "center"
   return (
@@ -25,13 +26,13 @@ export function ContactBlock({ block }: BlockProps<"contact">) {
           <ul data-slot="contact-actions" role="list" className={join("flex flex-wrap gap-3", centre && "justify-center")}>
             {actions.map((action, i) => {
               const link = (
-                <a href={action.href} data-slot="contact-action" data-variant={i === 0 ? "primary" : "quiet"} className={i === 0 ? BUTTON_PRIMARY : BUTTON_QUIET}>
+                <a href={action.href} data-slot="contact-action" data-variant={i === filled ? "primary" : "quiet"} className={i === filled ? BUTTON_PRIMARY : BUTTON_QUIET}>
                   {action.label}
                 </a>
               )
               return (
                 <li key={action.href} data-slot="contact-action-item">
-                  {i === 0 ? <Magnetic>{link}</Magnetic> : link}
+                  {i === filled ? <Magnetic>{link}</Magnetic> : link}
                 </li>
               )
             })}

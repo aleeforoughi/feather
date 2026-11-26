@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 // feather-page: websites from a feather.page/0 or /1 document.
 //
+//   feather-page init <template> [--out file] [--theme <theme.json>] [--force]
+//                                                writes a template's page document (launch, studio, editorial, service,
+//                                                product, creator), ready to edit and build; never over a file without
+//                                                --force. --theme points `brand` at a theme file (and derives a scheme's
+//                                                other set from it). `init --list` lists the templates.
 //   feather-page validate <page.json>            every issue, with its JSON pointer; exit 1 when invalid
 //   feather-page routes <page.json>              the static routes: the base page and one per prepared scene
 //   feather-page build <page.json> --out <dir> [--css <href>] [--base </>] [--runtime <href>]
@@ -13,6 +18,7 @@
 // Deterministic: no network, no model.
 import fs from "node:fs"
 import path from "node:path"
+import { buildPage, pageRoutes, pageTokens } from "./build.mjs"
 
 const [command, file, ...rest] = process.argv.slice(2)
 const flag = (name, fallback) => {
@@ -20,9 +26,53 @@ const flag = (name, fallback) => {
   return i === -1 ? fallback : rest[i + 1]
 }
 const usage = () => {
-  console.error("usage: feather-page validate|routes|build <page.json> [--out dir] [--css href] [--base /]")
+  console.error("usage: feather-page validate|routes|build <page.json> [--out dir] [--css href] [--base /]\n       feather-page init <template> [--out file] [--theme theme.json] [--force] | init --list")
   process.exit(2)
 }
+
+if (command === "init") {
+  const { TEMPLATES, TEMPLATE_NAMES, otherSet } = await import("../templates/index.js")
+  const list = () => TEMPLATE_NAMES.map((n) => `  ${n.padEnd(10)} ${TEMPLATES[n].description}`).join("\n")
+  if (file === "--list") {
+    console.log(`The templates (feather-page init <template>):\n${list()}`)
+    process.exit(0)
+  }
+  if (!file || file.startsWith("--")) {
+    console.error(`usage: feather-page init <template> [--out file] [--theme theme.json] [--force]\n\nThe templates:\n${list()}`)
+    process.exit(2)
+  }
+  const template = TEMPLATES[file]
+  if (!template) {
+    console.error(`feather-page init: there is no template "${file}". The templates:\n${list()}`)
+    process.exit(1)
+  }
+  const out = path.resolve(flag("--out", `${file}.page.json`))
+  if (fs.existsSync(out) && !rest.includes("--force")) {
+    console.error(`feather-page init: ${path.relative(process.cwd(), out) || out} exists; pass --force to overwrite it`)
+    process.exit(1)
+  }
+  const page = structuredClone(template.page)
+  const theme = flag("--theme")
+  if (theme) {
+    const at = path.resolve(theme)
+    if (!fs.existsSync(at)) {
+      console.error(`feather-page init: the theme ${theme} does not exist`)
+      process.exit(1)
+    }
+    page.brand = path.relative(path.dirname(out), at).split(path.sep).join("/")
+    // The scheme toggle needs the brand's other set: start from the theme's own colours, ground and ink swapped.
+    const json = JSON.parse(fs.readFileSync(at, "utf8"))
+    if (page.scheme) page.scheme.colors = otherSet((json.tokens ?? json).colors)
+  }
+  fs.mkdirSync(path.dirname(out), { recursive: true })
+  fs.writeFileSync(out, `${JSON.stringify(page, null, 2)}\n`)
+  const shown = path.relative(process.cwd(), out) || out
+  console.log(`wrote ${shown}: the ${file} template (layout ${page.layout ?? "none"}, loudness ${page.loudness ?? "the brand's"})`)
+  if (!theme) console.log(`brand is "${page.brand}", read beside the page: put your feather-tokens file there, or run init again with --theme`)
+  console.log(`replace the media/ paths with your pictures, then: feather-page build ${shown} --out site`)
+  process.exit(0)
+}
+
 if (!command || !file) usage()
 
 const lib = await import("../dist/index.js")
@@ -35,58 +85,25 @@ if (!result.ok) {
 }
 const page = result.page
 const base = flag("--base", "/")
-const scenes = lib.pageScenes(page)
-const root = base.endsWith("/") ? base : `${base}/`
-const routes = [{ path: root, intent: null, title: page.title ?? "" }, ...scenes.map((s) => ({ path: `${root}${s.intent}`, intent: s.intent, title: s.blocks.find((b) => typeof b.title === "string")?.title ?? s.ask }))]
+const routes = pageRoutes(lib, page, base)
 
 if (command === "validate") {
-  console.log(`${file}: valid ${page.schema}, ${page.sections.length} sections, ${scenes.length} prepared scenes`)
+  console.log(`${file}: valid ${page.schema}, ${page.sections.length} sections, ${routes.length - 1} prepared scenes`)
 } else if (command === "routes") {
   console.log(JSON.stringify(routes, null, 2))
 } else if (command === "build") {
   const out = flag("--out")
   if (!out) usage()
-  const css = flag("--css")
-  const runtime = flag("--runtime")
+  const tokens = pageTokens(page, file)
+  // What the brand's colours cannot carry (a layout's grounds below 4.5:1) is reported like a validation issue.
+  const issues = lib.checkLayout(page, tokens)
+  if (issues.length) {
+    console.error(`${file} cannot be built in its brand:`)
+    for (const i of issues) console.error(`- ${i.path} ${i.code}: ${i.message}`)
+    process.exit(1)
+  }
   const React = await import("react")
-  const { renderToStaticMarkup, renderToString } = await import("react-dom/server")
-  let tokens
-  if (typeof page.brand === "string") {
-    const brand = JSON.parse(fs.readFileSync(path.resolve(path.dirname(file), page.brand), "utf8"))
-    tokens = brand.tokens ?? brand
-  }
-  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
-  // Route transitions between the static pages are the browser's own cross-document View Transitions: no script, off
-  // under reduced motion. view and push are styled by foundation.css; columns needs script, so a static site fades.
-  const transition = page.transition
-  const crossDocument = transition !== undefined && transition !== "none"
-  const routeAttr = transition === "view" || transition === "push" ? ` data-route-transition="${transition}"` : ""
-  const vt = crossDocument ? `<style>@media (prefers-reduced-motion: no-preference){@view-transition{navigation:auto}}</style>\n` : ""
-  // With a runtime, the markup is rendered for hydration and wrapped with the data the runtime boots from. JSON in a
-  // script is escaped so no "</script>" or "<!--" inside the document can end it.
-  const json = (v) => JSON.stringify(v).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029")
-  const render = (element, data) =>
-    runtime
-      ? `<div data-feather-page-root>${renderToString(element)}</div>\n<script type="application/json" data-feather-page>${json({ ...data, tokens })}</script>\n<script type="module" src="${esc(runtime)}"></script>`
-      : renderToStaticMarkup(element)
-  const html = (title, body) =>
-    `<!doctype html>\n<html lang="${esc(page.lang ?? "en")}"${routeAttr}>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(title)}</title>\n${page.description ? `<meta name="description" content="${esc(page.description)}">\n<meta property="og:title" content="${esc(title)}">\n<meta property="og:description" content="${esc(page.description)}">\n` : ""}${css ? `<link rel="stylesheet" href="${esc(css)}">\n` : ""}${vt}</head>\n<body>\n${body}\n</body>\n</html>\n`
-  const href = (intent) => `${root}${intent}`
-  fs.mkdirSync(out, { recursive: true })
-  // A static build has no runtime to mount the loader (it would hold at 0%), so the static pages never carry it. With
-  // --runtime the base page keeps it: the runtime runs it.
-  const { loader: _loader, ...staticPage } = page
-  void _loader
-  const basePage = runtime ? page : staticPage
-  fs.writeFileSync(path.join(out, "index.html"), html(page.title ?? "", render(React.createElement(lib.FeatherPage, { page: basePage, tokens }), { page: basePage })))
-  for (const s of scenes) {
-    fs.mkdirSync(path.join(out, s.intent), { recursive: true })
-    const title = `${s.ask}${page.title ? ` — ${page.title}` : ""}`
-    fs.writeFileSync(path.join(out, s.intent, "index.html"), html(title, render(React.createElement(lib.PreparedPage, { page: staticPage, intent: s.intent, tokens, href }), { page: staticPage, intent: s.intent, base: root })))
-  }
-  if (page.notFound) {
-    const title = `${page.notFound.title ?? "Not found"}${page.title ? ` — ${page.title}` : ""}`
-    fs.writeFileSync(path.join(out, "404.html"), html(title, render(React.createElement(lib.PageNotFound, { page: staticPage, tokens }), { page: staticPage, notFound: true })))
-  }
-  console.log(`built ${routes.length + (page.notFound ? 1 : 0)} routes into ${out}`)
+  const server = await import("react-dom/server")
+  const written = buildPage({ lib, React, server, page, tokens, out, css: flag("--css"), base, runtime: flag("--runtime") })
+  console.log(`built ${written} routes into ${out}`)
 } else usage()

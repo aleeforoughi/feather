@@ -104,4 +104,32 @@ describe("Reel", () => {
     await user.click(screen.getByRole("button", { name: "Next" }))
     expect(vi.mocked(region.scrollBy).mock.calls[0]![0]).toMatchObject({ behavior: "auto" })
   })
+
+  it("loops: a hidden, inert copy of the items on each side once mounted, moved back by one set when it settles in one", async () => {
+    vi.useFakeTimers()
+    const { container } = render(
+      <Reel aria-label="Stories" loop>
+        <a href="#1">One</a>
+        <a href="#2">Two</a>
+      </Reel>,
+    )
+    await act(async () => {})
+    const items = [...container.querySelectorAll<HTMLElement>('[data-slot="reel-item"]')]
+    expect(items).toHaveLength(6)
+    const copies = items.filter((i) => i.getAttribute("data-variant") === "copy")
+    expect(copies).toHaveLength(4)
+    for (const c of copies) {
+      expect(c.getAttribute("aria-hidden")).toBe("true")
+      expect(c.hasAttribute("inert")).toBe(true)
+    }
+    expect(screen.getAllByRole("link")).toHaveLength(2)
+    expect(container.querySelector('[data-slot="reel"]')!.getAttribute("data-variant")).toBe("loop")
+    vi.useRealTimers()
+  })
+
+  it("does not loop a single item", async () => {
+    const { container } = render(<Reel aria-label="Stories" loop><p>One</p></Reel>)
+    await act(async () => {})
+    expect(container.querySelectorAll('[data-slot="reel-item"]')).toHaveLength(1)
+  })
 })
