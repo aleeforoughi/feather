@@ -161,10 +161,26 @@ jobs:
           export CHROME_PATH="$(node -p "require('@playwright/test').chromium.executablePath()")"
           test -x "$CHROME_PATH"
           npx --yes @lhci/cli@0.14.0 autorun --config=lighthouserc.json --collect.settings.chromeFlags="--no-sandbox --disable-dev-shm-usage"
+      - name: Lighthouse values (each URL's median LCP and TBT, pass or fail, so the margin is visible)
+        if: always()
+        working-directory: apps/showcase
+        run: |
+          node -e '
+          const fs = require("fs"), dir = ".lighthouseci", runs = {}
+          if (!fs.existsSync(dir)) process.exit(0)
+          for (const f of fs.readdirSync(dir).filter((f) => /^lhr-.*\.json$/.test(f))) {
+            const r = JSON.parse(fs.readFileSync(`${dir}/${f}`, "utf8")), a = r.audits
+            ;(runs[r.finalDisplayedUrl] ??= []).push([a["largest-contentful-paint"].numericValue, a["total-blocking-time"].numericValue])
+          }
+          const med = (v) => v.sort((x, y) => x - y)[Math.floor(v.length / 2)]
+          for (const [url, v] of Object.entries(runs)) console.log(`LCP ${Math.round(med(v.map((x) => x[0])))} ms  TBT ${Math.round(med(v.map((x) => x[1])))} ms  ${url.replace(/^https?:\/\/[^/]+/, "")}`)
+          '
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: sites-report
+          # .lighthouseci is a hidden folder, which upload-artifact leaves out unless asked.
+          include-hidden-files: true
           path: |
             apps/showcase/playwright-report
             apps/showcase/test-results
